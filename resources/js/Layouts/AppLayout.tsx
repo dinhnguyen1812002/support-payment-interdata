@@ -51,8 +51,8 @@ export default function AppLayout({
 
       <Banner />
 
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-        <nav className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 ">
+        <nav className="bg-white border-b border-gray-100 dark:border-gray-700 text-black">
           {/* <!-- Primary Navigation Menu --> */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
@@ -60,22 +60,24 @@ export default function AppLayout({
                 {/* <!-- Logo --> */}
                 <div className="flex-shrink-0 flex items-center">
                   <Link href={route('dashboard')}>
-                    <ApplicationMark className="block h-9 w-auto" />
+                    <ApplicationMark className="block h-9 w-auto " />
                   </Link>
                 </div>
 
                 {/* <!-- Navigation Links --> */}
-                <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex ">
                   <NavLink
                     href={route('dashboard')}
                     active={route().current('dashboard')}
+
                   >
                     Dashboard
                   </NavLink>
                     <NavLink
-                        href={route('dashboard')}
+                        href={route('posts.create')}
+                        active={route().current('posts.create')}
                     >
-                        Dashboard
+                        Create Post
                     </NavLink>
                 </div>
               </div>
