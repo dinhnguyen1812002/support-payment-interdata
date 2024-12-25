@@ -7,7 +7,6 @@ use Spatie\LaravelData\Data;
 
 class PostData extends Data
 {
-
     public function __construct(
         #[Rule('required|string|max:255')]
         public string $title,

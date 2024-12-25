@@ -15,9 +15,29 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('user')->latest()->get();
+        $posts = Post::with('user')->latest()->get()->map(function ($post) {
+            // Extract the first sentence
+            $firstSentence = strtok($post->content, '.');
 
-        return Inertia::render('Posts/Index', ['posts' => $posts]);
+            // Return post data with modified content
+            return [
+                'id' => $post->id,
+                'title' => $post->title,
+                'content' => $firstSentence, // Only the first sentence
+                'slug' => $post->slug,
+                'user' => [
+                    'name' => $post->user->name,
+                    'profile_photo_path' => $post->user->profile_photo_path,
+                ],
+                'created_at' => $post->created_at,
+                'published_at' => $post->published_at,
+            ];
+        });
+
+        return Inertia::render('Posts/Index', [
+            'posts' => $posts,
+        ]);
+
     }
 
     /**
@@ -25,7 +45,6 @@ class PostController extends Controller
      */
     public function create()
     {
-
         return Inertia::render('Posts/Create');
     }
 
@@ -34,7 +53,7 @@ class PostController extends Controller
      */
     public function store(PostData $request)
     {
-        // Transform request data into a PostData object
+
         $postData = PostData::from($request);
 
         $post = Post::create([
@@ -45,33 +64,45 @@ class PostController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Post created successfully!');
+        return redirect()->route('/')->with('success', 'Post created successfully!');
     }
-
-
 
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
-    {
-        //
-    }
+public function show($slug)
+{
+    $post = Post::where('slug', $slug)->with('user')->firstOrFail();
+    return Inertia::render('Posts/PostDetail', [
+        'post' => $post,
+    ]);
+}
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Post $post)
     {
-        //
+       return Inertia::render("Posts/Edit", [
+           'post' => $post
+       ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Post $post)
+    public function update(PostData $request, Post $post)
     {
-        //
+        $postData = PostData::from($request);
+
+        $post->update([
+            'title' => $postData->title,
+            'content' => $postData->content,
+            'slug' => $postData->slug ?? Str::slug($postData->title),
+            'is_published' => $postData->is_published,
+        ]);
+
+        return redirect()->route('/')->with('success', 'Post updated successfully!');
     }
 
     /**
@@ -79,6 +110,7 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route('/')->with('success', 'Post deleted successfully!');
     }
 }

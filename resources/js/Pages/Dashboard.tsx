@@ -1,26 +1,38 @@
 import React from 'react';
-import Welcome from '@/Components/Welcome';
 import AppLayout from '@/Layouts/AppLayout';
-import Index from "@/Pages/Posts/Index";
+import BlogCard from '@/Pages/Posts/PostCard';
 
-export default function Dashboard() {
-  return (
-    <AppLayout
-      title="Dashboard"
-      // renderHeader={() => (
-      //   <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-      //     Dashboard
-      //   </h2>
-      // )}
-    >
-      <div className="py-12">
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-          <div className="bg-white  overflow-hidden shadow-xl sm:rounded-lg">
-            {/*<Welcome />*/}
-              <Index/>
-          </div>
-        </div>
-      </div>
-    </AppLayout>
-  );
+interface BlogPost {
+    id: number;
+    title: string;
+    content: string;
+    slug: string;
+    user: {
+        name: string;
+        profile_photo_path: string;
+    };
+    created_at: string;
+    published_at: string;
+}
+
+interface Props {
+    posts: BlogPost[];
+}
+
+export default function Dashboard({ posts = [] }: Props) {
+    return (
+        <AppLayout
+            title="Dashboard"
+            canRegister={true}
+            canLogin={true}>
+            <div className="py-12">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                        {/* Pass posts to BlogCard */}
+                        <BlogCard posts={posts} />
+                    </div>
+                </div>
+            </div>
+        </AppLayout>
+    );
 }

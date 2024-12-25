@@ -53,7 +53,7 @@ const CreatePost = () => {
 
 
     return (
-        <AppLayout title="Create Post">
+        <AppLayout title="Create Post" canLogin={true} canRegister={true}>
             <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md mt-10">
                 <h1 className="text-2xl font-bold mb-4">Thêm bài viết</h1>
 
