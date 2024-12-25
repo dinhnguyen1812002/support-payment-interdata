@@ -11,6 +11,7 @@ interface Comment {
         profile_photo_path: string;
     };
     created_at: string;
+
 }
 
 interface BlogPost {
@@ -23,6 +24,7 @@ interface BlogPost {
     };
     created_at: string;
     published_at: string;
+    updated_at: string;
     comments: Comment[];
 }
 
@@ -60,24 +62,28 @@ const PostDetail: React.FC<PostDetailProps> = ({ post }) => {
 
                 <div className="flex items-center space-x-4 mb-6">
                     <img
-                        src={"http://localhost:8000/storage/" + post.user.profile_photo_path}
+                        src={
+                            post.user.profile_photo_path
+                                ? `/storage/${post.user.profile_photo_path}`
+                                : `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name)}&color=7F9CF5&background=EBF4FF`
+                        }
                         alt={post.user.name}
                         className="h-12 w-12 rounded-full object-cover ring-2 ring-gray-100"
                     />
                     <div>
                         <h3 className="font-medium text-gray-900">{post.user.name}</h3>
                         <div className="flex items-center text-sm text-gray-500">
-                            <Clock className="w-4 h-4 mr-1" />
-                            <time dateTime={post.published_at}>
-                                {new Date(post.created_at).toLocaleDateString()}
+                            <Clock className="w-4 h-4 mr-1"/>
+                            <time dateTime={post.created_at}>
+                                {post.created_at}
                             </time>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Article Content */}
-            <article className="prose prose-lg max-w-none mb-12">
+                {/* Article Content */}
+                <article className="prose prose-lg max-w-none mb-12">
                 <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </article>
 
@@ -143,8 +149,8 @@ const PostDetail: React.FC<PostDetailProps> = ({ post }) => {
                                 <div className="bg-white rounded-lg px-4 py-3 shadow-sm">
                                     <div className="flex items-center justify-between mb-1">
                                         <h4 className="font-medium text-gray-900">{comment.user.name}</h4>
-                                        <time className="text-sm text-gray-500">
-                                            {new Date(comment.created_at).toLocaleDateString()}
+                                        <time dateTime={post.created_at}  className="text-sm text-gray-500">
+                                            {post.created_at}
                                         </time>
                                     </div>
                                     <p className="text-gray-600">{comment.content}</p>

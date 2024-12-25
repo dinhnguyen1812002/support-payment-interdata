@@ -16,6 +16,8 @@ export default function ApiTokenIndex({
 }: Props) {
   return (
     <AppLayout
+        canRegister={true}
+        canLogin={true}
       title={'API Tokens'}
       renderHeader={() => (
         <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">

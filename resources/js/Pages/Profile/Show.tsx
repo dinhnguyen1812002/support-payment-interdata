@@ -21,7 +21,9 @@ export default function Show({
   const page = useTypedPage();
 
   return (
-    <AppLayout canRegister={true} canLogin={true}
+    <AppLayout
+        canRegister={true}
+        canLogin={true}
       title={'Profile'}
     >
       <div>

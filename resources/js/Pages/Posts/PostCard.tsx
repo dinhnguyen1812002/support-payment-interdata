@@ -1,4 +1,12 @@
 import React from 'react';
+import { Card, CardContent, CardFooter, CardHeader } from "@/Components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
+import { Badge } from "@/Components/ui/badge";
+import { Button } from "@/Components/ui/button";
+import { Separator } from "@/Components/ui/separator";
+import { Link } from "@inertiajs/react";
+import useTypedPage from "@/Hooks/useTypedPage";
+import { PlusCircle } from "lucide-react";
 
 interface BlogPost {
     id: number;
@@ -11,90 +19,103 @@ interface BlogPost {
     };
     created_at: string;
     published_at: string;
-
 }
+
 interface BlogCardProps {
     posts: BlogPost[];
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ posts = [] }) => { // Fallback to an empty array
+const BlogCard: React.FC<BlogCardProps> = ({ posts = [] }) => {
+    const page = useTypedPage();
+
     if (posts.length === 0) {
-        return <p className="text-center text-gray-500">No blog posts available.</p>;
+        return (
+            <div className="text-center p-8">
+                <p className="text-muted-foreground">No questions available.</p>
+            </div>
+        );
     }
 
     return (
-        <div className="container mx-auto space-y-6">
-            {posts.map((post) => (
-                <div key={post.id} className="bg-white py-6 rounded-lg border-b border-gray-200">
-                    <div className="space-y-4 lg:grid lg:grid-cols-3 lg:items-start lg:gap-6 lg:space-y-0">
-                        {/* Content Section */}
-                        <div className="sm:col-span-2">
-                            {/* Tags */}
-                            <div className="flex items-center space-x-3">
-                                <div className="flex items-center space-x-2">
-                                    {/*{post.tags.map((tag, index) => (*/}
-                                    {/*    <span*/}
-                                    {/*        key={index}*/}
-                                    {/*        className="inline-flex items-center px-2.5 py-1.5 text-sm font-medium text-gray-700*/}
-                                    {/*        bg-white rounded-full border border-gray-300"*/}
-                                    {/*    >*/}
-                                    {/*        <svg*/}
-                                    {/*            className="mr-1.5 h-2 w-2"*/}
-                                    {/*            fill="currentColor"*/}
-                                    {/*            viewBox="0 0 8 8"*/}
-                                    {/*        >*/}
-                                    {/*            <circle cx="4" cy="4" r="3"></circle>*/}
-                                    {/*        </svg>*/}
-                                    {/*        {tag}*/}
-                                    {/*    </span>*/}
-                                    {/*))}*/}
-                                </div>
-                            </div>
+        <div className="container mx-auto">
+            {/* Header Section */}
+            <div className="mb-6 flex items-center justify-between mt-10">
+                <div className="space-y-1">
+                    <h2 className="text-2xl font-bold tracking-tight">All Questions</h2>
+                    <p className="text-sm text-muted-foreground">
+                        Browse through all community questions and discussions.
+                    </p>
+                </div>
+                <Link href="/posts/create">
+                    <Button className="flex items-center gap-2">
+                        <PlusCircle className="w-4 h-4" />
+                        Ask Question
+                    </Button>
+                </Link>
+            </div>
 
-                            {/* Blog Details */}
-                            <div className="mt-2">
-                                <a href={`/posts/${post.slug}`} className="group">
-                                    <h4 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600">
-                                        {post.title}
-                                    </h4>
-                                    {/*<h4 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600">*/}
-                                    {/*    {post.slug}*/}
-                                    {/*</h4>*/}
-                                </a>
-                                <p className="mt-1 text-sm text-gray-700 line-clamp-3"
-                                   dangerouslySetInnerHTML={{__html: post.content}}></p>
-
-                                {/* Author and Meta */}
-                                <div className="mt-3 flex items-center">
-                                    <a href="#">
-                                        <img
-                                            className="h-10 w-10 rounded-full"
-                                            src={"http://localhost:8000/storage/" + post.user.profile_photo_path}
+            {/* Cards Container with reduced spacing */}
+            <div className="space-y-3">
+                {posts.map((post) => (
+                    <Card key={post.id} className="w-full">
+                        <CardHeader className="p-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-4">
+                                    <Avatar className="h-8 w-8">
+                                        <AvatarImage
+                                            src={
+                                                post.user.profile_photo_path
+                                                    ? `/storage/${post.user.profile_photo_path}`
+                                                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name)}&color=7F9CF5&background=EBF4FF`
+                                            }
                                             alt={post.user.name}
                                         />
-                                    </a>
-                                    <div className="ml-3">
-                                        <p className="text-sm font-medium text-gray-900">
-                                            <a href="#" className="hover:underline">
-                                                {post.user.name}
-                                            </a>
-                                        </p>
-                                        <div className="flex space-x-1 text-sm text-gray-500">
-                                            <time dateTime={post.published_at}>
-                                                {new Date(post.created_at
-                                                ).toLocaleDateString()}
+                                        <AvatarFallback>
+                                            {post.user.name.charAt(0)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="text-sm font-medium">{post.user.name}</p>
+                                        <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                                            <time dateTime={post.created_at}>
+                                                {(post.created_at)}
                                             </time>
-                                            <span aria-hidden="true">·</span>
-                                            {/*<span>{post.read_time}</span>*/}
+                                            <span>&middot;</span>
+                                            {/*<Badge variant="outline">Question</Badge>*/}
                                         </div>
                                     </div>
                                 </div>
+                                <Link href={`/posts/${post.slug}/edit`}>
+                                    <Button variant="outline" size="sm">
+                                        Edit
+                                    </Button>
+                                </Link>
                             </div>
-                            <div className="separator separator-dashed border-gray-300 my-8"></div>
-                        </div>
-                    </div>
-                </div>
-            ))}
+                        </CardHeader>
+
+                        <CardContent className="p-4 pt-0">
+                            <div className="space-y-2">
+                                <a
+                                    href={`/posts/${post.slug}`}
+                                    className="block group"
+                                >
+                                    <h3 className="text-lg font-semibold tracking-tight group-hover:text-primary transition-colors">
+                                        {post.title}
+                                    </h3>
+                                    <div
+                                        className="text-sm text-muted-foreground line-clamp-2 mt-1"
+                                        dangerouslySetInnerHTML={{__html: post.content}}
+                                    />
+                                </a>
+                            </div>
+                        </CardContent>
+
+                        <CardFooter className="p-4 pt-0">
+                            <Separator className="my-2" />
+                        </CardFooter>
+                    </Card>
+                ))}
+            </div>
         </div>
     );
 };
