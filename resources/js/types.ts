@@ -94,4 +94,22 @@ export interface TeamInvitation {
   created_at: DateTime;
   updated_at: DateTime;
 }
+export interface Paginate{
+    total: number;
+    per_page: number;
+    current_page: number;
+    last_page: number;
+    next_page_url: string | null;
+    prev_page_url: string | null;
+}
 
+
+
+export interface Category {
+    id: number;
+    title: string;
+    slug: string;
+    description?: string;
+    created_at: string;
+    updated_at: string;
+}

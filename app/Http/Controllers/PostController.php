@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\Post\CreatePostData;
 use App\Data\Post\PostData;
+use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -12,10 +14,44 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
+//    public function index()
+//    {
+//        $categories = Category::latest()->get();
+//
+//        $posts = Post::with('user')->latest()->paginate(10)->map(function ($post) {
+//
+//            $firstSentence = strtok($post->content, '.');
+//
+//            return [
+//                'id' => $post->id,
+//                'title' => $post->title,
+//                'content' => $firstSentence,
+//                'slug' => $post->slug,
+//                'user' => [
+//                    'name' => $post->user->name,
+//                    'profile_photo_path' => $post->user->profile_photo_path,
+//                ],
+//                'created_at' => $post->created_at->diffForHumans(),
+//                'published_at' => $post->published_at,
+//            ];
+//        });
+//
+//        return Inertia::render('Posts/Index', [
+//            'posts' => $posts,
+//            'categories' => $categories,
+//
+//        ]);
+//    }
     public function index()
     {
-        $posts = Post::with('user')->latest()->get()->map(function ($post) {
+        $categories = Category::latest()->get();
 
+        $posts = Post::with('user')
+            ->latest()
+            ->paginate(6);
+
+        $formattedPosts = $posts->items();
+        $formattedPosts = collect($formattedPosts)->map(function ($post) {
             $firstSentence = strtok($post->content, '.');
 
             return [
@@ -33,7 +69,16 @@ class PostController extends Controller
         });
 
         return Inertia::render('Posts/Index', [
-            'posts' => $posts,
+            'posts' => $formattedPosts,
+            'categories' => $categories,
+            'pagination' => [
+                'total' => $posts->total(),
+                'per_page' => $posts->perPage(),
+                'current_page' => $posts->currentPage(),
+                'last_page' => $posts->lastPage(),
+                'next_page_url' => $posts->nextPageUrl(),
+                'prev_page_url' => $posts->previousPageUrl(),
+            ],
         ]);
     }
 
@@ -42,26 +87,44 @@ class PostController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Posts/Create');
+        $categories = Category::all(['id', 'title']);
+
+        return Inertia::render('Posts/Create', [
+            'categories' => $categories,
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(PostData $request)
+    public function store(CreatePostData $postData)
     {
+        // Kiểm tra trùng lặp bài viết
+        $existingPost = Post::where('title', $postData->title)
+            ->orWhere('slug', Str::slug($postData->title))
+            ->first();
 
-        $postData = PostData::from($request);
+        if ($existingPost) {
+            return redirect()->back()->withErrors([
+                'title' => 'Tiêu đề hoặc đường dẫn (slug) đã tồn tại. Vui lòng chọn tiêu đề khác.',
+            ])->withInput();
+        }
 
+        // Tạo bài viết mới
         $post = Post::create([
             'title' => $postData->title,
             'content' => $postData->content,
-            'slug' => $postData->slug ?? Str::slug($postData->title),
+            'slug' => Str::slug($postData->title),
             'is_published' => $postData->is_published,
             'user_id' => auth()->id(),
         ]);
 
-        return redirect()->route('/')->with('success', 'Post created successfully!');
+        // Gắn danh mục vào bài viết
+        if (!empty($postData->categories)) {
+            $post->categories()->attach($postData->categories);
+        }
+
+        return redirect()->route('posts.index')->with('success', 'Post created successfully!');
     }
 
     /**
@@ -86,14 +149,14 @@ class PostController extends Controller
                     'name' => $post->user->name,
                     'profile_photo_path' => $post->user->profile_photo_path,
                 ],
-                'created_at' => $post->created_at_human, // Gửi dữ liệu `diffForHumans` lên frontend
+                'created_at' => $post->created_at_human,
             ],
         ]);
     }
-
     /**
      * Show the form for editing the specified resource.
      */
+
     public function edit($slug)
     {
 

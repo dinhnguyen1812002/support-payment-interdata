@@ -2,11 +2,12 @@ import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from "@/Components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Badge } from "@/Components/ui/badge";
-import { Button } from "@/Components/ui/button";
+
 import { Separator } from "@/Components/ui/separator";
 import { Link } from "@inertiajs/react";
 import useTypedPage from "@/Hooks/useTypedPage";
 import { PlusCircle } from "lucide-react";
+import { Button } from '@/components/ui/button';
 
 interface BlogPost {
     id: number;
@@ -95,8 +96,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [] }) => {
 
                         <CardContent className="p-4 pt-0">
                             <div className="space-y-2">
-                                <a
+                                <Link
                                     href={`/posts/${post.slug}`}
+
                                     className="block group"
                                 >
                                     <h3 className="text-lg font-semibold tracking-tight group-hover:text-primary transition-colors">
@@ -106,7 +108,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [] }) => {
                                         className="text-sm text-muted-foreground line-clamp-2 mt-1"
                                         dangerouslySetInnerHTML={{__html: post.content}}
                                     />
-                                </a>
+                                </Link>
                             </div>
                         </CardContent>
 

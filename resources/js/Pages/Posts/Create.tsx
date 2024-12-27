@@ -1,38 +1,51 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Switch } from '@/Components/ui/switch';
+import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
-import { Button } from "@/Components/ui/button";
-import { Switch } from "@/Components/ui/switch";
-import { ImagePlus, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-
 const CreatePost = () => {
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         content: '',
         is_published: true,
-        images: [] as File[],
+        category: [] as string[], // Changed to array for multiple categories
+
     });
 
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-    const quillRef = useRef(null);
+    const [newCategory, setNewCategory] = useState<string>(''); // State to handle input for new category
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const files = Array.from(e.target.files as FileList);
-            setData('images', files);
-            const previews = files.map((file) => URL.createObjectURL(file));
-            setImagePreviews(previews);
-        }
-    };
+    const categories = ['Technology', 'Health', 'Business', 'Sports']; // Define available categories
+
+    // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     if (e.target.files) {
+    //         const files = Array.from(e.target.files as FileList);
+    //         setData('images', files);
+    //         const previews = files.map((file) => URL.createObjectURL(file));
+    //         setImagePreviews(previews);
+    //     }
+    // };
 
     const handleContentChange = (value: string) => {
         setData('content', value);
+    };
+
+    const handleCategoryAdd = () => {
+        if (!(!newCategory || data.category.includes(newCategory))) {
+            setData('category', [...data.category, newCategory]);
+            setNewCategory(''); // Clear input after adding
+        }
+    };
+
+    const handleCategoryRemove = (category: string) => {
+        setData('category', data.category.filter((item) => item !== category));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -62,6 +75,7 @@ const CreatePost = () => {
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
+                            {/* Title */}
                             <div className="space-y-2">
                                 <Label htmlFor="title">Tiêu đề</Label>
                                 <Input
@@ -70,17 +84,22 @@ const CreatePost = () => {
                                     value={data.title}
                                     onChange={(e) => setData('title', e.target.value)}
                                     placeholder="Nhập tiêu đề bài viết"
-                                    className={cn(errors.title && "ring-2 ring-red-500")}
+                                    className={cn(errors.title && 'ring-2 ring-red-500')}
                                 />
                                 {errors.title && (
                                     <p className="text-sm text-red-500">{errors.title}</p>
                                 )}
                             </div>
 
+                            {/* Content */}
                             <div className="space-y-2">
                                 <Label htmlFor="content">Nội dung</Label>
-                                <div className={cn("border rounded-md",
-                                    errors.content && "ring-2 ring-red-500")}>
+                                <div
+                                    className={cn(
+                                        'border rounded-md',
+                                        errors.content && 'ring-2 ring-red-500',
+                                    )}
+                                >
                                     <ReactQuill
                                         theme="snow"
                                         value={data.content}
@@ -88,8 +107,8 @@ const CreatePost = () => {
                                         modules={{
                                             toolbar: [
                                                 ['bold', 'italic', 'underline'],
-                                                [{header: [1, 2, false]}],
-                                                [{list: 'ordered'}, {list: 'bullet'}],
+                                                [{ header: [1, 2, false] }],
+                                                [{ list: 'ordered' }, { list: 'bullet' }],
                                                 ['link', 'image'],
                                             ],
                                         }}
@@ -100,48 +119,54 @@ const CreatePost = () => {
                                     <p className="text-sm text-red-500">{errors.content}</p>
                                 )}
                             </div>
-                            {/*<p className="text-sm text-muted-foreground">*/}
-                            {/*    image upload but not need for now*/}
-                            {/*</p>*/}
-                            {/*<div className="space-y-2">*/}
-                            {/*    <Label htmlFor="images">Hình ảnh</Label>*/}
-                            {/*    <div className="grid w-full items-center gap-1.5">*/}
-                            {/*        <Label*/}
-                            {/*            htmlFor="images"*/}
-                            {/*            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"*/}
-                            {/*        >*/}
-                            {/*            <div className="flex flex-col items-center justify-center pt-5 pb-6">*/}
-                            {/*                <ImagePlus className="w-8 h-8 mb-4 text-gray-500" />*/}
-                            {/*                <p className="mb-2 text-sm text-gray-500">*/}
-                            {/*                    <span className="font-semibold">Click để tải ảnh lên</span> hoặc kéo thả vào đây*/}
-                            {/*                </p>*/}
-                            {/*            </div>*/}
-                            {/*            <Input*/}
-                            {/*                id="images"*/}
-                            {/*                type="file"*/}
-                            {/*                multiple*/}
-                            {/*                className="hidden"*/}
-                            {/*                onChange={handleFileChange}*/}
-                            {/*            />*/}
-                            {/*        </Label>*/}
-                            {/*    </div>*/}
-                            {/*    {errors.images && (*/}
-                            {/*        <p className="text-sm text-red-500">{errors.images}</p>*/}
-                            {/*    )}*/}
-                            {/*    {imagePreviews.length > 0 && (*/}
-                            {/*        <div className="grid grid-cols-4 gap-4 mt-4">*/}
-                            {/*            {imagePreviews.map((src, index) => (*/}
-                            {/*                <img*/}
-                            {/*                    key={index}*/}
-                            {/*                    src={src}*/}
-                            {/*                    alt={`Preview ${index + 1}`}*/}
-                            {/*                    className="h-24 w-full object-cover rounded-lg"*/}
-                            {/*                />*/}
-                            {/*            ))}*/}
-                            {/*        </div>*/}
-                            {/*    )}*/}
-                            {/*</div>*/}
 
+                            {/* Category Selector - Multiple Tags */}
+                            <div className="space-y-2">
+                                <Label htmlFor="category">Danh mục</Label>
+                                <div className="flex flex-wrap gap-2">
+                                    {data.category.map((category) => (
+                                        <div
+                                            key={category}
+                                            className="flex items-center space-x-2 bg-gray-200 px-2 py-1 rounded-full"
+                                        >
+                                            <span>{category}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleCategoryRemove(category)}
+                                                className="text-red-500"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <div className="flex items-center space-x-2">
+                                        <input
+                                            type="text"
+                                            value={newCategory}
+                                            onChange={(e) => setNewCategory(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    handleCategoryAdd();
+                                                }
+                                            }}
+                                            placeholder="Nhập danh mục"
+                                            className="border rounded-md px-2 py-1"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleCategoryAdd}
+                                            className="bg-blue-500 text-white px-4 py-1 rounded-md"
+                                        >
+                                            Thêm
+                                        </button>
+                                    </div>
+                                </div>
+                                {errors.category && (
+                                    <p className="text-sm text-red-500">{errors.category}</p>
+                                )}
+                            </div>
+
+                            {/* Publish Toggle */}
                             <div className="flex items-center justify-between">
                                 <div className="space-y-0.5">
                                     <Label htmlFor="is_published">Công khai bài viết</Label>
@@ -156,6 +181,7 @@ const CreatePost = () => {
                                 />
                             </div>
 
+                            {/* Submit Button */}
                             <Button
                                 type="submit"
                                 className="w-full"

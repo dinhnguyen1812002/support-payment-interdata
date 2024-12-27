@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
+//Route::get('/categorise', [CategoryController::class, 'index'])->name('categorise');
 
-// Authenticated Post Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
@@ -16,13 +17,13 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 });
 
-// Optional Dashboard Redirection
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return redirect('/'); // Redirect to homepage
+        return redirect('/');
     })->name('dashboard');
 });

@@ -1,17 +1,13 @@
 import React from "react";
-import {Link} from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
+import { Category } from "@/types";
 
-interface Category {
-    id: number;
-    title: string;
-    slug: string;
-}
 
 interface SidebarProps {
     categories: Category[];
 }
 
-const Sidebar: React.FC<SidebarProps> = ({categories}) => {
+const Sidebar: React.FC<SidebarProps> = ({ categories }) => {
     return (
         <div className="bg-white shadow p-4 rounded-md">
             <h3 className="text-lg font-semibold mb-2">Categories</h3>
@@ -27,7 +23,6 @@ const Sidebar: React.FC<SidebarProps> = ({categories}) => {
                     </li>
                 ))}
             </ul>
-
         </div>
     );
 };
