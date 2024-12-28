@@ -14,8 +14,8 @@ class CreatePostData extends Data
         public string $content,
         #[Rule('required|bool')]
         public bool $is_published,
-       #[Rule('exists:categories,id')]
-       public array $categories,
+        #[Rule('exists:categories,id')]
+        public array $categories,
 
     ) {}
 }

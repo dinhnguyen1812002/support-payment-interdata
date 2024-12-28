@@ -11,37 +11,6 @@ use Inertia\Inertia;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-//    public function index()
-//    {
-//        $categories = Category::latest()->get();
-//
-//        $posts = Post::with('user')->latest()->paginate(10)->map(function ($post) {
-//
-//            $firstSentence = strtok($post->content, '.');
-//
-//            return [
-//                'id' => $post->id,
-//                'title' => $post->title,
-//                'content' => $firstSentence,
-//                'slug' => $post->slug,
-//                'user' => [
-//                    'name' => $post->user->name,
-//                    'profile_photo_path' => $post->user->profile_photo_path,
-//                ],
-//                'created_at' => $post->created_at->diffForHumans(),
-//                'published_at' => $post->published_at,
-//            ];
-//        });
-//
-//        return Inertia::render('Posts/Index', [
-//            'posts' => $posts,
-//            'categories' => $categories,
-//
-//        ]);
-//    }
     public function index()
     {
         $categories = Category::latest()->get();
@@ -120,11 +89,11 @@ class PostController extends Controller
         ]);
 
         // Gắn danh mục vào bài viết
-        if (!empty($postData->categories)) {
+        if (! empty($postData->categories)) {
             $post->categories()->attach($postData->categories);
         }
 
-        return redirect()->route('posts.index')->with('success', 'Post created successfully!');
+        return redirect()->route('/')->with('success', 'Post created successfully!');
     }
 
     /**
@@ -153,20 +122,22 @@ class PostController extends Controller
             ],
         ]);
     }
+
     /**
      * Show the form for editing the specified resource.
      */
-
     public function edit($slug)
     {
+        $post = Post::where('slug', $slug)->with('user', 'categories')->firstOrFail();
 
-        // Retrieve the post using the slug, including the user relationship
-        $post = Post::where('slug', $slug)->with('user')->firstOrFail();
         if ($post->user_id !== auth()->id()) {
             return redirect()->route('/')->with('error', 'You are not authorized to update this post!');
         }
 
-        // Pass the post to the Inertia view for editing
+        // Lấy tất cả danh mục
+        $allCategories = Category::all(['id', 'title']);
+
+        // Pass dữ liệu đến view
         return Inertia::render('Posts/EditPost', [
             'post' => [
                 'id' => $post->id,
@@ -174,6 +145,7 @@ class PostController extends Controller
                 'content' => $post->content,
                 'slug' => $post->slug,
                 'is_published' => $post->is_published,
+                'categories' => $post->categories->pluck('id'),
                 'user' => [
                     'id' => $post->user->id,
                     'name' => $post->user->name,
@@ -182,25 +154,34 @@ class PostController extends Controller
                 'created_at' => $post->created_at->toDateTimeString(),
                 'updated_at' => $post->updated_at->toDateTimeString(),
             ],
+            'categories' => $allCategories,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PostData $request, Post $post)
+    public function update(CreatePostData $request, Post $post)
     {
         if ($post->user_id !== auth()->id()) {
             return redirect()->route('/')->with('error', 'You are not authorized to update this post!');
         }
+
         $postData = PostData::from($request);
 
+        // Cập nhật thông tin bài viết
         $post->update([
             'title' => $postData->title,
             'content' => $postData->content,
             'slug' => $postData->slug ?? Str::slug($postData->title),
             'is_published' => $postData->is_published,
         ]);
+
+        if (! empty($postData->categories)) {
+            $post->categories()->sync($postData->categories);
+        } else {
+            $post->categories()->detach();
+        }
 
         return redirect()->route('/')->with('success', 'Post updated successfully!');
     }

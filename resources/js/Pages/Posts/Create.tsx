@@ -1,51 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
-import { Input } from '@/Components/ui/input';
-import { Label } from '@/Components/ui/label';
-import { Switch } from '@/Components/ui/switch';
-import { Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-const CreatePost = () => {
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import { Switch } from "@/Components/ui/switch";
+import { ImagePlus, Loader2, X, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from '@/Components/ui/button';
+import { Badge } from "@/Components/ui/badge";
+
+interface Category {
+    id: number;
+    title: string;
+}
+
+const CreatePost = ({ categories }: { categories: Category[] }) => {
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         content: '',
         is_published: true,
-        category: [] as string[], // Changed to array for multiple categories
-
+        categories: [] as number[],
     });
 
-    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-    const [newCategory, setNewCategory] = useState<string>(''); // State to handle input for new category
+    const [showCategories, setShowCategories] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const categories = ['Technology', 'Health', 'Business', 'Sports']; // Define available categories
+    const selectedCategories = categories.filter(category =>
+        data.categories.includes(category.id)
+    );
 
-    // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     if (e.target.files) {
-    //         const files = Array.from(e.target.files as FileList);
-    //         setData('images', files);
-    //         const previews = files.map((file) => URL.createObjectURL(file));
-    //         setImagePreviews(previews);
-    //     }
-    // };
+    const filteredCategories = categories.filter(category =>
+        category.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !data.categories.includes(category.id)
+    );
 
-    const handleContentChange = (value: string) => {
-        setData('content', value);
-    };
-
-    const handleCategoryAdd = () => {
-        if (!(!newCategory || data.category.includes(newCategory))) {
-            setData('category', [...data.category, newCategory]);
-            setNewCategory(''); // Clear input after adding
+    const handleCategoryChange = (id: number) => {
+        if (data.categories.includes(id)) {
+            setData('categories', data.categories.filter((categoryId) => categoryId !== id));
+        } else {
+            setData('categories', [...data.categories, id]);
+            setSearchTerm('');
         }
-    };
-
-    const handleCategoryRemove = (category: string) => {
-        setData('category', data.category.filter((item) => item !== category));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -54,7 +52,6 @@ const CreatePost = () => {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
-                setImagePreviews([]);
                 alert('Bài viết đã được tạo thành công!');
             },
             onError: (errors) => {
@@ -75,7 +72,6 @@ const CreatePost = () => {
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Title */}
                             <div className="space-y-2">
                                 <Label htmlFor="title">Tiêu đề</Label>
                                 <Input
@@ -84,26 +80,20 @@ const CreatePost = () => {
                                     value={data.title}
                                     onChange={(e) => setData('title', e.target.value)}
                                     placeholder="Nhập tiêu đề bài viết"
-                                    className={cn(errors.title && 'ring-2 ring-red-500')}
+                                    className={cn(errors.title && "ring-2 ring-red-500")}
                                 />
                                 {errors.title && (
                                     <p className="text-sm text-red-500">{errors.title}</p>
                                 )}
                             </div>
 
-                            {/* Content */}
                             <div className="space-y-2">
                                 <Label htmlFor="content">Nội dung</Label>
-                                <div
-                                    className={cn(
-                                        'border rounded-md',
-                                        errors.content && 'ring-2 ring-red-500',
-                                    )}
-                                >
+                                <div className={cn("border rounded-md", errors.content && "ring-2 ring-red-500")}>
                                     <ReactQuill
                                         theme="snow"
                                         value={data.content}
-                                        onChange={handleContentChange}
+                                        onChange={(value) => setData('content', value)}
                                         modules={{
                                             toolbar: [
                                                 ['bold', 'italic', 'underline'],
@@ -120,53 +110,62 @@ const CreatePost = () => {
                                 )}
                             </div>
 
-                            {/* Category Selector - Multiple Tags */}
                             <div className="space-y-2">
-                                <Label htmlFor="category">Danh mục</Label>
-                                <div className="flex flex-wrap gap-2">
-                                    {data.category.map((category) => (
-                                        <div
-                                            key={category}
-                                            className="flex items-center space-x-2 bg-gray-200 px-2 py-1 rounded-full"
-                                        >
-                                            <span>{category}</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => handleCategoryRemove(category)}
-                                                className="text-red-500"
+                                <Label>Danh mục</Label>
+                                <div className="relative">
+                                    <div className="flex flex-wrap gap-2 p-2 bg-white border rounded-md min-h-[42px]">
+                                        {selectedCategories.map((category) => (
+                                            <Badge
+                                                key={category.id}
+                                                variant="secondary"
+                                                className="flex items-center gap-1"
                                             >
-                                                &times;
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <div className="flex items-center space-x-2">
-                                        <input
+                                                {category.title}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleCategoryChange(category.id)}
+                                                    className="ml-1 hover:text-destructive"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            </Badge>
+                                        ))}
+                                        <Input
                                             type="text"
-                                            value={newCategory}
-                                            onChange={(e) => setNewCategory(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    handleCategoryAdd();
-                                                }
+                                            value={searchTerm}
+                                            onChange={(e) => {
+                                                setSearchTerm(e.target.value);
+                                                setShowCategories(true);
                                             }}
-                                            placeholder="Nhập danh mục"
-                                            className="border rounded-md px-2 py-1"
+                                            onFocus={() => setShowCategories(true)}
+                                            placeholder="Tìm kiếm danh mục..."
+                                            className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-sm flex-1 min-w-[120px] bg-transparent"
                                         />
-                                        <button
-                                            type="button"
-                                            onClick={handleCategoryAdd}
-                                            className="bg-blue-500 text-white px-4 py-1 rounded-md"
-                                        >
-                                            Thêm
-                                        </button>
                                     </div>
+                                    {showCategories && filteredCategories.length > 0 && (
+                                        <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg">
+                                            <div className="max-h-[200px] overflow-auto py-1">
+                                                {filteredCategories.map((category) => (
+                                                    <div
+                                                        key={category.id}
+                                                        className="px-2 py-1.5 hover:bg-muted cursor-pointer"
+                                                        onClick={() => {
+                                                            handleCategoryChange(category.id);
+                                                            setShowCategories(false);
+                                                        }}
+                                                    >
+                                                        {category.title}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                                {errors.category && (
-                                    <p className="text-sm text-red-500">{errors.category}</p>
+                                {errors.categories && (
+                                    <p className="text-sm text-red-500">{errors.categories}</p>
                                 )}
                             </div>
 
-                            {/* Publish Toggle */}
                             <div className="flex items-center justify-between">
                                 <div className="space-y-0.5">
                                     <Label htmlFor="is_published">Công khai bài viết</Label>
@@ -181,12 +180,7 @@ const CreatePost = () => {
                                 />
                             </div>
 
-                            {/* Submit Button */}
-                            <Button
-                                type="submit"
-                                className="w-full"
-                                disabled={processing}
-                            >
+                            <Button type="submit" className="w-full" disabled={processing}>
                                 {processing ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

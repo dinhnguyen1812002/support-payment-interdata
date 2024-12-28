@@ -1,8 +1,8 @@
 import React from 'react';
-import { Separator } from "@/Components/ui/separator";
-import { Button } from "@/components/ui/button";
 import { Link } from "@inertiajs/react";
 import { Github, Twitter, Facebook } from "lucide-react";
+import {Button} from "./ui/button";
+import {Separator} from "./ui/separator";
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();

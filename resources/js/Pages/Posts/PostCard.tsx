@@ -7,7 +7,7 @@ import { Separator } from "@/Components/ui/separator";
 import { Link } from "@inertiajs/react";
 import useTypedPage from "@/Hooks/useTypedPage";
 import { PlusCircle } from "lucide-react";
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 
 interface BlogPost {
     id: number;
@@ -18,6 +18,7 @@ interface BlogPost {
         name: string;
         profile_photo_path: string;
     };
+
     created_at: string;
     published_at: string;
 }

@@ -22,7 +22,7 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import Footer from "@/Components/Footer";
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 
 interface Props {
     title: string;
