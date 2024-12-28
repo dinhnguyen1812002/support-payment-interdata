@@ -15,7 +15,7 @@ class PostController extends Controller
     {
         $category = Category::all(['id', 'title', 'slug']);
         $posts = Post::with(['user', 'categories'])
-        ->latest()
+            ->latest()
             ->paginate(6);
 
         $formattedPosts = $posts->items();
@@ -55,7 +55,6 @@ class PostController extends Controller
             ],
         ]);
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -117,7 +116,7 @@ class PostController extends Controller
                 'title' => $post->title,
                 'content' => $post->content,
                 'slug' => $post->slug,
-                'categories' => $post->categories->map(fn($category) => [
+                'categories' => $post->categories->map(fn ($category) => [
                     'id' => $category->id,
                     'title' => $category->title,
                 ]),
@@ -129,7 +128,6 @@ class PostController extends Controller
             ],
         ]);
     }
-
 
     /**
      * Show the form for editing the specified resource.
