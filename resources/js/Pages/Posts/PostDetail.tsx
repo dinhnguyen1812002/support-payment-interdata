@@ -1,11 +1,13 @@
 import React, {useState} from 'react';
 import {Clock, MessageCircle, Heart, Share2, Send} from 'lucide-react';
 import AppLayout from "@/Layouts/AppLayout";
+import {Category} from "@/types";
+import {Link} from "@inertiajs/react";
+import {Badge} from "@/Components/ui/badge";
 
 interface Comment {
     id: number;
     content: string;
-
     user: {
         name: string;
         profile_photo_path: string;
@@ -22,6 +24,7 @@ interface BlogPost {
         name: string;
         profile_photo_path: string;
     };
+    categories: Category[];
     created_at: string;
     published_at: string;
     updated_at: string;
@@ -52,7 +55,7 @@ const PostDetail: React.FC<PostDetailProps> = ({post}) => {
         setComments([...comments, mockComment]);
         setNewComment('');
     };
-
+    console.log(post.categories);
     return (
         <AppLayout title={post.title} canLogin={true} canRegister={true}>
             <div className="max-w-4xl mx-auto px-4 py-8">
@@ -68,7 +71,7 @@ const PostDetail: React.FC<PostDetailProps> = ({post}) => {
                                     : `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name)}&color=7F9CF5&background=EBF4FF`
                             }
                             alt={post.user.name}
-                            className="h-12 w-12 rounded-full object-cover ring-2 ring-gray-100"
+                            className="h-8 w-8 rounded-full object-cover ring-2 ring-gray-100"
                         />
                         <div>
                             <h3 className="font-medium text-gray-900">{post.user.name}</h3>
@@ -85,6 +88,9 @@ const PostDetail: React.FC<PostDetailProps> = ({post}) => {
                 {/* Article Content */}
                 <article className="prose prose-lg max-w-none mb-12">
                     <p dangerouslySetInnerHTML={{__html: post.content}}/>
+                    {post.categories && post.categories.map((category) => (
+                        <span key={category.id}>{category.title}</span>
+                    ))}
                 </article>
 
                 {/* Interaction Buttons */}
@@ -101,6 +107,15 @@ const PostDetail: React.FC<PostDetailProps> = ({post}) => {
                         <Share2 className="w-5 h-5"/>
                         <span>Share</span>
                     </button>
+                    {post.categories && post.categories.map((category) => (
+                        <Link key={category.id} href={`/categories/${category.slug}`}>
+                            <Badge variant="outline"
+                                   className= " text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400">
+                                Outline
+                            </Badge>
+
+                        </Link>
+                    ))}
                 </div>
 
                 {/* Comments Section */}
@@ -159,6 +174,7 @@ const PostDetail: React.FC<PostDetailProps> = ({post}) => {
                                     <div className="mt-2 ml-4 flex items-center space-x-4">
                                         <button className="text-sm text-gray-500 hover:text-blue-600">Reply</button>
                                         <button className="text-sm text-gray-500 hover:text-blue-600">Like</button>
+
                                     </div>
                                 </div>
                             </div>

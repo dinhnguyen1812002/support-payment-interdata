@@ -13,10 +13,9 @@ class PostController extends Controller
 {
     public function index()
     {
-        $categories = Category::latest()->get();
-
-        $posts = Post::with('user')
-            ->latest()
+        $category = Category::all(['id', 'title', 'slug']);
+        $posts = Post::with(['user', 'categories'])
+        ->latest()
             ->paginate(6);
 
         $formattedPosts = $posts->items();
@@ -28,6 +27,12 @@ class PostController extends Controller
                 'title' => $post->title,
                 'content' => $firstSentence,
                 'slug' => $post->slug,
+                'categories' => $post->categories->map(function ($category) {
+                    return [
+                        'id' => $category->id,
+                        'title' => $category->title,
+                    ];
+                }),
                 'user' => [
                     'name' => $post->user->name,
                     'profile_photo_path' => $post->user->profile_photo_path,
@@ -39,7 +44,7 @@ class PostController extends Controller
 
         return Inertia::render('Posts/Index', [
             'posts' => $formattedPosts,
-            'categories' => $categories,
+            'categories' => $category,
             'pagination' => [
                 'total' => $posts->total(),
                 'per_page' => $posts->perPage(),
@@ -50,6 +55,7 @@ class PostController extends Controller
             ],
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -102,11 +108,8 @@ class PostController extends Controller
     public function show($slug)
     {
         $post = Post::where('slug', $slug)
-            ->with('user')
+            ->with(['user:id,name,profile_photo_path', 'categories:id,title'])
             ->firstOrFail();
-
-        // Chuyển đổi `created_at` sang `diffForHumans`
-        $post->created_at_human = $post->created_at->diffForHumans();
 
         return Inertia::render('Posts/PostDetail', [
             'post' => [
@@ -114,14 +117,19 @@ class PostController extends Controller
                 'title' => $post->title,
                 'content' => $post->content,
                 'slug' => $post->slug,
+                'categories' => $post->categories->map(fn($category) => [
+                    'id' => $category->id,
+                    'title' => $category->title,
+                ]),
                 'user' => [
                     'name' => $post->user->name,
                     'profile_photo_path' => $post->user->profile_photo_path,
                 ],
-                'created_at' => $post->created_at_human,
+                'created_at' => $post->created_at->diffForHumans(),
             ],
         ]);
     }
+
 
     /**
      * Show the form for editing the specified resource.

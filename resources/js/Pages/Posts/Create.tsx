@@ -87,11 +87,12 @@ const CreatePost = ({ categories }: { categories: Category[] }) => {
                                 )}
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-2 h-40 mb-6">
                                 <Label htmlFor="content">Nội dung</Label>
-                                <div className={cn("border rounded-md", errors.content && "ring-2 ring-red-500")}>
+                                <div className={ cn(" rounded-md ", errors.content && " ring-2 ring-red-500")}>
                                     <ReactQuill
                                         theme="snow"
+                                        className="h-28 "
                                         value={data.content}
                                         onChange={(value) => setData('content', value)}
                                         modules={{
@@ -110,7 +111,7 @@ const CreatePost = ({ categories }: { categories: Category[] }) => {
                                 )}
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-2 mb-8 h-16">
                                 <Label>Danh mục</Label>
                                 <div className="relative">
                                     <div className="flex flex-wrap gap-2 p-2 bg-white border rounded-md min-h-[42px]">

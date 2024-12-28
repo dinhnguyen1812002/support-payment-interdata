@@ -97,18 +97,19 @@ const EditPost = ({ post, categories }: EditPostProps) => {
                                 )}
                             </div>
 
-                            <div className="space-y-2">
+                            <div className="space-y-2 h-40 mb-6">
                                 <Label htmlFor="content">Nội dung</Label>
-                                <div className={cn("border rounded-md", errors.content && "ring-2 ring-red-500")}>
+                                <div className={cn(" rounded-md ", errors.content && " ring-2 ring-red-500")}>
                                     <ReactQuill
                                         theme="snow"
+                                        className="h-28 "
                                         value={data.content}
                                         onChange={(value) => setData('content', value)}
                                         modules={{
                                             toolbar: [
                                                 ['bold', 'italic', 'underline'],
-                                                [{ header: [1, 2, false] }],
-                                                [{ list: 'ordered' }, { list: 'bullet' }],
+                                                [{header: [1, 2, false]}],
+                                                [{list: 'ordered'}, {list: 'bullet'}],
                                                 ['link', 'image'],
                                             ],
                                         }}
@@ -120,31 +121,31 @@ const EditPost = ({ post, categories }: EditPostProps) => {
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="images">Hình ảnh</Label>
-                                <div className="mt-2">
-                                    <Input
-                                        id="images"
-                                        type="file"
-                                        multiple
-                                        onChange={handleFileChange}
-                                        className={cn(errors.images && "ring-2 ring-red-500")}
-                                    />
-                                    {errors.images && (
-                                        <p className="text-sm text-red-500">{errors.images}</p>
-                                    )}
-                                    <div className="mt-4 flex flex-wrap gap-4">
-                                        {imagePreviews.map((src, index) => (
-                                            <img
-                                                key={index}
-                                                src={src}
-                                                alt={`Preview ${index + 1}`}
-                                                className="h-20 w-20 object-cover rounded-md"
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
+                            {/*<div className="space-y-2">*/}
+                            {/*    <Label htmlFor="images">Hình ảnh</Label>*/}
+                            {/*    <div className="mt-2">*/}
+                            {/*        <Input*/}
+                            {/*            id="images"*/}
+                            {/*            type="file"*/}
+                            {/*            multiple*/}
+                            {/*            onChange={handleFileChange}*/}
+                            {/*            className={cn(errors.images && "ring-2 ring-red-500")}*/}
+                            {/*        />*/}
+                            {/*        {errors.images && (*/}
+                            {/*            <p className="text-sm text-red-500">{errors.images}</p>*/}
+                            {/*        )}*/}
+                            {/*        <div className="mt-4 flex flex-wrap gap-4">*/}
+                            {/*            {imagePreviews.map((src, index) => (*/}
+                            {/*                <img*/}
+                            {/*                    key={index}*/}
+                            {/*                    src={src}*/}
+                            {/*                    alt={`Preview ${index + 1}`}*/}
+                            {/*                    className="h-20 w-20 object-cover rounded-md"*/}
+                            {/*                />*/}
+                            {/*            ))}*/}
+                            {/*        </div>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
 
                             <div className="space-y-2">
                                 <Label>Danh mục</Label>
@@ -165,7 +166,7 @@ const EditPost = ({ post, categories }: EditPostProps) => {
                                                     );
                                                 }}
                                             >
-                                                <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                                                <X className="h-3 w-3 text-muted-foreground hover:text-foreground"/>
                                             </button>
                                         </Badge>
                                     ))}
@@ -244,7 +245,7 @@ const EditPost = ({ post, categories }: EditPostProps) => {
                             <Button type="submit" className="w-full" disabled={processing}>
                                 {processing ? (
                                     <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                                         Đang xử lý
                                     </>
                                 ) : (

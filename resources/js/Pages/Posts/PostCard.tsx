@@ -2,23 +2,28 @@ import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from "@/Components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Badge } from "@/Components/ui/badge";
-
 import { Separator } from "@/Components/ui/separator";
 import { Link } from "@inertiajs/react";
 import useTypedPage from "@/Hooks/useTypedPage";
 import { PlusCircle } from "lucide-react";
 import { Button } from '@/Components/ui/button';
 
+interface Category {
+    id: number;
+    title: string;
+    slug: string;
+}
+
 interface BlogPost {
     id: number;
     title: string;
     content: string;
     slug: string;
+    categories: Category[];
     user: {
         name: string;
         profile_photo_path: string;
     };
-
     created_at: string;
     published_at: string;
 }
@@ -56,7 +61,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [] }) => {
                 </Link>
             </div>
 
-            {/* Cards Container with reduced spacing */}
+            {/* Cards Container */}
             <div className="space-y-3">
                 {posts.map((post) => (
                     <Card key={post.id} className="w-full">
@@ -80,10 +85,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [] }) => {
                                         <p className="text-sm font-medium">{post.user.name}</p>
                                         <div className="flex items-center space-x-2 text-xs text-muted-foreground">
                                             <time dateTime={post.created_at}>
-                                                {(post.created_at)}
+                                                {post.created_at}
                                             </time>
                                             <span>&middot;</span>
-                                            {/*<Badge variant="outline">Question</Badge>*/}
                                         </div>
                                     </div>
                                 </div>
@@ -99,7 +103,6 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [] }) => {
                             <div className="space-y-2">
                                 <Link
                                     href={`/posts/${post.slug}`}
-
                                     className="block group"
                                 >
                                     <h3 className="text-lg font-semibold tracking-tight group-hover:text-primary transition-colors">
@@ -110,6 +113,23 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [] }) => {
                                         dangerouslySetInnerHTML={{__html: post.content}}
                                     />
                                 </Link>
+
+                                {/* Categories Section */}
+                                <div className="flex flex-wrap gap-2 mt-3">
+                                    {post.categories && post.categories.map((category) => (
+                                        <Link
+                                            key={category.id}
+                                            href={`/categories/${category.slug}`}
+                                        >
+                                            <Badge
+                                                variant="secondary"
+                                                className="hover:bg-secondary/80 cursor-pointer"
+                                            >
+                                                {category.title}
+                                            </Badge>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
                         </CardContent>
 
