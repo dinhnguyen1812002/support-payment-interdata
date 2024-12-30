@@ -16,6 +16,7 @@ interface BlogPost {
         name: string;
         profile_photo_path: string;
     };
+
     created_at: string;
     published_at: string;
 }
@@ -24,9 +25,10 @@ interface Props {
     posts: BlogPost[];
     categories: Category[];
     pagination: Paginate;
+    postCount: number;
 }
 
-const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination }) => {
+const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination , postCount}) => {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
     const handleCategoryClick = (slug: string) => {
@@ -48,24 +50,22 @@ const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination }
                                 {categories.map((category) => (
                                     <Button
                                         key={category.id}
-                                        onClick={() => handleCategoryClick(category.slug)} // Attach click handler
+                                        onClick={() => handleCategoryClick(category.slug)}
                                         className="w-full justify-between text-left
                                         px-2 font-normal hover:bg-slate-100 flex items-center"
-
                                     >
                                         {category.title}
-                                        <span className="ml-11">1</span>
+                                        <span className="ml-11">{category.posts_count || 0}</span>
                                     </Button>
                                 ))}
                             </div>
                         </div>
-                        {/*<Separator orientation="vertical" className="mt-10 h-5/6 border-l border-dashed border-gray-300" />*/}
-                        {/* Blog Posts */}
+
                         <div className="mt-10 h-5/6 border-l border-dashed border-gray-300"> </div>
                         <div className="flex-1 max-w-3xl">
 
                             <div className="space-y-6">
-                                <BlogCard posts={posts}/>
+                                <BlogCard posts={posts} postCount={postCount}/>
                                 <Pagination
                                     current_page={pagination.current_page}
                                     last_page={pagination.last_page}

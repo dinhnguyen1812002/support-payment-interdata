@@ -11,15 +11,17 @@ interface BlogPost {
         name: string;
         profile_photo_path: string;
     };
+    categories: []
     created_at: string;
     published_at: string;
 }
 
 interface Props {
     posts: BlogPost[];
+    postCount: number;
 }
 
-export default function Dashboard({ posts = [] }: Props) {
+export default function Dashboard({ posts = [], postCount }: Props) {
     return (
         <AppLayout
             title="Dashboard"
@@ -29,7 +31,7 @@ export default function Dashboard({ posts = [] }: Props) {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                         {/* Pass posts to BlogCard */}
-                        <BlogCard posts={posts} />
+                        <BlogCard posts={posts}  postCount={postCount}/>
                     </div>
                 </div>
             </div>

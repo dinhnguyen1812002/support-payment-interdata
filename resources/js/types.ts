@@ -112,4 +112,14 @@ export interface Category {
     description?: string;
     created_at: string;
     updated_at: string;
+    posts_count: number;
+}
+
+export interface Comment {
+    id: number;
+    comment: string;
+    user: User;
+    created_at: string;
+    replies?: Comment[];
+    parent_id?: number | null;
 }

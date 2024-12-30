@@ -13,13 +13,17 @@ class PostController extends Controller
 {
     public function index()
     {
-        $category = Category::all(['id', 'title', 'slug']);
+        $category = Category::select(['id', 'title', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
         $posts = Post::with(['user', 'categories'])
             ->latest()
             ->paginate(6);
 
         $formattedPosts = $posts->items();
         $formattedPosts = collect($formattedPosts)->map(function ($post) {
+
             $firstSentence = strtok($post->content, '.');
 
             return [
@@ -45,6 +49,7 @@ class PostController extends Controller
         return Inertia::render('Posts/Index', [
             'posts' => $formattedPosts,
             'categories' => $category,
+            'postCount' => Post::count(),
             'pagination' => [
                 'total' => $posts->total(),
                 'per_page' => $posts->perPage(),
@@ -104,27 +109,66 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
+//    public function show($slug)
+//    {
+//        $post = Post::where('slug', $slug)
+//            ->with(['user:id,name,profile_photo_path', 'categories:id,title'])
+//            ->firstOrFail();
+//
+//        return Inertia::render('Posts/PostDetail', [
+//            'post' => [
+//                'id' => $post->id,
+//                'title' => $post->title,
+//                'content' => $post->content,
+//                'slug' => $post->slug,
+//                'categories' => $post->categories->map(fn ($category) => [
+//                    'id' => $category->id,
+//                    'title' => $category->title,
+//                ]),
+//                'user' => [
+//                    'name' => $post->user->name,
+//                    'profile_photo_path' => $post->user->profile_photo_path,
+//                ],
+//                'created_at' => $post->created_at->diffForHumans(),
+//            ],
+//        ]);
+//    }
     public function show($slug)
     {
-        $post = Post::where('slug', $slug)
-            ->with(['user:id,name,profile_photo_path', 'categories:id,title'])
-            ->firstOrFail();
 
+        $post = Post::with(['user:id,name,profile_photo_path', 'categories:id,title,slug'])
+            ->where('slug', $slug)
+            ->firstOrFail();
+        $comments = $post->comments()
+            ->whereNull('parent_id')
+            ->with(['user:id,name,profile_photo_path', 'replies.user:id,name,profile_photo_path'])
+            ->latest()
+            ->get()
+            ->map(fn($comment) => [
+                'id' => $comment->id,
+                'comment' => $comment->comment,
+                'created_at' => $comment->created_at->diffForHumans(),
+                'user' => $comment->user,
+                'replies' => $comment->replies->map(fn($reply) => [
+                    'id' => $reply->id,
+                    'comment' => $reply->comment,
+                    'created_at' => $reply->created_at->diffForHumans(),
+                    'user' => $reply->user,
+                ]),
+            ]);
+
+        // Return the post details and comments
         return Inertia::render('Posts/PostDetail', [
             'post' => [
                 'id' => $post->id,
                 'title' => $post->title,
                 'content' => $post->content,
-                'slug' => $post->slug,
-                'categories' => $post->categories->map(fn ($category) => [
-                    'id' => $category->id,
-                    'title' => $category->title,
-                ]),
-                'user' => [
-                    'name' => $post->user->name,
-                    'profile_photo_path' => $post->user->profile_photo_path,
-                ],
-                'created_at' => $post->created_at->diffForHumans(),
+                'created_at' => $post->created_at,
+                'updated_at' => $post->updated_at,
+                'published_at' => $post->published_at,
+                'user' => $post->user,
+                'categories' => $post->categories,
+                'comments' => $comments,
             ],
         ]);
     }

@@ -19,7 +19,7 @@ interface EditPostProps {
         content: string;
         slug: string;
         is_published: boolean;
-        images?: string[];
+
         categories?: number[];
     };
     categories: Array<{ id: number; title: string }>;
@@ -30,23 +30,12 @@ const EditPost = ({ post, categories }: EditPostProps) => {
         title: post.title || '',
         content: post.content || '',
         is_published: post.is_published || false,
-        images: [] as File[],
         categories: post.categories || [],
     });
 
     const [showCategories, setShowCategories] = useState(false);
-    const [imagePreviews, setImagePreviews] = useState<string[]>(post.images || []);
+
     const [searchTerm, setSearchTerm] = useState('');
-
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const files = Array.from(e.target.files as FileList);
-            setData('images', files);
-
-            const previews = files.map((file) => URL.createObjectURL(file));
-            setImagePreviews([...imagePreviews, ...previews]);
-        }
-    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

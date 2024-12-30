@@ -30,15 +30,15 @@ interface BlogPost {
 
 interface BlogCardProps {
     posts: BlogPost[];
+    postCount: number;
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ posts = [] }) => {
+const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
     const page = useTypedPage();
-
     if (posts.length === 0) {
         return (
             <div className="text-center p-8">
-                <p className="text-muted-foreground">No questions available.</p>
+                <p className="text-muted-foreground">No questions available. ({postCount})</p>
             </div>
         );
     }
@@ -48,8 +48,11 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [] }) => {
             {/* Header Section */}
             <div className="mb-6 flex items-center justify-between mt-10">
                 <div className="space-y-1">
-                    <h2 className="text-2xl font-bold tracking-tight">All Questions</h2>
-                    <p className="text-sm text-muted-foreground">
+                    <h2 className="text-2xl font-bold tracking-tight">
+                        All Questions
+                         <span className="text-gray-500 pl-2">({postCount})</span>
+                    </h2>
+                    <p className="text-base text-muted-foreground">
                         Browse through all community questions and discussions.
                     </p>
                 </div>

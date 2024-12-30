@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,9 +14,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/posts/{slug}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::post('/comments', [CommentsController::class, 'store'])->name('comments.store');
+
+
+    // Nếu bạn muốn thêm routes cho reply comments
+    Route::post('/comments/{comment}/reply', [CommentsController::class, 'reply'])->name('comments.reply');
 });
 Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
-
+Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'index'])->name('categories');
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

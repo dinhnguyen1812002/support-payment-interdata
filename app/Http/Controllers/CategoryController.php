@@ -15,9 +15,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::latest()->get();
+        $categories = Category::withCount('posts')->latest()->get();
 
-        return Inertia::render('Categories/Index', [
+        return Inertia::render('Categories/CategoriesSidebar', [
             'categories' => $categories,
         ]);
     }
@@ -27,7 +27,6 @@ class CategoryController extends Controller
      */
     public function create()
     {
-
         return Inertia::render('Categories/Create');
     }
 

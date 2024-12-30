@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Comments;
 
 class Post extends Model
 {
@@ -22,6 +23,15 @@ class Post extends Model
 
     public function categories()
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsToMany(Category::class, 'category_post');
+    }
+
+    public function countPost()
+    {
+        return Post::count();
+    }
+    public function comments()
+    {
+        return $this->hasMany(Comments::class);
     }
 }

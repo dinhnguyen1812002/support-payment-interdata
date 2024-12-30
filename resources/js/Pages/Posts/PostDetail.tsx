@@ -1,19 +1,23 @@
-import React, {useState} from 'react';
-import {Clock, MessageCircle, Heart, Share2, Send} from 'lucide-react';
+import React from 'react';
+import { router } from '@inertiajs/react';
+import { Clock, MessageCircle, Heart, Share2 } from 'lucide-react';
 import AppLayout from "@/Layouts/AppLayout";
+import { Link } from "@inertiajs/react";
+import { Badge } from "@/Components/ui/badge";
+import CommentsSection from "@/Pages/Comments/CommentsSection";
+import {route} from "ziggy-js";
 import {Category} from "@/types";
-import {Link} from "@inertiajs/react";
-import {Badge} from "@/Components/ui/badge";
-
-interface Comment {
+import {Comment} from "@/types";
+interface Comments {
     id: number;
-    content: string;
+    comment: string;
     user: {
         name: string;
         profile_photo_path: string;
     };
     created_at: string;
-
+    replies?: Comment[];
+    parent_id?: number | null;
 }
 
 interface BlogPost {
@@ -33,29 +37,37 @@ interface BlogPost {
 
 interface PostDetailProps {
     post: BlogPost;
+
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            profile_photo_path: string;
+        };
+    };
 }
 
-const PostDetail: React.FC<PostDetailProps> = ({post}) => {
-    const [newComment, setNewComment] = useState('');
-    const [comments, setComments] = useState<Comment[]>(post.comments || []);
+const PostDetail: React.FC<PostDetailProps> = ({ post, auth }) => {
 
-    const handleCommentSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newComment.trim()) return;
-        const mockComment: Comment = {
-            id: Date.now(),
-            content: newComment,
-            user: {
-                name: 'Current User',
-                profile_photo_path: '/api/placeholder/40/40',
-            },
-            created_at: new Date().toISOString(),
-        };
+    const handleCommentSubmit = (comment: string, parentId?: number) => {
+        router.post(route('comments.store'), {
+            comment: comment,
+            post_id: post.id,
+            parent_id: parentId || null,
+        }, {
+            preserveScroll: true,
+            preserveState: true,
 
-        setComments([...comments, mockComment]);
-        setNewComment('');
+            onError: (errors) => {
+                console.error('Comment submission errors:', errors);
+            }
+        });
     };
-    console.log(post.categories);
+
+    const userAvatar = auth.user.profile_photo_path
+        ? `/storage/${auth.user.profile_photo_path}`
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(auth.user.name)}&color=7F9CF5&background=EBF4FF`;
+
     return (
         <AppLayout title={post.title} canLogin={true} canRegister={true}>
             <div className="max-w-4xl mx-auto px-4 py-8">
@@ -63,6 +75,10 @@ const PostDetail: React.FC<PostDetailProps> = ({post}) => {
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
 
+                    {/* Article Content */}
+                    <article className="prose prose-lg max-w-none mb-12">
+                        <div dangerouslySetInnerHTML={{__html: post.content}}/>
+                    </article>
                     <div className="flex items-center space-x-4 mb-6">
                         <img
                             src={
@@ -78,20 +94,13 @@ const PostDetail: React.FC<PostDetailProps> = ({post}) => {
                             <div className="flex items-center text-sm text-gray-500">
                                 <Clock className="w-4 h-4 mr-1"/>
                                 <time dateTime={post.created_at}>
-                                    {post.created_at}
+                                    {new Date(post.created_at).toLocaleDateString()}
                                 </time>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Article Content */}
-                <article className="prose prose-lg max-w-none mb-12">
-                    <p dangerouslySetInnerHTML={{__html: post.content}}/>
-                    {post.categories && post.categories.map((category) => (
-                        <span key={category.id}>{category.title}</span>
-                    ))}
-                </article>
 
                 {/* Interaction Buttons */}
                 <div className="flex items-center space-x-6 border-y border-gray-200 py-4 mb-8">
@@ -107,83 +116,24 @@ const PostDetail: React.FC<PostDetailProps> = ({post}) => {
                         <Share2 className="w-5 h-5"/>
                         <span>Share</span>
                     </button>
-                    {post.categories && post.categories.map((category) => (
-                        <Link key={category.id} href={`/categories/${category.slug}`}>
+                    {post.categories?.map((category) => (
+                        <Link key={category.id} href={route('categories')}>
                             <Badge variant="outline"
-                                   className= " text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-blue-400">
-                                Outline
+                                   className="text-blue-800 text-sm font-medium me-2 px-3 py-1 rounded dark:bg-gray-700 dark:text-blue-400 border border-dashed border-blue-400 hover:border-solid hover:border-blue-600">
+                                {category.title}
                             </Badge>
-
                         </Link>
                     ))}
                 </div>
 
                 {/* Comments Section */}
-                <section className="bg-gray-50 rounded-xl p-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Comments</h2>
-
-                    {/* Comment Form */}
-                    <form onSubmit={handleCommentSubmit} className="mb-8">
-                        <div className="flex items-start space-x-4">
-                            <img
-                                src="/api/placeholder/40/40"
-                                alt="Current user"
-                                className="h-10 w-10 rounded-full object-cover"
-                            />
-                            <div className="flex-grow">
-                              <textarea
-                                  value={newComment}
-                                  onChange={(e) => setNewComment(e.target.value)}
-                                  placeholder="Write a comment..."
-                                  className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                  rows={3}
-                              />
-                                <div className="mt-2 flex justify-end">
-                                    <button
-                                        type="submit"
-                                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                    >
-                                        <Send className="w-4 h-4 mr-2"/>
-                                        Post Comment
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-
-                    {/* Comments List */}
-                    <div className="space-y-6">
-                        {comments.map((comment) => (
-                            <div key={comment.id} className="flex space-x-4">
-                                <img
-                                    src={comment.user.profile_photo_path}
-                                    alt={comment.user.name}
-                                    className="h-10 w-10 rounded-full object-cover"
-                                />
-                                <div className="flex-grow">
-                                    <div className="bg-white rounded-lg px-4 py-3 shadow-sm">
-                                        <div className="flex items-center justify-between mb-1">
-                                            <h4 className="font-medium text-gray-900">{comment.user.name}</h4>
-                                            <time dateTime={post.created_at} className="text-sm text-gray-500">
-                                                {post.created_at}
-                                            </time>
-                                        </div>
-
-                                        <p className="text-gray-600">{comment.content}</p>
-                                    </div>
-                                    <div className="mt-2 ml-4 flex items-center space-x-4">
-                                        <button className="text-sm text-gray-500 hover:text-blue-600">Reply</button>
-                                        <button className="text-sm text-gray-500 hover:text-blue-600">Like</button>
-
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+                <CommentsSection
+                    initialComments={post.comments as  []}
+                    onCommentSubmit={handleCommentSubmit}
+                    currentUserAvatar={userAvatar}
+                />
             </div>
         </AppLayout>
-
     );
 };
 
