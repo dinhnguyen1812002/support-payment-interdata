@@ -10,6 +10,7 @@ class Comments extends Model
 {
     use HasFactory;
     use HasUlids;
+
     protected $fillable = ['post_id', 'user_id', 'parent_id', 'comment'];
 
     public function post()
@@ -25,5 +26,20 @@ class Comments extends Model
     public function replies()
     {
         return $this->hasMany(Comments::class, 'parent_id'); // Sub-comments (replies)
+    }
+
+    public function allReplies()
+    {
+        return $this->hasMany(Comments::class, 'parent_id')->with('allReplies');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // When deleting a comment, also delete all replies
+        static::deleting(function ($comment) {
+            $comment->replies()->delete();
+        });
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\Comment\CommentData;
 use App\Models\Comments;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class CommentsController extends Controller
@@ -44,7 +44,7 @@ class CommentsController extends Controller
 
         return back()->with([
             'success' => 'Comment added successfully!',
-            'comment' => $commentData
+            'comment' => $commentData,
         ]);
     }
 
@@ -56,5 +56,18 @@ class CommentsController extends Controller
             'post' => $post,
             'comments' => $comments,
         ]);
+    }
+
+    public function destroy(Comments $comment)
+    {
+
+        // Check if user is authorized to delete this comment
+        if (! Gate::allows('delete-comment', $comment)) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $comment->delete();
+
+        return redirect()->back()->with('success', 'Comment deleted successfully!');
     }
 }

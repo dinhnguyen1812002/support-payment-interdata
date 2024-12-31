@@ -3,8 +3,9 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/Components/ui/avatar';
 import { Button } from '@/Components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Textarea } from '@/Components/ui/textarea';
-import { MessageCircle, Send } from 'lucide-react';
+import {MessageCircle, Send, Trash2} from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {Link, router} from '@inertiajs/react';
 
 interface User {
     id: number;
@@ -85,24 +86,23 @@ const CommentItem = ({
                          depth = 0,
                      }: CommentItemProps) => {
     const [isReplying, setIsReplying] = React.useState(false);
-    const maxDepth = 3;
 
     const handleReply = (content: string) => {
         onReply(content, comment.id);
         setIsReplying(false);
     };
-
-    const getInitials = (name: string) => {
-        return name
-            .split(' ')
-            .map(word => word[0])
-            .join('')
-            .toUpperCase();
-    };
-
+    const deleteComment = (id: number) => {
+        router.delete(`/comments/${id}`, {
+            onSuccess: () => {
+                alert("xóa thành công");
+            },
+            onError: (errors:any) => {
+                alert('Error deleting comment');
+            }
+        });
+    }
     return (
-        <div className="flex gap-4">
-
+        <div className={cn("flex gap-4", depth > 0 && `ml-${depth * 4}`)}>
             <Avatar>
                 <AvatarImage
                     src={
@@ -112,9 +112,7 @@ const CommentItem = ({
                     }
                     alt={comment.user.name}
                 />
-                <AvatarFallback>
-                    {comment.user.name.charAt(0)}
-                </AvatarFallback>
+                <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1 space-y-4">
                 <Card>
@@ -122,26 +120,48 @@ const CommentItem = ({
                         <div className="flex items-center justify-between mb-2">
                             <span className="font-semibold">{comment.user.name}</span>
                             <time className="text-sm text-muted-foreground">
-
-                                 {comment.created_at}
+                                {comment.created_at}
                             </time>
                         </div>
                         <p className="text-sm">{comment.comment}</p>
                     </CardContent>
                 </Card>
 
-                {depth < maxDepth && (
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setIsReplying(!isReplying)}
-                        >
-                            <MessageCircle className="w-4 h-4 mr-2" />
-                            Reply
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsReplying(!isReplying)}
+                    >
+                        <MessageCircle className="w-4 h-4 mr-2" />
+                        Reply
+                    </Button>
+                    {/*<Button*/}
+                    {/*    variant="ghost"*/}
+                    {/*    size="sm"*/}
+                    {/*    onClick={() => {*/}
+                    {/*        if (confirm('Are you sure you want to delete this comment?')) {*/}
+                    {/*            router.delete(`/comments/${comment.id}`, {*/}
+                    {/*                onSuccess: () => {*/}
+                    {/*                  alert("xóa thành công")*/}
+                    {/*                },*/}
+                    {/*                onError: (errors:any) => {*/}
+                    {/*                    alert('Error deleting comment');*/}
+                    {/*                }*/}
+                    {/*            });*/}
+                    {/*        }*/}
+                    {/*    }}*/}
+                    {/*    className="text-red-500 hover:text-red-600"*/}
+                    {/*>*/}
+                    {/*    <Trash2 className="w-4 h-4 mr-2" />*/}
+                    {/*</Button>*/}
+                        <Button variant="outline" size="sm"
+                                onClick={() => deleteComment(comment.id)}
+                                className="text-red-500 hover:text-red-600">
+                            <Trash2 className="w-4 h-4 mr-2" />
                         </Button>
-                    </div>
-                )}
+
+                </div>
 
                 {isReplying && (
                     <div className="ml-4">
@@ -155,14 +175,14 @@ const CommentItem = ({
                 )}
 
                 {comment.replies && comment.replies.length > 0 && (
-                    <div className={cn("space-y-4", depth > 0 && "ml-4")}>
+                    <div className="space-y-4">
                         {comment.replies.map((reply) => (
                             <CommentItem
                                 key={reply.id}
                                 comment={reply}
                                 onReply={onReply}
                                 currentUserAvatar={currentUserAvatar}
-                                depth={depth + 1}
+                                depth={depth + 1} // Tăng độ sâu
                             />
                         ))}
                     </div>
@@ -171,6 +191,7 @@ const CommentItem = ({
         </div>
     );
 };
+
 
 interface CommentsSectionProps {
     initialComments: Comment[];

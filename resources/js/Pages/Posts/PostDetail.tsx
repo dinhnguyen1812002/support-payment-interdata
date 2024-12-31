@@ -1,5 +1,5 @@
 import React from 'react';
-import { router } from '@inertiajs/react';
+import {router, usePage} from '@inertiajs/react';
 import { Clock, MessageCircle, Heart, Share2 } from 'lucide-react';
 import AppLayout from "@/Layouts/AppLayout";
 import { Link } from "@inertiajs/react";
@@ -8,17 +8,9 @@ import CommentsSection from "@/Pages/Comments/CommentsSection";
 import {route} from "ziggy-js";
 import {Category} from "@/types";
 import {Comment} from "@/types";
-interface Comments {
-    id: number;
-    comment: string;
-    user: {
-        name: string;
-        profile_photo_path: string;
-    };
-    created_at: string;
-    replies?: Comment[];
-    parent_id?: number | null;
-}
+
+import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
+
 
 interface BlogPost {
     id: number;
@@ -37,7 +29,6 @@ interface BlogPost {
 
 interface PostDetailProps {
     post: BlogPost;
-
     auth: {
         user: {
             id: number;
@@ -64,13 +55,18 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, auth }) => {
         });
     };
 
-    const userAvatar = auth.user.profile_photo_path
-        ? `/storage/${auth.user.profile_photo_path}`
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(auth.user.name)}&color=7F9CF5&background=EBF4FF`;
+    const userAvatar =  post.user.profile_photo_path
+        ? `/storage/${post.user.profile_photo_path}`
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name)}&color=7F9CF5&background=EBF4FF`;
 
     return (
         <AppLayout title={post.title} canLogin={true} canRegister={true}>
+
             <div className="max-w-4xl mx-auto px-4 py-8">
+                <CategoriesSidebar
+                    categories={post.categories}
+                    selectedCategory={post.categories[0]?.slug}
+                />
                 {/* Article Header */}
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
@@ -128,7 +124,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, auth }) => {
 
                 {/* Comments Section */}
                 <CommentsSection
-                    initialComments={post.comments as  []}
+                    initialComments={post.comments as []}
                     onCommentSubmit={handleCommentSubmit}
                     currentUserAvatar={userAvatar}
                 />

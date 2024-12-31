@@ -16,10 +16,13 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::post('/comments', [CommentsController::class, 'store'])->name('comments.store');
 
-
     // Nếu bạn muốn thêm routes cho reply comments
     Route::post('/comments/{comment}/reply', [CommentsController::class, 'reply'])->name('comments.reply');
 });
+Route::delete('/comments/{comment}', [CommentsController::class, 'destroy'])
+    ->middleware(['auth:sanctum'])
+    ->name('comments.destroy');
+
 Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
 Route::get('/categories', [\App\Http\Controllers\CategoryController::class, 'index'])->name('categories');
 Route::middleware([

@@ -32,13 +32,19 @@ const EditPost = ({ post, categories }: EditPostProps) => {
         is_published: post.is_published || false,
         categories: post.categories || [],
     });
-
-    const [showCategories, setShowCategories] = useState(false);
+    console.log(data);
+    const [showCategories, setShowCategories] = useState(true);
 
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!data.categories || data.categories.length === 0) {
+            alert("Hãy chọn ít nhất một danh mục.");
+            return;
+        }
+
         put(`/posts/${post.id}`, {
             preserveScroll: true,
             onSuccess: () => {
@@ -109,32 +115,6 @@ const EditPost = ({ post, categories }: EditPostProps) => {
                                     <p className="text-sm text-red-500">{errors.content}</p>
                                 )}
                             </div>
-
-                            {/*<div className="space-y-2">*/}
-                            {/*    <Label htmlFor="images">Hình ảnh</Label>*/}
-                            {/*    <div className="mt-2">*/}
-                            {/*        <Input*/}
-                            {/*            id="images"*/}
-                            {/*            type="file"*/}
-                            {/*            multiple*/}
-                            {/*            onChange={handleFileChange}*/}
-                            {/*            className={cn(errors.images && "ring-2 ring-red-500")}*/}
-                            {/*        />*/}
-                            {/*        {errors.images && (*/}
-                            {/*            <p className="text-sm text-red-500">{errors.images}</p>*/}
-                            {/*        )}*/}
-                            {/*        <div className="mt-4 flex flex-wrap gap-4">*/}
-                            {/*            {imagePreviews.map((src, index) => (*/}
-                            {/*                <img*/}
-                            {/*                    key={index}*/}
-                            {/*                    src={src}*/}
-                            {/*                    alt={`Preview ${index + 1}`}*/}
-                            {/*                    className="h-20 w-20 object-cover rounded-md"*/}
-                            {/*                />*/}
-                            {/*            ))}*/}
-                            {/*        </div>*/}
-                            {/*    </div>*/}
-                            {/*</div>*/}
 
                             <div className="space-y-2">
                                 <Label>Danh mục</Label>

@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('comments', function (Blueprint $table) {
-            $table->ulid("id")->primary();
+            $table->ulid('id')->primary();
             $table->foreignIdFor(User::class);
             $table->foreignIdFor(Post::class);
             $table->foreignUlid('parent_id')->nullable()->constrained('comments')->cascadeOnDelete();

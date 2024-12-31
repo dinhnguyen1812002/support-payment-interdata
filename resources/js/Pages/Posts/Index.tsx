@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import BlogCard from "@/Pages/Posts/PostCard";
 import AppLayout from "@/Layouts/AppLayout";
 import Pagination from "@/Components/Pagination";
-import Index from "@/Pages/Categories/Index";
 import { Category, Paginate } from "@/types";
 import { Button } from "@headlessui/react";
-import { Separator } from "@/Components/ui/separator"
+
 interface BlogPost {
     id: number;
     title: string;

@@ -109,55 +109,48 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-//    public function show($slug)
-//    {
-//        $post = Post::where('slug', $slug)
-//            ->with(['user:id,name,profile_photo_path', 'categories:id,title'])
-//            ->firstOrFail();
-//
-//        return Inertia::render('Posts/PostDetail', [
-//            'post' => [
-//                'id' => $post->id,
-//                'title' => $post->title,
-//                'content' => $post->content,
-//                'slug' => $post->slug,
-//                'categories' => $post->categories->map(fn ($category) => [
-//                    'id' => $category->id,
-//                    'title' => $category->title,
-//                ]),
-//                'user' => [
-//                    'name' => $post->user->name,
-//                    'profile_photo_path' => $post->user->profile_photo_path,
-//                ],
-//                'created_at' => $post->created_at->diffForHumans(),
-//            ],
-//        ]);
-//    }
+    //    public function show($slug)
+    //    {
+    //        $post = Post::where('slug', $slug)
+    //            ->with(['user:id,name,profile_photo_path', 'categories:id,title'])
+    //            ->firstOrFail();
+    //
+    //        return Inertia::render('Posts/PostDetail', [
+    //            'post' => [
+    //                'id' => $post->id,
+    //                'title' => $post->title,
+    //                'content' => $post->content,
+    //                'slug' => $post->slug,
+    //                'categories' => $post->categories->map(fn ($category) => [
+    //                    'id' => $category->id,
+    //                    'title' => $category->title,
+    //                ]),
+    //                'user' => [
+    //                    'name' => $post->user->name,
+    //                    'profile_photo_path' => $post->user->profile_photo_path,
+    //                ],
+    //                'created_at' => $post->created_at->diffForHumans(),
+    //            ],
+    //        ]);
+    //    }
+    //PostController.php
     public function show($slug)
     {
-
         $post = Post::with(['user:id,name,profile_photo_path', 'categories:id,title,slug'])
             ->where('slug', $slug)
             ->firstOrFail();
+
+        // Load all comments with nested replies
         $comments = $post->comments()
             ->whereNull('parent_id')
-            ->with(['user:id,name,profile_photo_path', 'replies.user:id,name,profile_photo_path'])
+            ->with(['user:id,name,profile_photo_path'])
+            ->with(['allReplies.user:id,name,profile_photo_path']) // Using a new relationship
             ->latest()
             ->get()
-            ->map(fn($comment) => [
-                'id' => $comment->id,
-                'comment' => $comment->comment,
-                'created_at' => $comment->created_at->diffForHumans(),
-                'user' => $comment->user,
-                'replies' => $comment->replies->map(fn($reply) => [
-                    'id' => $reply->id,
-                    'comment' => $reply->comment,
-                    'created_at' => $reply->created_at->diffForHumans(),
-                    'user' => $reply->user,
-                ]),
-            ]);
+            ->map(function ($comment) {
+                return $this->formatComment($comment);
+            });
 
-        // Return the post details and comments
         return Inertia::render('Posts/PostDetail', [
             'post' => [
                 'id' => $post->id,
@@ -171,6 +164,29 @@ class PostController extends Controller
                 'comments' => $comments,
             ],
         ]);
+    }
+
+    private function formatComment($comment)
+    {
+        $formattedComment = [
+            'id' => $comment->id,
+            'comment' => $comment->comment,
+            'created_at' => $comment->created_at->diffForHumans(),
+            'user' => [
+                'name' => $comment->user->name,
+                'profile_photo_path' => $comment->user->profile_photo_path,
+            ],
+            'replies' => [],
+        ];
+
+        // Recursively format replies
+        if ($comment->allReplies) {
+            $formattedComment['replies'] = $comment->allReplies->map(function ($reply) {
+                return $this->formatComment($reply);
+            });
+        }
+
+        return $formattedComment;
     }
 
     /**
@@ -213,11 +229,13 @@ class PostController extends Controller
      */
     public function update(CreatePostData $request, Post $post)
     {
+        // Kiểm tra quyền truy cập
         if ($post->user_id !== auth()->id()) {
             return redirect()->route('/')->with('error', 'You are not authorized to update this post!');
         }
 
-        $postData = PostData::from($request);
+        // Lấy dữ liệu từ request
+        $postData = CreatePostData::from($request);
 
         // Cập nhật thông tin bài viết
         $post->update([
@@ -229,8 +247,6 @@ class PostController extends Controller
 
         if (! empty($postData->categories)) {
             $post->categories()->sync($postData->categories);
-        } else {
-            $post->categories()->detach();
         }
 
         return redirect()->route('/')->with('success', 'Post updated successfully!');
