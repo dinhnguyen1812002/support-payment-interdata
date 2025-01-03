@@ -15,10 +15,14 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::withCount('posts')->latest()->get();
+        $category = Category::select(['id', 'title', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
 
         return Inertia::render('Categories/CategoriesSidebar', [
-            'categories' => $categories,
+            'categories' => $category,
+
         ]);
     }
 

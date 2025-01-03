@@ -63,10 +63,10 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, auth }) => {
         <AppLayout title={post.title} canLogin={true} canRegister={true}>
 
             <div className="max-w-4xl mx-auto px-4 py-8">
-                <CategoriesSidebar
-                    categories={post.categories}
-                    selectedCategory={post.categories[0]?.slug}
-                />
+                {/*<CategoriesSidebar*/}
+                {/*    categories={post.categories}*/}
+                {/*    selectedCategory={post.categories[0]?.slug}*/}
+                {/*/>*/}
                 {/* Article Header */}
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>

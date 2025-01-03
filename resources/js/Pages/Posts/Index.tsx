@@ -4,6 +4,7 @@ import AppLayout from "@/Layouts/AppLayout";
 import Pagination from "@/Components/Pagination";
 import { Category, Paginate } from "@/types";
 import { Button } from "@headlessui/react";
+import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 
 interface BlogPost {
     id: number;
@@ -43,26 +44,15 @@ const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination ,
                     {/* Main content with categories sidebar */}
                     <div className="flex-1 flex flex-col lg:flex-row gap-6">
                         {/* Categories Sidebar */}
-                        <div className="lg:max-w-52 mt-10">
-                            <h2 className="text-lg font-semibold mb-2">Categories</h2>
-                            <div className="space-y-1">
-                                {categories.map((category) => (
-                                    <Button
-                                        key={category.id}
-                                        onClick={() => handleCategoryClick(category.slug)}
-                                        className="w-full justify-between text-left
-                                        px-2 font-normal hover:bg-slate-100 flex items-center"
-                                    >
-                                        {category.title}
-                                        <span className="ml-11">{category.posts_count || 0}</span>
-                                    </Button>
-                                ))}
-                            </div>
-                        </div>
+                        <CategoriesSidebar
+                            categories={categories}
+                            selectedCategory={selectedCategory}
+                            className="lg:w-1/4"
+                        />
+
 
                         <div className="mt-10 h-5/6 border-l border-dashed border-gray-300"> </div>
                         <div className="flex-1 max-w-3xl">
-
                             <div className="space-y-6">
                                 <BlogCard posts={posts} postCount={postCount}/>
                                 <Pagination

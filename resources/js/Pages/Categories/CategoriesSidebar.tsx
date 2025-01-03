@@ -21,6 +21,7 @@ const CategoriesSidebar: React.FC<Props> = ({
                                                 selectedCategory,
                                                 className = ""
                                             }) => {
+
     return (
         <div className={`lg:max-w-52 mt-10 ${className}`}>
             <h2 className="text-lg font-semibold mb-4 text-gray-900">Categories</h2>

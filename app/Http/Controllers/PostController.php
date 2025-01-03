@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Data\Post\CreatePostData;
-use App\Data\Post\PostData;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Support\Str;
@@ -136,10 +135,14 @@ class PostController extends Controller
     //PostController.php
     public function show($slug)
     {
+
         $post = Post::with(['user:id,name,profile_photo_path', 'categories:id,title,slug'])
             ->where('slug', $slug)
             ->firstOrFail();
-
+        $category = Category::select(['id', 'title', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
         // Load all comments with nested replies
         $comments = $post->comments()
             ->whereNull('parent_id')
@@ -163,6 +166,7 @@ class PostController extends Controller
                 'categories' => $post->categories,
                 'comments' => $comments,
             ],
+            'categories' => $category,
         ]);
     }
 

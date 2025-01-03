@@ -17,4 +17,9 @@ class Category extends Model
     {
         return $this->belongsToMany(Post::class, 'category_post');
     }
+
+    public function count()
+    {
+        $categories = Category::withCount('posts')->latest()->get();
+    }
 }

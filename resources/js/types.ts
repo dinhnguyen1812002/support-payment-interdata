@@ -105,16 +105,21 @@ export interface Paginate{
 
 
 
+// export interface Category {
+//     id: number;
+//     title: string;
+//     slug: string;
+//     description?: string;
+//     created_at: string;
+//     updated_at: string;
+//     posts_count: number;
+// }
 export interface Category {
     id: number;
     title: string;
     slug: string;
-    description?: string;
-    created_at: string;
-    updated_at: string;
-    posts_count: number;
+    posts_count?: number;
 }
-
 export interface Comment {
     id: number;
     comment: string;
