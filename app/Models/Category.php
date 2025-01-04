@@ -18,8 +18,11 @@ class Category extends Model
         return $this->belongsToMany(Post::class, 'category_post');
     }
 
-    public function count()
+    public static function getCategoriesCount()
     {
-        $categories = Category::withCount('posts')->latest()->get();
+        return self::select(['id', 'title', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
     }
 }

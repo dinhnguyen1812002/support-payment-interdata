@@ -14,7 +14,7 @@ const Sidebar: React.FC<CategoriesProps> = ({ categories, onCategoryClick }) => 
     return (
         <Card className="w-64 mt-10">
             <CardHeader >
-                <h3 className="text-lg font-semibold">Categories</h3>
+                <h3 className="text-lg font-semibold">Danh mục</h3>
             </CardHeader>
             <CardContent className="p-0">
                 <ScrollArea className="h-[300px] px-1">
@@ -32,6 +32,7 @@ const Sidebar: React.FC<CategoriesProps> = ({ categories, onCategoryClick }) => 
                                     {category.title}
                                 </a>
                             </Button>
+
                         ))}
                     </div>
                 </ScrollArea>

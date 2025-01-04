@@ -1,7 +1,8 @@
 import React from 'react';
-import { Link } from "@inertiajs/react";
-import { Badge } from "@/Components/ui/badge";
-import { route } from "ziggy-js";
+
+import {ScrollArea} from "@/Components/ui/scroll-area";
+import {Button} from "@/Components/ui/button";
+import {ChevronRight} from "lucide-react";
 
 interface Category {
     id: number;
@@ -11,43 +12,45 @@ interface Category {
 }
 
 interface Props {
-    categories: Category[];
     selectedCategory?: string | null;
     className?: string;
+    categories: Category[];
 }
 
-const CategoriesSidebar: React.FC<Props> = ({
-                                                categories,
-                                                selectedCategory,
-                                                className = ""
-                                            }) => {
-
+const CategoriesSidebar: React.FC<Props> = ({categories, className = ""}) => {
     return (
         <div className={`lg:max-w-52 mt-10 ${className}`}>
-            <h2 className="text-lg font-semibold mb-4 text-gray-900">Categories</h2>
-            <div className="space-y-2">
-                {categories.map((category) => (
-                    <Link
-                        key={category.id}
-                        href={route('categories', { slug: category.slug })}
-                        className="block"
-                    >
-                        <Badge
-                            variant={selectedCategory === category.slug ? "secondary" : "outline"}
-                            className={`w-full flex justify-between items-center px-3 py-2 text-sm font-medium
-                                ${selectedCategory === category.slug
-                                ? 'bg-gray-200 text-gray-900'
-                                : 'text-gray-600 hover:bg-gray-100'}`}
-                        >
-                            <span>{category.title}</span>
-                            {category.posts_count !== undefined && (
-                                <span className="ml-2 text-xs text-gray-500">
-                                    {category.posts_count}
-                                </span>
-                            )}
-                        </Badge>
-                    </Link>
-                ))}
+            <div>
+                <h3 className="text-lg font-semibold ml-5">Danh mục</h3>
+            </div>
+            <div className="p-0">
+                <ScrollArea className="h-[300px] px-1">
+                    <div className="space-y-1 p-2">
+                        {categories.map((category) => (
+                            <Button
+                                key={category.id}
+                                variant="ghost"
+                                className="w-full justify-between hover:bg-slate-100 px-2"
+                                asChild
+                            >
+                                <a
+                                    href={`/categories/${category.slug}`}
+                                    className="flex items-center w-full"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <ChevronRight className="h-4 w-4"/>
+                                        <span className="font-normal">{category.title}</span>
+                                    </div>
+                                    {category.posts_count !== undefined && (
+                                        <div className="ml-auto text-xs">
+                                            {category.posts_count}
+                                        </div>
+                                    )}
+                                </a>
+                            </Button>
+                        ))}
+                    </div>
+                </ScrollArea>
             </div>
         </div>
     );

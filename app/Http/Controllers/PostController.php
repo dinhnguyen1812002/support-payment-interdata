@@ -65,10 +65,12 @@ class PostController extends Controller
      */
     public function create()
     {
-        $categories = Category::all(['id', 'title']);
+
+        $categories = Category::getCategoriesCount();
 
         return Inertia::render('Posts/Create', [
             'categories' => $categories,
+            //            'category' => Category::getCategoriesCount(),
         ]);
     }
 
@@ -204,16 +206,15 @@ class PostController extends Controller
             return redirect()->route('/')->with('error', 'You are not authorized to update this post!');
         }
 
-        // Lấy tất cả danh mục
-        $allCategories = Category::all(['id', 'title']);
+        $categoriesWithCount = Category::getCategoriesCount();
 
-        // Pass dữ liệu đến view
         return Inertia::render('Posts/EditPost', [
             'post' => [
                 'id' => $post->id,
                 'title' => $post->title,
                 'content' => $post->content,
                 'slug' => $post->slug,
+                'category' => $categoriesWithCount,
                 'is_published' => $post->is_published,
                 'categories' => $post->categories->pluck('id'),
                 'user' => [
@@ -224,7 +225,7 @@ class PostController extends Controller
                 'created_at' => $post->created_at->toDateTimeString(),
                 'updated_at' => $post->updated_at->toDateTimeString(),
             ],
-            'categories' => $allCategories,
+            'categories' => $categoriesWithCount,
         ]);
     }
 
