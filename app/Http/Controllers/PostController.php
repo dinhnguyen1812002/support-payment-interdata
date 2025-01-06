@@ -17,19 +17,20 @@ class PostController extends Controller
             ->orderBy('posts_count', 'desc')
             ->get();
         $posts = Post::with(['user', 'categories'])
+            ->withCount('upvotes')
+            ->orderBy('upvotes_count', 'desc')
             ->latest()
             ->paginate(6);
 
         $formattedPosts = $posts->items();
         $formattedPosts = collect($formattedPosts)->map(function ($post) {
 
-            $firstSentence = strtok($post->content, '.');
-
             return [
                 'id' => $post->id,
                 'title' => $post->title,
-                'content' => $firstSentence,
+                'content' => $this->getExcerpt($post->content),
                 'slug' => $post->slug,
+                'upvotes_count' => $post->upvotes_count,
                 'categories' => $post->categories->map(function ($category) {
                     return [
                         'id' => $category->id,
@@ -37,6 +38,7 @@ class PostController extends Controller
                     ];
                 }),
                 'user' => [
+                    'id' => $post->user->id,
                     'name' => $post->user->name,
                     'profile_photo_path' => $post->user->profile_photo_path,
                 ],
@@ -58,6 +60,23 @@ class PostController extends Controller
                 'prev_page_url' => $posts->previousPageUrl(),
             ],
         ]);
+    }
+
+    public function getExcerpt(string $content, int $limit = 100): string
+    {
+        if (strlen($content) <= $limit) {
+            return $content;
+        }
+
+        $excerpt = substr($content, 0, $limit);
+
+        // Tìm vị trí khoảng trắng cuối cùng để cắt
+        $lastSpace = strrpos($excerpt, ' ');
+        if ($lastSpace !== false) {
+            $excerpt = substr($excerpt, 0, $lastSpace);
+        }
+
+        return $excerpt.'...';
     }
 
     /**

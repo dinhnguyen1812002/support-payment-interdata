@@ -10,10 +10,11 @@ import {Category} from "@/types";
 import {Comment} from "@/types";
 
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
+import Upvote from "@/Components/UpVote";
 
 
 interface BlogPost {
-    id: number;
+    id: string;
     title: string;
     content: string;
     user: {
@@ -25,6 +26,8 @@ interface BlogPost {
     published_at: string;
     updated_at: string;
     comments: Comment[];
+    upvotes_count: number;
+    upvoted_by_user: boolean;
 }
 
 interface PostDetailProps {
@@ -138,12 +141,14 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, auth, categories }) => {
                 {/* Main content with categories sidebar */}
                 <div className="flex-1 flex flex-col lg:flex-row gap-6">
                     {/* Categories Sidebar */}
+
                     <CategoriesSidebar
                         categories={categories}
                         selectedCategory={null}
                         className="lg:w-1/4"
                     />
-                    <div className="mt-10 h-5/6 border-l border-dashed border-gray-300"> </div>
+                    <div className="mt-10 h-5/6 border-l border-dashed border-gray-300"></div>
+
                     <div className="flex-1 max-w-3xl">
                         <div className="space-y-6 mt-10">
                             <div className="max-w-4xl mx-auto px-4 py-8">
@@ -219,8 +224,8 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, auth, categories }) => {
             </div>
         </div>
     </AppLayout>
-)
-    ;
+    )
+        ;
 };
 
 export default PostDetail;

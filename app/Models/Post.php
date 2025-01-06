@@ -34,4 +34,14 @@ class Post extends Model
     {
         return $this->hasMany(Comments::class);
     }
+
+    public function upvotes()
+    {
+        return $this->hasMany(PostUpvote::class);
+    }
+
+    public function upvoteCount()
+    {
+        return $this->upvotes()->count();
+    }
 }

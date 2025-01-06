@@ -7,7 +7,7 @@ import { Button } from "@headlessui/react";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 
 interface BlogPost {
-    id: number;
+    id: string;
     title: string;
     content: string;
     slug: string;
@@ -19,6 +19,8 @@ interface BlogPost {
 
     created_at: string;
     published_at: string;
+    upvotes_count: number;
+    upvoted_by_user: boolean;
 }
 
 interface Props {

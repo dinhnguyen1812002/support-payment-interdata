@@ -343,7 +343,9 @@ export default function AppLayout({
 
                 {/* <!-- Page Content --> */}
 
-                <main>{children}</main>
+                <main>
+                    {children}
+                </main>
             </div>
             <Footer/>
         </div>
