@@ -1,7 +1,7 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Events\NewCommentPosted;
 use App\Models\Comments;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -10,7 +10,6 @@ use Inertia\Inertia;
 
 class CommentsController extends Controller
 {
-    //
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -26,21 +25,35 @@ class CommentsController extends Controller
             'parent_id' => $validated['parent_id'],
         ]);
 
-        // Load relationships cho comment mới
+        // Load the relationships
         $comment->load(['user', 'replies.user']);
 
-        // Format comment data
+        // Format the comment data consistently with your frontend structure
         $commentData = [
             'id' => $comment->id,
-            'comment' => $comment->content,
-            'created_at' => $comment->created_at,
+            'comment' => $comment->comment, // Changed from content to match your model
+            'created_at' => $comment->created_at->toISOString(),
             'user' => [
                 'id' => $comment->user->id,
                 'name' => $comment->user->name,
                 'profile_photo_path' => $comment->user->profile_photo_path,
             ],
-            'replies' => [],
+            'replies' => $comment->replies->map(function ($reply) {
+                return [
+                    'id' => $reply->id,
+                    'comment' => $reply->comment,
+                    'created_at' => $reply->created_at->toISOString(),
+                    'user' => [
+                        'id' => $reply->user->id,
+                        'name' => $reply->user->name,
+                        'profile_photo_path' => $reply->user->profile_photo_path,
+                    ],
+                ];
+            }),
         ];
+
+        // Broadcast the new comment
+        broadcast(new NewCommentPosted($commentData))->toOthers();
 
         return back()->with([
             'success' => 'Comment added successfully!',
@@ -50,7 +63,35 @@ class CommentsController extends Controller
 
     public function show(Post $post)
     {
-        $comments = $post->comments()->with(['replies.user', 'user'])->get();
+        $comments = $post->comments()
+            ->whereNull('parent_id') // Get only parent comments
+            ->with(['user', 'replies.user'])
+            ->latest()
+            ->get()
+            ->map(function ($comment) {
+                return [
+                    'id' => $comment->id,
+                    'comment' => $comment->comment,
+                    'created_at' => $comment->created_at->toISOString(),
+                    'user' => [
+                        'id' => $comment->user->id,
+                        'name' => $comment->user->name,
+                        'profile_photo_path' => $comment->user->profile_photo_path,
+                    ],
+                    'replies' => $comment->replies->map(function ($reply) {
+                        return [
+                            'id' => $reply->id,
+                            'comment' => $reply->comment,
+                            'created_at' => $reply->created_at->toISOString(),
+                            'user' => [
+                                'id' => $reply->user->id,
+                                'name' => $reply->user->name,
+                                'profile_photo_path' => $reply->user->profile_photo_path,
+                            ],
+                        ];
+                    }),
+                ];
+            });
 
         return Inertia::render('Posts/PostDetail', [
             'post' => $post,
@@ -60,9 +101,7 @@ class CommentsController extends Controller
 
     public function destroy(Comments $comment)
     {
-
-        // Check if user is authorized to delete this comment
-        if (! Gate::allows('delete-comment', $comment)) {
+        if (!Gate::allows('delete-comment', $comment)) {
             abort(403, 'Unauthorized action.');
         }
 

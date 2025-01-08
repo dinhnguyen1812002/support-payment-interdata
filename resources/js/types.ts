@@ -128,3 +128,10 @@ export interface Comment {
     replies?: Comment[];
     parent_id?: number | null;
 }
+export interface NewCommentEvent {
+    id: number;
+    content: string;
+    question_id: number;
+    created_at: string;
+    user: User;
+}

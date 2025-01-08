@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Post extends Model
 {
@@ -43,5 +44,10 @@ class Post extends Model
     public function upvoteCount()
     {
         return $this->upvotes()->count();
+    }
+
+    public function getExcerpt()
+    {
+        return Str::limit(strip_tags($this->content), 150);
     }
 }

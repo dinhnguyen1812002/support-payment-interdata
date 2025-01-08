@@ -12,6 +12,7 @@
     "paths": {
       "@/*": ["./resources/js/*"]
     },
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   }
 }

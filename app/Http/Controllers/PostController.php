@@ -28,7 +28,7 @@ class PostController extends Controller
             return [
                 'id' => $post->id,
                 'title' => $post->title,
-                'content' => $this->getExcerpt($post->content),
+                'content' => $post->getExcerpt(),
                 'slug' => $post->slug,
                 'upvotes_count' => $post->upvotes_count,
                 'categories' => $post->categories->map(function ($category) {
@@ -62,23 +62,6 @@ class PostController extends Controller
         ]);
     }
 
-    public function getExcerpt(string $content, int $limit = 100): string
-    {
-        if (strlen($content) <= $limit) {
-            return $content;
-        }
-
-        $excerpt = substr($content, 0, $limit);
-
-        // Tìm vị trí khoảng trắng cuối cùng để cắt
-        $lastSpace = strrpos($excerpt, ' ');
-        if ($lastSpace !== false) {
-            $excerpt = substr($excerpt, 0, $lastSpace);
-        }
-
-        return $excerpt.'...';
-    }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -89,7 +72,7 @@ class PostController extends Controller
 
         return Inertia::render('Posts/Create', [
             'categories' => $categories,
-            //            'category' => Category::getCategoriesCount(),
+            //'category' => Category::getCategoriesCount(),
         ]);
     }
 
@@ -126,34 +109,6 @@ class PostController extends Controller
         return redirect()->route('/')->with('success', 'Post created successfully!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    //    public function show($slug)
-    //    {
-    //        $post = Post::where('slug', $slug)
-    //            ->with(['user:id,name,profile_photo_path', 'categories:id,title'])
-    //            ->firstOrFail();
-    //
-    //        return Inertia::render('Posts/PostDetail', [
-    //            'post' => [
-    //                'id' => $post->id,
-    //                'title' => $post->title,
-    //                'content' => $post->content,
-    //                'slug' => $post->slug,
-    //                'categories' => $post->categories->map(fn ($category) => [
-    //                    'id' => $category->id,
-    //                    'title' => $category->title,
-    //                ]),
-    //                'user' => [
-    //                    'name' => $post->user->name,
-    //                    'profile_photo_path' => $post->user->profile_photo_path,
-    //                ],
-    //                'created_at' => $post->created_at->diffForHumans(),
-    //            ],
-    //        ]);
-    //    }
-    //PostController.php
     public function show($slug)
     {
 

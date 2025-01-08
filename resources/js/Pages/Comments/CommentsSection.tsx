@@ -1,11 +1,9 @@
-import React from 'react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/Components/ui/avatar';
-import { Button } from '@/Components/ui/button';
+import React, {useEffect, useState} from 'react';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
-import { Textarea } from '@/Components/ui/textarea';
-import {MessageCircle, Send, Trash2} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import {Link, router} from '@inertiajs/react';
+
+import CommentForm from "@/Pages/Comments/CommentForm";
+import CommentItem from "@/Pages/Comments/CommentItem";
 
 interface User {
     id: number;
@@ -21,178 +19,6 @@ interface Comment {
     replies?: Comment[];
 }
 
-interface CommentFormProps {
-    onSubmit: (content: string, parentId?: number) => void;
-    currentUserAvatar: string;
-    placeholder?: string;
-    autoFocus?: boolean;
-}
-
-const CommentForm = ({
-                         onSubmit,
-                         currentUserAvatar,
-                         placeholder = "Write a comment...",
-                         autoFocus = false,
-                     }: CommentFormProps) => {
-    const [comment, setComment] = React.useState('');
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!comment.trim()) return;
-        onSubmit(comment);
-        setComment('');
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex items-start gap-4">
-                <Avatar>
-                    <AvatarImage src={currentUserAvatar} alt="Your avatar" />
-                    <AvatarFallback>You</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 space-y-2">
-                    <Textarea
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        placeholder={placeholder}
-                        autoFocus={autoFocus}
-                        className="min-h-[100px] resize-none"
-                    />
-                    <div className="flex justify-end">
-                        <Button type="submit" disabled={!comment.trim()}>
-                            <Send className="w-4 h-4 mr-2" />
-                            Post
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    );
-};
-
-
-
-interface CommentItemProps {
-    comment: Comment;
-    onReply: (content: string, parentId: number) => void;
-    currentUserAvatar: string;
-    depth?: number;
-}
-
-const CommentItem = ({
-                         comment,
-                         onReply,
-                         currentUserAvatar,
-                         depth = 0,
-                     }: CommentItemProps) => {
-    const [isReplying, setIsReplying] = React.useState(false);
-
-    const handleReply = (content: string) => {
-        onReply(content, comment.id);
-        setIsReplying(false);
-    };
-    const deleteComment = (id: number) => {
-        router.delete(`/comments/${id}`, {
-            onSuccess: () => {
-                alert("xóa thành công");
-            },
-            onError: (errors:any) => {
-                alert('Error deleting comment');
-            }
-        });
-    }
-    return (
-        <div className={cn("flex gap-4", depth > 0 && `ml-${depth * 4}`)}>
-            <Avatar>
-                <AvatarImage
-                    src={
-                        comment.user.profile_photo_path
-                            ? `/storage/${comment.user.profile_photo_path}`
-                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.name)}&color=7F9CF5&background=EBF4FF`
-                    }
-                    alt={comment.user.name}
-                />
-                <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 space-y-4">
-                <Card>
-                    <CardContent className="pt-4">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="font-semibold">{comment.user.name}</span>
-                            <time className="text-sm text-muted-foreground">
-                                {comment.created_at}
-                            </time>
-                        </div>
-                        <p className="text-sm">{comment.comment}</p>
-                    </CardContent>
-                </Card>
-
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsReplying(!isReplying)}
-                    >
-                        <MessageCircle className="w-4 h-4 mr-2" />
-                        Reply
-                    </Button>
-                    {/*<Button*/}
-                    {/*    variant="ghost"*/}
-                    {/*    size="sm"*/}
-                    {/*    onClick={() => {*/}
-                    {/*        if (confirm('Are you sure you want to delete this comment?')) {*/}
-                    {/*            router.delete(`/comments/${comment.id}`, {*/}
-                    {/*                onSuccess: () => {*/}
-                    {/*                  alert("xóa thành công")*/}
-                    {/*                },*/}
-                    {/*                onError: (errors:any) => {*/}
-                    {/*                    alert('Error deleting comment');*/}
-                    {/*                }*/}
-                    {/*            });*/}
-                    {/*        }*/}
-                    {/*    }}*/}
-                    {/*    className="text-red-500 hover:text-red-600"*/}
-                    {/*>*/}
-                    {/*    <Trash2 className="w-4 h-4 mr-2" />*/}
-                    {/*</Button>*/}
-                        <Button variant="outline" size="sm"
-                                onClick={() => deleteComment(comment.id)}
-                                className="text-red-500 hover:text-red-600">
-                            <Trash2 className="w-4 h-4 mr-2" />
-                        </Button>
-
-                </div>
-
-                {isReplying && (
-                    <div className="ml-4">
-                        <CommentForm
-                            onSubmit={handleReply}
-                            currentUserAvatar={currentUserAvatar}
-                            placeholder="Write a reply..."
-                            autoFocus
-                        />
-                    </div>
-                )}
-
-                {comment.replies && comment.replies.length > 0 && (
-                    <div className="space-y-4">
-                        {comment.replies.map((reply) => (
-                            <CommentItem
-                                key={reply.id}
-                                comment={reply}
-                                onReply={onReply}
-                                currentUserAvatar={currentUserAvatar}
-                                depth={depth + 1} // Tăng độ sâu
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
-
-
 interface CommentsSectionProps {
     initialComments: Comment[];
     onCommentSubmit: (content: string, parentId?: number) => void;
@@ -204,6 +30,21 @@ const CommentsSection = ({
                              onCommentSubmit,
                              currentUserAvatar,
                          }: CommentsSectionProps) => {
+    const [comments, setComments] = useState<Comment[]>(initialComments);
+
+    useEffect(() => {
+        const channel = window.Echo.channel('comments-channel');
+
+        channel.listen('.comment.posted', (event: { comment: Comment }) => {
+            console.log('Received event:', event);
+            setComments((prevComments) => [...prevComments, event.comment]);
+        });
+
+        return () => {
+            window.Echo.leaveChannel('comments-channel');
+        };
+    }, []);
+
     return (
         <Card className="w-full">
             <CardHeader>
@@ -216,7 +57,7 @@ const CommentsSection = ({
                 />
 
                 <div className="space-y-6">
-                    {initialComments.map((comment) => (
+                    {comments.map((comment) => (
                         <CommentItem
                             key={comment.id}
                             comment={comment}

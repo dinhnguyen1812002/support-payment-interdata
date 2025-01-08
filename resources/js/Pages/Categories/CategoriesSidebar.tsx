@@ -38,7 +38,7 @@ const CategoriesSidebar: React.FC<Props> = ({categories, className = ""}) => {
                                     className="flex items-center w-full"
                                 >
                                     <div className="flex items-center gap-2">
-                                        <ChevronRight className="h-4 w-4"/>
+                                        <ChevronRight className="h-4 w-4 hover:text-blue-600"/>
                                         <span className="font-normal">{category.title}</span>
                                     </div>
                                     {category.posts_count !== undefined && (
