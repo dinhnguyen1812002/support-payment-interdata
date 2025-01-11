@@ -135,3 +135,20 @@ export interface NewCommentEvent {
     created_at: string;
     user: User;
 }
+export interface BlogPost {
+    id: string;
+    title: string;
+    content: string;
+    slug: string;
+    categories: Category[];
+    user: {
+        id: number;
+        name: string;
+        profile_photo_path: string;
+    };
+
+    created_at: string;
+    published_at: string;
+    upvote_count: number;
+    isUpvote: boolean;
+}

@@ -5,32 +5,10 @@ import { Badge } from "@/Components/ui/badge";
 import { Separator } from "@/Components/ui/separator";
 import { Link } from "@inertiajs/react";
 import useTypedPage from "@/Hooks/useTypedPage";
-import {PenLine, PlusCircle, FilePenLine} from "lucide-react";
+import { PenLine, PlusCircle } from "lucide-react";
 import { Button } from '@/Components/ui/button';
-import { useForm } from '@inertiajs/react';
 import Upvote from "@/Components/UpVote";
-interface Category {
-    id: number;
-    title: string;
-    slug: string;
-}
-
-interface BlogPost {
-    id: string;
-    title: string;
-    content: string;
-    slug: string;
-    categories: Category[];
-    user: {
-        id:number;
-        name: string;
-        profile_photo_path: string;
-    };
-    created_at: string;
-    published_at: string;
-    upvotes_count: number;
-    upvoted_by_user: boolean;
-}
+import {BlogPost} from "@/types";
 
 interface BlogCardProps {
     posts: BlogPost[];
@@ -38,7 +16,6 @@ interface BlogCardProps {
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
-
     const page = useTypedPage();
 
     if (posts.length === 0) {
@@ -69,17 +46,18 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                 </Link>
             </div>
 
-            {/* Cards Container */}
             <div className="space-y-3">
                 {posts.map((post) => (
                     <Card key={post.id} className="w-full">
-                        <div className="flex items-center justify-items-center">
+                        <div className="flex">
                             {/* Left side - Upvote */}
-                            <div className="p-4">
+                            <div className=" border-r flex items-center justify-items-center">
                                 <Upvote
                                     postId={post.id}
-                                    isUpvoted={post.upvoted_by_user}
-                                 upvotes_count={post.upvotes_count}/>
+                                    initialIsUpvote={post.isUpvote}
+                                    initialUpvoteCount={post.upvote_count}
+                                    upvote_count={post.upvote_count}
+                                />
                             </div>
 
                             {/* Right side - Post content */}
@@ -133,11 +111,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                             </h3>
                                             <div
                                                 className="text-sm text-muted-foreground line-clamp-2 mt-1"
-                                                dangerouslySetInnerHTML={{__html: post.content}}
+                                                dangerouslySetInnerHTML={{ __html: post.content }}
                                             />
                                         </Link>
 
-                                        {/* Categories Section */}
                                         <div className="flex flex-wrap gap-2 mt-3">
                                             {post.categories && post.categories.map((category) => (
                                                 <Link
@@ -146,17 +123,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                                 >
                                                     <Badge
                                                         variant="outline"
-                                                        className=" cursor-pointer border
-                                                        border-dashed hover:border-gray-600 border-gray-400 hover:border-solid"
+                                                        className="cursor-pointer border border-dashed hover:border-gray-600 border-gray-400 hover:border-solid"
                                                     >
                                                         {category.title}
                                                     </Badge>
-                                                    {/*<Badge variant="outline"*/}
-                                                    {/*       className="text-gray-700 text-sm font-medium me-2 px-3 py-1*/}
-                                                    {/*           rounded dark:bg-gray-700 hover:text-blue-600 border*/}
-                                                    {/*           border-dashed border-gray-400  hover:border-blue-600">*/}
-                                                    {/*    {category.title}*/}
-                                                    {/*</Badge>*/}
                                                 </Link>
                                             ))}
                                         </div>
@@ -164,7 +134,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                 </CardContent>
 
                                 <CardFooter className="p-4 pt-0">
-                                    <Separator className="my-2"/>
+                                    <Separator className="my-2" />
                                 </CardFooter>
                             </div>
                         </div>
@@ -176,4 +146,3 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
 };
 
 export default BlogCard;
-

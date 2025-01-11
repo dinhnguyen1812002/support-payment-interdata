@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 
 import CommentForm from "@/Pages/Comments/CommentForm";
 import CommentItem from "@/Pages/Comments/CommentItem";
+import useTypedPage from "@/Hooks/useTypedPage";
+import {useRoute} from "ziggy-js";
+import {route} from "../../../../vendor/tightenco/ziggy";
 
 interface User {
     id: number;
@@ -31,7 +34,7 @@ const CommentsSection = ({
                              currentUserAvatar,
                          }: CommentsSectionProps) => {
     const [comments, setComments] = useState<Comment[]>(initialComments);
-
+    const page = useTypedPage();
     useEffect(() => {
         const channel = window.Echo.channel('comments-channel');
 
@@ -53,9 +56,10 @@ const CommentsSection = ({
             <CardContent className="space-y-6">
                 <CommentForm
                     onSubmit={(content) => onCommentSubmit(content)}
+
+                    // currentUserAvatar={page.props.auth.user.profile_photo_path}
                     currentUserAvatar={currentUserAvatar}
                 />
-
                 <div className="space-y-6">
                     {comments.map((comment) => (
                         <CommentItem

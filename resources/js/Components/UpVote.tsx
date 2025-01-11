@@ -1,65 +1,86 @@
-import React from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import React, { useState } from 'react';
+import { Minus, Plus } from 'lucide-react';
 import { useForm } from '@inertiajs/react';
+import { Button } from "@/Components/ui/button";
 import { cn } from '@/lib/utils';
 
 interface UpvoteProps {
     postId: string;
-    upvotes_count: number;
-    isUpvoted: boolean;
+    initialUpvoteCount: number;
+    initialIsUpvote: boolean;
+    upvote_count: number;
+
 }
 
-const Upvote: React.FC<UpvoteProps> = ({ postId, upvotes_count, isUpvoted }) => {
+const Upvote: React.FC<UpvoteProps> = ({ postId, initialUpvoteCount, initialIsUpvote }) => {
     const { post, processing } = useForm({});
+    const [upvoteCount, setUpvoteCount] = useState(initialUpvoteCount);
+    const [isUpvote, setIsUpvote] = useState(initialIsUpvote);
 
-    const handleUpvote = (action: 'upvote' | 'remove') => {
+    const handleVote = async () => {
         if (processing) return;
-
-        if ((action === 'upvote' && isUpvoted) || (action === 'remove' && !isUpvoted)) {
-            return;
-        }
 
         post(`/posts/${postId}/upvote`, {
             preserveScroll: true,
+            onSuccess: () => {
+                // Toggle trạng thái upvote
+                if (isUpvote) {
+                    setUpvoteCount(upvoteCount - 1);
+                } else {
+                    setUpvoteCount(upvoteCount + 1);
+                }
+                setIsUpvote(!isUpvote);
+            },
         });
     };
 
     return (
-        <div className="flex flex-col items-center gap-2">
-            <button
-                onClick={() => handleUpvote('upvote')}
-                disabled={processing}
+        <div className="flex flex-col items-center gap-0">
+            {/* Nút Upvote */}
+            <Button
+                onClick={handleVote}
+                disabled={processing || isUpvote} // Disable nếu đã upvote
+                variant="ghost"
+                size="lg"
                 className={cn(
-                    "p-0 h-16 w-16 rounded-full flex items-center justify-center transition-all duration-200",
-                    isUpvoted && "text-green-500 bg-green-50 hover:bg-green-100",
-                    !isUpvoted && "text-gray-400 hover:text-green-600 hover:bg-green-50",
+                    "p-0 h-14 w-14 ",
+                    isUpvote && [
+                        "bg-blue-50 text-blue-500 hover:bg-blue-50 hover:text-blue-500",
+                        "cursor-default"
+                    ],
+                    !isUpvote && "text-gray-400 hover:text-blue-500 hover:bg-blue-50",
                     processing && "cursor-wait opacity-50"
                 )}
-                title={isUpvoted ? "Already upvoted" : "Upvote this post"}
+                title={isUpvote ? "Đã upvote" : "Upvote bài viết"}
             >
-                <ChevronUp className="h-12 w-12" strokeWidth={2.5} />
-            </button>
+                <Plus className="h-10 w-10" strokeWidth={2.5} />
 
+            </Button>
+
+            {/* Hiển thị số lượng upvotes */}
             <span className={cn(
-                "text-xl font-semibold",
-                isUpvoted ? "text-green-500" : "text-gray-600"
+                "text-lg font-semibold",
+                isUpvote ? "text-blue-500" : "text-gray-600"
             )}>
-                {upvotes_count || 0}
+                {upvoteCount || 0}
             </span>
 
-            <button
-                onClick={() => handleUpvote('remove')}
-                disabled={processing || !isUpvoted}
+            {/* Nút Downvote */}
+            <Button
+                onClick={handleVote}
+                disabled={processing || !isUpvote} // Disable nếu chưa upvote
+                variant="ghost"
+                size="lg"
                 className={cn(
-                    "p-0 h-16 w-16 rounded-full flex items-center justify-center transition-all duration-200",
-                    isUpvoted && "text-gray-400 hover:text-red-500 hover:bg-red-50",
-                    !isUpvoted && "text-gray-300 opacity-50",
+                    "p-0 h-14 w-14 rounded-full",
+                    isUpvote && "text-gray-400 hover:text-red-500 hover:bg-red-50",
+                    !isUpvote && "text-gray-300 opacity-50",
                     processing && "cursor-wait opacity-50"
                 )}
-                title={isUpvoted ? "Remove your upvote" : "Cannot remove - not upvoted"}
+                title={isUpvote ? "Xóa upvote" : "Chưa upvote"}
             >
-                <ChevronDown className="h-12 w-12" strokeWidth={2.5} />
-            </button>
+                <Minus className="h-10 w-10" strokeWidth={2.5}  />
+            </Button>
         </div>
     );
 };

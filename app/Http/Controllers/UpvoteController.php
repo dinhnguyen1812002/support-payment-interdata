@@ -14,10 +14,13 @@ class UpvoteController extends Controller
         $user = Auth::user();
 
         // Kiểm tra nếu user đã upvote
+        if ($user == null) {
+            return redirect('/login');
+        }
+
         $alreadyUpvote = PostUpvote::where('post_id', $post->id)
             ->where('user_id', $user->id)
             ->exists();
-
         if ($alreadyUpvote) {
             // Nếu đã upvote, thì xóa upvote
             PostUpvote::where('post_id', $post->id)

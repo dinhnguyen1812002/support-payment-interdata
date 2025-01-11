@@ -23,7 +23,6 @@ Route::middleware(['auth'])->group(function () {
 
 });
 Route::post('/posts/{post}/upvote', [UpvoteController::class, 'upvote'])
-    ->middleware('auth')
     ->name('posts.upvote');
 Route::delete('/comments/{comment}', [CommentsController::class, 'destroy'])
     ->middleware(['auth:sanctum'])
@@ -31,6 +30,7 @@ Route::delete('/comments/{comment}', [CommentsController::class, 'destroy'])
 
 Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

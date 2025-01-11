@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Events\NewCommentPosted;
@@ -52,7 +53,6 @@ class CommentsController extends Controller
             }),
         ];
 
-        // Broadcast the new comment
         broadcast(new NewCommentPosted($commentData))->toOthers();
 
         return back()->with([
@@ -101,7 +101,7 @@ class CommentsController extends Controller
 
     public function destroy(Comments $comment)
     {
-        if (!Gate::allows('delete-comment', $comment)) {
+        if (! Gate::allows('delete-comment', $comment)) {
             abort(403, 'Unauthorized action.');
         }
 

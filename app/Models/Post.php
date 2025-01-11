@@ -50,4 +50,9 @@ class Post extends Model
     {
         return Str::limit(strip_tags($this->content), 150);
     }
+
+    public function isUpvotedBy($userId)
+    {
+        return $this->upvotes()->where('user_id', $userId)->exit();
+    }
 }

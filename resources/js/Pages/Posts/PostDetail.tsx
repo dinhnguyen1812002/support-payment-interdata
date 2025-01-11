@@ -8,10 +8,7 @@ import CommentsSection from "@/Pages/Comments/CommentsSection";
 import {route} from "ziggy-js";
 import {Category} from "@/types";
 import {Comment} from "@/types";
-
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
-import Upvote from "@/Components/UpVote";
-
 
 interface BlogPost {
     id: string;
@@ -26,8 +23,7 @@ interface BlogPost {
     published_at: string;
     updated_at: string;
     comments: Comment[];
-    upvotes_count: number;
-    upvoted_by_user: boolean;
+
 }
 
 interface PostDetailProps {

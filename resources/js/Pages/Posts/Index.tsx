@@ -2,26 +2,27 @@ import React, { useState } from 'react';
 import BlogCard from "@/Pages/Posts/PostCard";
 import AppLayout from "@/Layouts/AppLayout";
 import Pagination from "@/Components/Pagination";
-import { Category, Paginate } from "@/types";
+import { Category, Paginate,BlogPost } from "@/types";
 import { Button } from "@headlessui/react";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 
-interface BlogPost {
-    id: string;
-    title: string;
-    content: string;
-    slug: string;
-    categories: Category[];
-    user: {
-        name: string;
-        profile_photo_path: string;
-    };
-
-    created_at: string;
-    published_at: string;
-    upvotes_count: number;
-    upvoted_by_user: boolean;
-}
+// interface BlogPost {
+//     id: string;
+//     title: string;
+//     content: string;
+//     slug: string;
+//     categories: Category[];
+//     user: {
+//         id: number;
+//         name: string;
+//         profile_photo_path: string;
+//     };
+//
+//     created_at: string;
+//     published_at: string;
+//     upvote_count: number;
+//     isUpvote: boolean;
+// }
 
 interface Props {
     posts: BlogPost[];
@@ -56,7 +57,9 @@ const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination ,
                         <div className="mt-10 h-5/6 border-l border-dashed border-gray-300"> </div>
                         <div className="flex-1 max-w-3xl">
                             <div className="space-y-6">
-                                <BlogCard posts={posts} postCount={postCount}/>
+                                <BlogCard posts={posts}
+                                          postCount={postCount}
+                                />
                                 <Pagination
                                     current_page={pagination.current_page}
                                     last_page={pagination.last_page}

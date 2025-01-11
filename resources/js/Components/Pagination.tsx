@@ -24,43 +24,30 @@ const PaginationComponent: React.FC<PaginationProps> = ({
                                                             prev_page_url,
                                                         }) => {
     const getVisiblePages = () => {
-        // Always show first and last page
         const pages: (number | string)[] = [];
-        const delta = 1; // Number of pages to show before and after current page
+        const delta = 1;
 
-        // Calculate range of visible pages
         const rangeStart = Math.max(2, current_page - delta);
         const rangeEnd = Math.min(last_page - 1, current_page + delta);
 
-        // Add first page
         if (last_page > 1) {
             pages.push(1);
         }
-
-        // Add dots if needed before range
         if (rangeStart > 2) {
-            pages.push('...');
+            pages.push("...");
         }
-
-        // Add pages in range
         for (let i = rangeStart; i <= rangeEnd; i++) {
             pages.push(i);
         }
-
-        // Add dots if needed after range
         if (rangeEnd < last_page - 1) {
-            pages.push('...');
+            pages.push("...");
         }
-
-        // Add last page if it's not already included
         if (last_page > 1 && !pages.includes(last_page)) {
             pages.push(last_page);
         }
-
         return pages;
     };
 
-    // Don't render pagination if there's only one page
     if (last_page <= 1) return null;
 
     return (
@@ -68,31 +55,23 @@ const PaginationComponent: React.FC<PaginationProps> = ({
             <PaginationContent>
                 {/* Previous button */}
                 <PaginationItem>
-                    <Link
-                        preserveScroll
-                        href={prev_page_url ?? ''}
-                        className={!prev_page_url ? 'pointer-events-none' : ''}
-                    >
-                        <PaginationPrevious
-                            aria-disabled={!prev_page_url}
-                            className={!prev_page_url ? 'opacity-50' : ''}
-                        />
-                    </Link>
+                    {prev_page_url ? (
+                        <Link preserveScroll href={prev_page_url}>
+                            <PaginationPrevious />
+                        </Link>
+                    ) : (
+                        <PaginationPrevious aria-disabled className="opacity-50 pointer-events-none" />
+                    )}
                 </PaginationItem>
 
                 {/* Page numbers */}
                 {getVisiblePages().map((page, index) => (
                     <PaginationItem key={index}>
-                        {page === '...' ? (
+                        {page === "..." ? (
                             <PaginationEllipsis />
                         ) : (
-                            <Link
-                                preserveScroll
-                                href={`?page=${page}`}
-                            >
-                                <PaginationLink isActive={page === current_page}>
-                                    {page}
-                                </PaginationLink>
+                            <Link preserveScroll href={`?page=${page}`}>
+                                <PaginationLink isActive={page === current_page}>{page}</PaginationLink>
                             </Link>
                         )}
                     </PaginationItem>
@@ -100,16 +79,13 @@ const PaginationComponent: React.FC<PaginationProps> = ({
 
                 {/* Next button */}
                 <PaginationItem>
-                    <Link
-                        preserveScroll
-                        href={next_page_url ?? ''}
-                        className={!next_page_url ? 'pointer-events-none' : ''}
-                    >
-                        <PaginationNext
-                            aria-disabled={!next_page_url}
-                            className={!next_page_url ? 'opacity-50' : ''}
-                        />
-                    </Link>
+                    {next_page_url ? (
+                        <Link preserveScroll href={next_page_url}>
+                            <PaginationNext />
+                        </Link>
+                    ) : (
+                        <PaginationNext aria-disabled className="opacity-50 pointer-events-none" />
+                    )}
                 </PaginationItem>
             </PaginationContent>
         </Pagination>

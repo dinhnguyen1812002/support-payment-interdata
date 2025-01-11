@@ -84,6 +84,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Reply
                     </Button>
+
                     <Button
                         variant="outline"
                         size="sm"

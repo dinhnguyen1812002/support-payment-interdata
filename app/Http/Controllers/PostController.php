@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Data\Post\CreatePostData;
 use App\Models\Category;
 use App\Models\Post;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -21,7 +22,6 @@ class PostController extends Controller
             ->orderBy('upvotes_count', 'desc')
             ->latest()
             ->paginate(6);
-
         $formattedPosts = $posts->items();
         $formattedPosts = collect($formattedPosts)->map(function ($post) {
 
@@ -30,7 +30,7 @@ class PostController extends Controller
                 'title' => $post->title,
                 'content' => $post->getExcerpt(),
                 'slug' => $post->slug,
-                'upvotes_count' => $post->upvotes_count,
+                'upvote_count' => $post->upvotes_count,
                 'categories' => $post->categories->map(function ($category) {
                     return [
                         'id' => $category->id,
