@@ -8,11 +8,12 @@ import useTypedPage from "@/Hooks/useTypedPage";
 import { PenLine, PlusCircle } from "lucide-react";
 import { Button } from '@/Components/ui/button';
 import Upvote from "@/Components/UpVote";
-import {BlogPost} from "@/types";
+import {BlogPost, Category} from "@/types";
 
 interface BlogCardProps {
     posts: BlogPost[];
     postCount: number;
+
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
@@ -27,7 +28,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
     }
 
     return (
-        <div className="container mx-auto">
+        <div className="container mx-auto mb-8">
             <div className="mb-6 flex items-center justify-between mt-10">
                 <div className="space-y-1">
                     <h2 className="text-2xl font-bold tracking-tight">
@@ -38,12 +39,14 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                         Browse through all community questions and discussions.
                     </p>
                 </div>
+
                 <Link href="/posts/create">
                     <Button className="flex items-center gap-2">
                         <PlusCircle className="w-4 h-4" />
                         Ask Question
                     </Button>
                 </Link>
+
             </div>
 
             <div className="space-y-3">
@@ -119,7 +122,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                             {post.categories && post.categories.map((category) => (
                                                 <Link
                                                     key={category.id}
-                                                    href={`/categories/${category.slug}`}
+
+                                                    href={`/categories/${category.title}/posts`}
                                                 >
                                                     <Badge
                                                         variant="outline"

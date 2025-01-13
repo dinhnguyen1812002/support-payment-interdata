@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\Route;
 
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
-
+Route::get('/categories/{categorySlug}/posts', [PostController::class, 'filterPostByCategory'])
+    ->name('categories.posts.index');
+Route::get('/posts/search', [PostController::class, 'search']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
-    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::post('/new-post', [PostController::class, 'store'])->name('posts.store');
 
     Route::get('/posts/{slug}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');

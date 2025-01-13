@@ -26,39 +26,25 @@ class CommentsController extends Controller
             'parent_id' => $validated['parent_id'],
         ]);
 
-        // Load the relationships
         $comment->load(['user', 'replies.user']);
 
-        // Format the comment data consistently with your frontend structure
         $commentData = [
             'id' => $comment->id,
-            'comment' => $comment->comment, // Changed from content to match your model
+            'comment' => $comment->comment,
+            'parent_id' => $comment->parent_id,
             'created_at' => $comment->created_at->toISOString(),
             'user' => [
                 'id' => $comment->user->id,
                 'name' => $comment->user->name,
                 'profile_photo_path' => $comment->user->profile_photo_path,
             ],
-            'replies' => $comment->replies->map(function ($reply) {
-                return [
-                    'id' => $reply->id,
-                    'comment' => $reply->comment,
-                    'created_at' => $reply->created_at->toISOString(),
-                    'user' => [
-                        'id' => $reply->user->id,
-                        'name' => $reply->user->name,
-                        'profile_photo_path' => $reply->user->profile_photo_path,
-                    ],
-                ];
-            }),
+            'replies' => [],
         ];
 
-        broadcast(new NewCommentPosted($commentData))->toOthers();
+        // Broadcast event cho tất cả users
+        broadcast(new NewCommentPosted($commentData));
 
-        return back()->with([
-            'success' => 'Comment added successfully!',
-            'comment' => $commentData,
-        ]);
+        return back()->with('success', 'Comment added successfully!');
     }
 
     public function show(Post $post)

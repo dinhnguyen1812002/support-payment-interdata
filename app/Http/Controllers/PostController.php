@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Data\Post\CreatePostData;
 use App\Models\Category;
 use App\Models\Post;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -242,5 +242,91 @@ class PostController extends Controller
         $post->delete();
 
         return redirect()->route('/')->with('success', 'Post deleted successfully!');
+    }
+
+    public function filterPostByCategory(Request $request, $categorySlug)
+    {
+        // Lấy thông tin danh mục dựa vào slug
+        $category = Category::where('slug', $categorySlug)->firstOrFail();
+        $categories = Category::getCategoriesCount();
+        // Lấy bài viết thuộc danh mục đó
+        $posts = Post::whereHas('categories', function ($query) use ($category) {
+            $query->where('categories.id', $category->id);
+        })
+            ->with(['user', 'categories'])
+            ->withCount('upvotes')
+            ->orderBy('upvotes_count', 'desc')
+            ->latest()
+            ->paginate(6);
+
+        // Định dạng bài viết
+        $formattedPosts = $this->getPosts($posts);
+
+        // Trả về dữ liệu thông qua Inertia
+        return Inertia::render('Posts/Category', [
+            'category' => [
+                'id' => $category->id,
+                'title' => $category->title,
+                'slug' => $category->slug,
+            ],
+            'categories' => $categories,
+            'posts' => $formattedPosts,
+            'pagination' => [
+                'total' => $posts->total(),
+                'per_page' => $posts->perPage(),
+                'current_page' => $posts->currentPage(),
+                'last_page' => $posts->lastPage(),
+                'next_page_url' => $posts->nextPageUrl(),
+                'prev_page_url' => $posts->previousPageUrl(),
+            ],
+        ]);
+    }
+
+    public function getPosts($posts): \Illuminate\Support\Collection
+    {
+        $formattedPosts = $posts->items();
+
+        return collect($formattedPosts)->map(function ($post) {
+            return [
+                'id' => $post->id,
+                'title' => $post->title,
+                'content' => $post->getExcerpt(),
+                'slug' => $post->slug,
+                'upvote_count' => $post->upvotes_count,
+                'categories' => $post->categories->map(function ($category) {
+                    return [
+                        'id' => $category->id,
+                        'title' => $category->title,
+                    ];
+                }),
+                'user' => [
+                    'id' => $post->user->id,
+                    'name' => $post->user->name,
+                    'profile_photo_path' => $post->user->profile_photo_path,
+                ],
+                'created_at' => $post->created_at->diffForHumans(),
+                'published_at' => $post->published_at,
+            ];
+        });
+    }
+
+    public function search(Request $request)
+    {
+        $keyword = $request->input('keyword', '');
+
+        // Sử dụng phương thức search trong model Post
+        $posts = Post::search($keyword)->paginate(6);
+
+        return Inertia::render('Posts/search', [
+            'posts' => $posts->items(),
+            'pagination' => [
+                'total' => $posts->total(),
+                'per_page' => $posts->perPage(),
+                'current_page' => $posts->currentPage(),
+                'last_page' => $posts->lastPage(),
+                'next_page_url' => $posts->nextPageUrl(),
+                'prev_page_url' => $posts->previousPageUrl(),
+            ],
+        ]);
     }
 }

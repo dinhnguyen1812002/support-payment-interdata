@@ -1,12 +1,8 @@
-import React, {useEffect, useState} from 'react';
-
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
-
 import CommentForm from "@/Pages/Comments/CommentForm";
 import CommentItem from "@/Pages/Comments/CommentItem";
 import useTypedPage from "@/Hooks/useTypedPage";
-import {useRoute} from "ziggy-js";
-import {route} from "../../../../vendor/tightenco/ziggy";
 
 interface User {
     id: number;
@@ -14,11 +10,13 @@ interface User {
     profile_photo_path: string;
 }
 
+
 interface Comment {
     id: number;
     user: User;
     comment: string;
     created_at: string;
+    parent_id?: number | null;
     replies?: Comment[];
 }
 
@@ -35,15 +33,42 @@ const CommentsSection = ({
                          }: CommentsSectionProps) => {
     const [comments, setComments] = useState<Comment[]>(initialComments);
     const page = useTypedPage();
+    const addNewComment = (newComment: Comment) => {
+        // If it's a reply (has parent_id), add it to the appropriate parent comment
+        if (newComment.parent_id) {
+            setComments(prevComments =>
+                prevComments.map(comment => {
+                    if (comment.id === newComment.parent_id) {
+                        return {
+                            ...comment,
+                            replies: [...(comment.replies || []), newComment]
+                        };
+                    }
+                    return comment;
+                })
+            );
+        } else {
+            // If it's a root comment, add it to the main list
+            setComments(prevComments => [...prevComments, {...newComment, replies: []}]);
+        }
+    };
+
     useEffect(() => {
+        // Ensure Echo is properly initialized
+        if (typeof window.Echo === 'undefined') {
+            console.error('Echo is not initialized');
+            return;
+        }
+
         const channel = window.Echo.channel('comments-channel');
 
         channel.listen('.comment.posted', (event: { comment: Comment }) => {
-            console.log('Received event:', event);
-            setComments((prevComments) => [...prevComments, event.comment]);
+            console.log('Received comment:', event.comment);
+            addNewComment(event.comment);
         });
 
         return () => {
+            channel.stopListening('.comment.posted');
             window.Echo.leaveChannel('comments-channel');
         };
     }, []);
@@ -54,11 +79,13 @@ const CommentsSection = ({
                 <CardTitle>Comments</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+                {/*<CommentForm*/}
+                {/*    onSubmit={(content) => onCommentSubmit(content)}*/}
+                {/*    currentUserAvatar={currentUserAvatar}*/}
+                {/*/>*/}
                 <CommentForm
                     onSubmit={(content) => onCommentSubmit(content)}
-
-                    // currentUserAvatar={page.props.auth.user.profile_photo_path}
-                    currentUserAvatar={currentUserAvatar}
+                    currentUserAvatar={page.props.auth.user?.profile_photo_path || ""}
                 />
                 <div className="space-y-6">
                     {comments.map((comment) => (

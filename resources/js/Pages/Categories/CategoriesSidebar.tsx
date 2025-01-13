@@ -34,7 +34,7 @@ const CategoriesSidebar: React.FC<Props> = ({categories, className = ""}) => {
                                 asChild
                             >
                                 <a
-                                    href={`/categories/${category.slug}`}
+                                    href={`/categories/${category.slug}/posts`}
                                     className="flex items-center w-full"
                                 >
                                     <div className="flex items-center gap-2">

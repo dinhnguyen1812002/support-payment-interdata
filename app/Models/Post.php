@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
 
 class Post extends Model
 {
     //
     use HasFactory,SoftDeletes;
     use HasUlids;
+    use Searchable;
 
     protected $fillable = ['title', 'content', 'user_id', 'is_published', 'slug', 'image'];
 
@@ -54,5 +57,22 @@ class Post extends Model
     public function isUpvotedBy($userId)
     {
         return $this->upvotes()->where('user_id', $userId)->exit();
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'title' => $this->title,
+            'content' => $this->content,
+        ];
+    }
+
+    public function scopeSearch(Builder $query, string $keyword): Builder
+    {
+        return $query->with(['user', 'categories'])
+            ->where('title', 'like', "%{$keyword}%")
+            ->orWhere('content', 'like', "%{$keyword}%")
+            ->withCount('upvotes')
+            ->orderBy('upvotes_count', 'desc');
     }
 }

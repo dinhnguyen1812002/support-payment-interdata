@@ -55,10 +55,18 @@ const CommentForm: React.FC<CommentFormProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex items-start gap-4">
                 {/* Avatar */}
-                <Avatar>
-                    <AvatarImage src={currentUserAvatar} alt="Your avatar" />
-                    <AvatarFallback>You</AvatarFallback>
+                <Avatar className="h-8 w-8">
+                    <AvatarImage
+                        src={
+                            currentUserAvatar
+                                ? `/storage/${currentUserAvatar}`
+                                : `https://ui-avatars.com/api/?name=${encodeURIComponent(comment)}&color=7F9CF5&background=EBF4FF`
+                        }
+                        alt="Your avatar"
+                    />
+                    <AvatarFallback>Your</AvatarFallback>
                 </Avatar>
+
 
                 {/* Comment Input Area */}
                 <div className="flex-1 space-y-2 relative">

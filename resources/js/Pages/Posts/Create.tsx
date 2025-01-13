@@ -72,7 +72,7 @@ const CreatePost = ({  categories }: { categories: Category[] }) => {
     console.log(categories);
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/posts', {
+        post('/new-post', {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
