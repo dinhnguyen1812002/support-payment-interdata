@@ -1,13 +1,31 @@
-import React, { useState } from 'react';
-import { router } from '@inertiajs/react';
-import AppLayout from '@/Layouts/AppLayout';
-import BlogCard from '@/Pages/Posts/PostCard';
-import CategoriesSidebar from '@/Pages/Categories/CategoriesSidebar';
-import { Category, Paginate, BlogPost } from '@/types';
-import { Separator } from "@/Components/ui/separator";
+// Trong file Posts/Search.tsx
 import SearchComponent from '@/Components/Search';
-import Pagination from "@/Components/Pagination";
+import AppLayout from '@/Layouts/AppLayout';
+import React from 'react';
+import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
+import {Separator} from "@/Components/ui/separator";
+import BlogCard from "@/Pages/Posts/PostCard";
+import {BlogPost, Category, Paginate} from "@/types";
+import {usePage} from "@inertiajs/react";
 
+interface Post {
+    id: number;
+    title: string;
+    content: string;
+}
+
+interface SearchPageProps {
+    posts: Post[];
+    pagination: {
+        total: number;
+        per_page: number;
+        current_page: number;
+        last_page: number;
+        next_page_url: string | null;
+        prev_page_url: string | null;
+    };
+    search: string;
+}
 interface Props {
     posts: BlogPost[];
     categories: Category[];
@@ -25,6 +43,8 @@ const PostsIndex: React.FC<Props> = ({
                                          keyword,
                                          selectedCategory
                                      }) => {
+
+
     return (
         <AppLayout title="Posts" canLogin={true} canRegister={true}>
             <div className="max-w-6xl mx-auto px-4">
@@ -32,7 +52,7 @@ const PostsIndex: React.FC<Props> = ({
                 <div className="mb-6">
                     <SearchComponent
                         initialSearch={keyword}
-                        route="/posts/search"
+                        route="/posts"
                         pagination={pagination}
                     >
                         <div className="flex flex-col lg:flex-row gap-6">
@@ -47,10 +67,9 @@ const PostsIndex: React.FC<Props> = ({
                             {/* Posts */}
                             <div className="flex-1 max-w-3xl">
                                 <BlogCard posts={posts} postCount={postCount} />
-
                             </div>
 
-                            {/*<CategoriesSidebar categories={categories} className="lg:w-1/4" />*/}
+                            <CategoriesSidebar categories={categories} className="lg:w-1/4" />
                         </div>
                     </SearchComponent>
                 </div>

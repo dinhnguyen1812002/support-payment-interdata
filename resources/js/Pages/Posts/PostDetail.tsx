@@ -29,6 +29,7 @@ interface BlogPost {
 interface PostDetailProps {
     post: BlogPost;
     categories: Category[];
+
     auth: {
         user: {
             id: number;
@@ -54,7 +55,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, auth, categories }) => {
             }
         });
     };
-
+    const selectedCategory = usePage().props.selectedCategory;
     const userAvatar =  post.user.profile_photo_path
         ? `/storage/${post.user.profile_photo_path}`
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name)}&color=7F9CF5&background=EBF4FF`;
@@ -140,7 +141,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, auth, categories }) => {
 
                     <CategoriesSidebar
                         categories={categories}
-                        selectedCategory={null}
+                        selectedCategory={selectedCategory as string | null | undefined} // Đảm bảo kiểu hợp lệ
                         className="lg:w-1/4"
                     />
                     <div className="mt-10 h-5/6 border-l border-dashed border-gray-300"></div>

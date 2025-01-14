@@ -51,10 +51,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
 
             <div className="space-y-3">
                 {posts.map((post) => (
-                    <Card key={post.id} className="w-full">
+                    <Card key={post.id} className="w-full border-none shadow-none">
                         <div className="flex">
                             {/* Left side - Upvote */}
-                            <div className=" border-r flex items-center justify-items-center">
+                            <div className=" flex items-center justify-items-center">
                                 <Upvote
                                     postId={post.id}
                                     initialIsUpvote={post.isUpvote}
@@ -137,14 +137,17 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                     </div>
                                 </CardContent>
 
-                                <CardFooter className="p-4 pt-0">
-                                    <Separator className="my-2" />
-                                </CardFooter>
+                                {/*<CardFooter className="p-4 pt-0">*/}
+                                {/*    <Separator className="my-2" />*/}
+                                {/*</CardFooter>*/}
                             </div>
                         </div>
+                        <Separator className="my-2 border-dashed border-0 border-sky-500" />
                     </Card>
                 ))}
+
             </div>
+
         </div>
     );
 };
