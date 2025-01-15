@@ -29,27 +29,27 @@ const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination, 
         <AppLayout title="Posts" canLogin={true} canRegister={true}>
             <div className="max-w-6xl mx-auto px-4">
                 {/* Search Section */}
-                <div className="mb-6">
-                    <SearchComponent
-                        initialSearch={keyword}
-                        route={selectedCategory ? `/categories/${selectedCategory}/posts` : `/posts`}
-                        pagination={pagination}
-                    >
-                        <div className="flex flex-col lg:flex-row gap-6">
-                            {/* Sidebar - Categories */}
-                            <CategoriesSidebar
-                                categories={categories}
-                                className="lg:w-1/4"
-                            />
-                            <Separator orientation="vertical" />
+                <div className="mb-6 ">
+                    <div className="flex flex-col lg:flex-row gap-6">
+                        {/* Sidebar - Categories */}
+                        <CategoriesSidebar
+                            categories={categories}
+                            selectedCategory={selectedCategory as string | null | undefined} // Đảm bảo kiểu hợp lệ
+                            className="lg:w-1/4"
+                        />
+                        <Separator orientation="vertical"/>
 
-                            {/* Posts */}
-                            <div className="flex-1 max-w-3xl">
-                                <BlogCard posts={posts} postCount={postCount} />
+                        <SearchComponent initialSearch={keyword}
+                                         route="/posts/search"
+                                         pagination={pagination}>
+                            <div className="flex-1 max-w-full ">
+                                <BlogCard posts={posts} postCount={postCount}/>
 
                             </div>
-                        </div>
-                    </SearchComponent>
+                        </SearchComponent>
+                        {/* Posts */}
+                    </div>
+
                 </div>
             </div>
         </AppLayout>

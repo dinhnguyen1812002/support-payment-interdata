@@ -10,6 +10,8 @@ import { Button } from '@/Components/ui/button';
 import Upvote from "@/Components/UpVote";
 import {BlogPost, Category} from "@/types";
 
+import  {generateSlug} from "@/Utils/slugUtils";
+import SearchComponent from "@/Components/Search";
 interface BlogCardProps {
     posts: BlogPost[];
     postCount: number;
@@ -29,10 +31,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
 
     return (
         <div className="container mx-auto mb-8">
-            <div className="mb-6 flex items-center justify-between mt-10">
+            <div className="mb-6 flex items-center justify-between mt-5">
                 <div className="space-y-1">
                     <h2 className="text-2xl font-bold tracking-tight">
-                        All Questions
+                        Tất cả câu hỏi
                         <span className="text-gray-500 pl-2">({postCount})</span>
                     </h2>
                     <p className="text-base text-muted-foreground">
@@ -123,7 +125,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                                 <Link
                                                     key={category.id}
 
-                                                    href={`/categories/${category.title}/posts`}
+                                                    href={`/categories/${generateSlug(category.title)}/posts`}
                                                 >
                                                     <Badge
                                                         variant="outline"

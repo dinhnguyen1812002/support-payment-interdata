@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import { Input } from '@/Components/ui/input';
 import { Command, CommandInput } from '@/Components/ui/command';
-import { Alert, AlertDescription } from '@/Components/ui/alert';
+
 import Pagination from "@/Components/Pagination";
 import { Search, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -65,15 +65,16 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
     };
 
     return (
-        <div>
-            <Command className="rounded-lg border shadow-md">
+        <div className="w-full">
+            <Command className="rounded-lg border mt-8">
                 <div className="flex items-center border-b px-3">
                     <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                     <Input
                         placeholder="Tìm kiếm bài viết..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-0 focus-visible:ring-0"
+                        className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none
+                        placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-0 focus-visible:ring-0"
                     />
                     {isLoading && (
                         <Loader2 className="h-4 w-4 animate-spin opacity-50" />
