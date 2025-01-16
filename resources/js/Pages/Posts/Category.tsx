@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import BlogCard from "@/Pages/Posts/PostCard";
 import AppLayout from "@/Layouts/AppLayout";
 import Pagination from "@/Components/Pagination";
-import { Category, Paginate, BlogPost } from "@/types";
+import {Category, Paginate, BlogPost, Notification} from "@/types";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 import SearchComponent from "@/Components/Search";
 import { Separator } from "@/Components/ui/separator";
@@ -12,9 +12,10 @@ interface Props {
     categories: Category[];
     pagination: Paginate;
     keyword: string;
+    notifications: Notification[]
 }
 
-const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination, keyword }) => {
+const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination, keyword, notifications=[] }) => {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
     const handleCategoryClick = (slug: string) => {
@@ -26,7 +27,7 @@ const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination, 
     const postCount = posts.length;
 
     return (
-        <AppLayout title="Posts" canLogin={true} canRegister={true}>
+        <AppLayout title="Posts" canLogin={true} canRegister={true} notifications={notifications}>
             <div className="max-w-6xl mx-auto px-4">
                 {/* Search Section */}
                 <div className="mb-6 ">

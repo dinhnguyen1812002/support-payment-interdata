@@ -6,7 +6,7 @@ import { Link } from "@inertiajs/react";
 import { Badge } from "@/Components/ui/badge";
 import CommentsSection from "@/Pages/Comments/CommentsSection";
 import {route} from "ziggy-js";
-import {Category} from "@/types";
+import {Category, Notification} from "@/types";
 import {Comment} from "@/types";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 
@@ -37,9 +37,10 @@ interface PostDetailProps {
             profile_photo_path: string;
         };
     };
+    notifications:Notification[]
 }
 
-const PostDetail: React.FC<PostDetailProps> = ({ post, auth, categories }) => {
+const PostDetail: React.FC<PostDetailProps> = ({ post, auth, categories, notifications }) => {
 
     const handleCommentSubmit = (comment: string, parentId?: number) => {
         router.post(route('comments.store'), {
@@ -132,7 +133,7 @@ const PostDetail: React.FC<PostDetailProps> = ({ post, auth, categories }) => {
         //     </div>
         // </AppLayout>
 
-    <AppLayout title={'Post'} canLogin={true} canRegister={true}>
+    <AppLayout title={'Post'} canLogin={true} canRegister={true} notifications={notifications}>
         <div className="max-w-6xl mx-auto px-4">
             <div className="flex flex-col lg:flex-row gap-6">
                 {/* Main content with categories sidebar */}

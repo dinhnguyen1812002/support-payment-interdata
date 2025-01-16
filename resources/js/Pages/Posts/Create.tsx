@@ -18,28 +18,16 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import CategoriesSidebar from '@/Pages/Categories/CategoriesSidebar';
+import {Category, Notification} from "@/types";
 
 
-interface Category {
-    id: number;
-    title: string;
-    slug: string;
-    posts_count?: number;
-}
-interface EditPostProps {
-    post: {
-        id: number;
-        title: string;
-        content: string;
-        slug: string;
-        is_published: boolean;
-        categories?: number[];
-    };
-    categories:Category[];
 
+interface FromPostProps{
+    categories: Category[];
+    notifications:Notification[]
 }
 
-const CreatePost = ({  categories }: { categories: Category[] }) => {
+const CreatePost = ({categories, notifications}:FromPostProps) => {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
@@ -86,7 +74,7 @@ const CreatePost = ({  categories }: { categories: Category[] }) => {
 
     return (
 
-    <AppLayout title={'Post'} canLogin={true} canRegister={true}>
+    <AppLayout title={'Post'} canLogin={true} canRegister={true} notifications={notifications}>
         <div className="max-w-6xl mx-auto px-4">
             <div className="flex flex-col lg:flex-row gap-6">
                 {/* Main content with categories sidebar */}

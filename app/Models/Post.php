@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
 
@@ -15,6 +16,7 @@ class Post extends Model
     //
     use HasFactory,SoftDeletes;
     use HasUlids;
+    use Notifiable;
     use Searchable;
 
     protected $fillable = ['title', 'content', 'user_id', 'is_published', 'slug', 'image'];

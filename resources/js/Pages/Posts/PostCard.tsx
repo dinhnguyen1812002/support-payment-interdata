@@ -11,7 +11,7 @@ import Upvote from "@/Components/UpVote";
 import {BlogPost, Category} from "@/types";
 
 import  {generateSlug} from "@/Utils/slugUtils";
-import SearchComponent from "@/Components/Search";
+
 interface BlogCardProps {
     posts: BlogPost[];
     postCount: number;
@@ -147,7 +147,6 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                         <Separator className="my-2 border-dashed border-0 border-sky-500" />
                     </Card>
                 ))}
-
             </div>
 
         </div>

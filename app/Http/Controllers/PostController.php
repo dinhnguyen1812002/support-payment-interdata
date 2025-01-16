@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Data\Post\CreatePostData;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\User;
+use App\Notifications\NewQuestionOrAnswerNotification;
 use App\Services\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -44,18 +46,16 @@ class PostController extends Controller
                 'prev_page_url' => $posts->previousPageUrl(),
             ],
             'keyword' => $search,
+            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
         ]);
     }
-
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-
         $categories = Category::getCategoriesCount();
-
         return Inertia::render('Posts/Create', [
             'categories' => $categories,
             //'category' => Category::getCategoriesCount(),
@@ -67,6 +67,7 @@ class PostController extends Controller
      */
     public function store(CreatePostData $postData)
     {
+        $slug = Str::slug($postData->title);
         // Kiểm tra trùng lặp bài viết
         $existingPost = Post::where('title', $postData->title)
             ->orWhere('slug', Str::slug($postData->title))
@@ -82,7 +83,7 @@ class PostController extends Controller
         $post = Post::create([
             'title' => $postData->title,
             'content' => $postData->content,
-            'slug' => Str::slug($postData->title),
+            'slug' => $slug,
             'is_published' => $postData->is_published,
             'user_id' => auth()->id(),
         ]);
@@ -90,6 +91,13 @@ class PostController extends Controller
         // Gắn danh mục vào bài viết
         if (! empty($postData->categories)) {
             $post->categories()->attach($postData->categories);
+        }
+        $users = User::all();
+        foreach ($users as $user) {
+            $user->notify(new NewQuestionOrAnswerNotification('question', [
+                'title' => $postData->title,
+                'url' => "/posts/{$slug}",
+            ]));
         }
 
         return redirect()->route('/')->with('success', 'Post created successfully!');
@@ -300,4 +308,5 @@ class PostController extends Controller
     {
         return $this->index($request);
     }
+
 }

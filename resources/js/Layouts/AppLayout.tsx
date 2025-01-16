@@ -9,7 +9,7 @@ import Banner from '@/Components/Banner';
 
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import {Team} from '@/types';
+import {Notification, Team} from '@/types';
 
 import {
     DropdownMenu,
@@ -23,6 +23,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import Footer from "@/Components/Footer";
 import { Button } from '@/Components/ui/button';
+import NotificationsDropdown from "@/Components/NotificationsDropdown";
 
 interface Props {
     title: string;
@@ -31,6 +32,7 @@ interface Props {
 
     canLogin: boolean;
     canRegister: boolean;
+    notifications:Notification[];
 }
 
 export default function AppLayout({
@@ -39,7 +41,7 @@ export default function AppLayout({
                                       children,
                                       canLogin,
                                       canRegister,
-
+notifications
                                   }: PropsWithChildren<Props>) {
     const page = useTypedPage();
     const route = useRoute();
@@ -105,9 +107,13 @@ export default function AppLayout({
                                         Create Post
                                     </NavLink>
                                 </div>
+
                             </div>
 
                             <div className="flex items-center space-x-4">
+                                {page.props.auth.user && (
+                                    <NotificationsDropdown notifications={notifications} />
+                                )}
                                 {page.props.auth.user ? (
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>

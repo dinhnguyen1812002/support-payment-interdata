@@ -24,6 +24,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/comments/{comment}/reply', [CommentsController::class, 'reply'])->name('comments.reply');
 
 });
+
 Route::post('/posts/{post}/upvote', [UpvoteController::class, 'upvote'])
     ->name('posts.upvote');
 Route::delete('/comments/{comment}', [CommentsController::class, 'destroy'])
@@ -32,6 +33,10 @@ Route::delete('/comments/{comment}', [CommentsController::class, 'destroy'])
 
 Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
+Route::post('/notifications/mark-as-read', function () {
+    auth()->user()->unreadNotifications()->markAsRead();
+    return back();
+})->name('notifications.markAsRead');
 
 Route::middleware([
     'auth:sanctum',

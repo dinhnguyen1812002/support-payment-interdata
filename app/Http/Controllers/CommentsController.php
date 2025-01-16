@@ -5,12 +5,31 @@ namespace App\Http\Controllers;
 use App\Events\NewCommentPosted;
 use App\Models\Comments;
 use App\Models\Post;
+use App\Notifications\NewQuestionOrAnswerNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class CommentsController extends Controller
 {
+    //    public function store(CommentData $data)
+    //    {
+    //        $comment = Comments::create([
+    //            'comment' => $data->comment,
+    //            'post_id' => $data->post_id,
+    //            'user_id' => auth()->id(),
+    //            'parent_id' => $data->parent_id,
+    //        ]);
+    //        $post = Post::find($data->post_id);
+    //        if ($post && $post->user_id !== auth()->id()) {
+    //            $post->user->notify(new NewQuestionOrAnswerNotification('answer', [
+    //                'title' => $post->title,
+    //                'url' => "/posts/{$post->slug}",
+    //            ]));
+    //        }
+    //
+    //        return back()->with('success', 'Comment added successfully!');
+    //    }
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -41,7 +60,13 @@ class CommentsController extends Controller
             'replies' => [],
         ];
 
-        // Broadcast event cho tất cả users
+        $post = Post::find($request->post_id);
+        if ($post && $post->user_id !== auth()->id()) {
+            $post->user->notify(new NewQuestionOrAnswerNotification('answer', [
+                'title' => $post->title,
+                'url' => "/posts/{$post->slug}",
+            ]));
+        }
         broadcast(new NewCommentPosted($commentData));
 
         return back()->with('success', 'Comment added successfully!');

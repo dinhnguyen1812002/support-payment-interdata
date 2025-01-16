@@ -3,30 +3,21 @@ import {router} from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import BlogCard from '@/Pages/Posts/PostCard';
 import CategoriesSidebar from '@/Pages/Categories/CategoriesSidebar';
-import {Category, Paginate, BlogPost} from '@/types';
+import {IndexProps} from '@/types';
 import {Separator} from "@/Components/ui/separator";
 import SearchComponent from '@/Components/Search';
-import Pagination from "@/Components/Pagination";
 
-interface Props {
-    posts: BlogPost[];
-    categories: Category[];
-    pagination: Paginate;
-    postCount: number;
-    keyword: string;
-    selectedCategory?: string | null | undefined | unknown;
-}
-
-const PostsIndex: React.FC<Props> = ({
+const PostsIndex: React.FC<IndexProps> = ({
                                          posts = [],
                                          categories = [],
                                          pagination,
                                          postCount,
                                          keyword,
-                                         selectedCategory
+                                         selectedCategory,
+                                         notifications
                                      }) => {
     return (
-        <AppLayout title="Posts" canLogin={true} canRegister={true}>
+        <AppLayout title="Posts" canLogin={true} canRegister={true} notifications={notifications}>
             <div className="max-w-6xl mx-auto px-4">
                 {/* Search Section */}
                 <div className="mb-6 ">

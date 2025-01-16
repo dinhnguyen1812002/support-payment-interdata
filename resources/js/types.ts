@@ -152,3 +152,33 @@ export interface BlogPost {
     upvote_count: number;
     isUpvote: boolean;
 }
+export interface Notification {
+    read: unknown;
+    id: string;
+    data: {
+        message: string;
+        url?: string;
+    };
+    read_at: string | null;
+}
+export interface IndexProps {
+    posts: BlogPost[];
+    categories: Category[];
+    pagination: Paginate;
+    postCount: number;
+    keyword: string;
+    selectedCategory?: string | null | undefined | unknown;
+    notifications: Notification[];
+}
+export interface EditPostProps {
+    post: {
+        id: number;
+        title: string;
+        content: string;
+        slug: string;
+        is_published: boolean;
+        categories?: number[];
+    };
+    categories:Category[];
+
+}
