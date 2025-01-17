@@ -7,21 +7,24 @@ import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfile
 import useTypedPage from '@/Hooks/useTypedPage';
 import SectionBorder from '@/Components/SectionBorder';
 import AppLayout from '@/Layouts/AppLayout';
-import { Session } from '@/types';
+import {Notification, Session} from '@/types';
 
 interface Props {
   sessions: Session[];
   confirmsTwoFactorAuthentication: boolean;
+    notifications: Notification[];
 }
+
 
 export default function Show({
   sessions,
   confirmsTwoFactorAuthentication,
+    notifications
 }: Props) {
   const page = useTypedPage();
 
   return (
-    <AppLayout
+    <AppLayout notifications={notifications}
         canRegister={true}
         canLogin={true}
       title={'Profile'}

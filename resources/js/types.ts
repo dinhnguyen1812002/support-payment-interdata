@@ -153,7 +153,7 @@ export interface BlogPost {
     isUpvote: boolean;
 }
 export interface Notification {
-    read: unknown;
+
     id: string;
     data: {
         message: string;

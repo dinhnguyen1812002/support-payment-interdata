@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import CommentForm from "@/Pages/Comments/CommentForm";
 import CommentItem from "@/Pages/Comments/CommentItem";
 import useTypedPage from "@/Hooks/useTypedPage";
+import {getFirstTwoLetters} from "@/lib/utils";
 
 interface User {
     id: number;
@@ -33,6 +34,7 @@ const CommentsSection = ({
                          }: CommentsSectionProps) => {
     const [comments, setComments] = useState<Comment[]>(initialComments);
     const page = useTypedPage();
+    const name= getFirstTwoLetters(page.props.auth.user!.name);
     const addNewComment = (newComment: Comment) => {
         // If it's a reply (has parent_id), add it to the appropriate parent comment
         if (newComment.parent_id) {

@@ -75,7 +75,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                                     src={
                                                         post.user.profile_photo_path
                                                             ? `/storage/${post.user.profile_photo_path}`
-                                                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name)}&color=7F9CF5&background=EBF4FF`
+                                                            : `https://ui-avatars.com/api/?name=${encodeURI(post.user.name)}&color=7F9CF5&background=EBF4FF`
                                                     }
                                                     alt={post.user.name}
                                                 />

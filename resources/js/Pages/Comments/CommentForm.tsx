@@ -4,6 +4,9 @@ import { Textarea } from "@/Components/ui/textarea";
 import { Button } from "@/Components/ui/button";
 import { Send, Image, Smile } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
+import useTypedPage from "@/Hooks/useTypedPage";
+import {getFirstTwoLetters} from "@/lib/utils";
+
 
 
 interface CommentFormProps {
@@ -23,13 +26,13 @@ const CommentForm: React.FC<CommentFormProps> = ({
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-
+    const page = useTypedPage();
     // Handle Emoji Selection
     const handleEmojiClick = (emojiObject: any) => {
         setComment((prev) => prev + emojiObject.emoji);
         setShowEmojiPicker(false);
     };
-
+    const name= getFirstTwoLetters(page.props.auth.user!.name);
     // Handle Image Selection
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -60,9 +63,9 @@ const CommentForm: React.FC<CommentFormProps> = ({
                         src={
                             currentUserAvatar
                                 ? `/storage/${currentUserAvatar}`
-                                : `https://ui-avatars.com/api/?name=${encodeURIComponent(comment)}&color=7F9CF5&background=EBF4FF`
+                                : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&color=7F9CF5&background=EBF4FF`
                         }
-                        alt="Your avatar"
+                        alt="{${page.props.auth.user?.name}}"
                     />
                     <AvatarFallback>Your</AvatarFallback>
                 </Avatar>

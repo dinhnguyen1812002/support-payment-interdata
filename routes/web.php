@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UpvoteController;
 use Illuminate\Support\Facades\Route;
@@ -33,10 +34,9 @@ Route::delete('/comments/{comment}', [CommentsController::class, 'destroy'])
 
 Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
-Route::post('/notifications/mark-as-read', function () {
-    auth()->user()->unreadNotifications()->markAsRead();
-    return back();
-})->name('notifications.markAsRead');
+Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
+    ->middleware('auth')
+    ->name('notifications.read_all');
 
 Route::middleware([
     'auth:sanctum',

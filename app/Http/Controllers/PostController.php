@@ -56,6 +56,7 @@ class PostController extends Controller
     public function create()
     {
         $categories = Category::getCategoriesCount();
+
         return Inertia::render('Posts/Create', [
             'categories' => $categories,
             //'category' => Category::getCategoriesCount(),
@@ -308,5 +309,4 @@ class PostController extends Controller
     {
         return $this->index($request);
     }
-
 }
