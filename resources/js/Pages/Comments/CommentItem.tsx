@@ -55,7 +55,11 @@ const CommentItem: React.FC<CommentItemProps> = ({
         <div className={cn("flex gap-4", depth > 0 && `ml-${depth * 4}`)}>
             <Avatar className="h-8 w-8">
                 <AvatarImage
-                    src={currentUserAvatar ||`https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&color=7F9CF5&background=EBF4FF`}
+                    src={
+                        comment.user.profile_photo_path
+                            ? `/storage/${comment.user.profile_photo_path}`
+                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.name)}&color=7F9CF5&background=EBF4FF`
+                    }
                     alt={comment.user.name}
                 />
                 <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
@@ -105,13 +109,14 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
                 {comment.replies && comment.replies.length > 0 && (
                     <div className="space-y-4">
-                        {comment.replies.map((reply) => (
+                        {comment.replies?.map((reply) => (
                             <CommentItem
                                 key={reply.id}
                                 comment={reply}
                                 onReply={onReply}
-                                currentUserAvatar={currentUserAvatar}
-                                depth={depth + 1}
+                                currentUserAvatar={reply.user.profile_photo_path
+                                    ? `/storage/${reply.user.profile_photo_path}`
+                                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.user.name)}&color=7F9CF5&background=EBF4FF`}
                             />
                         ))}
                     </div>

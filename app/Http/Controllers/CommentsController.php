@@ -6,6 +6,7 @@ use App\Events\NewCommentPosted;
 use App\Models\Comments;
 use App\Models\Post;
 use App\Notifications\NewQuestionOrAnswerNotification;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -30,7 +31,7 @@ class CommentsController extends Controller
     //
     //        return back()->with('success', 'Comment added successfully!');
     //    }
-    public function store(Request $request)
+    public function store(Request $request, NotificationService $notificationService)
     {
         $validated = $request->validate([
             'comment' => 'required|string|max:1000',
@@ -66,7 +67,18 @@ class CommentsController extends Controller
                 'title' => $post->title,
                 'url' => "/posts/{$post->slug}",
             ]));
+
+            // Gửi email thông báo
+            $notificationService->sendMail(
+                $post->user->email,
+                'New Answer to Your Question',
+                'Hi '.$post->user->name.',',
+                'Your question "'.$post->title.'" has received a new answer.',
+                'View Answer',
+                route('posts.show', $post->slug)
+            );
         }
+
         broadcast(new NewCommentPosted($commentData));
 
         return back()->with('success', 'Comment added successfully!');
@@ -104,6 +116,10 @@ class CommentsController extends Controller
                 ];
             });
 
+        //        return response()->json([
+        //            'post' => $post,
+        //            'comments' => $comments,
+        //        ]);
         return Inertia::render('Posts/PostDetail', [
             'post' => $post,
             'comments' => $comments,

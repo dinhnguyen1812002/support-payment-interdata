@@ -141,27 +141,22 @@ class PostController extends Controller
         ]);
     }
 
-    private function formatComment($comment)
+    protected function formatComment($comment)
     {
-        $formattedComment = [
+        return [
             'id' => $comment->id,
-            'comment' => $comment->comment,
-            'created_at' => $comment->created_at->diffForHumans(),
             'user' => [
+                'id' => $comment->user->id,
                 'name' => $comment->user->name,
                 'profile_photo_path' => $comment->user->profile_photo_path,
             ],
-            'replies' => [],
-        ];
-
-        // Recursively format replies
-        if ($comment->allReplies) {
-            $formattedComment['replies'] = $comment->allReplies->map(function ($reply) {
+            'comment' => $comment->comment,
+            'created_at' => $comment->created_at,
+            'parent_id' => $comment->parent_id,
+            'replies' => $comment->allReplies->map(function ($reply) {
                 return $this->formatComment($reply);
-            });
-        }
-
-        return $formattedComment;
+            }),
+        ];
     }
 
     /**

@@ -4,6 +4,7 @@ import CommentForm from "@/Pages/Comments/CommentForm";
 import CommentItem from "@/Pages/Comments/CommentItem";
 import useTypedPage from "@/Hooks/useTypedPage";
 import {getFirstTwoLetters} from "@/lib/utils";
+import {forEach} from "lodash";
 
 interface User {
     id: number;
@@ -34,44 +35,46 @@ const CommentsSection = ({
                          }: CommentsSectionProps) => {
     const [comments, setComments] = useState<Comment[]>(initialComments);
     const page = useTypedPage();
-    const name= getFirstTwoLetters(page.props.auth.user!.name);
+    const user = page.props.auth.user; // Lưu user vào biến để tránh truy cập lặp lại
+    const name = user ? getFirstTwoLetters(user.name) : ""; // Kiểm tra user trước khi truy cập name
+
     const addNewComment = (newComment: Comment) => {
-        // If it's a reply (has parent_id), add it to the appropriate parent comment
         if (newComment.parent_id) {
-            setComments(prevComments =>
-                prevComments.map(comment => {
+            setComments((prevComments) =>
+                prevComments.map((comment) => {
                     if (comment.id === newComment.parent_id) {
                         return {
                             ...comment,
-                            replies: [...(comment.replies || []), newComment]
+                            replies: [...(comment.replies || []), newComment],
                         };
                     }
                     return comment;
                 })
             );
         } else {
-            // If it's a root comment, add it to the main list
-            setComments(prevComments => [...prevComments, {...newComment, replies: []}]);
+            setComments((prevComments) => [
+                ...prevComments,
+                { ...newComment, replies: [] },
+            ]);
         }
     };
 
     useEffect(() => {
-        // Ensure Echo is properly initialized
-        if (typeof window.Echo === 'undefined') {
-            console.error('Echo is not initialized');
+        if (typeof window.Echo === "undefined") {
+            console.error("Echo is not initialized");
             return;
         }
 
-        const channel = window.Echo.channel('comments-channel');
+        const channel = window.Echo.channel("comments-channel");
 
-        channel.listen('.comment.posted', (event: { comment: Comment }) => {
-            console.log('Received comment:', event.comment);
+        channel.listen(".comment.posted", (event: { comment: Comment }) => {
+            console.log("Received comment:", event.comment);
             addNewComment(event.comment);
         });
 
         return () => {
-            channel.stopListening('.comment.posted');
-            window.Echo.leaveChannel('comments-channel');
+            channel.stopListening(".comment.posted");
+            window.Echo.leaveChannel("comments-channel");
         };
     }, []);
 
@@ -81,21 +84,32 @@ const CommentsSection = ({
                 <CardTitle>Comments</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-                {/*<CommentForm*/}
-                {/*    onSubmit={(content) => onCommentSubmit(content)}*/}
-                {/*    currentUserAvatar={currentUserAvatar}*/}
-                {/*/>*/}
-                <CommentForm
-                    onSubmit={(content) => onCommentSubmit(content)}
-                    currentUserAvatar={page.props.auth.user?.profile_photo_path || ""}
-                />
+                {user ? (
+                    <CommentForm
+                        onSubmit={(content) => onCommentSubmit(content)}
+                        currentUserAvatar={
+                            user.profile_photo_path || // Dùng avatar từ user nếu có
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                name
+                            )}&color=7F9CF5&background=EBF4FF`
+                        }
+                    />
+                ) : (
+                    <p>Please log in to add a comment.</p> // Hiển thị thông báo nếu không đăng nhập
+                )}
                 <div className="space-y-6">
                     {comments.map((comment) => (
                         <CommentItem
                             key={comment.id}
                             comment={comment}
                             onReply={onCommentSubmit}
-                            currentUserAvatar={currentUserAvatar}
+                            currentUserAvatar={
+                                comment.user.profile_photo_path
+                                    ? `/storage/${comment.user.profile_photo_path}`
+                                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                        comment.user.name
+                                    )}&color=7F9CF5&background=EBF4FF`
+                            }
                         />
                     ))}
                 </div>
@@ -103,5 +117,6 @@ const CommentsSection = ({
         </Card>
     );
 };
+
 
 export default CommentsSection;

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/categories/{categorySlug}/posts', [PostController::class, 'filterPostByCategory'])
     ->name('categories.posts.index');
+Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
 Route::get('/posts/search', [PostController::class, 'search'])->name('posts.search');
 Route::middleware(['auth'])->group(function () {
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -32,12 +33,11 @@ Route::delete('/comments/{comment}', [CommentsController::class, 'destroy'])
     ->middleware(['auth:sanctum'])
     ->name('comments.destroy');
 
-Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
 Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
     ->middleware('auth')
     ->name('notifications.read_all');
-
+Route::get('/send-email', [\Illuminate\Notifications\Notification::class, 'sendEmailNotification']);
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

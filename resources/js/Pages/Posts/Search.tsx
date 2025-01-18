@@ -5,7 +5,7 @@ import React from 'react';
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 import {Separator} from "@/Components/ui/separator";
 import BlogCard from "@/Pages/Posts/PostCard";
-import {BlogPost, Category, Paginate} from "@/types";
+import {BlogPost, Category, Notification, Paginate} from "@/types";
 import {usePage} from "@inertiajs/react";
 
 interface Post {
@@ -33,6 +33,7 @@ interface Props {
     postCount: number;
     keyword: string;
     selectedCategory?: string | null | undefined | unknown;
+    notifications: Notification[]
 }
 
 const PostsIndex: React.FC<Props> = ({
@@ -41,12 +42,13 @@ const PostsIndex: React.FC<Props> = ({
                                          pagination,
                                          postCount,
                                          keyword,
-                                         selectedCategory
+                                         selectedCategory,
+    notifications
                                      }) => {
 
 
     return (
-        <AppLayout title="Posts" canLogin={true} canRegister={true}>
+        <AppLayout title="Posts" canLogin={true} canRegister={true} notifications={notifications}>
             <div className="max-w-6xl mx-auto px-4">
                 {/* Search Section */}
                 <div className="mb-6">

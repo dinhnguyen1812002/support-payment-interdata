@@ -20,7 +20,7 @@ interface BlogCardProps {
 
 const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
     const page = useTypedPage();
-
+    const isAuthenticated = !!page.props.auth.user;
     if (posts.length === 0) {
         return (
             <div className="text-center p-8">
@@ -42,13 +42,23 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                     </p>
                 </div>
 
-                <Link href="/posts/create">
-                    <Button className="flex items-center gap-2">
-                        <PlusCircle className="w-4 h-4" />
-                        Ask Question
-                    </Button>
-                </Link>
-
+                {isAuthenticated ? (
+                    // Nếu đã đăng nhập, hiển thị nút Ask Question
+                    <Link href="/posts/create">
+                        <Button className="flex items-center gap-2">
+                            <PlusCircle className="w-4 h-4" />
+                           đặt câu  hỏi tại đây
+                        </Button>
+                    </Link>
+                ) : (
+                    // Nếu chưa đăng nhập, dẫn người dùng đến trang login
+                    <Link href="/login">
+                        <Button className="flex items-center gap-2">
+                            <PlusCircle className="w-4 h-4" />
+                            Đăng Nhập để đặt câu hỏi
+                        </Button>
+                    </Link>
+                )}
             </div>
 
             <div className="space-y-3">
@@ -56,7 +66,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                     <Card key={post.id} className="w-full border-none shadow-none">
                         <div className="flex">
                             {/* Left side - Upvote */}
-                            <div className=" flex items-center justify-items-center">
+                            <div className="flex items-center justify-items-center">
                                 <Upvote
                                     postId={post.id}
                                     initialIsUpvote={post.isUpvote}
@@ -121,34 +131,29 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                         </Link>
 
                                         <div className="flex flex-wrap gap-2 mt-3">
-                                            {post.categories && post.categories.map((category) => (
-                                                <Link
-                                                    key={category.id}
-
-                                                    href={`/categories/${generateSlug(category.title)}/posts`}
-                                                >
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="cursor-pointer border border-dashed hover:border-gray-600 border-gray-400 hover:border-solid"
+                                            {post.categories &&
+                                                post.categories.map((category) => (
+                                                    <Link
+                                                        key={category.id}
+                                                        href={`/categories/${generateSlug(category.title)}/posts`}
                                                     >
-                                                        {category.title}
-                                                    </Badge>
-                                                </Link>
-                                            ))}
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="cursor-pointer border border-dashed hover:border-gray-600 border-gray-400 hover:border-solid"
+                                                        >
+                                                            {category.title}
+                                                        </Badge>
+                                                    </Link>
+                                                ))}
                                         </div>
                                     </div>
                                 </CardContent>
-
-                                {/*<CardFooter className="p-4 pt-0">*/}
-                                {/*    <Separator className="my-2" />*/}
-                                {/*</CardFooter>*/}
                             </div>
                         </div>
                         <Separator className="my-2 border-dashed border-0 border-sky-500" />
                     </Card>
                 ))}
             </div>
-
         </div>
     );
 };
