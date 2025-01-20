@@ -9,10 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
-Route::get('/categories/{categorySlug}/posts', [PostController::class, 'filterPostByCategory'])
-    ->name('categories.posts.index');
-Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
-Route::get('/posts/search', [PostController::class, 'search'])->name('posts.search');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/new-post', [PostController::class, 'store'])->name('posts.store');
@@ -26,6 +23,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/comments/{comment}/reply', [CommentsController::class, 'reply'])->name('comments.reply');
 
 });
+Route::get('/categories/{categorySlug}/posts', [PostController::class, 'filterPostByCategory'])
+    ->name('categories.posts.index');
+Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
+Route::get('/posts/search', [PostController::class, 'search'])->name('posts.search');
 
 Route::post('/posts/{post}/upvote', [UpvoteController::class, 'upvote'])
     ->name('posts.upvote');

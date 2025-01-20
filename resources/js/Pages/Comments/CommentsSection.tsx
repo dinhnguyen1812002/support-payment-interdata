@@ -4,13 +4,9 @@ import CommentForm from "@/Pages/Comments/CommentForm";
 import CommentItem from "@/Pages/Comments/CommentItem";
 import useTypedPage from "@/Hooks/useTypedPage";
 import {getFirstTwoLetters} from "@/lib/utils";
-import {forEach} from "lodash";
+import { User } from '@/types';
 
-interface User {
-    id: number;
-    name: string;
-    profile_photo_path: string;
-}
+
 
 
 interface Comment {
@@ -34,6 +30,7 @@ const CommentsSection = ({
                              currentUserAvatar,
                          }: CommentsSectionProps) => {
     const [comments, setComments] = useState<Comment[]>(initialComments);
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
     const page = useTypedPage();
     const user = page.props.auth.user; // Lưu user vào biến để tránh truy cập lặp lại
     const name = user ? getFirstTwoLetters(user.name) : ""; // Kiểm tra user trước khi truy cập name
@@ -95,7 +92,7 @@ const CommentsSection = ({
                         }
                     />
                 ) : (
-                    <p>Please log in to add a comment.</p> // Hiển thị thông báo nếu không đăng nhập
+                    <p>Đang nhập để bình luận</p>
                 )}
                 <div className="space-y-6">
                     {comments.map((comment) => (

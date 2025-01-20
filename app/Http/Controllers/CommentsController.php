@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\NewCommentPosted;
 use App\Models\Comments;
 use App\Models\Post;
 use App\Notifications\NewQuestionOrAnswerNotification;
@@ -79,8 +78,6 @@ class CommentsController extends Controller
             );
         }
 
-        broadcast(new NewCommentPosted($commentData));
-
         return back()->with('success', 'Comment added successfully!');
     }
 
@@ -95,7 +92,7 @@ class CommentsController extends Controller
                 return [
                     'id' => $comment->id,
                     'comment' => $comment->comment,
-                    'created_at' => $comment->created_at->toISOString(),
+                    'created_at' => $comment->created_at->diffForHumans(),
                     'user' => [
                         'id' => $comment->user->id,
                         'name' => $comment->user->name,
@@ -105,7 +102,7 @@ class CommentsController extends Controller
                         return [
                             'id' => $reply->id,
                             'comment' => $reply->comment,
-                            'created_at' => $reply->created_at->toISOString(),
+                            'created_at' => $reply->created_at->diffForHumans(),
                             'user' => [
                                 'id' => $reply->user->id,
                                 'name' => $reply->user->name,
@@ -116,10 +113,6 @@ class CommentsController extends Controller
                 ];
             });
 
-        //        return response()->json([
-        //            'post' => $post,
-        //            'comments' => $comments,
-        //        ]);
         return Inertia::render('Posts/PostDetail', [
             'post' => $post,
             'comments' => $comments,

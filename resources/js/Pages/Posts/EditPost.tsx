@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Button } from '@/Components/ui/button';
 import { Badge } from "@/Components/ui/badge";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
-import  { Category } from "@/types";
+import {Category, Notification} from "@/types";
 interface EditPostProps {
     post: {
         id: number;
@@ -23,11 +23,13 @@ interface EditPostProps {
         categories?: number[];
     };
     categories:Category[];
+    notifications:Notification[]
+
 }
 
 
 
-const EditPost = ({ post, categories }: EditPostProps) => {
+const EditPost = ({ post, categories , notifications }: EditPostProps) => {
     const { data, setData, put, processing, errors, reset } = useForm({
         title: post.title || '',
         content: post.content || '',
@@ -64,9 +66,8 @@ const EditPost = ({ post, categories }: EditPostProps) => {
     const filteredCategories = categories.filter(category =>
         category.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
     return (
-        <AppLayout title={'Post'} canLogin={true} canRegister={true}>
+        <AppLayout title={'Post'} canLogin={true} canRegister={true} notifications={notifications}>
             <div className="max-w-6xl mx-auto px-4">
                 <div className="flex flex-col lg:flex-row gap-6">
                     {/* Main content with categories sidebar */}

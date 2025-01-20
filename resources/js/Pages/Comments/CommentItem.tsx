@@ -1,24 +1,21 @@
 import React from "react";
 import useTypedPage from "@/Hooks/useTypedPage";
 import {router} from "@inertiajs/react";
-import {cn, getFirstTwoLetters} from "@/lib/utils";
+import {cn, formatDate, getFirstTwoLetters} from "@/lib/utils";
 import {Avatar, AvatarFallback, AvatarImage} from "@/Components/ui/avatar";
 import {Card, CardContent} from "@/Components/ui/card";
 import {Button} from "@/Components/ui/button";
 import {MessageCircle, Trash2} from "lucide-react";
 import CommentForm from "@/Pages/Comments/CommentForm";
+import {User} from "@/types";
+
+
 interface CommentItemProps {
     comment: Comment;
     onReply: (content: string, parentId: number) => void;
     currentUserAvatar: string;
     depth?: number;
 }
-interface User {
-    id: number;
-    name: string;
-    profile_photo_path: string;
-}
-
 interface Comment {
     id: number;
     user: User;
@@ -69,7 +66,10 @@ const CommentItem: React.FC<CommentItemProps> = ({
                     <CardContent className="pt-4">
                         <div className="flex items-center justify-between mb-2">
                             <span className="font-semibold">{comment.user.name}</span>
-                            <time className="text-sm text-muted-foreground">{comment.created_at}</time>
+                            <time className="text-sm text-muted-foreground">
+                                {/*{format(new Date(comment.created_at), 'dd/MM/yyyy HH:mm')}*/}
+                                {formatDate(comment.created_at)}
+                            </time>
                         </div>
                         <p className="text-sm">{comment.comment}</p>
                     </CardContent>

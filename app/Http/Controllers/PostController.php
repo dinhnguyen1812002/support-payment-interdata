@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Data\Post\CreatePostData;
+use App\Events\NewCommentPosted;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
@@ -106,19 +107,20 @@ class PostController extends Controller
 
     public function show($slug)
     {
-
         $post = Post::with(['user:id,name,profile_photo_path', 'categories:id,title,slug'])
             ->where('slug', $slug)
             ->firstOrFail();
+
         $category = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
+
         // Load all comments with nested replies
         $comments = $post->comments()
             ->whereNull('parent_id')
             ->with(['user:id,name,profile_photo_path'])
-            ->with(['allReplies.user:id,name,profile_photo_path']) // Using a new relationship
+            ->with(['allReplies.user:id,name,profile_photo_path'])
             ->latest()
             ->get()
             ->map(function ($comment) {
@@ -140,6 +142,7 @@ class PostController extends Controller
             'categories' => $category,
         ]);
     }
+
 
     protected function formatComment($comment)
     {

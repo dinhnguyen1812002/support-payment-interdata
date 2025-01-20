@@ -1,16 +1,17 @@
 import React from 'react';
-import { Card, CardContent, CardFooter, CardHeader } from "@/Components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
-import { Badge } from "@/Components/ui/badge";
-import { Separator } from "@/Components/ui/separator";
-import { Link } from "@inertiajs/react";
+import {Card, CardContent, CardFooter, CardHeader} from "@/Components/ui/card";
+import {Avatar, AvatarFallback, AvatarImage} from "@/Components/ui/avatar";
+import {Badge} from "@/Components/ui/badge";
+import {Separator} from "@/Components/ui/separator";
+import {Link} from "@inertiajs/react";
 import useTypedPage from "@/Hooks/useTypedPage";
-import { PenLine, PlusCircle } from "lucide-react";
-import { Button } from '@/Components/ui/button';
+import {PenLine, PlusCircle} from "lucide-react";
+import {Button} from '@/Components/ui/button';
 import Upvote from "@/Components/UpVote";
 import {BlogPost, Category} from "@/types";
 
-import  {generateSlug} from "@/Utils/slugUtils";
+import {generateSlug} from "@/Utils/slugUtils";
+import {route} from "ziggy-js";
 
 interface BlogCardProps {
     posts: BlogPost[];
@@ -18,7 +19,7 @@ interface BlogCardProps {
 
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
+const BlogCard: React.FC<BlogCardProps> = ({posts = [], postCount}) => {
     const page = useTypedPage();
     const isAuthenticated = !!page.props.auth.user;
     if (posts.length === 0) {
@@ -44,18 +45,18 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
 
                 {isAuthenticated ? (
                     // Nếu đã đăng nhập, hiển thị nút Ask Question
-                    <Link href="/posts/create">
+                    <Link  href={"posts/create"}>
                         <Button className="flex items-center gap-2">
-                            <PlusCircle className="w-4 h-4" />
-                           đặt câu  hỏi tại đây
+                            <PlusCircle className="w-4 h-4"/>
+                            đặt câu hỏi tại đây
                         </Button>
                     </Link>
                 ) : (
                     // Nếu chưa đăng nhập, dẫn người dùng đến trang login
                     <Link href="/login">
                         <Button className="flex items-center gap-2">
-                            <PlusCircle className="w-4 h-4" />
-                            Đăng Nhập để đặt câu hỏi
+                            <PlusCircle className="w-4 h-4"/>
+                            Đặt câu hỏi ở đây
                         </Button>
                     </Link>
                 )}
@@ -95,7 +96,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                             </Avatar>
                                             <div>
                                                 <p className="text-sm font-medium">{post.user.name}</p>
-                                                <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                                                <div
+                                                    className="flex items-center space-x-2 text-xs text-muted-foreground">
                                                     <time dateTime={post.created_at}>
                                                         {post.created_at}
                                                     </time>
@@ -108,8 +110,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                                 href={`/posts/${post.slug}/edit`}
                                                 className="inline-flex items-center gap-1.5 text-gray-500 hover:text-blue-600 transition-all duration-200 rounded-md px-3 py-1.5 hover:bg-blue-50 border border-transparent hover:border-blue-100"
                                             >
-                                                <PenLine className="w-4 h-4" />
-                                                <span className="text-sm font-medium">Chỉnh sửa</span>
+                                                <PenLine className="w-4 h-4"/>
+                                                {/*<span className="text-sm font-medium">Chỉnh sửa</span>*/}
                                             </Link>
                                         )}
                                     </div>
@@ -126,7 +128,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                             </h3>
                                             <div
                                                 className="text-sm text-muted-foreground line-clamp-2 mt-1"
-                                                dangerouslySetInnerHTML={{ __html: post.content }}
+                                                dangerouslySetInnerHTML={{__html: post.content}}
                                             />
                                         </Link>
 
@@ -150,7 +152,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                 </CardContent>
                             </div>
                         </div>
-                        <Separator className="my-2 border-dashed border-0 border-sky-500" />
+                        <Separator className="my-2 border-dashed border-0 border-sky-500"/>
                     </Card>
                 ))}
             </div>

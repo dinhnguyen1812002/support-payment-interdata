@@ -43,7 +43,7 @@ const PostsIndex: React.FC<Props> = ({
                                          postCount,
                                          keyword,
                                          selectedCategory,
-    notifications
+                                            notifications
                                      }) => {
 
 
