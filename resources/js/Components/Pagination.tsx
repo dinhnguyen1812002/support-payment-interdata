@@ -73,6 +73,7 @@ const PaginationComponent: React.FC<PaginationProps> = ({
                             <Link preserveScroll href={`?page=${page}`}>
                                 <PaginationLink isActive={page === current_page}>{page}</PaginationLink>
                             </Link>
+
                         )}
                     </PaginationItem>
                 ))}

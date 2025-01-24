@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewCommentPosted;
 use App\Models\Comments;
 use App\Models\Post;
 use App\Notifications\NewQuestionOrAnswerNotification;
@@ -62,12 +63,11 @@ class CommentsController extends Controller
 
         $post = Post::find($request->post_id);
         if ($post && $post->user_id !== auth()->id()) {
-            $post->user->notify(new NewQuestionOrAnswerNotification('answer', [
-                'title' => $post->title,
-                'url' => "/posts/{$post->slug}",
-            ]));
+            //            $post->user->notify(new NewQuestionOrAnswerNotification('answer', [
+            //                'title' => $post->title,
+            //                'url' => "/posts/{$post->slug}",
+            //            ]));
 
-            // Gửi email thông báo
             $notificationService->sendMail(
                 $post->user->email,
                 'New Answer to Your Question',
@@ -77,6 +77,7 @@ class CommentsController extends Controller
                 route('posts.show', $post->slug)
             );
         }
+        event(new NewCommentPosted($comment));
 
         return back()->with('success', 'Comment added successfully!');
     }

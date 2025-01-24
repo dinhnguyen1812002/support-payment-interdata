@@ -2,6 +2,7 @@ import React from "react";
 import { ScrollArea } from "@/Components/ui/scroll-area";
 import { Button } from "@/Components/ui/button";
 import { ChevronRight } from "lucide-react";
+import {Link} from "@inertiajs/react";
 
 interface Category {
     id: number;
@@ -14,9 +15,15 @@ interface Props {
     selectedCategory?: string | null | undefined; // Cho phép undefined
     className?: string;
     categories: Category[];
+    onCategorySelect?: () => void;
 }
 
-const CategoriesSidebar: React.FC<Props> = ({ categories, selectedCategory, className = "" }) => {
+const CategoriesSidebar: React.FC<Props> = ({
+                                                categories,
+                                                selectedCategory,
+                                                className = "",
+                                                onCategorySelect,
+                                            }) => {
     return (
         <div className={`lg:max-w-52 mt-10 ${className}`}>
             <div>
@@ -36,15 +43,18 @@ const CategoriesSidebar: React.FC<Props> = ({ categories, selectedCategory, clas
                                         isActive ? "bg-slate-100" : ""
                                     }`}
                                     asChild
+                                    onClick={onCategorySelect}
                                 >
-                                    <a
+                                    <Link
                                         href={`/categories/${category.slug}/posts`}
                                         className="flex items-center w-full"
                                     >
                                         <div className="flex items-center gap-2">
                                             <ChevronRight
                                                 className={`h-4 w-4 ${
-                                                    isActive ? "text-blue-600" : "hover:text-blue-600"
+                                                    isActive
+                                                        ? "text-blue-600"
+                                                        : "hover:text-blue-600"
                                                 }`}
                                             />
                                             <span
@@ -60,7 +70,7 @@ const CategoriesSidebar: React.FC<Props> = ({ categories, selectedCategory, clas
                                                 {category.posts_count}
                                             </div>
                                         )}
-                                    </a>
+                                    </Link>
                                 </Button>
                             );
                         })}
@@ -70,5 +80,4 @@ const CategoriesSidebar: React.FC<Props> = ({ categories, selectedCategory, clas
         </div>
     );
 };
-
 export default CategoriesSidebar;

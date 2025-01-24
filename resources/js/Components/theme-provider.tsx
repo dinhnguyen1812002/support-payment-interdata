@@ -10,7 +10,7 @@ type ThemeProviderProps = {
 
 type ThemeProviderState = {
     theme: Theme
-    setTheme: (theme: Theme) => void
+    setTheme: (theme: string) => void
 }
 
 const initialState: ThemeProviderState = {
@@ -57,10 +57,9 @@ export function ThemeProvider({
     }
 
     return (
-        {children}
-        // <ThemeProviderContext.Provider {...props} value={value}>
-        //     {children}
-        // </ThemeProviderContext.Provider>
+        <ThemeProviderContext.Provider {...props} value={value}>
+            {children}
+        </ThemeProviderContext.Provider>
     )
 }
 

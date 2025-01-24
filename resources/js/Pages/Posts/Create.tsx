@@ -80,12 +80,16 @@ const CreatePost = ({categories, notifications}:FromPostProps) => {
                 {/* Main content with categories sidebar */}
                 <div className="flex-1 flex flex-col lg:flex-row gap-6">
                     {/* Categories Sidebar */}
-                    <CategoriesSidebar
-                        categories={categories}
-                        selectedCategory={null}
-                        className="lg:w-1/4"
-                    />
-                    <div className="mt-10 h-5/6 border-l border-dashed border-gray-300"> </div>
+                    <div className="hidden lg:block lg:w-64 ">
+                        <div className="sticky top-20">
+                            <CategoriesSidebar
+                                categories={categories}
+                                selectedCategory={selectedCategory}
+                                className="w-full"
+                            />
+                        </div>
+                    </div>
+                    <div className="mt-10 h-5/6 border-l border-dashed border-gray-300"></div>
                     <div className="flex-1 max-w-3xl">
                         <div className="space-y-6 mt-10">
                             <Card>
@@ -130,8 +134,8 @@ const CreatePost = ({categories, notifications}:FromPostProps) => {
                                                     modules={{
                                                         toolbar: [
                                                             ['bold', 'italic', 'underline'],
-                                                            [{ header: [1, 2, false] }],
-                                                            [{ list: 'ordered' }, { list: 'bullet' }],
+                                                            [{header: [1, 2, false]}],
+                                                            [{list: 'ordered'}, {list: 'bullet'}],
                                                             ['link', 'image'],
                                                         ],
                                                     }}
@@ -147,7 +151,8 @@ const CreatePost = ({categories, notifications}:FromPostProps) => {
                                         <div className="space-y-2 mb-8 h-16">
                                             <Label>Danh mục</Label>
                                             <div className="relative">
-                                                <div className="flex flex-wrap gap-2 p-2 bg-white border rounded-md min-h-[42px]">
+                                                <div
+                                                    className="flex flex-wrap gap-2 p-2 bg-white border rounded-md min-h-[42px]">
                                                     {selectedCategories.map((category) => (
                                                         <Badge
                                                             key={category.id}
@@ -160,7 +165,7 @@ const CreatePost = ({categories, notifications}:FromPostProps) => {
                                                                 onClick={() => handleCategoryChange(category.id)}
                                                                 className="ml-1 hover:text-destructive"
                                                             >
-                                                                <X className="h-3 w-3" />
+                                                                <X className="h-3 w-3"/>
                                                             </button>
                                                         </Badge>
                                                     ))}
@@ -177,7 +182,8 @@ const CreatePost = ({categories, notifications}:FromPostProps) => {
                                                     />
                                                 </div>
                                                 {showCategories && filteredCategories.length > 0 && (
-                                                    <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg">
+                                                    <div
+                                                        className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg">
                                                         <div className="max-h-[200px] overflow-auto py-1">
                                                             {filteredCategories.map((category) => (
                                                                 <div
@@ -219,7 +225,7 @@ const CreatePost = ({categories, notifications}:FromPostProps) => {
                                         <Button type="submit" className="w-full" disabled={processing}>
                                             {processing ? (
                                                 <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
                                                     Đang xử lý
                                                 </>
                                             ) : (

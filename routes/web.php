@@ -23,10 +23,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/comments/{comment}/reply', [CommentsController::class, 'reply'])->name('comments.reply');
 
 });
+Route::get('/posts/search', [PostController::class, 'search'])->name('posts.search');
 Route::get('/categories/{categorySlug}/posts', [PostController::class, 'filterPostByCategory'])
     ->name('categories.posts.index');
 Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
-Route::get('/posts/search', [PostController::class, 'search'])->name('posts.search');
 
 Route::post('/posts/{post}/upvote', [UpvoteController::class, 'upvote'])
     ->name('posts.upvote');

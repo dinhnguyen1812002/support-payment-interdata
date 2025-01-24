@@ -1,44 +1,65 @@
-import React from "react";
-import { Card, CardHeader, CardContent } from "@/Components/ui/card";
-import { Button } from "@/Components/ui/button";
-import { ScrollArea } from "@/Components/ui/scroll-area";
-import { ChevronRight } from "lucide-react";
-import { Category } from "@/types";
+import React, { useState } from 'react';
+import { router } from '@inertiajs/react';
+import AppLayout from '@/Layouts/AppLayout';
+import BlogCard from '@/Pages/Posts/PostCard';
+import CategoriesSidebar from '@/Pages/Categories/CategoriesSidebar';
+import CategoriesSheet from '@/Pages/Categories/CategoriesSheet';
+import { IndexProps } from '@/types';
+import { Separator } from "@/Components/ui/separator";
+import SearchComponent from '@/Components/Search';
 
-interface CategoriesProps {
-    categories: Category[];
-    onCategoryClick?: (slug: string) => void; // Prop cho sự kiện click
-}
+const PostsIndex: React.FC<IndexProps> = ({
+                                              posts = [],
+                                              categories = [],
+                                              pagination,
+                                              postCount,
+                                              keyword,
+                                              selectedCategory,
+                                              notifications
+                                          }) => {
+    const title = "Support Autopay";
 
-const Sidebar: React.FC<CategoriesProps> = ({ categories, onCategoryClick }) => {
     return (
-        <Card className="w-64 mt-10">
-            <CardHeader >
-                <h3 className="text-lg font-semibold">Danh mục</h3>
-            </CardHeader>
-            <CardContent className="p-0">
-                <ScrollArea className="h-[300px] px-1">
-                    <div className="space-y-1 p-2">
-                        {categories.map((category) => (
-                            <Button
-                                key={category.id}
-                                variant="ghost"
-                                className="w-full justify-start gap-2 font-normal hover:bg-slate-100"
-                                onClick={() => onCategoryClick?.(category.slug)} // Gọi sự kiện click
-                                asChild
-                            >
-                                <a href={`/categories/${category.slug}`}>
-                                    <ChevronRight className="h-4 w-4" />
-                                    {category.title}
-                                </a>
-                            </Button>
+        <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
+            <div className="max-w-6xl mx-auto px-4">
+                {/* Search Section */}
+                <div className="mb-6">
+                    <div className="flex flex-col lg:flex-row gap-6">
+                        {/* Sidebar - Categories */}
+                        {/* Hiển thị trên màn hình lớn */}
+                        <div className="hidden lg:block lg:w-64">
+                            <div className="sticky top-20">
+                                <CategoriesSidebar
+                                    categories={categories}
+                                    selectedCategory={selectedCategory as string | null | undefined} // Đảm bảo kiểu hợp lệ
+                                    className="w-full"
+                                />
+                            </div>
+                        </div>
 
-                        ))}
+                        {/* Hiển thị trên màn hình nhỏ */}
+                        <div className="md:hidden mb-4">
+                            <CategoriesSheet
+                                categories={categories}
+                                selectedCategory={selectedCategory as string | null | undefined}
+                            />
+                        </div>
+
+                        <Separator orientation="vertical" />
+
+                        {/* Search Component & Posts */}
+                        <SearchComponent initialSearch={keyword}
+                                         route="/posts/search"
+                                         pagination={pagination}>
+                            <div className="flex-1 max-w-6xl">
+                                <BlogCard posts={posts} postCount={postCount} />
+                            </div>
+                        </SearchComponent>
                     </div>
-                </ScrollArea>
-            </CardContent>
-        </Card>
+                </div>
+            </div>
+        </AppLayout>
     );
 };
 
-export default Sidebar;
+export default PostsIndex;

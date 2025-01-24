@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 
@@ -21,8 +22,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Inertia::share('notifications', function () {
-            return Auth::check() ? Auth::user()->unreadNotifications : [];
-        });
+        if (env('APP_ENV') !== 'local') {
+            URL::forceScheme('https');
+        }
+        //        Inertia::share('notifications', function () {
+        //            return Auth::check() ? Auth::user()->unreadNotifications : [];
+        //        });
     }
 }

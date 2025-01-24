@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Data\Post\CreatePostData;
-use App\Events\NewCommentPosted;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
@@ -60,7 +59,7 @@ class PostController extends Controller
 
         return Inertia::render('Posts/Create', [
             'categories' => $categories,
-            //'category' => Category::getCategoriesCount(),
+            // 'category' => Category::getCategoriesCount(),
         ]);
     }
 
@@ -142,7 +141,6 @@ class PostController extends Controller
             'categories' => $category,
         ]);
     }
-
 
     protected function formatComment($comment)
     {

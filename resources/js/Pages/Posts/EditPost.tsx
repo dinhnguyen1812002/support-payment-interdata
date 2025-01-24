@@ -73,12 +73,16 @@ const EditPost = ({ post, categories , notifications }: EditPostProps) => {
                     {/* Main content with categories sidebar */}
                     <div className="flex-1 flex flex-col lg:flex-row gap-6">
                         {/* Categories Sidebar */}
-                        <CategoriesSidebar
-                            categories={categories}
-                            selectedCategory={null}
-                            className="lg:w-1/4"
-                        />
-                        <div className="mt-10 h-5/6 border-l border-dashed border-gray-300"> </div>
+                        <div className="hidden lg:block lg:w-64 ">
+                            <div className="sticky top-20">
+                                <CategoriesSidebar
+                                    categories={categories}
+                                    selectedCategory={null}
+                                    className="w-full"
+                                />
+                            </div>
+                        </div>
+                        <div className="mt-10 h-5/6 border-l border-dashed border-gray-300"></div>
                         <div className="flex-1 max-w-3xl">
                             <div className="space-y-6 mt-10">
                                 <Card>
@@ -107,7 +111,8 @@ const EditPost = ({ post, categories , notifications }: EditPostProps) => {
 
                                             <div className="space-y-2 h-40 mb-6">
                                                 <Label htmlFor="content">Nội dung</Label>
-                                                <div className={cn(" rounded-md ", errors.content && " ring-2 ring-red-500")}>
+                                                <div
+                                                    className={cn(" rounded-md ", errors.content && " ring-2 ring-red-500")}>
                                                     <ReactQuill
                                                         theme="snow"
                                                         className="h-28 "
@@ -163,7 +168,8 @@ const EditPost = ({ post, categories , notifications }: EditPostProps) => {
                                                         Chọn danh mục...
                                                     </Button>
                                                     {showCategories && (
-                                                        <div className="absolute z-10 w-full mt-2 bg-white border rounded-md shadow-lg">
+                                                        <div
+                                                            className="absolute z-10 w-full mt-2 bg-white border rounded-md shadow-lg">
                                                             <div className="p-2">
                                                                 <Input
                                                                     type="text"

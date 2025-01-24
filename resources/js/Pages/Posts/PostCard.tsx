@@ -5,13 +5,15 @@ import {Badge} from "@/Components/ui/badge";
 import {Separator} from "@/Components/ui/separator";
 import {Link} from "@inertiajs/react";
 import useTypedPage from "@/Hooks/useTypedPage";
-import {PenLine, PlusCircle} from "lucide-react";
+import {Menu, PenLine, PlusCircle} from "lucide-react";
 import {Button} from '@/Components/ui/button';
 import Upvote from "@/Components/UpVote";
 import {BlogPost, Category} from "@/types";
 
 import {generateSlug} from "@/Utils/slugUtils";
 import {route} from "ziggy-js";
+import {Sheet, SheetContent, SheetTrigger} from "@/Components/ui/sheet";
+import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 
 interface BlogCardProps {
     posts: BlogPost[];
@@ -31,6 +33,7 @@ const BlogCard: React.FC<BlogCardProps> = ({posts = [], postCount}) => {
     }
 
     return (
+
         <div className="container mx-auto mb-8">
             <div className="mb-6 flex items-center justify-between mt-5">
                 <div className="space-y-1">
@@ -45,7 +48,7 @@ const BlogCard: React.FC<BlogCardProps> = ({posts = [], postCount}) => {
 
                 {isAuthenticated ? (
                     // Nếu đã đăng nhập, hiển thị nút Ask Question
-                    <Link  href={"posts/create"}>
+                    <Link href={"posts/create"}>
                         <Button className="flex items-center gap-2">
                             <PlusCircle className="w-4 h-4"/>
                             đặt câu hỏi tại đây
@@ -65,6 +68,10 @@ const BlogCard: React.FC<BlogCardProps> = ({posts = [], postCount}) => {
             <div className="space-y-3">
                 {posts.map((post) => (
                     <Card key={post.id} className="w-full border-none shadow-none">
+                        <Link
+                            href={`/posts/${post.slug}`}
+                            className="block group"
+                        />
                         <div className="flex">
                             {/* Left side - Upvote */}
                             <div className="flex items-center justify-items-center">

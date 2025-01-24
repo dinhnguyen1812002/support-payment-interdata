@@ -28,7 +28,7 @@ class UserNotificationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'User Notification Mail',
+            subject: 'emails.answer-notification',
         );
     }
 

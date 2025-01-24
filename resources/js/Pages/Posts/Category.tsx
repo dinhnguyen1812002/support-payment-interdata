@@ -33,11 +33,15 @@ const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination, 
                 <div className="mb-6 ">
                     <div className="flex flex-col lg:flex-row gap-6">
                         {/* Sidebar - Categories */}
-                        <CategoriesSidebar
-                            categories={categories}
-                            selectedCategory={selectedCategory as string | null | undefined} // Đảm bảo kiểu hợp lệ
-                            className="lg:w-1/4"
-                        />
+                        <div className="hidden lg:block lg:w-64 ">
+                            <div className="sticky top-20">
+                                <CategoriesSidebar
+                                    categories={categories}
+                                    selectedCategory={selectedCategory as string | null | undefined} // Đảm bảo kiểu hợp lệ
+                                    className="w-full"
+                                />
+                            </div>
+                        </div>
                         <Separator orientation="vertical"/>
 
                         <SearchComponent initialSearch={keyword}
@@ -45,7 +49,6 @@ const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination, 
                                          pagination={pagination}>
                             <div className="flex-1 max-w-full ">
                                 <BlogCard posts={posts} postCount={postCount}/>
-
                             </div>
                         </SearchComponent>
                         {/* Posts */}

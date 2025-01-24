@@ -6,6 +6,9 @@ import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { RouteContext } from '@/Hooks/useRoute';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import ScrollProgress from "@/Components/ui/scroll-progress";
+import {ThemeProvider} from "@/Components/theme-provider";
+import ModeToggle from "@/Components/mode-toggle";
 
 const appName =
   window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
@@ -13,9 +16,9 @@ const appName =
 
 createInertiaApp({
   title: title => `${title}`,
-  progress: {
-    color: '#4B5563',
-  },
+  // progress: {
+  //   color: '#4B5563',
+  // },
   resolve: name =>
     resolvePageComponent(
       `./Pages/${name}.tsx`,
@@ -25,7 +28,11 @@ createInertiaApp({
     const root = createRoot(el);
     return root.render(
       <RouteContext.Provider value={(window as any).route}>
-        <App {...props} />
+        <ThemeProvider>
+              <ScrollProgress  />
+              <App {...props} />
+</ThemeProvider>
+
       </RouteContext.Provider>,
     );
   },

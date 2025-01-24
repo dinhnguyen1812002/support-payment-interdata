@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
+use App\Models\Comments;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -14,18 +14,18 @@ class NewCommentPosted implements ShouldBroadcast
 
     public $comment;
 
-    public function __construct($comment)
+    public function __construct(Comments $comment)
     {
-        $this->comment = $comment;
+        $this->comment = $comment->load('user:id,name,profile_photo_path');
     }
 
     public function broadcastOn()
     {
-        return new Channel('comments-channel');
+        return ['public'];
     }
 
     public function broadcastAs()
     {
-        return 'comment.posted';
+        return 'chat';
     }
 }
