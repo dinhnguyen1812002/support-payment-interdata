@@ -30,6 +30,8 @@ import ModeToggle from "@/Components/mode-toggle";
 import {Sheet, SheetContent, SheetTrigger} from "@/Components/ui/sheet";
 import {Menu} from "lucide-react";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
+import {NotificationProvider} from "@/Context/NotificationContext";
+import { Toaster } from '@/Components/ui/sonner';
 
 interface Props {
     title: string;
@@ -51,8 +53,7 @@ notifications
                                   }: PropsWithChildren<Props>) {
     const page = useTypedPage();
     const route = useRoute();
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     function switchToTeam(e: React.FormEvent, team: Team) {
         e.preventDefault();
@@ -119,7 +120,7 @@ notifications
                                 <div className="flex items-center space-x-4">
                                     <ModeToggle/>
                                     {page.props.auth.user && (
-                                        <NotificationsDropdown notifications={notifications}/>
+                                        <NotificationsDropdown notifications={notifications} />
                                     )}
                                     {page.props.auth.user ? (
                                         <DropdownMenu>
@@ -359,8 +360,8 @@ notifications
                     {/* <!-- Page Content --> */}
 
                     <main>
-
-                        {children}
+                    <Toaster position="top-right" />
+                            {children}
                     </main>
                 </div>
                 <Footer/>

@@ -11,9 +11,7 @@ import Upvote from "@/Components/UpVote";
 import {BlogPost, Category} from "@/types";
 
 import {generateSlug} from "@/Utils/slugUtils";
-import {route} from "ziggy-js";
-import {Sheet, SheetContent, SheetTrigger} from "@/Components/ui/sheet";
-import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
+
 
 interface BlogCardProps {
     posts: BlogPost[];
@@ -79,7 +77,7 @@ const BlogCard: React.FC<BlogCardProps> = ({posts = [], postCount}) => {
                                     postId={post.id}
                                     initialIsUpvote={post.isUpvote}
                                     initialUpvoteCount={post.upvote_count}
-                                    upvote_count={post.upvote_count}
+                                    // upvote_count={post.upvote_count}
                                 />
                             </div>
 

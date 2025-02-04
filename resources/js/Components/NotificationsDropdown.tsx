@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { BellRing, Check, Bell } from "lucide-react";
 import { Link } from '@inertiajs/react';
 import { cn } from "@/lib/utils";
@@ -16,7 +16,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
-import { Switch } from "@/Components/ui/switch";
 import { Button } from "@/Components/ui/button";
 import {Notification} from "@/types";
 
@@ -25,18 +24,23 @@ import {Notification} from "@/types";
 interface NotificationsDropdownProps {
     notifications: Notification[];
     className?: string;
+
 }
 import axios from 'axios';
 
 const NotificationsDropdown = ({
                                    notifications,
-                                   className
+                                   className,
                                }: NotificationsDropdownProps) => {
-    const [localNotifications, setLocalNotifications] = React.useState(notifications);
-    const [isPushEnabled, setIsPushEnabled] = React.useState(false);
+    const [localNotifications, setLocalNotifications] = useState(notifications);
+
+
+    const [isPushEnabled, setIsPushEnabled] = useState(false);
 
     // Tính toán số lượng chưa đọc
-    const unreadCount = localNotifications.filter((n) => !n.read_at).length;
+    const unreadCount = (localNotifications || []).filter((n) => !n.read_at).length;
+
+    // const unreadCount = localNotifications.filter((n) => !n.read_at).length;
 
     // Hàm đánh dấu tất cả là đã đọc
     const markAllAsRead = async () => {
@@ -75,15 +79,15 @@ const NotificationsDropdown = ({
             <DropdownMenuContent align="end" className="w-[380px]">
                 <Card className={cn("w-full border-0 shadow-none", className)}>
                     <CardHeader>
-                        <CardTitle>Notifications</CardTitle>
+                        <CardTitle>Thông báo</CardTitle>
                         <CardDescription>
-                            You have {unreadCount} unread messages.
+                            {/*You have {unreadCount} unread messages.*/}
                         </CardDescription>
                     </CardHeader>
 
                     <CardContent className="grid gap-4">
                         {/* Push Notification Toggle */}
-                        <div className="flex items-center space-x-4 rounded-md border p-4">
+                        {/* <div className="flex items-center space-x-4 rounded-md border p-4">
                             <BellRing className="h-5 w-5" />
                             <div className="flex-1 space-y-1">
                                 <p className="text-sm font-medium leading-none">
@@ -97,8 +101,8 @@ const NotificationsDropdown = ({
                                 checked={isPushEnabled}
                                 onCheckedChange={setIsPushEnabled}
                             />
-                        </div>
-
+                        </div> */}
+                           
                         {/* List of Notifications */}
                         <div>
                             {localNotifications.map((notification, index) => (
@@ -128,7 +132,7 @@ const NotificationsDropdown = ({
                     {/* Mark all as read */}
                     <CardFooter>
                         <Button className="w-full" onClick={markAllAsRead}>
-                            <Check className="mr-2 h-4 w-4" /> Mark all as read
+                            <Check className="mr-2 h-4 w-4" />Đánh dấu đã đọc
                         </Button>
                     </CardFooter>
                 </Card>

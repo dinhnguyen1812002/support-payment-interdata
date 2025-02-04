@@ -9,7 +9,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import ScrollProgress from "@/Components/ui/scroll-progress";
 import {ThemeProvider} from "@/Components/theme-provider";
 import ModeToggle from "@/Components/mode-toggle";
-
+import { Toaster } from "@/Components/ui/sonner"
 const appName =
   window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
@@ -28,10 +28,12 @@ createInertiaApp({
     const root = createRoot(el);
     return root.render(
       <RouteContext.Provider value={(window as any).route}>
+
         <ThemeProvider>
               <ScrollProgress  />
               <App {...props} />
-</ThemeProvider>
+              <Toaster />
+        </ThemeProvider>
 
       </RouteContext.Provider>,
     );

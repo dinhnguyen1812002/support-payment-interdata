@@ -1,9 +1,23 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/Components/ui/tabs";
+import React, { useState } from 'react';
+import { cn } from "@/lib/utils";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from "@/Components/ui/card";
+import { Button } from "@/Components/ui/button";
 import { ScrollArea } from "@/Components/ui/scroll-area";
 import { Separator } from "@/Components/ui/separator";
-import { Shield, Key, Smartphone, LogOut, UserX } from 'lucide-react';
+import {
+    UserCircle,
+    Lock,
+    Activity,
+    Bell as BellIcon,
+    UserX,
+    ChevronRight,
+} from 'lucide-react';
 
 import DeleteUserForm from '@/Pages/Profile/Partials/DeleteUserForm';
 import LogoutOtherBrowserSessions from '@/Pages/Profile/Partials/LogoutOtherBrowserSessionsForm';
@@ -17,95 +31,137 @@ import { Notification, Session } from '@/types';
 interface Props {
     sessions: Session[];
     confirmsTwoFactorAuthentication: boolean;
-    notifications: Notification[];
 }
 
-const ProfilePage = ({
-                         sessions,
-                         confirmsTwoFactorAuthentication,
-                         notifications
-                     }: Props) => {
+interface SidebarItemProps {
+    icon: React.ReactNode;
+    title: string;
+    isActive: boolean;
+    onClick: () => void;
+}
+
+const SidebarItem = ({ icon, title, isActive, onClick }: SidebarItemProps) => (
+    <Button
+        variant={isActive ? "secondary" : "ghost"}
+        className={cn(
+            "w-full justify-start gap-2 h-12",
+            isActive && "bg-muted font-medium"
+        )}
+        onClick={onClick}
+    >
+        {icon}
+        <span>{title}</span>
+        {isActive && <ChevronRight className="ml-auto w-4 h-4" />}
+    </Button>
+);
+
+const ProfilePage = ({ sessions, confirmsTwoFactorAuthentication }: Props) => {
     const page = useTypedPage();
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [activeSection, setActiveSection] = useState('profile');
+    const user = page.props.auth.user!;
+
+    const sidebarItems = [
+        {
+            id: 'profile',
+            title: 'Profile Information',
+            icon: <UserCircle className="w-5 h-5" />,
+            component: <UpdateProfileInformationForm user={user} />
+        },
+        {
+            id: 'security',
+            title: 'Security Settings',
+            icon: <Lock className="w-5 h-5" />,
+            component: (
+                <div className="space-y-6">
+                    <UpdatePasswordForm />
+                    {page.props.jetstream.canManageTwoFactorAuthentication && (
+                        <TwoFactorAuthenticationForm
+                            requiresConfirmation={confirmsTwoFactorAuthentication}
+                        />
+                    )}
+                </div>
+            )
+        },
+        {
+            id: 'sessions',
+            title: 'Active Sessions',
+            icon: <Activity className="w-5 h-5" />,
+            component: <LogoutOtherBrowserSessions sessions={sessions} />
+        },
+        {
+            id: 'notifications',
+            title: 'Notifications',
+            icon: <BellIcon className="w-5 h-5" />,
+            component: (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Notification Preferences</CardTitle>
+                        <CardDescription>
+                            Manage how you receive notifications.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {/* Add notification settings here */}
+                    </CardContent>
+                </Card>
+            )
+        }
+    ];
 
     return (
         <AppLayout
             notifications={notifications}
             canRegister={true}
             canLogin={true}
-            title="Profile"
+            title={user.name}
         >
-            <div className="container mx-auto py-6 space-y-6">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-2xl font-bold">Profile Settings</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <Tabs defaultValue="profile" className="w-full">
-                            <ScrollArea className="w-full">
-                                <TabsList className="w-full justify-start border-b mb-4">
-                                    {page.props.jetstream.canUpdateProfileInformation && (
-                                        <TabsTrigger value="profile" className="flex items-center gap-2">
-                                            <Shield className="w-4 h-4" />
-                                            Profile Information
-                                        </TabsTrigger>
-                                    )}
-                                    {page.props.jetstream.canUpdatePassword && (
-                                        <TabsTrigger value="password" className="flex items-center gap-2">
-                                            <Key className="w-4 h-4" />
-                                            Password
-                                        </TabsTrigger>
-                                    )}
-                                    {page.props.jetstream.canManageTwoFactorAuthentication && (
-                                        <TabsTrigger value="2fa" className="flex items-center gap-2">
-                                            <Smartphone className="w-4 h-4" />
-                                            Two-Factor Auth
-                                        </TabsTrigger>
-                                    )}
-                                    <TabsTrigger value="sessions" className="flex items-center gap-2">
-                                        <LogOut className="w-4 h-4" />
-                                        Browser Sessions
-                                    </TabsTrigger>
-                                    {page.props.jetstream.hasAccountDeletionFeatures && (
-                                        <TabsTrigger value="delete" className="flex items-center gap-2">
-                                            <UserX className="w-4 h-4" />
-                                            Delete Account
-                                        </TabsTrigger>
-                                    )}
-                                </TabsList>
-                            </ScrollArea>
-
-                            {page.props.jetstream.canUpdateProfileInformation && (
-                                <TabsContent value="profile" className="mt-4">
-                                    <UpdateProfileInformationForm user={page.props.auth.user!} />
-                                </TabsContent>
-                            )}
-
-                            {page.props.jetstream.canUpdatePassword && (
-                                <TabsContent value="password" className="mt-4">
-                                    <UpdatePasswordForm />
-                                </TabsContent>
-                            )}
-
-                            {page.props.jetstream.canManageTwoFactorAuthentication && (
-                                <TabsContent value="2fa" className="mt-4">
-                                    <TwoFactorAuthenticationForm
-                                        requiresConfirmation={confirmsTwoFactorAuthentication}
-                                    />
-                                </TabsContent>
-                            )}
-
-                            <TabsContent value="sessions" className="mt-4">
-                                <LogoutOtherBrowserSessions sessions={sessions} />
-                            </TabsContent>
-
+            <div className="flex h-[calc(100vh-4rem)]">
+                {/* Sidebar */}
+                <div className="w-64 border-r bg-background">
+                    <div className="flex items-center px-4 h-14 border-b">
+                        <h2 className="text-lg font-semibold">Settings</h2>
+                    </div>
+                    <ScrollArea className="h-[calc(100vh-8rem)]">
+                        <div className="p-3 space-y-1">
+                            {sidebarItems.map((item) => (
+                                <SidebarItem
+                                    key={item.id}
+                                    icon={item.icon}
+                                    title={item.title}
+                                    isActive={activeSection === item.id}
+                                    onClick={() => setActiveSection(item.id)}
+                                />
+                            ))}
                             {page.props.jetstream.hasAccountDeletionFeatures && (
-                                <TabsContent value="delete" className="mt-4">
-                                    <DeleteUserForm />
-                                </TabsContent>
+                                <>
+                                    <Separator className="my-2" />
+                                    <SidebarItem
+                                        icon={<UserX className="w-5 h-5 text-destructive" />}
+                                        title="Delete Account"
+                                        isActive={activeSection === 'delete'}
+                                        onClick={() => setActiveSection('delete')}
+                                    />
+                                </>
                             )}
-                        </Tabs>
-                    </CardContent>
-                </Card>
+                        </div>
+                    </ScrollArea>
+                </div>
+
+                {/* Main Content */}
+                <div className="overflow-y-auto flex-1">
+                    <div className="flex items-center px-6 h-14 border-b">
+                        <h1 className="text-lg font-semibold">
+                            {sidebarItems.find(item => item.id === activeSection)?.title || 'Delete Account'}
+                        </h1>
+                    </div>
+                    <div className="p-6">
+                        {activeSection === 'delete'
+                            ? <DeleteUserForm />
+                            : sidebarItems.find(item => item.id === activeSection)?.component
+                        }
+                    </div>
+                </div>
             </div>
         </AppLayout>
     );

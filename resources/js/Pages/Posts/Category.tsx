@@ -15,49 +15,45 @@ interface Props {
     notifications: Notification[]
 }
 
-const PostsIndex: React.FC<Props> = ({ posts = [], categories = [], pagination, keyword, notifications=[] }) => {
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+const PostsIndex: React.FC<Props & { category?: Category }> = ({ 
+    posts = [], 
+    categories = [], 
+    pagination, 
+    keyword, 
+    notifications = [], 
+    category 
+}) => {
+    // Lấy danh mục hiện tại từ props (nếu có)
+    const categoryTitle = category ? category.title : "All Categories";
 
-    const handleCategoryClick = (slug: string) => {
-        setSelectedCategory(slug);
-        console.log(`Fetching posts for category: ${slug}`);
-    };
-
-    // Count the number of posts on the current page
-    const postCount = posts.length;
+    // Cập nhật title
+    const title = `Danh mục - ${categoryTitle}`;
 
     return (
-        <AppLayout title="Posts" canLogin={true} canRegister={true} notifications={notifications}>
+        <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
             <div className="max-w-6xl mx-auto px-4">
                 {/* Search Section */}
-                <div className="mb-6 ">
+                <div className="mb-6">
                     <div className="flex flex-col lg:flex-row gap-6">
                         {/* Sidebar - Categories */}
-                        <div className="hidden lg:block lg:w-64 ">
+                        <div className="hidden lg:block lg:w-64">
                             <div className="sticky top-20">
-                                <CategoriesSidebar
-                                    categories={categories}
-                                    selectedCategory={selectedCategory as string | null | undefined} // Đảm bảo kiểu hợp lệ
-                                    className="w-full"
-                                />
+                                <CategoriesSidebar categories={categories} selectedCategory={category?.slug} className="w-full" />
                             </div>
                         </div>
-                        <Separator orientation="vertical"/>
+                        <Separator orientation="vertical" />
 
-                        <SearchComponent initialSearch={keyword}
-                                         route="/posts/search"
-                                         pagination={pagination}>
-                            <div className="flex-1 max-w-full ">
-                                <BlogCard posts={posts} postCount={postCount}/>
+                        <SearchComponent initialSearch={keyword} route="/posts/search" pagination={pagination}>
+                            <div className="flex-1 max-w-full">
+                                <BlogCard posts={posts} postCount={posts.length} />
                             </div>
                         </SearchComponent>
-                        {/* Posts */}
                     </div>
-
                 </div>
             </div>
         </AppLayout>
     );
 };
+
 
 export default PostsIndex;

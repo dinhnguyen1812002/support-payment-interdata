@@ -60,6 +60,7 @@ class PostController extends Controller
         return Inertia::render('Posts/Create', [
             'categories' => $categories,
             // 'category' => Category::getCategoriesCount(),
+            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
         ]);
     }
 
@@ -139,6 +140,7 @@ class PostController extends Controller
                 'comments' => $comments,
             ],
             'categories' => $category,
+            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
         ]);
     }
 
@@ -191,6 +193,7 @@ class PostController extends Controller
                 'updated_at' => $post->updated_at->toDateTimeString(),
             ],
             'categories' => $categoriesWithCount,
+            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
         ]);
     }
 

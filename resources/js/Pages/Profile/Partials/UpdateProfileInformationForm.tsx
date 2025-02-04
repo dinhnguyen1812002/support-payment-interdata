@@ -114,7 +114,7 @@ export default function UpdateProfileInformationForm({ user }: Props) {
             // <!-- New Profile Photo Preview -->
             <div className="mt-2">
               <span
-                className="block rounded-full w-20 h-20"
+                className="block w-20 h-20 rounded-full"
                 style={{
                   backgroundSize: 'cover',
                   backgroundRepeat: 'no-repeat',
@@ -129,7 +129,7 @@ export default function UpdateProfileInformationForm({ user }: Props) {
               <img
                 src={user.profile_photo_url}
                 alt={user.name}
-                className="rounded-full h-20 w-20 object-cover"
+                className="object-cover w-20 h-20 rounded-full"
               />
             </div>
           )}
@@ -162,7 +162,7 @@ export default function UpdateProfileInformationForm({ user }: Props) {
         <TextInput
           id="name"
           type="text"
-          className="mt-1 block w-full"
+          className="block mt-1 w-full"
           value={form.data.name}
           onChange={e => form.setData('name', e.currentTarget.value)}
           autoComplete="name"
@@ -176,7 +176,7 @@ export default function UpdateProfileInformationForm({ user }: Props) {
         <TextInput
           id="email"
           type="email"
-          className="mt-1 block w-full"
+          className="block mt-1 w-full"
           value={form.data.email}
           onChange={e => form.setData('email', e.currentTarget.value)}
         />
@@ -185,13 +185,13 @@ export default function UpdateProfileInformationForm({ user }: Props) {
         {page.props.jetstream.hasEmailVerification &&
         user.email_verified_at === null ? (
           <div>
-            <p className="text-sm mt-2 dark:text-white">
+            <p className="mt-2 text-sm dark:text-white">
               Your email address is unverified.
               <Link
                 href={route('verification.send')}
                 method="post"
                 as="button"
-                className="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                className="text-sm text-gray-600 underline rounded-md dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
                 onClick={e => {
                   e.preventDefault();
                   setVerificationLinkSent(true);
@@ -201,7 +201,7 @@ export default function UpdateProfileInformationForm({ user }: Props) {
               </Link>
             </p>
             {verificationLinkSent && (
-              <div className="mt-2 font-medium text-sm text-green-600 dark:text-green-400">
+              <div className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
                 A new verification link has been sent to your email address.
               </div>
             )}

@@ -39,6 +39,7 @@ Route::post('/notifications/read-all', [NotificationController::class, 'markAllA
     ->middleware('auth')
     ->name('notifications.read_all');
 Route::get('/send-email', [\Illuminate\Notifications\Notification::class, 'sendEmailNotification']);
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

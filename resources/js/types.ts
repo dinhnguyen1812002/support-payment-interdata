@@ -21,6 +21,7 @@ export interface User {
   email_verified_at: Nullable<DateTime>;
   created_at: DateTime;
   updated_at: DateTime;
+  notifications: Notification[];
 }
 
 export interface Auth {
@@ -181,4 +182,9 @@ export interface EditPostProps {
     };
     categories:Category[];
 
+}
+export interface NotificationContextType {
+    notifications: Notification[];
+    unreadCount: number;
+    markAllAsRead: () => void;
 }

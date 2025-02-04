@@ -31,6 +31,7 @@ class CommentsController extends Controller
     //
     //        return back()->with('success', 'Comment added successfully!');
     //    }
+    
     public function store(Request $request, NotificationService $notificationService)
     {
         $validated = $request->validate([
@@ -48,18 +49,18 @@ class CommentsController extends Controller
 
         $comment->load(['user', 'replies.user']);
 
-        $commentData = [
-            'id' => $comment->id,
-            'comment' => $comment->comment,
-            'parent_id' => $comment->parent_id,
-            'created_at' => $comment->created_at->toISOString(),
-            'user' => [
-                'id' => $comment->user->id,
-                'name' => $comment->user->name,
-                'profile_photo_path' => $comment->user->profile_photo_path,
-            ],
-            'replies' => [],
-        ];
+        // $commentData = [
+        //     'id' => $comment->id,
+        //     'comment' => $comment->comment,
+        //     'parent_id' => $comment->parent_id,
+        //     'created_at' => $comment->created_at->toISOString(),
+        //     'user' => [
+        //         'id' => $comment->user->id,
+        //         'name' => $comment->user->name,
+        //         'profile_photo_path' => $comment->user->profile_photo_path,
+        //     ],
+        //     'replies' => [],
+        // ];
 
         $post = Post::find($request->post_id);
         if ($post && $post->user_id !== auth()->id()) {
@@ -71,8 +72,8 @@ class CommentsController extends Controller
             $notificationService->sendMail(
                 $post->user->email,
                 'New Answer to Your Question',
-                'Hi '.$post->user->name.',',
-                'Your question "'.$post->title.'" has received a new answer.',
+                'Hi ' . $post->user->name . ',',
+                'Your question "' . $post->title . '" has received a new answer.',
                 'View Answer',
                 route('posts.show', $post->slug)
             );
@@ -82,43 +83,60 @@ class CommentsController extends Controller
         return back()->with('success', 'Comment added successfully!');
     }
 
+    // public function show(Post $post)
+    // {
+    //     $comments = $post->comments()
+    //         ->whereNull('parent_id') // Get only parent comments
+    //         ->with(['user', 'replies.user'])
+    //         ->latest()
+    //         ->get()
+    //         ->map(function ($comment) {
+    //             return [
+    //                 'id' => $comment->id,
+    //                 'comment' => $comment->comment,
+    //                 'created_at' => $comment->created_at->diffForHumans(),
+    //                 'user' => [
+    //                     'id' => $comment->user->id,
+    //                     'name' => $comment->user->name,
+    //                     'profile_photo_path' => $comment->user->profile_photo_path,
+    //                 ],
+    //                 'replies' => $comment->replies->map(function ($reply) {
+    //                     return [
+    //                         'id' => $reply->id,
+    //                         'comment' => $reply->comment,
+    //                         'created_at' => $reply->created_at->diffForHumans(),
+    //                         'user' => [
+    //                             'id' => $reply->user->id,
+    //                             'name' => $reply->user->name,
+    //                             'profile_photo_path' => $reply->user->profile_photo_path,
+    //                         ],
+    //                     ];
+    //                 }),
+    //             ];
+    //         });
+
+    //     return Inertia::render('Posts/PostDetail', [
+    //         'post' => $post,
+    //         'comments' => $comments,
+    //     ]);
+    // }
     public function show(Post $post)
     {
         $comments = $post->comments()
-            ->whereNull('parent_id') // Get only parent comments
+            ->whereNull('parent_id')
             ->with(['user', 'replies.user'])
             ->latest()
-            ->get()
-            ->map(function ($comment) {
-                return [
-                    'id' => $comment->id,
-                    'comment' => $comment->comment,
-                    'created_at' => $comment->created_at->diffForHumans(),
-                    'user' => [
-                        'id' => $comment->user->id,
-                        'name' => $comment->user->name,
-                        'profile_photo_path' => $comment->user->profile_photo_path,
-                    ],
-                    'replies' => $comment->replies->map(function ($reply) {
-                        return [
-                            'id' => $reply->id,
-                            'comment' => $reply->comment,
-                            'created_at' => $reply->created_at->diffForHumans(),
-                            'user' => [
-                                'id' => $reply->user->id,
-                                'name' => $reply->user->name,
-                                'profile_photo_path' => $reply->user->profile_photo_path,
-                            ],
-                        ];
-                    }),
-                ];
-            });
+            ->paginate(5); // Sử dụng paginate()
 
         return Inertia::render('Posts/PostDetail', [
             'post' => $post,
-            'comments' => $comments,
+            'comments' => [
+                'data' => $comments->items(),
+                'next_page_url' => $comments->nextPageUrl(),
+            ],
         ]);
     }
+
 
     public function destroy(Comments $comment)
     {

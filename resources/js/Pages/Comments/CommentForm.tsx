@@ -126,7 +126,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                             </Button>
 
                             {/* Image Upload Button */}
-                            <label htmlFor="image-upload" className="cursor-pointer">
+                            {/* <label htmlFor="image-upload" className="cursor-pointer">
                                 <Image className="w-5 h-5" />
                                 <input
                                     type="file"
@@ -135,7 +135,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                                     className="hidden"
                                     onChange={handleImageChange}
                                 />
-                            </label>
+                            </label> */}
                         </div>
 
                         {/* Submit Button */}

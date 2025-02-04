@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import ReactQuill from 'react-quill';
@@ -27,8 +27,14 @@ interface FromPostProps{
     notifications:Notification[]
 }
 
+function AlterDialog(props: { open: boolean, onClose: () => void, title: string, description: string }) {
+    return null;
+}
+
 const CreatePost = ({categories, notifications}:FromPostProps) => {
+    const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const quillRef = useRef<ReactQuill>(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         content: '',
@@ -57,14 +63,15 @@ const CreatePost = ({categories, notifications}:FromPostProps) => {
             setSearchTerm('');
         }
     };
-    console.log(categories);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/new-post', {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
-                alert('Bài viết đã được tạo thành công!');
+                // alert('Bài viết đã được tạo thành công!');
+                setDialogOpen(true); // Mở dialog khi thành công
             },
             onError: (errors) => {
                 console.error('Form submission errors:', errors);
@@ -73,8 +80,8 @@ const CreatePost = ({categories, notifications}:FromPostProps) => {
     };
 
     return (
-
-    <AppLayout title={'Post'} canLogin={true} canRegister={true} notifications={notifications}>
+    <AppLayout title={'Đặt câu hỏi'} canLogin={true} canRegister={true} notifications={notifications}>
+        <AlterDialog open={dialogOpen} onClose={() => setDialogOpen(false)} title="Thành công" description="Bài viết đã được tạo thành công!"/>
         <div className="max-w-6xl mx-auto px-4">
             <div className="flex flex-col lg:flex-row gap-6">
                 {/* Main content with categories sidebar */}
@@ -127,6 +134,7 @@ const CreatePost = ({categories, notifications}:FromPostProps) => {
                                                 )}
                                             >
                                                 <ReactQuill
+                                                    ref={quillRef} // Thêm ref
                                                     theme="snow"
                                                     className="h-28"
                                                     value={data.content}

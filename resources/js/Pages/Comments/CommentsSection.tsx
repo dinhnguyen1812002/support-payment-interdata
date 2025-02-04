@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import React, { useState, useEffect } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import CommentForm from "@/Pages/Comments/CommentForm";
 import CommentItem from "@/Pages/Comments/CommentItem";
 import useTypedPage from "@/Hooks/useTypedPage";
-import {getFirstTwoLetters} from "@/lib/utils";
-import { User } from '@/types';
-
-
-
+import { getFirstTwoLetters } from "@/lib/utils";
+import { User } from "@/types";
 
 interface Comment {
     id: number;
@@ -19,26 +17,23 @@ interface Comment {
 }
 
 interface CommentsSectionProps {
-    initialComments: Comment[];
+    initialComments: { data: Comment[], next_page_url: string | null };
     onCommentSubmit: (content: string, parentId?: number) => void;
     currentUserAvatar: string;
 }
 
-const CommentsSection = ({
-                             initialComments,
-                             onCommentSubmit,
-                             currentUserAvatar,
-                         }: CommentsSectionProps) => {
-    const [comments, setComments] = useState<Comment[]>(initialComments);
-    const [isSubmitting, setIsSubmitting] = React.useState(false);
+const CommentsSection = ({ initialComments, onCommentSubmit, currentUserAvatar }: CommentsSectionProps) => {
+    const [comments, setComments] = useState<Comment[]>(initialComments.data);
+    const [nextPage, setNextPage] = useState<string | null>(initialComments.next_page_url);
     const page = useTypedPage();
-    const user = page.props.auth.user; // Lưu user vào biến để tránh truy cập lặp lại
-    const name = user ? getFirstTwoLetters(user.name) : ""; // Kiểm tra user trước khi truy cập name
+    const user = page.props.auth.user;
+    const name = user ? getFirstTwoLetters(user.name) : "";
 
+    // Thêm bình luận mới vào danh sách
     const addNewComment = (newComment: Comment) => {
         if (newComment.parent_id) {
-            setComments((prevComments) =>
-                prevComments.map((comment) => {
+            setComments(prevComments =>
+                prevComments.map(comment => {
                     if (comment.id === newComment.parent_id) {
                         return {
                             ...comment,
@@ -49,10 +44,7 @@ const CommentsSection = ({
                 })
             );
         } else {
-            setComments((prevComments) => [
-                ...prevComments,
-                { ...newComment, replies: [] },
-            ]);
+            setComments(prevComments => [{ ...newComment, replies: [] }, ...prevComments]);
         }
     };
 
@@ -75,6 +67,21 @@ const CommentsSection = ({
         };
     }, []);
 
+    // Fetch thêm comment khi cuộn xuống
+    const fetchMoreComments = async () => {
+        if (!nextPage) return;
+
+        try {
+            const response = await fetch(nextPage);
+            const data = await response.json();
+
+            setComments(prev => [...prev, ...data.data]);
+            setNextPage(data.next_page_url);
+        } catch (error) {
+            console.error("Error loading more comments:", error);
+        }
+    };
+
     return (
         <Card className="w-full">
             <CardHeader>
@@ -83,37 +90,39 @@ const CommentsSection = ({
             <CardContent className="space-y-6">
                 {user ? (
                     <CommentForm
-                        onSubmit={(content) => onCommentSubmit(content)}
-                        currentUserAvatar={
-                            user.profile_photo_path || // Dùng avatar từ user nếu có
-                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                name
-                            )}&color=7F9CF5&background=EBF4FF`
-                        }
+                        onSubmit={content => onCommentSubmit(content)}
+                        currentUserAvatar={user.profile_photo_path ||
+                            `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&color=7F9CF5&background=EBF4FF`}
                     />
                 ) : (
-                    <p>Đang nhập để bình luận</p>
+                    <p>Đăng nhập để bình luận</p>
                 )}
-                <div className="space-y-6">
-                    {comments.map((comment) => (
-                        <CommentItem
-                            key={comment.id}
-                            comment={comment}
-                            onReply={onCommentSubmit}
-                            currentUserAvatar={
-                                comment.user.profile_photo_path
-                                    ? `/storage/${comment.user.profile_photo_path}`
-                                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                        comment.user.name
-                                    )}&color=7F9CF5&background=EBF4FF`
-                            }
-                        />
-                    ))}
-                </div>
+
+                <InfiniteScroll
+                    dataLength={comments.length}
+                    next={fetchMoreComments}
+                    hasMore={!!nextPage}
+                    loader={<p>Đang tải thêm bình luận...</p>}
+                   
+                >
+                    <div className="space-y-6">
+                        {comments.map(comment => (
+                            <CommentItem
+                                key={comment.id}
+                                comment={comment}
+                                onReply={onCommentSubmit}
+                                currentUserAvatar={
+                                    comment.user.profile_photo_path
+                                        ? `/storage/${comment.user.profile_photo_path}`
+                                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.name)}&color=7F9CF5&background=EBF4FF`
+                                }
+                            />
+                        ))}
+                    </div>
+                </InfiniteScroll>
             </CardContent>
         </Card>
     );
 };
-
 
 export default CommentsSection;

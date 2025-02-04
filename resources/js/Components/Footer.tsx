@@ -8,9 +8,9 @@ const Footer = () => {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="border-t mt-5">
-            <div className="container mx-auto px-4 py-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <footer className="mt-5 border-t">
+            <div className="container px-4 py-8 mx-auto">
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
                     {/* Company Info */}
                     <div className="space-y-3">
                         <h3 className="text-lg font-semibold">AutoPay</h3>
@@ -59,13 +59,13 @@ const Footer = () => {
                         <h3 className="text-lg font-semibold">Follow Us</h3>
                         <div className="flex space-x-2">
                             <Button variant="ghost" size="icon">
-                                <Github className="h-5 w-5" />
+                                <Github className="w-5 h-5" />
                             </Button>
                             <Button variant="ghost" size="icon">
-                                <Twitter className="h-5 w-5" />
+                                <Twitter className="w-5 h-5" />
                             </Button>
                             <Button variant="ghost" size="icon">
-                                <Facebook className="h-5 w-5" />
+                                <Facebook className="w-5 h-5" />
                             </Button>
                         </div>
                     </div>
@@ -74,9 +74,9 @@ const Footer = () => {
                 <Separator className="my-8" />
 
                 {/* Copyright */}
-                <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div className="flex flex-col justify-between items-center space-y-4 md:flex-row md:space-y-0">
                     <p className="text-sm text-muted-foreground">
-                        © {currentYear} Company Name. All rights reserved.
+                        © {currentYear} Inter Group. All rights reserved.
                     </p>
                     <div className="flex space-x-4">
                         <Link href="/terms" className="text-sm text-muted-foreground hover:text-foreground">

@@ -10,3 +10,5 @@ Route::get('/user', function (Request $request) {
 // Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
 //    ->middleware('auth')
 //    ->name('notifications.read_all');
+
+// Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);

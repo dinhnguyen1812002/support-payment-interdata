@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-import { Minus, Plus } from 'lucide-react';
-import { useForm } from '@inertiajs/react';
+import React, { useState } from "react";
+import { Minus, Plus } from "lucide-react";
+import { useForm } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
-import { cn } from '@/lib/utils';
-
+import { cn } from "@/lib/utils";
+import { Toaster } from "@/Components/ui/sonner";
+import { toast } from "sonner"
 interface UpvoteProps {
     postId: string;
     initialUpvoteCount: number;
     initialIsUpvote: boolean;
-    upvote_count: number;
-
 }
 
 const Upvote: React.FC<UpvoteProps> = ({ postId, initialUpvoteCount, initialIsUpvote }) => {
@@ -23,52 +22,38 @@ const Upvote: React.FC<UpvoteProps> = ({ postId, initialUpvoteCount, initialIsUp
         post(`/posts/${postId}/upvote`, {
             preserveScroll: true,
             onSuccess: () => {
-                // Toggle trạng thái upvote
-                if (isUpvote) {
-                    setUpvoteCount(upvoteCount - 1);
-                } else {
-                    setUpvoteCount(upvoteCount + 1);
-                }
-                setIsUpvote(!isUpvote);
+                const newUpvoteState = !isUpvote;
+                setIsUpvote(newUpvoteState);
+                setUpvoteCount(prev => (newUpvoteState ? prev + 1 : prev - 1));
             },
         });
     };
 
     return (
         <div className="flex flex-col items-center gap-0">
-            {/* Nút Upvote */}
             <Button
                 onClick={handleVote}
-                disabled={processing || isUpvote} // Disable nếu đã upvote
+                disabled={processing || isUpvote}
                 variant="ghost"
                 size="lg"
                 className={cn(
-                    "p-0 h-14 w-14 ",
-                    isUpvote && [
-                        "bg-blue-50 text-blue-500 hover:bg-blue-50 hover:text-blue-500",
-                        "cursor-default"
-                    ],
+                    "p-0 h-14 w-14",
+                    isUpvote && "bg-blue-50 text-blue-500 hover:bg-blue-50",
                     !isUpvote && "text-gray-400 hover:text-blue-500 hover:bg-blue-50",
                     processing && "cursor-wait opacity-50"
                 )}
                 title={isUpvote ? "Đã upvote" : "Upvote bài viết"}
             >
                 <Plus className="h-10 w-10" strokeWidth={2.5} />
-
             </Button>
 
-            {/* Hiển thị số lượng upvotes */}
-            <span className={cn(
-                "text-lg font-semibold",
-                isUpvote ? "text-blue-500" : "text-gray-600"
-            )}>
+            <span className={cn("text-lg font-semibold", isUpvote ? "text-blue-500" : "text-gray-600")}>
                 {upvoteCount || 0}
             </span>
 
-            {/* Nút Downvote */}
             <Button
                 onClick={handleVote}
-                disabled={processing || !isUpvote} // Disable nếu chưa upvote
+                disabled={processing || !isUpvote}
                 variant="ghost"
                 size="lg"
                 className={cn(
@@ -79,7 +64,7 @@ const Upvote: React.FC<UpvoteProps> = ({ postId, initialUpvoteCount, initialIsUp
                 )}
                 title={isUpvote ? "Xóa upvote" : "Chưa upvote"}
             >
-                <Minus className="h-10 w-10" strokeWidth={2.5}  />
+                <Minus className="h-10 w-10" strokeWidth={2.5} />
             </Button>
         </div>
     );
