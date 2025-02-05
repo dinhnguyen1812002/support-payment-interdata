@@ -188,3 +188,12 @@ export interface NotificationContextType {
     unreadCount: number;
     markAllAsRead: () => void;
 }
+export interface Post {
+    id: number;
+    title: string;
+    created_at: string;
+    is_published: boolean;
+    comments_count: number;
+    slug: string;
+    upvotes_count: number;
+}

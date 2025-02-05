@@ -17,6 +17,7 @@ import {
     Bell as BellIcon,
     UserX,
     ChevronRight,
+    FileText
 } from 'lucide-react';
 
 import DeleteUserForm from '@/Pages/Profile/Partials/DeleteUserForm';
@@ -26,11 +27,34 @@ import UpdatePasswordForm from '@/Pages/Profile/Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfileInformationForm';
 import useTypedPage from '@/Hooks/useTypedPage';
 import AppLayout from '@/Layouts/AppLayout';
-import { Notification, Session } from '@/types';
-
+import {Notification, Post, Session} from '@/types';
+import PostsTable from "@/Pages/Profile/Partials/PostTable";
+import { router } from '@inertiajs/core';
+import {route} from "ziggy-js";
+// interface Post {
+//     id: number;
+//     title: string;
+//     created_at: string;
+//     is_public: boolean;
+//     comments_count: number;
+//     slug: string;
+// }
 interface Props {
     sessions: Session[];
     confirmsTwoFactorAuthentication: boolean;
+    posts: Post[];
+    categories: any[];
+    postCount: number;
+    pagination: {
+        total: number;
+        per_page: number;
+        current_page: number;
+        last_page: number;
+        next_page_url: string | null;
+        prev_page_url: string | null;
+    };
+    keyword?: string;
+    notifications: Notification[];
 }
 
 interface SidebarItemProps {
@@ -55,11 +79,36 @@ const SidebarItem = ({ icon, title, isActive, onClick }: SidebarItemProps) => (
     </Button>
 );
 
-const ProfilePage = ({ sessions, confirmsTwoFactorAuthentication }: Props) => {
+const ProfilePage = ({
+                         sessions,
+                         confirmsTwoFactorAuthentication,
+                         posts,
+                         categories,
+                         postCount,
+                         pagination,
+                         keyword = '',
+    notifications
+                     }: Props) => {
     const page = useTypedPage();
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+    // const [notifications, setNotifications] = useState<Notification[]>([]);
     const [activeSection, setActiveSection] = useState('profile');
     const user = page.props.auth.user!;
+
+    const handleSearch = (searchKeyword: string) => {
+        router.get(
+            route('profile.show'),
+            { search: searchKeyword },
+            { preserveState: true }
+        );
+    };
+
+    const handlePageChange = (pageNumber: number) => {
+        router.get(
+            route('profile.show'),
+            { page: pageNumber, search: keyword },
+            { preserveState: true }
+        );
+    };
 
     const sidebarItems = [
         {
@@ -106,6 +155,18 @@ const ProfilePage = ({ sessions, confirmsTwoFactorAuthentication }: Props) => {
                     </CardContent>
                 </Card>
             )
+        },
+        {
+            id: 'posts',
+            title: 'Your Questions',
+            icon: <FileText className="h-5 w-5" />,
+            component: (
+                <PostsTable
+                    posts={{data:posts}}
+                    pagination={pagination}
+                    keyword={keyword}
+                />
+            )
         }
     ];
 
@@ -150,7 +211,7 @@ const ProfilePage = ({ sessions, confirmsTwoFactorAuthentication }: Props) => {
 
                 {/* Main Content */}
                 <div className="overflow-y-auto flex-1">
-                    <div className="flex items-center px-6 h-14 border-b">
+                    <div className="flex items-center px-6 h-14 ">
                         <h1 className="text-lg font-semibold">
                             {sidebarItems.find(item => item.id === activeSection)?.title || 'Delete Account'}
                         </h1>

@@ -222,7 +222,7 @@ class PostController extends Controller
             $post->categories()->sync($postData->categories);
         }
 
-        return redirect()->route('/')->with('success', 'Post updated successfully!');
+        return redirect()->back()->with('success', 'Post updated successfully!');
     }
 
     /**
@@ -235,7 +235,7 @@ class PostController extends Controller
         }
         $post->delete();
 
-        return redirect()->route('/')->with('success', 'Post deleted successfully!');
+        return redirect()->back()->with('success', 'Post deleted successfully!');
     }
 
     public function filterPostByCategory(Request $request, $categorySlug)
@@ -308,4 +308,33 @@ class PostController extends Controller
     {
         return $this->index($request);
     }
+
+    //    public function getPostByUser(Request $request)
+    //    {
+    //        $search = $request->input('search', '');
+    //        $posts = $this->postService->getPosts($search);
+    //        $formattedPosts = $this->postService->formatPosts($posts);
+    //
+    //        // Lấy categories và trả về response giống như trước
+    //        $categories = Category::select(['id', 'title', 'slug'])
+    //            ->withCount('posts')
+    //            ->orderBy('posts_count', 'desc')
+    //            ->get();
+    //
+    //        return Inertia::render('Profile/Show', [
+    //            'posts' => $formattedPosts,
+    //            'categories' => $categories,
+    //            'postCount' => Post::count(),
+    //            'pagination' => [
+    //                'total' => $posts->total(),
+    //                'per_page' => $posts->perPage(),
+    //                'current_page' => $posts->currentPage(),
+    //                'last_page' => $posts->lastPage(),
+    //                'next_page_url' => $posts->nextPageUrl(),
+    //                'prev_page_url' => $posts->previousPageUrl(),
+    //            ],
+    //            'keyword' => $search,
+    //            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
+    //        ]);
+    //    }
 }

@@ -25,8 +25,8 @@ class AppServiceProvider extends ServiceProvider
         // if (env('APP_ENV') !== 'local') {
         //     URL::forceScheme('http');
         // }
-               Inertia::share('notifications', function () {
-                   return Auth::check() ? Auth::user()->unreadNotifications : [];
-               });
+        Inertia::share('notifications', function () {
+            return Auth::check() ? Auth::user()->unreadNotifications : [];
+        });
     }
 }

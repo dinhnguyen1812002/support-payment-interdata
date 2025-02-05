@@ -31,7 +31,7 @@ class CommentsController extends Controller
     //
     //        return back()->with('success', 'Comment added successfully!');
     //    }
-    
+
     public function store(Request $request, NotificationService $notificationService)
     {
         $validated = $request->validate([
@@ -72,8 +72,8 @@ class CommentsController extends Controller
             $notificationService->sendMail(
                 $post->user->email,
                 'New Answer to Your Question',
-                'Hi ' . $post->user->name . ',',
-                'Your question "' . $post->title . '" has received a new answer.',
+                'Hi '.$post->user->name.',',
+                'Your question "'.$post->title.'" has received a new answer.',
                 'View Answer',
                 route('posts.show', $post->slug)
             );
@@ -136,7 +136,6 @@ class CommentsController extends Controller
             ],
         ]);
     }
-
 
     public function destroy(Comments $comment)
     {

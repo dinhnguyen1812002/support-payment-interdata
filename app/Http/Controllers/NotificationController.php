@@ -4,12 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Mail\UserNotificationMail;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class NotificationController extends Controller
 {
-
-
     public function markAllAsRead()
     {
         auth()->user()->unreadNotifications->markAsRead();
