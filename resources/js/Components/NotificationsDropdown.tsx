@@ -102,7 +102,7 @@ const NotificationsDropdown = ({
                                 onCheckedChange={setIsPushEnabled}
                             />
                         </div> */}
-                           
+
                         {/* List of Notifications */}
                         <div>
                             {localNotifications.map((notification, index) => (

@@ -8,6 +8,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import { Category, Notification, Comment } from '@/types';
+import UpvoteButton from '@/Components/VoteButton';
 
 interface BlogPost {
   next_page_url: string | null;
@@ -21,6 +22,8 @@ interface BlogPost {
   categories: Category[];
   created_at: string;
   comments: Comment[];
+  has_upvoted: boolean;
+  upvotes_count: number;
 }
 
 interface PostDetailProps {
@@ -125,7 +128,6 @@ const PostDetail: React.FC<PostDetailProps> = ({
                 <div className="mb-12 max-w-none prose prose-lg">
                   <div dangerouslySetInnerHTML={{ __html: post.content }} />
                 </div>
-
                 {/* Author Info */}
                 <div className="flex items-center mb-6 space-x-4">
                   <img
@@ -149,10 +151,11 @@ const PostDetail: React.FC<PostDetailProps> = ({
 
               {/* Interaction Buttons */}
               <div className="flex items-center py-4 mb-8 space-x-6 border-gray-200 border-y">
-                <button className="flex items-center space-x-2 text-gray-600 hover:text-red-500">
-                  <Heart className="w-5 h-5" />
-                  <span>Like</span>
-                </button>
+                {/*<button className="flex items-center space-x-2 text-gray-600 hover:text-red-500">*/}
+                {/*  <Heart className="w-5 h-5" />*/}
+                {/*  <span>Like</span>*/}
+                {/*</button>*/}
+
                 <button className="flex items-center space-x-2 text-gray-600 hover:text-blue-500">
                   <MessageCircle className="w-5 h-5" />
                   <span>Comment</span>
@@ -161,7 +164,11 @@ const PostDetail: React.FC<PostDetailProps> = ({
                   <Share2 className="w-5 h-5" />
                   <span>Share</span>
                 </button>
-
+                  <UpvoteButton
+                      postId={post.id}
+                      initialUpvotes={post.upvotes_count}
+                      initialHasUpvoted={post.has_upvoted}
+                  />
                 {post.categories.map(category => (
                   <Link
                     key={category.id}
@@ -170,7 +177,8 @@ const PostDetail: React.FC<PostDetailProps> = ({
                   >
                     <Badge
                       variant="outline"
-                      className="px-3 py-1 text-sm font-medium text-blue-800 rounded border border-blue-400 border-dashed dark:bg-gray-700 dark:text-blue-400 hover:border-solid hover:border-blue-600"
+                      className="px-3 py-1 text-sm font-medium text-blue-800 rounded
+                      border border-blue-400 border-dashed dark:bg-gray-700 dark:text-blue-400 hover:border-solid hover:border-blue-600"
                     >
                       {category.title}
                     </Badge>

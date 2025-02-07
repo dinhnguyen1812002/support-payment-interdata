@@ -9,7 +9,7 @@ import {Menu, PenLine, PlusCircle} from "lucide-react";
 import {Button} from '@/Components/ui/button';
 import Upvote from "@/Components/UpVote";
 import {BlogPost, Category} from "@/types";
-
+import UpvoteButton from '@/Components/VoteButton';
 import {generateSlug} from "@/Utils/slugUtils";
 
 
@@ -157,7 +157,8 @@ const BlogCard: React.FC<BlogCardProps> = ({posts = [], postCount}) => {
                                 </CardContent>
                             </div>
                         </div>
-                        <Separator className="my-2 border-dashed border-0 border-sky-500"/>
+                        {/*<Separator className="my-2 border-dashed border-sky-500"/>*/}
+                        <hr className="border-dotted border-t-2 border-gray-200 "/>
                     </Card>
                 ))}
             </div>

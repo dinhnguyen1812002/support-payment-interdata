@@ -158,7 +158,7 @@ const ProfilePage = ({
         },
         {
             id: 'posts',
-            title: 'Your Questions',
+            title: 'Câu hỏi của bạn ',
             icon: <FileText className="h-5 w-5" />,
             component: (
                 <PostsTable

@@ -39,10 +39,10 @@ const PostsIndex: React.FC<IndexProps> = ({
 
                         {/* Hiển thị trên màn hình nhỏ */}
                         <div className="md:hidden mb-4">
-                            <CategoriesSheet
-                                categories={categories}
-                                selectedCategory={selectedCategory as string | null | undefined}
-                            />
+                            {/*<CategoriesSheet*/}
+                            {/*    categories={categories}*/}
+                            {/*    selectedCategory={selectedCategory as string | null | undefined}*/}
+                            {/*/>*/}
                         </div>
 
                         <Separator orientation="vertical" />

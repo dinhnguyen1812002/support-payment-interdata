@@ -108,6 +108,7 @@ class PostController extends Controller
     public function show($slug)
     {
         $post = Post::with(['user:id,name,profile_photo_path', 'categories:id,title,slug'])
+            ->withCount('upvotes') // Đếm số lượng upvotes
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -127,6 +128,10 @@ class PostController extends Controller
                 return $this->formatComment($comment);
             });
 
+        // Kiểm tra nếu user đã upvote bài viết chưa
+
+        $hasUpvoted = auth()->check() ? $post->upvotes()->where('user_id', auth()->id())->exists() : false;
+
         return Inertia::render('Posts/PostDetail', [
             'post' => [
                 'id' => $post->id,
@@ -138,9 +143,11 @@ class PostController extends Controller
                 'user' => $post->user,
                 'categories' => $post->categories,
                 'comments' => $comments,
+                'upvotes_count' => $post->upvotes_count,
+                'has_upvoted' => $hasUpvoted,
             ],
             'categories' => $category,
-            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
+            'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
         ]);
     }
 

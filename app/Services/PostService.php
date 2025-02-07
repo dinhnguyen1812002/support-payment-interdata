@@ -23,6 +23,7 @@ class PostService
 
     public function formatPosts($posts)
     {
+
         return collect($posts->items())->map(function ($post) {
             return [
                 'id' => $post->id,
@@ -41,7 +42,7 @@ class PostService
                     'name' => $post->user->name,
                     'profile_photo_path' => $post->user->profile_photo_path,
                 ],
-                'created_at' => $post->created_at->diffForHumans(),
+                'created_at' => $post->created_at->locale('vi')->diffForHumans(),
                 'published_at' => $post->published_at,
             ];
         });

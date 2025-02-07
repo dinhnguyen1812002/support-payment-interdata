@@ -17,7 +17,7 @@ const PostsIndex: React.FC<IndexProps> = ({
                                          selectedCategory,
                                          notifications
                                      }) => {
-    const title = "Support Autopay";
+    const title = "Support AutoPay";
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
 

@@ -64,10 +64,10 @@ class CommentsController extends Controller
 
         $post = Post::find($request->post_id);
         if ($post && $post->user_id !== auth()->id()) {
-            //            $post->user->notify(new NewQuestionOrAnswerNotification('answer', [
-            //                'title' => $post->title,
-            //                'url' => "/posts/{$post->slug}",
-            //            ]));
+            $post->user->notify(new NewQuestionOrAnswerNotification('answer', [
+                'title' => $post->title,
+                'url' => "/posts/{$post->slug}",
+            ]));
 
             $notificationService->sendMail(
                 $post->user->email,

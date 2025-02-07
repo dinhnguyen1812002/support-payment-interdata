@@ -149,16 +149,18 @@ export default function PostsTable({ posts, pagination, keyword }: PostsTablePro
                                         {new Date(post.created_at).toLocaleDateString()}
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant="outline" className="font-normal">
-                                            <MessageSquare className="mr-1 h-3 w-3 inline"/>
-                                            {post.comments_count}
-                                        </Badge>
+                                        {/*<Badge variant="outline" className="font-normal">*/}
+                                        {/*   */}
+                                        {/*</Badge>*/}
+                                        <MessageSquare className="mr-1 h-3 w-3 inline"/>
+                                        {post.comments_count}
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant="outline" className="font-normal">
-                                            <ArrowUp className="mr-1 h-3 w-3 inline"/>
-                                            {post.upvotes_count}
-                                        </Badge>
+                                        {/*<Badge variant="outline" className="font-normal">*/}
+
+                                        {/*</Badge>*/}
+                                        <ArrowUp className="mr-1 h-3 w-3 inline text-green-600"/>
+                                        {post.upvotes_count}
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-1">

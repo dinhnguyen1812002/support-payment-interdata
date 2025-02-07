@@ -32,6 +32,7 @@ import {Menu} from "lucide-react";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 import {NotificationProvider} from "@/Context/NotificationContext";
 import { Toaster } from '@/Components/ui/sonner';
+import { motion } from 'framer-motion';
 
 interface Props {
     title: string;
@@ -78,7 +79,7 @@ notifications
                 <Head title={title}/>
                 <Banner/>
                 <div className="min-h-screen ">
-                    <nav className="bg-white border-b border-gray-100  text-black">
+                    <nav className="bg-white border-b border-gray-100  text-black sticky top-0 z-10">
 
                         {/* <!-- Primary Navigation Menu --> */}
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -117,7 +118,7 @@ notifications
 
                                 </div>
 
-                                <div className="flex items-center space-x-4">
+                                <div className="flex items-center space-x-4 sticky top-0">
                                     <ModeToggle/>
                                     {page.props.auth.user && (
                                         <NotificationsDropdown notifications={notifications} />
@@ -361,7 +362,13 @@ notifications
 
                     <main>
                     <Toaster position="top-right" />
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.3 }}
+                        >
                             {children}
+                        </motion.div>
                     </main>
                 </div>
                 <Footer/>
