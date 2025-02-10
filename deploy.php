@@ -8,26 +8,20 @@ require 'recipe/laravel.php';
 set('application', 'support ticket');
 set('repository', 'https://github.com/dinhnguyen1812002/support-payment-interdata.git');
 set('php_fpm_version', '8.3');
-set('password', 'Hhjshefnkd@23');
+
 // Cấu hình máy chủ
 host('103.20.96.236')
     ->set('remote_user', 'deployer')
-    ->set('password', 'Hhjshefnkd@23')
     ->set('deploy_path', '~/var/www/support-ticket')
-    ->set('auth_mode', 'password')
-    ->set('timeout', 300)
     ->set('ssh_multiplexing', false)
-    ->set('keep_releases', 5)
-    ->set('ssh_type', 'native');
+    ->set('timeout', 300)
+    ->set('keep_releases', 5);
 
 // Các thư mục shared
 set('shared_files', [
     '.env',
 ]);
-set('shared_dirs', [
-    'storage',
-    'public/storage',
-]);
+set('shared_dirs', ['storage', 'node_modules']);
 
 // Các thư mục writable
 set('writable_dirs', [
@@ -44,25 +38,29 @@ set('writable_dirs', [
 ]);
 
 // Tasks tùy chỉnh
-task('build-assets', function () {
-    cd('{{release_path}}');
-    run('npm install');
-    run('npm run build');
+desc('Build frontend');
+task('build:frontend', function () {
+    run('export NVM_DIR="$HOME/.nvm" && source $NVM_DIR/nvm.sh && cd {{release_path}} && npm install && npm run build');
 });
 
-// Task chạy migrations
-task('artisan:migrate', function () {
-    run('php {{release_path}}/artisan migrate --force');
+
+desc('Migrate database');
+task('database:migrate', function () {
+    run('{{bin/php}} {{release_path}}/artisan migrate --force');
 });
 
-// Thứ tự các task sẽ chạy
+// Quá trình deploy
+desc('Deploy the project');
 task('deploy', [
     'deploy:prepare',
     'deploy:vendors',
-    'build-assets',
+    'build:frontend',
     'artisan:storage:link',
     'artisan:view:cache',
     'artisan:config:cache',
     'artisan:migrate',
     'deploy:publish',
 ]);
+
+// Rollback nếu lỗi xảy ra
+after('deploy:failed', 'deploy:unlock');
