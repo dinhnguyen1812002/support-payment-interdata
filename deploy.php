@@ -21,7 +21,11 @@ host('103.20.96.236')
 set('shared_files', [
     '.env',
 ]);
-set('shared_dirs', ['storage', 'node_modules']);
+set('shared_dirs', [
+    'storage',
+    'node_modules',
+    'public/storage',
+]);
 
 // Các thư mục writable
 set('writable_dirs', [
@@ -40,13 +44,23 @@ set('writable_dirs', [
 // Tasks tùy chỉnh
 desc('Build frontend');
 task('build:frontend', function () {
+    // Sửa đường dẫn thành release_path thay vì deploy_path
     run('export NVM_DIR="$HOME/.nvm" && source $NVM_DIR/nvm.sh && cd {{release_path}} && npm install && npm run build');
 });
 
+desc('Fix assets permissions');
+task('deploy:assets', function () {
+    run('chmod -R 755 {{release_path}}/public/build');
+});
 
 desc('Migrate database');
 task('database:migrate', function () {
+    // Sửa đường dẫn thành release_path
     run('{{bin/php}} {{release_path}}/artisan migrate --force');
+});
+desc('Run Category seeder');
+task('database:seed:category', function () {
+    run('{{bin/php}} {{release_path}}/artisan db:seed --class=CategorySeeder --force');
 });
 
 // Quá trình deploy
@@ -55,6 +69,7 @@ task('deploy', [
     'deploy:prepare',
     'deploy:vendors',
     'build:frontend',
+    'deploy:assets',
     'artisan:storage:link',
     'artisan:view:cache',
     'artisan:config:cache',

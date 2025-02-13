@@ -15,9 +15,10 @@ const PostsIndex: React.FC<IndexProps> = ({
                                          postCount,
                                          keyword,
                                          selectedCategory,
-                                         notifications
+                                         notifications,
                                      }) => {
     const title = "Support AutoPay";
+
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
 
@@ -37,9 +38,11 @@ const PostsIndex: React.FC<IndexProps> = ({
                             </div>
                         </div>
                         <Separator orientation="vertical"/>
+
                         <SearchComponent initialSearch={keyword}
                                          route="/posts/search"
                                          pagination={pagination}>
+
                             <div className="flex-1 max-w-6xl ">
                                 <BlogCard posts={posts} postCount={postCount}/>
                             </div>

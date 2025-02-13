@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
-Route::get('/posts', [PostController::class, 'getPostByUser']);
+// Route::get('/posts', [PostController::class, 'getPostByUser']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/new-post', [PostController::class, 'store'])->name('posts.store');

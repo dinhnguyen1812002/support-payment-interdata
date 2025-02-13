@@ -2,21 +2,30 @@
 
 namespace App\Data\Post;
 
-use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Data;
+use Illuminate\Support\Carbon;
 
 class PostData extends Data
 {
     public function __construct(
-        #[Rule('required|string|max:255')]
+        public int $id,
         public string $title,
-
-        #[Rule('required|string')]
         public string $content,
-        #[Rule('required|bool')]
-        public bool $is_published,
-
-        #[Rule('nullable|image')]
-        public ?string $image = null,
+        public int $upvotes_count,
+        public Carbon $created_at,
+        public ?string $author_name,
     ) {}
+
+    public static function fromModel(\App\Models\Post $post): self
+    {
+        return new self(
+            id: $post->id,
+            title: $post->title,
+            content: $post->content,
+            upvotes_count: $post->upvotes_count,
+            created_at: $post->created_at,
+            author_name: $post->user?->name
+        );
+    }
 }
+

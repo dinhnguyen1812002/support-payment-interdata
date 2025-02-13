@@ -146,7 +146,8 @@ export default function PostsTable({ posts, pagination, keyword }: PostsTablePro
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-muted-foreground">
-                                        {new Date(post.created_at).toLocaleDateString()}
+                                        {post.created_at}
+                                        {/*{new Date(post.created_at).toLocaleDateString()}*/}
                                     </TableCell>
                                     <TableCell>
                                         {/*<Badge variant="outline" className="font-normal">*/}

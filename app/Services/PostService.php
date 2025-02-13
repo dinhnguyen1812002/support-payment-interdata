@@ -6,19 +6,33 @@ use App\Models\Post;
 
 class PostService
 {
-    public function getPosts($search = '', $paginate = 6)
+    //    public function getPosts($search = '', $paginate = 6, )
+    //    {
+    //        return Post::with(['user', 'categories'])
+    //            ->withCount('upvotes')
+    //            ->when($search, function ($query, $search) {
+    //                $query->where(function ($q) use ($search) {
+    //                    $q->where('title', 'LIKE', "%{$search}%")
+    //                        ->orWhere('content', 'LIKE', "%{$search}%");
+    //                });
+    //            })
+    //            ->orderBy('upvotes_count', 'desc')
+    //            ->latest()
+    //            ->paginate((int) $paginate);
+    //    }
+    public function getPosts($search = '', $paginate = 6, $sort = 'latest')
     {
-        return Post::with(['user', 'categories'])
+        return Post::with(['user:id,name,profile_photo_path', 'categories:id,title'])
             ->withCount('upvotes')
             ->when($search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('title', 'LIKE', "%{$search}%")
-                        ->orWhere('content', 'LIKE', "%{$search}%");
-                });
+                $query->whereFullText(['title', 'content'], $search); // Dùng full-text search nếu có
             })
-            ->orderBy('upvotes_count', 'desc')
-            ->latest()
-            ->paginate($paginate);
+            ->when($sort === 'popular', function ($query) {
+                $query->orderByDesc('upvotes_count');
+            }, function ($query) {
+                $query->orderByDesc('created_at');
+            })
+            ->paginate((int) $paginate);
     }
 
     public function formatPosts($posts)

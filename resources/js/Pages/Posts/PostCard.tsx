@@ -1,68 +1,92 @@
-import React from 'react';
-import {Card, CardContent, CardFooter, CardHeader} from "@/Components/ui/card";
-import {Avatar, AvatarFallback, AvatarImage} from "@/Components/ui/avatar";
-import {Badge} from "@/Components/ui/badge";
-import {Separator} from "@/Components/ui/separator";
-import {Link} from "@inertiajs/react";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader } from "@/Components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
+import { Badge } from "@/Components/ui/badge";
+import { Link } from "@inertiajs/react";
 import useTypedPage from "@/Hooks/useTypedPage";
-import {Menu, PenLine, PlusCircle} from "lucide-react";
-import {Button} from '@/Components/ui/button';
+import { Clock, PenLine, PlusCircle, TrendingUp } from "lucide-react";
+import { Button } from '@/Components/ui/button';
 import Upvote from "@/Components/UpVote";
-import {BlogPost, Category} from "@/types";
-import UpvoteButton from '@/Components/VoteButton';
-import {generateSlug} from "@/Utils/slugUtils";
+import { BlogPost } from "@/types";
+import { generateSlug } from "@/Utils/slugUtils";
+import CompactFilter from "@/Components/CompactFilter";
 
 
 interface BlogCardProps {
     posts: BlogPost[];
     postCount: number;
-
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({posts = [], postCount}) => {
+const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
     const page = useTypedPage();
     const isAuthenticated = !!page.props.auth.user;
+    const [sort, setSort] = useState("latest");
+
     if (posts.length === 0) {
         return (
-            <div className="text-center p-8">
+            <div className="text-center p-4 md:p-8">
                 <p className="text-muted-foreground">No questions available. ({postCount})</p>
             </div>
         );
     }
 
-    return (
+    const sortOptions = [
+        {
+            value: "latest",
+            label: "Mới nhất",
+            icon: <Clock className="w-4 h-4" />
+        },
+        {
+            value: "popular",
+            label: "Nhiều vote nhất",
+            icon: <TrendingUp className="w-4 h-4" />
+        }
+    ];
 
-        <div className="container mx-auto mb-8">
-            <div className="mb-6 flex items-center justify-between mt-5">
+    return (
+        <div className="container mx-auto px-4 md:px-6 mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-5 mb-6">
+                {/* Header Section */}
                 <div className="space-y-1">
-                    <h2 className="text-2xl font-bold tracking-tight">
+                    <h2 className="text-xl md:text-2xl font-bold tracking-tight">
                         Tất cả câu hỏi
                         <span className="text-gray-500 pl-2">({postCount})</span>
                     </h2>
-                    <p className="text-base text-muted-foreground">
+                    <p className="text-sm md:text-base text-muted-foreground">
                         Browse through all community questions and discussions.
                     </p>
                 </div>
 
-                {isAuthenticated ? (
-                    // Nếu đã đăng nhập, hiển thị nút Ask Question
-                    <Link href={"posts/create"}>
-                        <Button className="flex items-center gap-2">
-                            <PlusCircle className="w-4 h-4"/>
-                            đặt câu hỏi tại đây
-                        </Button>
-                    </Link>
-                ) : (
-                    // Nếu chưa đăng nhập, dẫn người dùng đến trang login
-                    <Link href="/login">
-                        <Button className="flex items-center gap-2">
-                            <PlusCircle className="w-4 h-4"/>
-                            Đặt câu hỏi ở đây
-                        </Button>
-                    </Link>
-                )}
+                {/* Actions Section */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <CompactFilter
+                        value={sort}
+                        onValueChange={setSort}
+                        options={sortOptions}
+                        className="w-full sm:w-auto"
+                    />
+
+                    {isAuthenticated ? (
+                        <Link href={"posts/create"} className="w-full sm:w-auto">
+                            <Button className="w-full sm:w-auto flex items-center justify-center gap-2">
+                                <PlusCircle className="w-4 h-4"/>
+                                <span className="hidden sm:inline">đặt câu hỏi tại đây</span>
+                                <span className="sm:hidden">Đặt câu hỏi</span>
+                            </Button>
+                        </Link>
+                    ) : (
+                        <Link href="/login" className="w-full sm:w-auto">
+                            <Button className="w-full sm:w-auto flex items-center justify-center gap-2">
+                                <PlusCircle className="w-4 h-4"/>
+                                <span className="hidden sm:inline">Đặt câu hỏi tại đây</span>
+                                <span className="sm:hidden">Đặt câu hỏi</span>
+                            </Button>
+                        </Link>
+                    )}
+                </div>
             </div>
 
+            {/* Posts List */}
             <div className="space-y-3">
                 {posts.map((post) => (
                     <Card key={post.id} className="w-full border-none shadow-none">

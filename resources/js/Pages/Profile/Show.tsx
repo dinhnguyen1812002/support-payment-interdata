@@ -177,7 +177,7 @@ const ProfilePage = ({
             canLogin={true}
             title={user.name}
         >
-            <div className="flex h-[calc(100vh-4rem)]">
+            <div className="flex h-[calc(100vh-4rem)] container">
                 {/* Sidebar */}
                 <div className="w-64 border-r bg-background">
                     <div className="flex items-center px-4 h-14 border-b">

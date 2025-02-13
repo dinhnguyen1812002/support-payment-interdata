@@ -24,19 +24,25 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search', '');
-        $posts = $this->postService->getPosts($search);
-        $formattedPosts = $this->postService->formatPosts($posts);
+        $sort = $request->input('sort', 'latest');
 
-        // Lấy categories và trả về response giống như trước
+        // Lấy bài viết
+        $posts = $this->postService->getPosts($search, 6, $sort);
+
+        // Lấy danh mục cùng số lượng bài viết
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
 
+        // Lấy thông báo nếu user đăng nhập
+        $user = auth()->user();
+        $notifications = $user ? $user->unreadNotifications : [];
+
         return Inertia::render('Posts/Index', [
-            'posts' => $formattedPosts,
+            'posts' => $this->postService->formatPosts($posts),
             'categories' => $categories,
-            'postCount' => Post::count(),
+            'postCount' => $posts->total(),
             'pagination' => [
                 'total' => $posts->total(),
                 'per_page' => $posts->perPage(),
@@ -46,9 +52,11 @@ class PostController extends Controller
                 'prev_page_url' => $posts->previousPageUrl(),
             ],
             'keyword' => $search,
-            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
+            'notifications' => $notifications,
+            'sort' => $sort,
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
