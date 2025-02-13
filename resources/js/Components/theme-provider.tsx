@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import React, { createContext, useContext, useEffect, useState } from "react"
 
 type Theme = "dark" | "light" | "system"
 
@@ -10,7 +10,7 @@ type ThemeProviderProps = {
 
 type ThemeProviderState = {
     theme: Theme
-    setTheme: (theme: string) => void
+    setTheme: (theme: Theme) => void
 }
 
 const initialState: ThemeProviderState = {

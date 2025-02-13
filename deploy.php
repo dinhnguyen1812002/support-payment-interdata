@@ -48,7 +48,10 @@ task('build:frontend', function () {
     run('export NVM_DIR="$HOME/.nvm" && source $NVM_DIR/nvm.sh && cd {{release_path}} && npm install && npm run build');
 });
 
-
+desc('Fix assets permissions');
+task('deploy:assets', function () {
+    run('chmod -R 755 {{release_path}}/public/build');
+});
 
 desc('Migrate database');
 task('database:migrate', function () {
