@@ -1,77 +1,70 @@
-// Trong file Posts/Search.tsx
-import SearchComponent from '@/Components/Search';
-import AppLayout from '@/Layouts/AppLayout';
-import React from 'react';
-import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
-import {Separator} from "@/Components/ui/separator";
+import React from "react";
+import { router } from "@inertiajs/react";
+import AppLayout from "@/Layouts/AppLayout";
 import BlogCard from "@/Pages/Posts/PostCard";
-import {BlogPost, Category, Notification, Paginate} from "@/types";
-import {usePage} from "@inertiajs/react";
+import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
+import { IndexProps } from "@/types";
+import { Separator } from "@/Components/ui/separator";
+import SearchComponent from "@/Components/Search";
 
-interface Post {
-    id: number;
-    title: string;
-    content: string;
-}
-
-interface SearchPageProps {
-    posts: Post[];
-    pagination: {
-        total: number;
-        per_page: number;
-        current_page: number;
-        last_page: number;
-        next_page_url: string | null;
-        prev_page_url: string | null;
-    };
-    search: string;
-}
-interface Props {
-    posts: BlogPost[];
-    categories: Category[];
-    pagination: Paginate;
-    postCount: number;
-    keyword: string;
-    selectedCategory?: string | null | undefined | unknown;
-    notifications: Notification[]
-}
-
-const PostsIndex: React.FC<Props> = ({
-                                         posts = [],
-                                         categories = [],
-                                         pagination,
-                                         postCount,
-                                         keyword,
-                                         selectedCategory,
-                                            notifications
-                                     }) => {
-
+const Search: React.FC<IndexProps> = ({
+                                              posts = [],
+                                              categories = [],
+                                              pagination,
+                                              postCount,
+                                              keyword,
+                                              selectedCategory,
+                                              notifications,
+                                          }) => {
+    const title = "Support AutoPay";
 
     return (
-        <AppLayout title="Posts" canLogin={true} canRegister={true} notifications={notifications}>
-            <div className="max-w-6xl mx-auto px-4">
-                {/* Search Section */}
-                <div className="mb-6">
+        <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
+            <div className="max-w-7xl mx-auto px-4">
+                <div className="flex space-x-4">
+                    {/* Left Sidebar */}
+                    <div className="hidden lg:block w-56">
+                        <CategoriesSidebar
+                            categories={categories}
+                            selectedCategory={selectedCategory as string | null | undefined}
+                            className="w-full"
+                        />
+                    </div>
+
+                    {/* Separator between Sidebar and Posts */}
+                    <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10" />
+
+                    {/* Main Content Area with Search Functionality */}
                     <SearchComponent
                         initialSearch={keyword}
-                        route="/posts"
+                        route="/posts/search"
                         pagination={pagination}
                     >
-                        <div className="flex flex-col lg:flex-row gap-6">
-                            {/* Sidebar - Categories */}
-                            <CategoriesSidebar
-                                categories={categories}
-                                selectedCategory={selectedCategory as string | null | undefined} // Đảm bảo kiểu hợp lệ
-                                className="lg:w-1/4"
-                            />
-                            <Separator orientation="vertical" />
-
-                            {/* Posts */}
-                            <div className="flex-1 max-w-3xl">
+                        <div className="flex flex-1">
+                            {/* Posts Content */}
+                            <div className="flex-1">
                                 <BlogCard posts={posts} postCount={postCount} />
                             </div>
 
-                            <CategoriesSidebar categories={categories} className="lg:w-1/4" />
+                            {/* Separator between Posts and Right Sidebar */}
+                            {/*<Separator orientation="vertical" className="hidden lg:flex h-auto mt-10" />*/}
+
+                            {/* Right Sidebar */}
+                            <div className="hidden lg:block w-72">
+                                {/* Search Input (visually placed in sidebar) */}
+                                <div className="sticky top-4">
+                                    <div className="mb-6">
+                                        <div id="search-container" />
+                                    </div>
+
+                                    {/* Categories */}
+                                    <CategoriesSidebar
+                                        categories={categories}
+                                        selectedCategory={selectedCategory as string | null | undefined}
+                                        className="w-full mt-6"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </SearchComponent>
                 </div>
@@ -80,4 +73,4 @@ const PostsIndex: React.FC<Props> = ({
     );
 };
 
-export default PostsIndex;
+export default  Search;

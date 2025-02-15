@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { router, usePage } from '@inertiajs/react';
-import { Input } from '@/Components/ui/input';
-import { Command, CommandInput } from '@/Components/ui/command';
-
+import React, { useState, useEffect } from "react";
+import { router, usePage } from "@inertiajs/react";
+import { Input } from "@/Components/ui/input";
+import { Command } from "@/Components/ui/command";
 import Pagination from "@/Components/Pagination";
-import { Search, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Search, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {createPortal} from "react-dom";
 
 interface PaginationData {
     total: number;
@@ -23,102 +23,84 @@ interface SearchComponentProps {
     pagination?: PaginationData | null;
 }
 
+const useDebounce = (value: string, delay: number = 300) => {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => clearTimeout(handler);
+    }, [value, delay]);
+
+    return debouncedValue;
+};
+
 const SearchComponent: React.FC<SearchComponentProps> = ({
-                                                             initialSearch = '',
+                                                             initialSearch = "",
                                                              route,
                                                              children,
                                                              pagination = null,
                                                          }) => {
     const [searchTerm, setSearchTerm] = useState<string>(initialSearch);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const debouncedSearch = useDebounce(searchTerm, 300);
     const { url } = usePage<{ url: string }>();
 
     useEffect(() => {
-        const handler = setTimeout(() => {
-            if (searchTerm !== initialSearch) {
-                setIsLoading(true);
-                router.get(route, {
-                    search: searchTerm,
-                    page: 1
-                }, {
+        if (debouncedSearch !== initialSearch) {
+            setIsLoading(true);
+            router.get(
+                route,
+                { search: debouncedSearch, page: 1 },
+                {
                     preserveState: true,
                     preserveScroll: true,
                     replace: true,
-                    onFinish: () => setIsLoading(false)
-                });
-            }
-        }, 300);
+                    onFinish: () => setIsLoading(false),
+                }
+            );
+        }
+    }, [debouncedSearch, initialSearch, route]);
 
-        return () => clearTimeout(handler);
-    }, [searchTerm, initialSearch, route]);
-
-    const handlePageChange = (page: number): void => {
-        setIsLoading(true);
-        router.get(route, {
-            search: searchTerm,
-            page: page
-        }, {
-            preserveState: true,
-            preserveScroll: true,
-            onFinish: () => setIsLoading(false)
-        });
-    };
+    const searchInput = (
+        <Command className="rounded-lg border bg-white shadow-md">
+            <div className="flex items-center px-3 py-1.5">
+                <Search className="mr-2 h-4 w-4 text-gray-400" />
+                <Input
+                    placeholder="Tìm kiếm bài viết..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full border-0 h-8 text-sm focus:ring-0 focus-visible:ring-0 placeholder:text-gray-400"
+                />
+                {isLoading && <Loader2 className="h-4 w-4 animate-spin text-gray-400" />}
+            </div>
+        </Command>
+    );
 
     return (
-        <div className="w-full">
-            <Command className="rounded-lg border mt-8">
-                <div className="flex items-center border-b px-3">
-                    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                    <Input
-                        placeholder="Tìm kiếm bài viết..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none
-                        placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-0 focus-visible:ring-0"
-                    />
-                    {isLoading && (
-                        <Loader2 className="h-4 w-4 animate-spin opacity-50" />
-                    )}
-                </div>
-            </Command>
+        <>
+            {/* Portal the search input to the sidebar container */}
+            {typeof document !== 'undefined' && document.getElementById('search-container') &&
+                createPortal(searchInput, document.getElementById('search-container')!)}
 
-            {/* Results Container */}
-            <div className={cn(
-                "min-h-[200px] relative",
-                isLoading && "opacity-70"
-            )}>
-                {/* Loading Overlay */}
+            {/* Main content with search results */}
+            <div className={cn("w-full", isLoading && "opacity-70")}>
                 {isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-50">
-                        <Loader2 className="h-6 w-6 animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/50 z-50">
+                        <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
                     </div>
                 )}
 
-                {/* Results */}
-                {children}
+                {/* Content */}
+                <div className="relative">{children}</div>
+
+                {/* Pagination */}
+
             </div>
-
-            {/* Pagination */}
-            {pagination && pagination.total > 0 && (
-                <Pagination
-                    current_page={pagination.current_page}
-                    last_page={pagination.last_page}
-                    next_page_url={pagination.next_page_url}
-                    prev_page_url={pagination.prev_page_url}
-                />
-            )}
-
-            {/* No Results Message */}
-            {/*{pagination && pagination.total === 0 && searchTerm && (*/}
-            {/*    <Alert variant="destructive" className="bg-destructive/10">*/}
-            {/*        <AlertDescription className="text-center">*/}
-            {/*            Không tìm thấy bài viết nào phù hợp với "{searchTerm}"*/}
-            {/*        </AlertDescription>*/}
-            {/*    </Alert>*/}
-            {/*)}*/}
-
-        </div>
+        </>
     );
 };
 
 export default SearchComponent;
+

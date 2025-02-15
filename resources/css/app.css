@@ -86,3 +86,34 @@
     @apply bg-background text-foreground;
     }
 }
+@keyframes upvote {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.35);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes downvote {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.8);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.animate-upvote {
+    animation: upvote 300ms ease-in-out;
+}
+
+.animate-downvote {
+    animation: downvote 300ms ease-in-out;
+}

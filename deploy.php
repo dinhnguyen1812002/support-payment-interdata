@@ -62,7 +62,6 @@ desc('Run Category seeder');
 task('database:seed:category', function () {
     run('{{bin/php}} {{release_path}}/artisan db:seed --class=CategorySeeder --force');
 });
-
 // Quá trình deploy
 desc('Deploy the project');
 task('deploy', [

@@ -152,6 +152,7 @@ export interface BlogPost {
     published_at: string;
     upvote_count: number;
     isUpvote: boolean;
+
 }
 export interface Notification {
 

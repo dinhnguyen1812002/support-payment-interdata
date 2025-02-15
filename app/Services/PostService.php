@@ -37,14 +37,17 @@ class PostService
 
     public function formatPosts($posts)
     {
-
         return collect($posts->items())->map(function ($post) {
+            $hasUpvoted = auth()->check() ? $post->upvotes()->where('user_id', auth()->id())->exists() : false;
+
             return [
+
                 'id' => $post->id,
                 'title' => $post->title,
                 'content' => $post->getExcerpt(),
                 'slug' => $post->slug,
                 'upvote_count' => $post->upvotes_count,
+                'has_upvoted' => $hasUpvoted,
                 'categories' => $post->categories->map(function ($category) {
                     return [
                         'id' => $category->id,

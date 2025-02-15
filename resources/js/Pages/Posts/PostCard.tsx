@@ -10,6 +10,8 @@ import Upvote from "@/Components/UpVote";
 import { BlogPost } from "@/types";
 import { generateSlug } from "@/Utils/slugUtils";
 import CompactFilter from "@/Components/CompactFilter";
+import VoteButton from "@/Components/VoteButton";
+import UpvoteButton from "@/Components/VoteButton";
 
 
 interface BlogCardProps {
@@ -44,7 +46,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
     ];
 
     return (
-        <div className="container mx-auto px-4 md:px-6 mb-8">
+        <div className="container mx-auto px-4 md:px-6 mb-8 w-full max-w-screen-xl">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-5 mb-6">
                 {/* Header Section */}
                 <div className="space-y-1">
@@ -52,9 +54,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                         Tất cả câu hỏi
                         <span className="text-gray-500 pl-2">({postCount})</span>
                     </h2>
-                    <p className="text-sm md:text-base text-muted-foreground">
-                        Browse through all community questions and discussions.
-                    </p>
+                    {/*<p className="text-sm md:text-base text-muted-foreground">*/}
+                    {/*    Browse through all community questions and discussions.*/}
+                    {/*</p>*/}
                 </div>
 
                 {/* Actions Section */}
@@ -68,7 +70,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
 
                     {isAuthenticated ? (
                         <Link href={"posts/create"} className="w-full sm:w-auto">
-                            <Button className="w-full sm:w-auto flex items-center justify-center gap-2">
+                            <Button className="w-full h-10 sm:w-auto flex items-center justify-center gap-2">
                                 <PlusCircle className="w-4 h-4"/>
                                 <span className="hidden sm:inline">đặt câu hỏi tại đây</span>
                                 <span className="sm:hidden">Đặt câu hỏi</span>
@@ -87,81 +89,113 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
             </div>
 
             {/* Posts List */}
-            <div className="space-y-3">
+            <div className="space-y-3 ">
+
                 {posts.map((post) => (
-                    <Card key={post.id} className="w-full border-none shadow-none">
+
+                    <div key={post.id}
+                         className="w-full h-full border-none shadow-none max-w-4xl mx-auto min-h-[150px] flex flex-col">
+
                         <Link
                             href={`/posts/${post.slug}`}
                             className="block group"
                         />
                         <div className="flex">
                             {/* Left side - Upvote */}
-                            <div className="flex items-center justify-items-center">
-                                <Upvote
-                                    postId={post.id}
-                                    initialIsUpvote={post.isUpvote}
-                                    initialUpvoteCount={post.upvote_count}
-                                    // upvote_count={post.upvote_count}
-                                />
-                            </div>
+                            {/*<div className="flex items-center justify-items-center">*/}
+                            {/*    <Upvote*/}
+                            {/*        postId={post.id}*/}
+                            {/*        initialIsUpvote={post.isUpvote}*/}
+                            {/*        initialUpvoteCount={post.upvote_count}*/}
+                            {/*        // upvote_count={post.upvote_count}*/}
+                            {/*    />*/}
+                            {/*</div>*/}
 
                             {/* Right side - Post content */}
                             <div className="flex-1">
-                                <CardHeader className="p-4">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
-                                            <Avatar className="h-8 w-8">
-                                                <AvatarImage
-                                                    src={
-                                                        post.user.profile_photo_path
-                                                            ? `/storage/${post.user.profile_photo_path}`
-                                                            : `https://ui-avatars.com/api/?name=${encodeURI(post.user.name)}&color=7F9CF5&background=EBF4FF`
-                                                    }
-                                                    alt={post.user.name}
-                                                />
-                                                <AvatarFallback>
-                                                    {post.user.name.charAt(0)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div>
-                                                <p className="text-sm font-medium">{post.user.name}</p>
-                                                <div
-                                                    className="flex items-center space-x-2 text-xs text-muted-foreground">
-                                                    <time dateTime={post.created_at}>
-                                                        {post.created_at}
-                                                    </time>
-                                                    <span>&middot;</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {page.props.auth.user?.id === post.user.id && (
-                                            <Link
-                                                href={`/posts/${post.slug}/edit`}
-                                                className="inline-flex items-center gap-1.5 text-gray-500 hover:text-blue-600 transition-all duration-200 rounded-md px-3 py-1.5 hover:bg-blue-50 border border-transparent hover:border-blue-100"
-                                            >
-                                                <PenLine className="w-4 h-4"/>
-                                                {/*<span className="text-sm font-medium">Chỉnh sửa</span>*/}
-                                            </Link>
-                                        )}
-                                    </div>
-                                </CardHeader>
+                                {/*<CardHeader className="p-4">*/}
+                                {/*    <div className="flex items-center justify-between">*/}
+                                {/*        <div className="flex items-center space-x-4">*/}
+                                {/*            <Avatar className="h-8 w-8">*/}
+                                {/*                <AvatarImage*/}
+                                {/*                    src={*/}
+                                {/*                        post.user.profile_photo_path*/}
+                                {/*                            ? `/storage/${post.user.profile_photo_path}`*/}
+                                {/*                            : `https://ui-avatars.com/api/?name=${encodeURI(post.user.name)}&color=7F9CF5&background=EBF4FF`*/}
+                                {/*                    }*/}
+                                {/*                    alt={post.user.name}*/}
+                                {/*                />*/}
+                                {/*                <AvatarFallback>*/}
+                                {/*                    {post.user.name.charAt(0)}*/}
+                                {/*                </AvatarFallback>*/}
+                                {/*            </Avatar>*/}
+                                {/*            <div>*/}
+                                {/*                <p className="text-sm font-medium">{post.user.name}</p>*/}
+                                {/*                <div*/}
+                                {/*                    className="flex items-center space-x-2 text-xs text-muted-foreground">*/}
+                                {/*                    <time dateTime={post.created_at}>*/}
+                                {/*                        {post.created_at}*/}
+                                {/*                    </time>*/}
+                                {/*                    <span>&middot;</span>*/}
+                                {/*                </div>*/}
+                                {/*            </div>*/}
+                                {/*        </div>*/}
+                                {/*        {page.props.auth.user?.id === post.user.id && (*/}
+                                {/*            <Link*/}
+                                {/*                href={`/posts/${post.slug}/edit`}*/}
+                                {/*                className="inline-flex items-center gap-1.5 text-gray-500 hover:text-blue-600 transition-all duration-200 rounded-md px-3 py-1.5 hover:bg-blue-50 border border-transparent hover:border-blue-100"*/}
+                                {/*            >*/}
+                                {/*                <PenLine className="w-4 h-4"/>*/}
+                                {/*                /!*<span className="text-sm font-medium">Chỉnh sửa</span>*!/*/}
+                                {/*            </Link>*/}
+                                {/*        )}*/}
+                                {/*    </div>*/}
+                                {/*</CardHeader>*/}
 
-                                <CardContent className="p-4 pt-0">
+                                <div className="p-4 pt-0">
                                     <div className="space-y-2">
                                         <Link
                                             href={`/posts/${post.slug}`}
                                             className="block group"
                                         >
-                                            <h3 className="text-lg font-semibold tracking-tight group-hover:text-primary transition-colors">
+                                            <a className="text-xl sm:text-2xl font-extrabold tracking-tight group-hover:text-primary transition-colors leading-snug">
                                                 {post.title}
-                                            </h3>
+                                            </a>
+
                                             <div
                                                 className="text-sm text-muted-foreground line-clamp-2 mt-1"
                                                 dangerouslySetInnerHTML={{__html: post.content}}
                                             />
                                         </Link>
+                                    </div>
+                                </div>
+                                <div className="flex items-center justify-between p-4">
+                                    {/* Thông tin tác giả */}
+                                    <div className="flex items-center space-x-4">
+                                        <Avatar className="h-8 w-8 rounded-md">
+                                            <AvatarImage
+                                                src={
+                                                    post.user.profile_photo_path
+                                                        ? `/storage/${post.user.profile_photo_path}`
+                                                        : `https://ui-avatars.com/api/?name=${encodeURI(post.user.name)}&color=7F9CF5&background=EBF4FF`
+                                                }
+                                                alt={post.user.name}
+                                            />
+                                            <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="text-sm font-medium">{post.user.name}</p>
+                                            <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                                                <time dateTime={post.created_at}>{post.created_at}</time>
+                                                <span>&middot;</span>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                        <div className="flex flex-wrap gap-2 mt-3">
+                                    {/* Badge Categories + Upvote Button */}
+                                    <div className="ml-auto flex items-center space-x-2">
+                                        {/* Categories */}
+                                        <div className="flex flex-wrap gap-2">
                                             {post.categories &&
                                                 post.categories.map((category) => (
                                                     <Link
@@ -170,20 +204,31 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                                     >
                                                         <Badge
                                                             variant="outline"
-                                                            className="cursor-pointer border border-dashed hover:border-gray-600 border-gray-400 hover:border-solid"
+                                                            className="px-3 py-1 text-sm font-medium text-dark rounded
+                                                             border border-gray-400 border-dashed dark:bg-gray-700
+                                                             hover:border-dashed hover:border-blue-600"
                                                         >
                                                             {category.title}
                                                         </Badge>
                                                     </Link>
                                                 ))}
                                         </div>
+
+                                        {/* Upvote Button */}
+                                        <UpvoteButton
+                                            postId={post.id}
+                                            initialUpvotes={post.upvote_count}
+                                            initialHasUpvoted={post.isUpvote}
+                                        />
                                     </div>
-                                </CardContent>
+                                </div>
+
+
                             </div>
                         </div>
                         {/*<Separator className="my-2 border-dashed border-sky-500"/>*/}
                         <hr className="border-dotted border-t-2 border-gray-200 "/>
-                    </Card>
+                    </div>
                 ))}
             </div>
         </div>

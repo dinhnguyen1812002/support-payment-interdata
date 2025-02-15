@@ -15,13 +15,13 @@ interface Props {
     notifications: Notification[]
 }
 
-const PostsIndex: React.FC<Props & { category?: Category }> = ({ 
-    posts = [], 
-    categories = [], 
-    pagination, 
-    keyword, 
-    notifications = [], 
-    category 
+const PostsIndex: React.FC<Props & { category?: Category }> = ({
+    posts = [],
+    categories = [],
+    pagination,
+    keyword,
+    notifications = [],
+    category
 }) => {
     // Lấy danh mục hiện tại từ props (nếu có)
     const categoryTitle = category ? category.title : "All Categories";
@@ -31,26 +31,42 @@ const PostsIndex: React.FC<Props & { category?: Category }> = ({
 
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
-            <div className="max-w-6xl mx-auto px-4">
+
+            <div className="max-w-6xl mx-auto">
+
                 {/* Search Section */}
-                <div className="mb-6">
-                    <div className="flex flex-col lg:flex-row gap-6">
+                <div className="mb-6 ">
+                    <div className="flex ">
                         {/* Sidebar - Categories */}
-                        <div className="hidden lg:block lg:w-64">
-                            <div className="sticky top-20">
-                                <CategoriesSidebar categories={categories} selectedCategory={category?.slug} className="w-full" />
+                        <div className="hidden lg:block lg:w-56 ">
+                            <div className="">
+                                <CategoriesSidebar categories={categories} selectedCategory={category?.slug}
+                                                   className="w-full"/>
                             </div>
                         </div>
-                        <Separator orientation="vertical" />
+                        <Separator orientation="vertical"/>
 
-                        <SearchComponent initialSearch={keyword} route="/posts/search" pagination={pagination}>
-                            <div className="flex-1 max-w-full">
-                                <BlogCard posts={posts} postCount={posts.length} />
+                        <SearchComponent initialSearch={keyword}
+                                         route="/posts/search"
+                                         pagination={pagination}>
+
+                            <div className="flex-1 max-w-6xl w-full  h-full">
+                                <BlogCard posts={posts} postCount={posts.length}/>
                             </div>
                         </SearchComponent>
+                        {/* Posts */}
+
+                        <div className="hidden lg:block lg:w-64 ">
+                            <div className="">
+                            <CategoriesSidebar categories={categories} selectedCategory={category?.slug}
+                                                   className="w-full"/>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
+
         </AppLayout>
     );
 };

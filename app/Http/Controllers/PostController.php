@@ -36,6 +36,7 @@ class PostController extends Controller
             ->get();
 
         // Lấy thông báo nếu user đăng nhập
+
         $user = auth()->user();
         $notifications = $user ? $user->unreadNotifications : [];
 
@@ -56,7 +57,6 @@ class PostController extends Controller
             'sort' => $sort,
         ]);
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -319,9 +319,53 @@ class PostController extends Controller
         });
     }
 
+    //    public function search(Request $request)
+    //    {
+    //        return $this->index($request);
+    //    }
+
     public function search(Request $request)
     {
-        return $this->index($request);
+        $search = $request->input('search', '');
+        $sort = $request->input('sort', 'latest');
+
+        // Lấy bài viết
+        $posts = Post::query()
+            ->when($search, function ($query, $search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(10) // Sử dụng pagination
+            ->withQueryString();
+
+        // Lấy danh mục cùng số lượng bài viết
+        $categories = Category::select(['id', 'title', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
+
+        // Lấy thông báo nếu user đăng nhập
+        $user = auth()->user();
+        $notifications = $user ? $user->unreadNotifications : [];
+
+        return Inertia::render('Posts/Search', [
+            'posts' => $this->postService->formatPosts($posts),
+            'categories' => $categories,
+            'postCount' => $posts->total(),
+            'pagination' => [
+                'total' => $posts->total(),
+                'per_page' => $posts->perPage(),
+                'current_page' => $posts->currentPage(),
+                'last_page' => $posts->lastPage(),
+                'next_page_url' => $posts->nextPageUrl(),
+                'prev_page_url' => $posts->previousPageUrl(),
+            ],
+            'keyword' => $search,
+            'notifications' => $notifications,
+            'sort' => $sort,
+        ]);
+
     }
 
     //    public function getPostByUser(Request $request)

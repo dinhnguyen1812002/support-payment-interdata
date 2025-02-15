@@ -83,7 +83,7 @@ export default function AppLayout({
         <nav className="sticky top-0 z-10 text-black bg-white border-b border-gray-100">
           {/* <!-- Primary Navigation Menu --> */}
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
+            <div className="flex justify-between h-20">
               <div className="flex">
                 {/* <!-- Logo --> */}
                 <div className="flex flex-shrink-0 items-center">

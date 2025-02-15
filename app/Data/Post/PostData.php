@@ -2,8 +2,8 @@
 
 namespace App\Data\Post;
 
-use Spatie\LaravelData\Data;
 use Illuminate\Support\Carbon;
+use Spatie\LaravelData\Data;
 
 class PostData extends Data
 {
@@ -28,4 +28,3 @@ class PostData extends Data
         );
     }
 }
-
