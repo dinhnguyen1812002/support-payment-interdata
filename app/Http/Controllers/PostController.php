@@ -396,4 +396,12 @@ class PostController extends Controller
     //            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
     //        ]);
     //    }
+    public function getLatesPost(Request $request)
+    {
+        $posts = Post::select(['id', 'title', 'slug'])->latest()->limit(5)->get();
+
+        return Inertia::render('Posts/LatestPost', [
+            'posts' => $posts,
+        ]);
+    }
 }

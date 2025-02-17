@@ -7,6 +7,8 @@ import { IndexProps } from "@/types";
 import { Separator } from "@/Components/ui/separator";
 import SearchComponent from "@/Components/Search";
 import Pagination from "@/Components/Pagination";
+import LatestPost from "@/Pages/Posts/LatestPost";
+import LatestPosts from "@/Pages/Posts/LatestPost";
 
 const PostsIndex: React.FC<IndexProps> = ({
                                               posts = [],
@@ -63,9 +65,9 @@ const PostsIndex: React.FC<IndexProps> = ({
                             {/* Right Sidebar */}
                             <div className="hidden lg:block w-72 mt-5">
                                 {/* Search Input (visually placed in sidebar) */}
-                                <div className="sticky top-4">
+                                <div className=" top-4">
                                     <div className="mb-6">
-                                        <div id="search-container" />
+                                        <div id="search-container"/>
                                     </div>
 
                                     {/* Categories */}
@@ -74,6 +76,11 @@ const PostsIndex: React.FC<IndexProps> = ({
                                     {/*    selectedCategory={selectedCategory as string | null | undefined}*/}
                                     {/*    className="w-full mt-6"*/}
                                     {/*/>*/}
+                                    <div className="hidden lg:block mt-5 rounded-md">
+                                        <div className="top-4 rounded-md">
+                                            <LatestPosts posts={posts}/>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
