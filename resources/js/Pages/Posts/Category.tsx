@@ -6,6 +6,7 @@ import {Category, Paginate, BlogPost, Notification} from "@/types";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 import SearchComponent from "@/Components/Search";
 import { Separator } from "@/Components/ui/separator";
+import LatestPosts from "@/Pages/Posts/LatestPost";
 
 interface Props {
     posts: BlogPost[];
@@ -70,9 +71,9 @@ const PostsIndex: React.FC<Props & { category?: Category }> = ({
                             {/* Right Sidebar */}
                             <div className="hidden lg:block w-72 mt-5">
                                 {/* Search Input (visually placed in sidebar) */}
-                                <div className="sticky top-4">
+                                <div className=" top-4">
                                     <div className="mb-6">
-                                        <div id="search-container" />
+                                        <div id="search-container"/>
                                     </div>
 
                                     {/* Categories */}
@@ -81,6 +82,11 @@ const PostsIndex: React.FC<Props & { category?: Category }> = ({
                                     {/*    selectedCategory={selectedCategory as string | null | undefined}*/}
                                     {/*    className="w-full mt-6"*/}
                                     {/*/>*/}
+                                    <div className="hidden lg:block mt-5 rounded-md">
+                                        <div className="top-4 rounded-md">
+                                            <LatestPosts />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

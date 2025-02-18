@@ -1,140 +1,223 @@
-import React, {useEffect, useState} from 'react';
-import { BellRing, Check, Bell } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { Bell, Check, Loader2, X, AlertTriangle } from "lucide-react";
 import { Link } from '@inertiajs/react';
 import { cn } from "@/lib/utils";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuTrigger,
+    DropdownMenuItem,
 } from "@/Components/ui/dropdown-menu";
 import { Badge } from "@/Components/ui/badge";
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
+    CardFooter,
 } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
-import {Notification} from "@/types";
-
-
+import { ScrollArea } from "@/Components/ui/scroll-area";
+import { format } from 'date-fns';
+import { vi } from 'date-fns/locale';
+import axios from 'axios';
+interface Notification {
+    id: string;
+    data: {
+        message: string;
+        url?: string;
+        type?: 'info' | 'success' | 'warning' | 'error';
+    };
+    read_at: string | null;
+    created_at: string;
+}
 
 interface NotificationsDropdownProps {
     notifications: Notification[];
     className?: string;
-
+    maxHeight?: number;
 }
-import axios from 'axios';
 
 const NotificationsDropdown = ({
                                    notifications,
                                    className,
+                                   maxHeight = 400
                                }: NotificationsDropdownProps) => {
     const [localNotifications, setLocalNotifications] = useState(notifications);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
+    const unreadCount = localNotifications.filter((n) => !n.read_at).length;
 
-    const [isPushEnabled, setIsPushEnabled] = useState(false);
-
-    // Tính toán số lượng chưa đọc
-    const unreadCount = (localNotifications || []).filter((n) => !n.read_at).length;
-
-    // const unreadCount = localNotifications.filter((n) => !n.read_at).length;
-
-    // Hàm đánh dấu tất cả là đã đọc
     const markAllAsRead = async () => {
         try {
-            // Gửi request đến API
+            setIsLoading(true);
             await axios.post('/notifications/read-all');
-
-            // Cập nhật trạng thái local
             setLocalNotifications((prev) =>
                 prev.map((notification) => ({
                     ...notification,
-                    read_at: new Date().toISOString(), // Gán thời gian hiện tại
+                    read_at: new Date().toISOString(),
                 }))
             );
         } catch (error) {
             console.error('Error marking notifications as read:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const markAsRead = async (notificationId: string) => {
+        try {
+            await axios.post(`/notifications/${notificationId}/read`);
+            setLocalNotifications((prev) =>
+                prev.map((notification) =>
+                    notification.id === notificationId
+                        ? { ...notification, read_at: new Date().toISOString() }
+                        : notification
+                )
+            );
+        } catch (error) {
+            console.error('Error marking notification as read:', error);
+        }
+    };
+
+    const getNotificationIcon = (type?: string) => {
+        switch (type) {
+            case 'success':
+                return <Check className="h-4 w-4 text-green-500" />;
+            case 'warning':
+                return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+            case 'error':
+                return <X className="h-4 w-4 text-red-500" />;
+            default:
+                return <Bell className="h-4 w-4 text-blue-500" />;
+        }
+    };
+
+    const formatTimeAgo = (date: string) => {
+        const now = new Date();
+        const notificationDate = new Date(date);
+        const diffInHours = Math.floor((now.getTime() - notificationDate.getTime()) / (1000 * 60 * 60));
+
+        if (diffInHours < 24) {
+            return format(notificationDate, 'HH:mm', { locale: vi });
+        } else if (diffInHours < 48) {
+            return 'Hôm qua';
+        } else {
+            return format(notificationDate, 'dd/MM/yyyy', { locale: vi });
         }
     };
 
     return (
-        <DropdownMenu>
+        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenuTrigger asChild>
-                <button className="relative inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-100 focus:outline-none">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative hover:bg-gray-100 focus-visible:ring-1 focus-visible:ring-gray-950"
+                >
                     <Bell className="h-5 w-5 text-gray-600" />
                     {unreadCount > 0 && (
                         <Badge
                             variant="destructive"
-                            className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                            className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs animate-pulse"
                         >
                             {unreadCount}
                         </Badge>
                     )}
-                </button>
+                </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="w-[380px]">
+            <DropdownMenuContent
+                align="end"
+                className="w-[380px] p-0"
+                onCloseAutoFocus={(e) => e.preventDefault()}
+            >
                 <Card className={cn("w-full border-0 shadow-none", className)}>
-                    <CardHeader>
-                        <CardTitle>Thông báo</CardTitle>
-                        <CardDescription>
-                            {/*You have {unreadCount} unread messages.*/}
-                        </CardDescription>
+                    <CardHeader className="border-b py-3">
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-lg">Thông báo</CardTitle>
+                            {unreadCount > 0 && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={markAllAsRead}
+                                    disabled={isLoading}
+                                    className="text-sm  hover:text-blue-700"
+                                >
+                                    {isLoading && (
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    )}
+                                    Đánh dấu tất cả đã đọc
+                                </Button>
+                            )}
+                        </div>
                     </CardHeader>
 
-                    <CardContent className="grid gap-4">
-                        {/* Push Notification Toggle */}
-                        {/* <div className="flex items-center space-x-4 rounded-md border p-4">
-                            <BellRing className="h-5 w-5" />
-                            <div className="flex-1 space-y-1">
-                                <p className="text-sm font-medium leading-none">
-                                    Push Notifications
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                    Send notifications to device.
-                                </p>
-                            </div>
-                            <Switch
-                                checked={isPushEnabled}
-                                onCheckedChange={setIsPushEnabled}
-                            />
-                        </div> */}
-
-                        {/* List of Notifications */}
-                        <div>
-                            {localNotifications.map((notification, index) => (
-                                <div
-                                    key={index}
-                                    className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0"
-                                >
-                                    <span className={`flex h-2 w-2 translate-y-1 rounded-full ${notification.read_at ? 'bg-gray-400' : 'bg-sky-500'}`} />
-                                    <div className="space-y-1">
-                                        {notification.data.url ? (
-                                            <Link href={notification.data.url} className="block">
-                                                <p className="text-sm font-medium leading-none">
-                                                    {notification.data.message}
-                                                </p>
-                                            </Link>
-                                        ) : (
-                                            <p className="text-sm font-medium leading-none">
+                    <ScrollArea className={`max-h-[${maxHeight}px]`}>
+                        <CardContent className="p-0">
+                            {localNotifications.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+                                    <Bell className="h-12 w-12 mb-2 text-gray-400" />
+                                    <p>Không có thông báo nào</p>
+                                </div>
+                            ) : (
+                                localNotifications.map((notification) => (
+                                    <div
+                                        key={notification.id}
+                                        className={cn(
+                                            "flex items-start gap-3 p-4 hover:bg-gray-50 transition-colors cursor-pointer border-b last:border-0",
+                                            !notification.read_at && ""
+                                        )}
+                                        onClick={() => {
+                                            if (notification.data.url) {
+                                                window.location.href = notification.data.url;
+                                            }
+                                            if (!notification.read_at) {
+                                                markAsRead(notification.id);
+                                            }
+                                        }}
+                                    >
+                                        <div className="flex-shrink-0">
+                                            {getNotificationIcon(notification.data.type)}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className={cn(
+                                                "text-sm leading-5",
+                                                !notification.read_at && "font-medium"
+                                            )}>
                                                 {notification.data.message}
                                             </p>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                {formatTimeAgo(notification.created_at)}
+                                            </p>
+                                        </div>
+                                        {!notification.read_at && (
+                                            <div className="flex-shrink-0">
+                                                <div className="h-2 w-2  rounded-full" />
+                                            </div>
                                         )}
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    </CardContent>
+                                ))
+                            )}
+                        </CardContent>
+                    </ScrollArea>
 
-                    {/* Mark all as read */}
-                    <CardFooter>
-                        <Button className="w-full" onClick={markAllAsRead}>
-                            <Check className="mr-2 h-4 w-4" />Đánh dấu đã đọc
-                        </Button>
-                    </CardFooter>
+                    {/*{localNotifications.length > 0 && (*/}
+                    {/*    <CardFooter className="border-t p-3">*/}
+                    {/*        <Button*/}
+                    {/*            variant="outline"*/}
+                    {/*            className="w-full text-sm"*/}
+                    {/*            onClick={() => {*/}
+                    {/*                if (notifications[0]?.data.url) {*/}
+                    {/*                    window.location.href = notifications[0].data.url;*/}
+                    {/*                }*/}
+                    {/*            }}*/}
+                    {/*        >*/}
+                    {/*            Xem tất cả thông báo*/}
+                    {/*        </Button>*/}
+                    {/*    </CardFooter>*/}
+                    {/*)}*/}
                 </Card>
             </DropdownMenuContent>
         </DropdownMenu>

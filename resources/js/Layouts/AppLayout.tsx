@@ -25,12 +25,8 @@ import Footer from '@/Components/Footer';
 import { Button } from '@/Components/ui/button';
 import NotificationsDropdown from '@/Components/NotificationsDropdown';
 
-import { ThemeProvider } from '@/Components/theme-provider';
 import ModeToggle from '@/Components/mode-toggle';
-import { Sheet, SheetContent, SheetTrigger } from '@/Components/ui/sheet';
-import { Menu } from 'lucide-react';
-import CategoriesSidebar from '@/Pages/Categories/CategoriesSidebar';
-import { NotificationProvider } from '@/Context/NotificationContext';
+
 import { Toaster } from '@/Components/ui/sonner';
 import { motion } from 'framer-motion';
 
@@ -79,7 +75,7 @@ export default function AppLayout({
     <div>
       <Head title={title} />
       <Banner />
-      <div className="min-h-screen">
+      <div className="min-h-svh">
         <nav className="sticky top-0 z-10 text-black bg-white border-b border-gray-100">
           {/* <!-- Primary Navigation Menu --> */}
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -88,7 +84,10 @@ export default function AppLayout({
                 {/* <!-- Logo --> */}
                 <div className="flex flex-shrink-0 items-center">
                   <Link href={route('/')}>
-                    <ApplicationMark className="block w-auto h-9" />
+                    {/*<ApplicationMark className="block w-auto h-9" />\*/}
+                      <img alt="logo" src="	https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"
+                      className={"block w-auto h-7"}
+                      />
                   </Link>
                 </div>
 
@@ -123,7 +122,7 @@ export default function AppLayout({
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="flex relative gap-3 items-center px-3 h-12 rounded-lg"
+                        className="flex relative gap-3 items-center px-3 h-16 rounded-lg"
                       >
                         <div className="mr-2 text-sm">
                           <span className="text-gray-500">
@@ -134,10 +133,11 @@ export default function AppLayout({
                           </span>
                         </div>
 
-                        <Avatar className="w-8 h-8">
+                        <Avatar className="w-10 h-10 rounded-md">
                           <AvatarImage
                             src={page.props.auth.user?.profile_photo_url}
                             alt={page.props.auth.user?.name}
+                            className="rounded-lg"
                           />
                           <AvatarFallback>
                             {page.props.auth.user?.name.charAt(0)}

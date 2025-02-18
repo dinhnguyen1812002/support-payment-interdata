@@ -12,8 +12,10 @@ import { cn } from "@/lib/utils";
 import { Button } from '@/Components/ui/button';
 import { Badge } from "@/Components/ui/badge";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
-import {Category, Notification} from "@/types";
+import {BlogPost, Category, Notification} from "@/types";
+import LatestPosts from "@/Pages/Posts/LatestPost";
 interface EditPostProps {
+
     post: {
         id: number;
         title: string;
@@ -245,6 +247,7 @@ const EditPost = ({ post, categories , notifications }: EditPostProps) => {
                                 </Card>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>

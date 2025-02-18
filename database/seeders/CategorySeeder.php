@@ -13,30 +13,80 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
+//            [
+//                'title' => 'Technology',
+//                'slug' => 'technology',
+//                'description' => 'All about the latest technology trends and news.',
+//            ],
+//            [
+//                'title' => 'Lifestyle',
+//                'slug' => 'lifestyle',
+//                'description' => 'Tips and articles about lifestyle and personal development.',
+//            ],
+//            [
+//                'title' => 'Health',
+//                'slug' => 'health',
+//                'description' => 'Health tips and medical updates.',
+//            ],
+//            [
+//                'title' => 'Business',
+//                'slug' => 'business',
+//                'description' => 'Business news, strategies, and entrepreneurship.',
+//            ],
+//            [
+//                'title' => 'Test data',
+//                'slug' => 'test-data',
+//                'description' => 'Test data',
+//            ],
             [
-                'title' => 'Technology',
-                'slug' => 'technology',
-                'description' => 'All about the latest technology trends and news.',
+                'title' => 'Education',
+                'slug' => 'education',
+                'description' => 'Latest trends and news in the education sector.',
             ],
             [
-                'title' => 'Lifestyle',
-                'slug' => 'lifestyle',
-                'description' => 'Tips and articles about lifestyle and personal development.',
+                'title' => 'Entertainment',
+                'slug' => 'entertainment',
+                'description' => 'Movies, music, and entertainment industry updates.',
             ],
             [
-                'title' => 'Health',
-                'slug' => 'health',
-                'description' => 'Health tips and medical updates.',
+                'title' => 'Sports',
+                'slug' => 'sports',
+                'description' => 'Sports news, events, and highlights.',
             ],
             [
-                'title' => 'Business',
-                'slug' => 'business',
-                'description' => 'Business news, strategies, and entrepreneurship.',
+                'title' => 'Science',
+                'slug' => 'science',
+                'description' => 'Discoveries, innovations, and scientific research.',
             ],
             [
-                'title' => 'Test data',
-                'slug' => 'Test-data',
-                'description' => 'Test data',
+                'title' => 'Travel',
+                'slug' => 'travel',
+                'description' => 'Travel guides, tips, and destination reviews.',
+            ],
+            [
+                'title' => 'Food',
+                'slug' => 'food',
+                'description' => 'Recipes, restaurant reviews, and cooking tips.',
+            ],
+            [
+                'title' => 'Finance',
+                'slug' => 'finance',
+                'description' => 'Investment tips, market trends, and financial advice.',
+            ],
+            [
+                'title' => 'Gaming',
+                'slug' => 'gaming',
+                'description' => 'Latest gaming news, reviews, and industry updates.',
+            ],
+            [
+                'title' => 'Fashion',
+                'slug' => 'fashion',
+                'description' => 'Fashion trends, style tips, and industry news.',
+            ],
+            [
+                'title' => 'Environment',
+                'slug' => 'environment',
+                'description' => 'Climate change, sustainability, and environmental awareness.',
             ],
         ];
 
@@ -44,4 +94,5 @@ class CategorySeeder extends Seeder
             Category::create($category);
         }
     }
+
 }

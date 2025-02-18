@@ -52,7 +52,7 @@ desc('Fix assets permissions');
 task('deploy:assets', function () {
     run('chmod -R 755 {{release_path}}/public/build');
 });
-
+task('artisan:storage:link', artisan('storage:link', ['min' => 5.3]));
 desc('Migrate database');
 task('database:migrate', function () {
     // Sửa đường dẫn thành release_path

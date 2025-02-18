@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader } from "@/Components/ui/card";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Badge } from "@/Components/ui/badge";
 import { Link } from "@inertiajs/react";
@@ -12,6 +12,7 @@ import { generateSlug } from "@/Utils/slugUtils";
 import CompactFilter from "@/Components/CompactFilter";
 import VoteButton from "@/Components/VoteButton";
 import UpvoteButton from "@/Components/VoteButton";
+import {route} from "ziggy-js";
 
 
 interface BlogCardProps {
@@ -27,21 +28,30 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
     if (posts.length === 0) {
         return (
             <div className="text-center p-4 md:p-8">
-                <p className="text-muted-foreground">No questions available. ({postCount})</p>
-            </div>
-        );
-    }
+                <div className="space-y-1">
+                    <h2 className="text-xl md:text-2xl font-bold tracking-tight">
+                        Tất cả câu hỏi
+                        <span className="text-gray-500 pl-2">({postCount})</span>
+                    </h2>
+                    {/*<p className="text-sm md:text-base text-muted-foreground">*/}
+                    {/*    Browse through all community questions and discussions.*/}
+                    {/*</p>*/}
+                </div>
 
+                {/*<p className="text-muted-foreground">No questions available. ({postCount})</p>*/}
+            </div>
+        )
+    }
     const sortOptions = [
         {
             value: "latest",
             label: "Mới nhất",
-            icon: <Clock className="w-4 h-4" />
+            icon: <Clock className="w-4 h-4"/>
         },
         {
             value: "popular",
             label: "Nhiều vote nhất",
-            icon: <TrendingUp className="w-4 h-4" />
+            icon: <TrendingUp className="w-4 h-4"/>
         }
     ];
 
@@ -69,8 +79,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                     />
 
                     {isAuthenticated ? (
-                        <Link href={"posts/create"} className="w-full sm:w-auto">
-                            <Button className="w-full h-10 sm:w-auto flex items-center justify-center gap-2">
+                        <Link href={route('posts.create')} className="w-full sm:w-auto">
+                            <Button className="w-full h-10 sm:w-auto flex items-center justify-center gap-2 ">
                                 <PlusCircle className="w-4 h-4"/>
                                 <span className="hidden sm:inline">đặt câu hỏi tại đây</span>
                                 <span className="sm:hidden">Đặt câu hỏi</span>
@@ -89,76 +99,19 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
             </div>
 
             {/* Posts List */}
-            <div className="space-y-3 ">
-
+            <div className="space-y-4">
                 {posts.map((post) => (
-
-                    <div key={post.id}
-                         className="w-full h-full border-none shadow-none max-w-4xl mx-auto min-h-[150px] flex flex-col">
-
-                        <Link
-                            href={`/posts/${post.slug}`}
-                            className="block group"
-                        />
+                    <div key={post.id} className="w-full min-h-[150px] flex flex-col">
                         <div className="flex">
-                            {/* Left side - Upvote */}
-                            {/*<div className="flex items-center justify-items-center">*/}
-                            {/*    <Upvote*/}
-                            {/*        postId={post.id}*/}
-                            {/*        initialIsUpvote={post.isUpvote}*/}
-                            {/*        initialUpvoteCount={post.upvote_count}*/}
-                            {/*        // upvote_count={post.upvote_count}*/}
-                            {/*    />*/}
-                            {/*</div>*/}
-
                             {/* Right side - Post content */}
                             <div className="flex-1">
-                                {/*<CardHeader className="p-4">*/}
-                                {/*    <div className="flex items-center justify-between">*/}
-                                {/*        <div className="flex items-center space-x-4">*/}
-                                {/*            <Avatar className="h-8 w-8">*/}
-                                {/*                <AvatarImage*/}
-                                {/*                    src={*/}
-                                {/*                        post.user.profile_photo_path*/}
-                                {/*                            ? `/storage/${post.user.profile_photo_path}`*/}
-                                {/*                            : `https://ui-avatars.com/api/?name=${encodeURI(post.user.name)}&color=7F9CF5&background=EBF4FF`*/}
-                                {/*                    }*/}
-                                {/*                    alt={post.user.name}*/}
-                                {/*                />*/}
-                                {/*                <AvatarFallback>*/}
-                                {/*                    {post.user.name.charAt(0)}*/}
-                                {/*                </AvatarFallback>*/}
-                                {/*            </Avatar>*/}
-                                {/*            <div>*/}
-                                {/*                <p className="text-sm font-medium">{post.user.name}</p>*/}
-                                {/*                <div*/}
-                                {/*                    className="flex items-center space-x-2 text-xs text-muted-foreground">*/}
-                                {/*                    <time dateTime={post.created_at}>*/}
-                                {/*                        {post.created_at}*/}
-                                {/*                    </time>*/}
-                                {/*                    <span>&middot;</span>*/}
-                                {/*                </div>*/}
-                                {/*            </div>*/}
-                                {/*        </div>*/}
-                                {/*        {page.props.auth.user?.id === post.user.id && (*/}
-                                {/*            <Link*/}
-                                {/*                href={`/posts/${post.slug}/edit`}*/}
-                                {/*                className="inline-flex items-center gap-1.5 text-gray-500 hover:text-blue-600 transition-all duration-200 rounded-md px-3 py-1.5 hover:bg-blue-50 border border-transparent hover:border-blue-100"*/}
-                                {/*            >*/}
-                                {/*                <PenLine className="w-4 h-4"/>*/}
-                                {/*                /!*<span className="text-sm font-medium">Chỉnh sửa</span>*!/*/}
-                                {/*            </Link>*/}
-                                {/*        )}*/}
-                                {/*    </div>*/}
-                                {/*</CardHeader>*/}
-
-                                <div className="p-4 pt-0">
+                                <div className="pt-0">
                                     <div className="space-y-2">
                                         <Link
                                             href={`/posts/${post.slug}`}
                                             className="block group"
                                         >
-                                            <a className="text-xl sm:text-2xl font-extrabold tracking-tight group-hover:text-primary transition-colors leading-snug">
+                                            <a className="text-lg sm:text-2xl font-bold tracking-tight group-hover:text-primary transition-colors leading-snug">
                                                 {post.title}
                                             </a>
 
@@ -169,10 +122,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                         </Link>
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between p-4">
-                                    {/* Thông tin tác giả */}
+                                <div className="flex items-center justify-between mt-4">
+                                    {/* Author Info */}
                                     <div className="flex items-center space-x-4">
-                                        <Avatar className="h-8 w-8 rounded-md">
+                                        <Avatar className="h-9 w-9 rounded-md">
                                             <AvatarImage
                                                 src={
                                                     post.user.profile_photo_path
@@ -192,8 +145,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                         </div>
                                     </div>
 
-                                    {/* Badge Categories + Upvote Button */}
-                                    <div className="ml-auto flex items-center space-x-2">
+                                    {/* Categories + Upvote */}
+                                    <div className="flex items-center space-x-2">
                                         {/* Categories */}
                                         <div className="flex flex-wrap gap-2">
                                             {post.categories &&
@@ -205,8 +158,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                                         <Badge
                                                             variant="outline"
                                                             className="px-3 py-1 text-sm font-medium text-dark rounded
-                                                             border border-gray-400 border-dashed dark:bg-gray-700
-                                                             hover:border-dashed hover:border-blue-600"
+                                                border border-gray-400 border-dashed dark:bg-gray-700
+                                                hover:border-dashed hover:border-blue-600"
                                                         >
                                                             {category.title}
                                                         </Badge>
@@ -222,12 +175,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                         />
                                     </div>
                                 </div>
-
-
                             </div>
                         </div>
-                        {/*<Separator className="my-2 border-dashed border-sky-500"/>*/}
-                        <hr className="border-dotted border-t-2 border-gray-200 "/>
+                        <hr className="border-dotted border-t-2 border-gray-200 mt-4"/>
                     </div>
                 ))}
             </div>

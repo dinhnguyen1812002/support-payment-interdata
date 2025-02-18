@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import { router, usePage } from "@inertiajs/react";
 import { Input } from "@/Components/ui/input";
 import { Command } from "@/Components/ui/command";
-import Pagination from "@/Components/Pagination";
 import { Search, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {createPortal} from "react-dom";
+import { createPortal } from "react-dom";
 
 interface PaginationData {
     total: number;
@@ -64,18 +63,20 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
     }, [debouncedSearch, initialSearch, route]);
 
     const searchInput = (
-        <Command className="rounded-lg border bg-white shadow-md">
-            <div className="flex items-center px-3 py-1.5">
-                <Search className="mr-2 h-4 w-4 text-gray-400" />
-                <Input
-                    placeholder="Tìm kiếm bài viết..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full border-0 h-8 text-sm focus:ring-0 focus-visible:ring-0 placeholder:text-gray-400"
-                />
-                {isLoading && <Loader2 className="h-4 w-4 animate-spin text-gray-400" />}
-            </div>
-        </Command>
+        <div className="w-full ">
+            <Command className="rounded-lg border bg-white shadow-md w-full">
+                <div className="flex items-center px-3 py-1.5 w-full">
+                    <Search className="mr-2 h-4 w-4 shrink-0 text-gray-400" />
+                    <Input
+                        placeholder="Tìm kiếm bài viết..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="flex-1 border-0 h-8 text-sm focus:ring-0 focus-visible:ring-0 placeholder:text-gray-400"
+                    />
+                    {isLoading && <Loader2 className="h-4 w-4 shrink-0 animate-spin text-gray-400" />}
+                </div>
+            </Command>
+        </div>
     );
 
     return (
@@ -85,22 +86,18 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
                 createPortal(searchInput, document.getElementById('search-container')!)}
 
             {/* Main content with search results */}
-            <div className={cn("w-full", isLoading && "opacity-70")}>
+            <div className={cn("w-full space-y-1", isLoading && "opacity-70")}>
                 {isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white/50 z-50">
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/50 z-50 w-1/2">
                         <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
                     </div>
                 )}
 
                 {/* Content */}
                 <div className="relative">{children}</div>
-
-                {/* Pagination */}
-
             </div>
         </>
     );
 };
 
 export default SearchComponent;
-

@@ -25,7 +25,7 @@ const CategoriesSidebar: React.FC<Props> = ({
                                                 onCategorySelect,
                                             }) => {
     return (
-        <div className={`lg:max-w-52 mt-10 ${className}`}>
+        <div className={`lg:max-w-6xl mt-10 ${className}`}>
             <div>
                 <h3 className="text-lg font-semibold ml-5">Danh mục</h3>
             </div>

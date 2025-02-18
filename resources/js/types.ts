@@ -154,14 +154,24 @@ export interface BlogPost {
     isUpvote: boolean;
 
 }
+// export interface Notification {
+//
+//     id: string;
+//     data: {
+//         message: string;
+//         url?: string;
+//     };
+//     read_at: string | null;
+// }
 export interface Notification {
-
     id: string;
     data: {
         message: string;
         url?: string;
+        type?: 'info' | 'success' | 'warning' | 'error';
     };
     read_at: string | null;
+    created_at: string;
 }
 export interface IndexProps {
     posts: BlogPost[];

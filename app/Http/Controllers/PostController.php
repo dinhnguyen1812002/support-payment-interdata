@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Data\Post\CreatePostData;
+use App\Events\NewQuestionCreated;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
@@ -75,12 +76,50 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+//    public function store(CreatePostData $postData)
+//    {
+//        $slug = Str::slug($postData->title);
+//        // Kiểm tra trùng lặp bài viết
+//        $existingPost = Post::where('title', $postData->title)
+//            ->orWhere('slug', Str::slug($postData->title))
+//            ->first();
+//
+//        if ($existingPost) {
+//            return redirect()->back()->withErrors([
+//                'title' => 'Tiêu đề hoặc đường dẫn (slug) đã tồn tại. Vui lòng chọn tiêu đề khác.',
+//            ])->withInput();
+//        }
+//
+//        // Tạo bài viết mới
+//        $post = Post::create([
+//            'title' => $postData->title,
+//            'content' => $postData->content,
+//            'slug' => $slug,
+//            'is_published' => $postData->is_published,
+//            'user_id' => auth()->id(),
+//        ]);
+//
+//        // Gắn danh mục vào bài viết
+//        if (! empty($postData->categories)) {
+//            $post->categories()->attach($postData->categories);
+//        }
+//        $users = User::all();
+//        foreach ($users as $user) {
+//            $user->notify(new NewQuestionOrAnswerNotification('question', [
+//                'title' => $postData->title,
+//                'url' => "/posts/{$slug}",
+//            ]));
+//        }
+//
+//        return redirect()->route('/')->with('success', 'Post created successfully!');
+//    }
     public function store(CreatePostData $postData)
     {
         $slug = Str::slug($postData->title);
+
         // Kiểm tra trùng lặp bài viết
         $existingPost = Post::where('title', $postData->title)
-            ->orWhere('slug', Str::slug($postData->title))
+            ->orWhere('slug', $slug)
             ->first();
 
         if ($existingPost) {
@@ -102,17 +141,15 @@ class PostController extends Controller
         if (! empty($postData->categories)) {
             $post->categories()->attach($postData->categories);
         }
-        $users = User::all();
-        foreach ($users as $user) {
-            $user->notify(new NewQuestionOrAnswerNotification('question', [
-                'title' => $postData->title,
-                'url' => "/posts/{$slug}",
-            ]));
-        }
+
+        // Dispatch sự kiện real-time
+        event(new NewQuestionCreated([
+            'title' => $postData->title,
+            'url' => "/posts/{$slug}",
+        ]));
 
         return redirect()->route('/')->with('success', 'Post created successfully!');
     }
-
     public function show($slug)
     {
         $post = Post::with(['user:id,name,profile_photo_path', 'categories:id,title,slug'])
@@ -396,12 +433,13 @@ class PostController extends Controller
     //            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
     //        ]);
     //    }
-    public function getLatesPost(Request $request)
+    public function getLatestPosts(Request $request)
     {
-        $posts = Post::select(['id', 'title', 'slug'])->latest()->limit(5)->get();
-
-        return Inertia::render('Posts/LatestPost', [
-            'posts' => $posts,
-        ]);
+        return response()->json(
+            Post::select(['id', 'title', 'slug'])
+                ->latest()
+                ->limit(5)
+                ->get()
+        );
     }
 }
