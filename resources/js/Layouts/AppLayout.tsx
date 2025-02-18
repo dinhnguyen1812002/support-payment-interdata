@@ -84,10 +84,10 @@ export default function AppLayout({
                 {/* <!-- Logo --> */}
                 <div className="flex flex-shrink-0 items-center">
                   <Link href={route('/')}>
-                    {/*<ApplicationMark className="block w-auto h-9" />\*/}
-                      <img alt="logo" src="	https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"
-                      className={"block w-auto h-7"}
-                      />
+                    <ApplicationMark className="block w-auto h-9" />
+                    {/*  <img alt="logo" src="	https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"*/}
+                    {/*  className={"block w-auto h-7"}*/}
+                    {/*  />*/}
                   </Link>
                 </div>
 
