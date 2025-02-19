@@ -25,19 +25,16 @@ const PostsIndex: React.FC<IndexProps> = ({
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex space-x-4">
-                    {/* Left Sidebar - Made narrower */}
+                    {/* Left Sidebar */}
                     <div className="hidden lg:block w-56">
-                        <CategoriesSidebar
-                            categories={categories}
-                            selectedCategory={selectedCategory as string | null | undefined}
-                            className="w-full"
-                        />
+                        <CategoriesSidebar categories={categories}   selectedCategory={selectedCategory as string | null | undefined}
+                                           className="w-full"/>
                     </div>
 
                     {/* Separator between Sidebar and Posts */}
                     <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10" />
 
-                    {/* Main Content Area with Search Functionality - Made wider */}
+                    {/* Main Content Area with Search Functionality */}
                     <SearchComponent
                         initialSearch={keyword}
                         route="/posts/search"
@@ -45,8 +42,8 @@ const PostsIndex: React.FC<IndexProps> = ({
                     >
                         <div className="flex flex-1">
                             {/* Posts Content - Added more width */}
-                            <div className="flex-1 min-w-0 lg:mr-6">
-                                <BlogCard posts={posts} postCount={postCount} />
+                            <div className="flex-1 min-w lg:mr-6">
+                                <BlogCard posts={posts} postCount={postCount}/>
                                 {pagination && pagination.total > 0 && (
                                     <div className="mt-7 flex justify-center items-center">
                                         <Pagination
@@ -67,7 +64,7 @@ const PostsIndex: React.FC<IndexProps> = ({
                                     </div>
                                     <div className="hidden lg:block mt-5 ">
                                         <div className="top-4">
-                                            <LatestPosts />
+                                            <LatestPosts/>
                                         </div>
                                     </div>
                                 </div>
@@ -77,6 +74,7 @@ const PostsIndex: React.FC<IndexProps> = ({
                 </div>
             </div>
         </AppLayout>
+
     );
 };
 

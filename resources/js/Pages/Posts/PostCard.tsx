@@ -18,6 +18,7 @@ import {route} from "ziggy-js";
 interface BlogCardProps {
     posts: BlogPost[];
     postCount: number;
+
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
@@ -56,13 +57,13 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
     ];
 
     return (
-        <div className="container mx-auto px-4 md:px-6 mb-8 w-full max-w-screen-xl">
+        <div className="container mx-auto px-4  mt-10 w-full max-w-screen-xl">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-5 mb-6">
                 {/* Header Section */}
                 <div className="space-y-1">
                     <h2 className="text-xl md:text-2xl font-bold tracking-tight">
-                        Tất cả câu hỏi
-                        <span className="text-gray-500 pl-2">({postCount})</span>
+                        All Questions
+                        <span className="text-gray-500 pl-2 text-lg">({postCount})</span>
                     </h2>
                     {/*<p className="text-sm md:text-base text-muted-foreground">*/}
                     {/*    Browse through all community questions and discussions.*/}
@@ -106,12 +107,12 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                             {/* Right side - Post content */}
                             <div className="flex-1">
                                 <div className="pt-0">
-                                    <div className="space-y-2">
+                                    <div className="space-y-3">
                                         <Link
                                             href={`/posts/${post.slug}`}
                                             className="block group"
                                         >
-                                            <a className="text-lg sm:text-2xl font-bold tracking-tight group-hover:text-primary transition-colors leading-snug">
+                                            <a className="text-lg sm:text-xl font-bold tracking-tight group-hover:text-primary transition-colors leading-snug">
                                                 {post.title}
                                             </a>
 

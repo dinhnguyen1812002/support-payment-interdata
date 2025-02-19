@@ -29,7 +29,7 @@ class PostController extends Controller
 
         // Lấy bài viết
         $posts = $this->postService->getPosts($search, 6, $sort);
-
+        $totalComment = Post::withCount('comments')->count();
         // Lấy danh mục cùng số lượng bài viết
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
@@ -43,6 +43,7 @@ class PostController extends Controller
 
         return Inertia::render('Posts/Index', [
             'posts' => $this->postService->formatPosts($posts),
+            'totalComment' => $totalComment,
             'categories' => $categories,
             'postCount' => $posts->total(),
             'pagination' => [

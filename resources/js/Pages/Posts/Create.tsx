@@ -19,6 +19,8 @@ import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
 import CategoriesSidebar from '@/Pages/Categories/CategoriesSidebar';
 import {Category, Notification} from "@/types";
+import LatestPosts from "@/Pages/Posts/LatestPost";
+import {Separator} from "@/Components/ui/separator";
 
 
 
@@ -80,175 +82,64 @@ const CreatePost = ({categories, notifications}:FromPostProps) => {
     };
 
     return (
-    <AppLayout title={'Đặt câu hỏi'} canLogin={true} canRegister={true} notifications={notifications}>
-        <AlterDialog open={dialogOpen} onClose={() => setDialogOpen(false)} title="Thành công" description="Bài viết đã được tạo thành công!"/>
-        <div className="max-w-6xl mx-auto px-4">
-            <div className="flex flex-col lg:flex-row gap-6">
-                {/* Main content with categories sidebar */}
-                <div className="flex-1 flex flex-col lg:flex-row gap-6">
-                    {/* Categories Sidebar */}
-                    <div className="hidden lg:block lg:w-64 ">
-                        <div className="sticky top-20">
-                            <CategoriesSidebar
-                                categories={categories}
-                                selectedCategory={selectedCategory}
-                                className="w-full"
-                            />
-                        </div>
+        <AppLayout title={"Đặt câu hỏi"} canLogin={true} canRegister={true} notifications={notifications}>
+            <div className="max-w-7xl mx-auto px-4">
+                <div className="flex space-x-4">
+                    {/* Left Sidebar */}
+                    <div className="hidden lg:block w-56">
+                        <CategoriesSidebar categories={categories} selectedCategory={selectedCategory} className="w-full" />
                     </div>
-                    <div className="mt-10 h-5/6 border-l border-dashed border-gray-300"></div>
-                    <div className="flex-1 max-w-3xl">
-                        <div className="space-y-6 mt-10">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Thêm bài viết</CardTitle>
-                                    <CardDescription>
-                                        Tạo bài viết mới cho cộng đồng của bạn
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <form onSubmit={handleSubmit} className="space-y-6">
-                                        {/* Title Input */}
-                                        <div className="space-y-2">
-                                            <Label htmlFor="title">Tiêu đề</Label>
-                                            <Input
-                                                id="title"
-                                                type="text"
-                                                value={data.title}
-                                                onChange={(e) => setData('title', e.target.value)}
-                                                placeholder="Nhập tiêu đề bài viết"
-                                                className={cn(errors.title && 'ring-2 ring-red-500')}
-                                            />
-                                            {errors.title && (
-                                                <p className="text-sm text-red-500">{errors.title}</p>
-                                            )}
-                                        </div>
 
-                                        {/* Content Input */}
-                                        <div className="space-y-2 h-40 mb-6">
-                                            <Label htmlFor="content">Nội dung</Label>
-                                            <div
-                                                className={cn(
-                                                    'rounded-md',
-                                                    errors.content && 'ring-2 ring-red-500'
-                                                )}
-                                            >
-                                                <ReactQuill
-                                                    ref={quillRef} // Thêm ref
-                                                    theme="snow"
-                                                    className="h-28"
-                                                    value={data.content}
-                                                    onChange={(value) => setData('content', value)}
-                                                    modules={{
-                                                        toolbar: [
-                                                            ['bold', 'italic', 'underline'],
-                                                            [{header: [1, 2, false]}],
-                                                            [{list: 'ordered'}, {list: 'bullet'}],
-                                                            ['link', 'image'],
-                                                        ],
-                                                    }}
-                                                    placeholder="Nhập nội dung bài viết"
-                                                />
-                                            </div>
-                                            {errors.content && (
-                                                <p className="text-sm text-red-500">{errors.content}</p>
-                                            )}
-                                        </div>
+                    {/* Separator */}
+                    <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10" />
 
-                                        {/* Category Selection */}
-                                        <div className="space-y-2 mb-8 h-16">
-                                            <Label>Danh mục</Label>
-                                            <div className="relative">
-                                                <div
-                                                    className="flex flex-wrap gap-2 p-2 bg-white border rounded-md min-h-[42px]">
-                                                    {selectedCategories.map((category) => (
-                                                        <Badge
-                                                            key={category.id}
-                                                            variant="secondary"
-                                                            className="flex items-center gap-1"
-                                                        >
-                                                            {category.title}
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleCategoryChange(category.id)}
-                                                                className="ml-1 hover:text-destructive"
-                                                            >
-                                                                <X className="h-3 w-3"/>
-                                                            </button>
-                                                        </Badge>
-                                                    ))}
-                                                    <Input
-                                                        type="text"
-                                                        value={searchTerm}
-                                                        onChange={(e) => {
-                                                            setSearchTerm(e.target.value);
-                                                            setShowCategories(true);
-                                                        }}
-                                                        onFocus={() => setShowCategories(true)}
-                                                        placeholder="Tìm kiếm danh mục..."
-                                                        className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-sm flex-1 min-w-[120px] bg-transparent"
-                                                    />
-                                                </div>
-                                                {showCategories && filteredCategories.length > 0 && (
-                                                    <div
-                                                        className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg">
-                                                        <div className="max-h-[200px] overflow-auto py-1">
-                                                            {filteredCategories.map((category) => (
-                                                                <div
-                                                                    key={category.id}
-                                                                    className="px-2 py-1.5 hover:bg-muted cursor-pointer"
-                                                                    onClick={() => {
-                                                                        handleCategoryChange(category.id);
-                                                                        setShowCategories(false);
-                                                                    }}
-                                                                >
-                                                                    {category.title}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            {errors.categories && (
-                                                <p className="text-sm text-red-500">{errors.categories}</p>
-                                            )}
-                                        </div>
+                    {/* Main Content */}
+                    <div className="flex-1 max-w-3xl mt-10 ">
+                        <Card className="h-full">
+                            <CardHeader>
+                                <CardTitle>Thêm bài viết</CardTitle>
+                                <CardDescription>Tạo bài viết mới cho cộng đồng của bạn</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="title">Tiêu đề</Label>
+                                        <Input id="title" type="text" value={data.title} onChange={(e) => setData("title", e.target.value)} placeholder="Nhập tiêu đề" className={cn(errors.title && "ring-2 ring-red-500")} />
+                                        {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+                                    </div>
 
-                                        {/* Publish Toggle */}
-                                        <div className="flex items-center justify-between">
-                                            <div className="space-y-0.5">
-                                                <Label htmlFor="is_published">Công khai bài viết</Label>
-                                                <p className="text-sm text-muted-foreground">
-                                                    Bài viết sẽ hiển thị công khai với mọi người
-                                                </p>
-                                            </div>
-                                            <Switch
-                                                id="is_published"
-                                                checked={data.is_published}
-                                                onCheckedChange={(checked) => setData('is_published', checked)}
-                                            />
-                                        </div>
+                                    <div className="space-y-2 h-40 mb-6">
+                                        <Label htmlFor="content">Nội dung</Label>
+                                        <ReactQuill ref={quillRef} theme="snow" className="h-28" value={data.content} onChange={(value) => setData("content", value)} placeholder="Nhập nội dung bài viết" />
+                                        {errors.content && <p className="text-sm text-red-500">{errors.content}</p>}
+                                    </div>
 
-                                        {/* Submit Button */}
-                                        <Button type="submit" className="w-full" disabled={processing}>
-                                            {processing ? (
-                                                <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-                                                    Đang xử lý
-                                                </>
-                                            ) : (
-                                                'Thêm bài viết'
-                                            )}
-                                        </Button>
-                                    </form>
-                                </CardContent>
-                            </Card>
-                        </div>
+                                    <div className="flex items-center justify-between">
+
+
+
+                                        <div className="space-y-0.5">
+                                            <Label htmlFor="is_published">Công khai bài viết</Label>
+                                            <p className="text-sm text-muted-foreground">Bài viết sẽ hiển thị công khai với mọi người</p>
+                                        </div>
+                                        <Switch id="is_published" checked={data.is_published} onCheckedChange={(checked) => setData("is_published", checked)} />
+                                    </div>
+
+                                    <Button type="submit" className="w-full" disabled={processing}>
+                                        {processing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Thêm bài viết"}
+                                    </Button>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Right Sidebar */}
+                    <div className="hidden lg:block w-64 mt-5">
+                        <LatestPosts />
                     </div>
                 </div>
             </div>
-        </div>
-    </AppLayout>
+        </AppLayout>
     );
 
 };
