@@ -112,9 +112,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                             href={`/posts/${post.slug}`}
                                             className="block group"
                                         >
-                                            <a className="text-lg sm:text-xl font-bold tracking-tight group-hover:text-primary transition-colors leading-snug">
+                                            <h1 className="text-lg sm:text-xl font-bold tracking-tight group-hover:text-primary transition-colors leading-snug">
                                                 {post.title}
-                                            </a>
+                                            </h1>
 
                                             <div
                                                 className="text-sm text-muted-foreground line-clamp-2 mt-1"

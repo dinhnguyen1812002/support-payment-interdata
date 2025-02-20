@@ -74,20 +74,21 @@ export default function AppLayout({
   return (
     <div>
       <Head title={title} />
-      <Banner />
-      <div className="min-h-svh">
+
+      <div >
         <nav className="sticky top-0 z-10 text-black bg-white border-b border-gray-100">
           {/* <!-- Primary Navigation Menu --> */}
-          <div className="px-4 mx-auto max-w-screen-xl sm:px-6 lg:px-8">
-            <div className="flex justify-between h-20">
-              <div className="flex">
+            <div className="px-6 sm:px-8 lg:px-16 mx-auto max-w-screen-xl  ">
+            <div className="flex justify-between h-24">
+              <div className="flex ">
                 {/* <!-- Logo --> */}
-                <div className="flex flex-shrink-0 items-center">
+                <div className="flex flex-shrink-0 items-center ">
                   <Link href={route('/')}>
-                    <ApplicationMark className="block w-auto h-9" />
-                    {/*  <img alt="logo" src="	https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"*/}
-                    {/*  className={"block w-auto h-7"}*/}
-                    {/*  />*/}
+                    {/*<ApplicationMark className="block w-auto h-9" />*/}
+                      <img alt="logo" src="	https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"
+                      className={"block w-auto h-7"}
+                      />
+
                   </Link>
                 </div>
 
