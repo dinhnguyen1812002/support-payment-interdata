@@ -81,8 +81,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
 
                     {isAuthenticated ? (
                         <Link href={route('posts.create')} className="w-full sm:w-auto">
-                            <Button className="w-full h-10 sm:w-auto flex items-center justify-center gap-2 ">
-                                <PlusCircle className="w-4 h-4"/>
+                            <Button className="w-full h-10 sm:w-auto flex items-center justify-center gap-2  bg-blue-500 hover:bg-blue-600 ">
+                                {/*<PlusCircle className="w-4 h-4"/>*/}
                                 <span className="hidden sm:inline">đặt câu hỏi tại đây</span>
                                 <span className="sm:hidden">Đặt câu hỏi</span>
                             </Button>

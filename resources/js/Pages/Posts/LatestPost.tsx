@@ -27,7 +27,7 @@ const LatestPosts: React.FC = () => {
             <Button
                 variant="outline"
                 size="icon"
-                className="fixed right-4 top-4 z-50 lg:hidden"
+                className="fixed right-4 top-4 z-50 lg:hidden rounded-lg bg-gray-50"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <Menu className="h-5 w-5" />

@@ -156,7 +156,7 @@ const CreatePost = ({ categories, notifications }: CreatePostProps) => {
                                             </div>
                                             {/* Categories */}
                                             <div className="space-y-2 mt-10">
-                                                <Label className="text-base font-medium flex items-center">
+                                                <Label className="text-base font-medium flex items-center mt-14 ">
                                                     Danh mục <span className="text-red-500">*</span>
                                                     <span className="text-sm text-muted-foreground ml-2">
                                                 ({data.categories.length}/3)
@@ -210,23 +210,23 @@ const CreatePost = ({ categories, notifications }: CreatePostProps) => {
                                                 </div>
                                             </div>
                                             {/* Action Buttons */}
-                                            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                                <div
-                                                    className="flex-1 flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                                                    <Label htmlFor="is_published"
-                                                           className="font-medium cursor-pointer">
-                                                        Công khai bài viết
-                                                    </Label>
+                                            <div className="flex flex-col sm:flex-row gap-4 pt-5">
+                                                <div className="flex-1 flex items-center p-4 rounded-lg">
                                                     <Switch
                                                         id="is_published"
                                                         checked={data.is_published}
                                                         onCheckedChange={(checked) => setData("is_published", checked)}
+                                                        className="mr-2"
                                                     />
+                                                    <Label htmlFor="is_published"
+                                                           className="font-medium cursor-pointer">
+                                                        Công khai bài viết
+                                                    </Label>
                                                 </div>
                                                 <Button
                                                     type="submit"
                                                     disabled={processing}
-                                                    className="h-10 px-6 sm:w-1/3"
+                                                    className="h-10 px-6 sm:w-50 bg-blue-500 hover:bg-blue-600 text-white"
                                                 >
                                                     {processing ? (
                                                         <div className="flex items-center">

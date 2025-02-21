@@ -27,7 +27,8 @@ const PostsIndex: React.FC<IndexProps> = ({
                 <div className="flex space-x-4">
                     {/* Left Sidebar */}
                     <div className="hidden lg:block w-56">
-                        <CategoriesSidebar categories={categories}   selectedCategory={selectedCategory as string | null | undefined}
+                        <CategoriesSidebar categories={categories}
+                                           selectedCategory={selectedCategory as string | null | undefined}
                                            className="w-full"/>
                     </div>
 
