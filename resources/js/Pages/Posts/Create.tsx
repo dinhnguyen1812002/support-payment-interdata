@@ -130,7 +130,7 @@ const CreatePost = ({ categories, notifications }: CreatePostProps) => {
                                                 <Label htmlFor="content" className="text-base font-medium">
                                                     Nội dung <span className="text-red-500">*</span>
                                                 </Label>
-                                                <div className="rounded-lg ">
+                                                <div className="rounded-md ">
                                                     <ReactQuill
                                                         ref={quillRef}
                                                         theme="snow"
