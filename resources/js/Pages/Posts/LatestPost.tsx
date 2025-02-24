@@ -43,7 +43,7 @@ const LatestPosts: React.FC = () => {
             />
 
             {/* Card */}
-            <Card
+            <div
                 className={cn(
                     "fixed top-0 right-0 h-auto max-h-screen w-80 z-50 shadow-xl transition-transform duration-300 lg:static lg:shadow-none",
                     "bg-gray-50 border-0 lg:rounded-md lg:bg-gray-50 lg:w-80",
@@ -91,7 +91,7 @@ const LatestPosts: React.FC = () => {
                         ))}
                     </div>
                 </CardContent>
-            </Card>
+            </div>
         </>
     );
 };

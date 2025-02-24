@@ -57,7 +57,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
     ];
 
     return (
-        <div className="container mx-auto px-4  mt-10 w-full max-w-screen-xl">
+        <div className="container mx-auto px-0  mt-8 w-full max-w-screen-xl">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-5 mb-6">
                 {/* Header Section */}
                 <div className="space-y-1">
@@ -81,7 +81,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
 
                     {isAuthenticated ? (
                         <Link href={route('posts.create')} className="w-full sm:w-auto">
-                            <Button className="w-full h-10 sm:w-auto flex items-center justify-center gap-2  bg-blue-500 hover:bg-blue-600 ">
+                            <Button
+                                className="w-full h-10 sm:w-auto flex items-center justify-center gap-2  bg-blue-500 hover:bg-blue-600 ">
                                 {/*<PlusCircle className="w-4 h-4"/>*/}
                                 <span className="hidden sm:inline">đặt câu hỏi tại đây</span>
                                 <span className="sm:hidden">Đặt câu hỏi</span>
@@ -100,18 +101,15 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
             </div>
 
             {/* Posts List */}
-            <div className="space-y-4">
-                {posts.map((post) => (
+            <div className="space-y-6">
+                {posts.map((post, index) => (
                     <div key={post.id} className="w-full min-h-[150px] flex flex-col">
                         <div className="flex">
                             {/* Right side - Post content */}
-                            <div className="flex-1">
+                            <div className="flex-1 mb-2">
                                 <div className="pt-0">
                                     <div className="space-y-3">
-                                        <Link
-                                            href={`/posts/${post.slug}`}
-                                            className="block group"
-                                        >
+                                        <Link href={`/posts/${post.slug}`} className="block group">
                                             <h1 className="text-lg sm:text-xl font-bold tracking-tight group-hover:text-primary transition-colors leading-snug">
                                                 {post.title}
                                             </h1>
@@ -152,15 +150,11 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                         <div className="flex flex-wrap gap-2">
                                             {post.categories &&
                                                 post.categories.map((category) => (
-                                                    <Link
-                                                        key={category.id}
-                                                        href={`/categories/${generateSlug(category.title)}/posts`}
-                                                    >
+                                                    <Link key={category.id}
+                                                          href={`/categories/${generateSlug(category.title)}/posts`}>
                                                         <Badge
                                                             variant="outline"
-                                                            className="px-3 py-1 text-sm font-medium text-dark rounded
-                                                border border-gray-400 border-dashed dark:bg-gray-700
-                                                hover:border-dashed hover:border-blue-600"
+                                                            className="px-3 py-2 text-sm font-medium text-dark rounded border border-gray-200 border-dashed dark:bg-gray-200 hover:border-dashed hover:border-blue-600"
                                                         >
                                                             {category.title}
                                                         </Badge>
@@ -169,19 +163,17 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                         </div>
 
                                         {/* Upvote Button */}
-                                        <UpvoteButton
-                                            postId={post.id}
-                                            initialUpvotes={post.upvote_count}
-                                            initialHasUpvoted={post.isUpvote}
-                                        />
+                                        <UpvoteButton postId={post.id} initialUpvotes={post.upvote_count}
+                                                      initialHasUpvoted={post.isUpvote}/>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <hr className="border-dotted border-t-2 border-gray-200 mt-4"/>
+                        {index !== posts.length - 1 && <hr className="border-dotted border-t-2 border-gray-200 mt-4"/>}
                     </div>
                 ))}
             </div>
+
         </div>
     );
 };

@@ -41,7 +41,7 @@ const PostsIndex: React.FC<Props & { category?: Category }> = ({
                     </div>
 
                     {/* Separator between Sidebar and Posts */}
-                    <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10" />
+                    <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10 ml-[-2rem]" />
 
                     {/* Main Content Area with Search Functionality */}
                     <SearchComponent

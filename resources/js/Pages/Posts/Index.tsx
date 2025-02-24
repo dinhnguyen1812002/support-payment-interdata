@@ -23,13 +23,13 @@ const PostsIndex: React.FC<IndexProps> = ({
 
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
-            <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-7xl mx-auto px-0">
                 <div className="flex space-x-4">
                     {/* Main Content Area with Search Functionality */}
                     <SearchComponent initialSearch={keyword} route="/posts/search">
-                        <div className="flex flex-1 gap-x-6"> {/* Tạo khoảng cách giữa các phần */}
+                        <div className="flex flex-1 gap-x-6">
                             {/* Left Sidebar */}
-                            <div className="hidden lg:block w-56 pr-6"> {/* Thêm padding phải */}
+                            <div className="hidden lg:block w-56 pr-6">
                                 <CategoriesSidebar
                                     categories={categories}
                                     selectedCategory={selectedCategory as string | null | undefined}
@@ -38,11 +38,11 @@ const PostsIndex: React.FC<IndexProps> = ({
                             </div>
 
                             {/* Separator */}
-                            <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10" />
+                            <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10 ml-[-2rem]" />
 
                             {/* Posts Content */}
                             <div className="flex-1 min-w lg:mr-6">
-                                <BlogCard posts={posts} postCount={postCount} />
+                                <BlogCard posts={posts} postCount={postCount}/>
                                 {pagination && pagination.total > 0 && (
                                     <div className="mt-7 flex justify-center items-center">
                                         <Pagination
@@ -59,11 +59,11 @@ const PostsIndex: React.FC<IndexProps> = ({
                             <div className="hidden lg:block w-64 mt-5">
                                 <div className="top-4">
                                     <div className="mb-6">
-                                        <div id="search-container" />
+                                        <div id="search-container"/>
                                     </div>
                                     <div className="hidden lg:block mt-5">
                                         <div className="top-4">
-                                            <LatestPosts />
+                                            <LatestPosts/>
                                         </div>
                                     </div>
                                 </div>

@@ -6,43 +6,31 @@ use App\Data\Post\CreatePostData;
 use App\Events\NewQuestionCreated;
 use App\Models\Category;
 use App\Models\Post;
-use App\Models\User;
-use App\Notifications\NewQuestionOrAnswerNotification;
-use App\Services\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class PostController extends Controller
 {
-    protected $postService;
-
-    public function __construct(PostService $postService)
-    {
-        $this->postService = $postService;
-    }
-
     public function index(Request $request)
     {
         $search = $request->input('search', '');
         $sort = $request->input('sort', 'latest');
 
-        // Lấy bài viết
-        $posts = $this->postService->getPosts($search, 6, $sort);
+        $posts = Post::getPosts($search, 6, $sort);
         $totalComment = Post::withCount('comments')->count();
-        // Lấy danh mục cùng số lượng bài viết
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
 
-        // Lấy thông báo nếu user đăng nhập
-
         $user = auth()->user();
         $notifications = $user ? $user->unreadNotifications : [];
 
         return Inertia::render('Posts/Index', [
-            'posts' => $this->postService->formatPosts($posts),
+            'posts' => $posts->map(function ($post) {
+                return $post->toFormattedArray();
+            }),
             'totalComment' => $totalComment,
             'categories' => $categories,
             'postCount' => $posts->total(),
@@ -60,76 +48,29 @@ class PostController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        $categories = Category::getCategoriesCount();
+        $categories = Category::select(['id', 'title', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
 
         return Inertia::render('Posts/Create', [
             'categories' => $categories,
-            // 'category' => Category::getCategoriesCount(),
-            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
+            'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-//    public function store(CreatePostData $postData)
-//    {
-//        $slug = Str::slug($postData->title);
-//        // Kiểm tra trùng lặp bài viết
-//        $existingPost = Post::where('title', $postData->title)
-//            ->orWhere('slug', Str::slug($postData->title))
-//            ->first();
-//
-//        if ($existingPost) {
-//            return redirect()->back()->withErrors([
-//                'title' => 'Tiêu đề hoặc đường dẫn (slug) đã tồn tại. Vui lòng chọn tiêu đề khác.',
-//            ])->withInput();
-//        }
-//
-//        // Tạo bài viết mới
-//        $post = Post::create([
-//            'title' => $postData->title,
-//            'content' => $postData->content,
-//            'slug' => $slug,
-//            'is_published' => $postData->is_published,
-//            'user_id' => auth()->id(),
-//        ]);
-//
-//        // Gắn danh mục vào bài viết
-//        if (! empty($postData->categories)) {
-//            $post->categories()->attach($postData->categories);
-//        }
-//        $users = User::all();
-//        foreach ($users as $user) {
-//            $user->notify(new NewQuestionOrAnswerNotification('question', [
-//                'title' => $postData->title,
-//                'url' => "/posts/{$slug}",
-//            ]));
-//        }
-//
-//        return redirect()->route('/')->with('success', 'Post created successfully!');
-//    }
     public function store(CreatePostData $postData)
     {
         $slug = Str::slug($postData->title);
 
-        // Kiểm tra trùng lặp bài viết
-        $existingPost = Post::where('title', $postData->title)
-            ->orWhere('slug', $slug)
-            ->first();
-
-        if ($existingPost) {
+        if (Post::existsByTitleOrSlug($postData->title, $slug)) {
             return redirect()->back()->withErrors([
                 'title' => 'Tiêu đề hoặc đường dẫn (slug) đã tồn tại. Vui lòng chọn tiêu đề khác.',
             ])->withInput();
         }
 
-        // Tạo bài viết mới
         $post = Post::create([
             'title' => $postData->title,
             'content' => $postData->content,
@@ -138,12 +79,10 @@ class PostController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        // Gắn danh mục vào bài viết
         if (! empty($postData->categories)) {
             $post->categories()->attach($postData->categories);
         }
 
-        // Dispatch sự kiện real-time
         event(new NewQuestionCreated([
             'title' => $postData->title,
             'url' => "/posts/{$slug}",
@@ -151,39 +90,24 @@ class PostController extends Controller
 
         return redirect()->route('/')->with('success', 'Post created successfully!');
     }
+
     public function show($slug)
     {
-        $post = Post::with(['user:id,name,profile_photo_path', 'categories:id,title,slug'])
-            ->withCount('upvotes') // Đếm số lượng upvotes
-            ->where('slug', $slug)
-            ->firstOrFail();
-
-        $category = Category::select(['id', 'title', 'slug'])
+        $post = Post::getPostBySlug($slug);
+        $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
 
-        // Load all comments with nested replies
-        $comments = $post->comments()
-            ->whereNull('parent_id')
-            ->with(['user:id,name,profile_photo_path'])
-            ->with(['allReplies.user:id,name,profile_photo_path'])
-            ->latest()
-            ->get()
-            ->map(function ($comment) {
-                return $this->formatComment($comment);
-            });
-
-        // Kiểm tra nếu user đã upvote bài viết chưa
-
-        $hasUpvoted = auth()->check() ? $post->upvotes()->where('user_id', auth()->id())->exists() : false;
+        $comments = $post->getFormattedComments();
+        $hasUpvoted = auth()->check() ? $post->isUpvotedBy(auth()->id()) : false;
 
         return Inertia::render('Posts/PostDetail', [
             'post' => [
                 'id' => $post->id,
                 'title' => $post->title,
                 'content' => $post->content,
-                'created_at' => $post->created_at,
+                'created_at' => $post->created_at->diffForHumans(),
                 'updated_at' => $post->updated_at,
                 'published_at' => $post->published_at,
                 'user' => $post->user,
@@ -192,32 +116,11 @@ class PostController extends Controller
                 'upvotes_count' => $post->upvotes_count,
                 'has_upvoted' => $hasUpvoted,
             ],
-            'categories' => $category,
+            'categories' => $categories,
             'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
         ]);
     }
 
-    protected function formatComment($comment)
-    {
-        return [
-            'id' => $comment->id,
-            'user' => [
-                'id' => $comment->user->id,
-                'name' => $comment->user->name,
-                'profile_photo_path' => $comment->user->profile_photo_path,
-            ],
-            'comment' => $comment->comment,
-            'created_at' => $comment->created_at,
-            'parent_id' => $comment->parent_id,
-            'replies' => $comment->allReplies->map(function ($reply) {
-                return $this->formatComment($reply);
-            }),
-        ];
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($slug)
     {
         $post = Post::where('slug', $slug)->with('user', 'categories')->firstOrFail();
@@ -226,7 +129,10 @@ class PostController extends Controller
             return redirect()->route('/')->with('error', 'You are not authorized to update this post!');
         }
 
-        $categoriesWithCount = Category::getCategoriesCount();
+        $categories = Category::select(['id', 'title', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
 
         return Inertia::render('Posts/EditPost', [
             'post' => [
@@ -234,7 +140,6 @@ class PostController extends Controller
                 'title' => $post->title,
                 'content' => $post->content,
                 'slug' => $post->slug,
-                'category' => $categoriesWithCount,
                 'is_published' => $post->is_published,
                 'categories' => $post->categories->pluck('id'),
                 'user' => [
@@ -245,25 +150,19 @@ class PostController extends Controller
                 'created_at' => $post->created_at->toDateTimeString(),
                 'updated_at' => $post->updated_at->toDateTimeString(),
             ],
-            'categories' => $categoriesWithCount,
-            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
+            'categories' => $categories,
+            'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(CreatePostData $request, Post $post)
     {
-        // Kiểm tra quyền truy cập
         if ($post->user_id !== auth()->id()) {
             return redirect()->route('/')->with('error', 'You are not authorized to update this post!');
         }
 
-        // Lấy dữ liệu từ request
         $postData = CreatePostData::from($request);
 
-        // Cập nhật thông tin bài viết
         $post->update([
             'title' => $postData->title,
             'content' => $postData->content,
@@ -278,14 +177,12 @@ class PostController extends Controller
         return redirect()->back()->with('success', 'Post updated successfully!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Post $post)
     {
         if ($post->user_id !== auth()->id()) {
             return redirect()->route('/')->with('error', 'You are not authorized to delete this post!');
         }
+
         $post->delete();
 
         return redirect()->back()->with('success', 'Post deleted successfully!');
@@ -293,23 +190,19 @@ class PostController extends Controller
 
     public function filterPostByCategory(Request $request, $categorySlug)
     {
-        // Lấy thông tin danh mục dựa vào slug
         $category = Category::where('slug', $categorySlug)->firstOrFail();
-        $categories = Category::getCategoriesCount();
-        // Lấy bài viết thuộc danh mục đó
-        $posts = Post::whereHas('categories', function ($query) use ($category) {
-            $query->where('categories.id', $category->id);
-        })
+        $posts = Post::byCategorySlug($categorySlug)
             ->with(['user', 'categories'])
             ->withCount('upvotes')
             ->orderBy('upvotes_count', 'desc')
             ->latest()
             ->paginate(6);
 
-        // Định dạng bài viết
-        $formattedPosts = $this->getPosts($posts);
+        $categories = Category::select(['id', 'title', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
 
-        // Trả về dữ liệu thông qua Inertia
         return Inertia::render('Posts/Category', [
             'category' => [
                 'id' => $category->id,
@@ -317,7 +210,9 @@ class PostController extends Controller
                 'slug' => $category->slug,
             ],
             'categories' => $categories,
-            'posts' => $formattedPosts,
+            'posts' => $posts->map(function ($post) {
+                return $post->toFormattedArray();
+            }),
             'pagination' => [
                 'total' => $posts->total(),
                 'per_page' => $posts->perPage(),
@@ -329,66 +224,31 @@ class PostController extends Controller
         ]);
     }
 
-    public function getPosts($posts): \Illuminate\Support\Collection
-    {
-        $formattedPosts = $posts->items();
-
-        return collect($formattedPosts)->map(function ($post) {
-            return [
-                'id' => $post->id,
-                'title' => $post->title,
-                'content' => $post->getExcerpt(),
-                'slug' => $post->slug,
-                'upvote_count' => $post->upvotes_count,
-                'categories' => $post->categories->map(function ($category) {
-                    return [
-                        'id' => $category->id,
-                        'title' => $category->title,
-                    ];
-                }),
-                'user' => [
-                    'id' => $post->user->id,
-                    'name' => $post->user->name,
-                    'profile_photo_path' => $post->user->profile_photo_path,
-                ],
-                'created_at' => $post->created_at->diffForHumans(),
-                'published_at' => $post->published_at,
-            ];
-        });
-    }
-
-    //    public function search(Request $request)
-    //    {
-    //        return $this->index($request);
-    //    }
-
     public function search(Request $request)
     {
         $search = $request->input('search', '');
         $sort = $request->input('sort', 'latest');
 
-        // Lấy bài viết
-        $posts = Post::query()
-            ->when($search, function ($query, $search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('content', 'like', "%{$search}%");
-            })
-            ->latest()
-            ->paginate(10) // Sử dụng pagination
+        $posts = Post::search($search)
+            ->with(['user', 'categories'])
+            ->withCount('upvotes')
+            ->when($sort === 'latest', fn ($q) => $q->latest())
+            ->when($sort === 'upvotes', fn ($q) => $q->orderBy('upvotes_count', 'desc'))
+            ->paginate(10)
             ->withQueryString();
 
-        // Lấy danh mục cùng số lượng bài viết
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
 
-        // Lấy thông báo nếu user đăng nhập
         $user = auth()->user();
         $notifications = $user ? $user->unreadNotifications : [];
 
         return Inertia::render('Posts/Search', [
-            'posts' => $this->postService->formatPosts($posts),
+            'posts' => $posts->map(function ($post) {
+                return $post->toFormattedArray();
+            }),
             'categories' => $categories,
             'postCount' => $posts->total(),
             'pagination' => [
@@ -403,37 +263,8 @@ class PostController extends Controller
             'notifications' => $notifications,
             'sort' => $sort,
         ]);
-
     }
 
-    //    public function getPostByUser(Request $request)
-    //    {
-    //        $search = $request->input('search', '');
-    //        $posts = $this->postService->getPosts($search);
-    //        $formattedPosts = $this->postService->formatPosts($posts);
-    //
-    //        // Lấy categories và trả về response giống như trước
-    //        $categories = Category::select(['id', 'title', 'slug'])
-    //            ->withCount('posts')
-    //            ->orderBy('posts_count', 'desc')
-    //            ->get();
-    //
-    //        return Inertia::render('Profile/Show', [
-    //            'posts' => $formattedPosts,
-    //            'categories' => $categories,
-    //            'postCount' => Post::count(),
-    //            'pagination' => [
-    //                'total' => $posts->total(),
-    //                'per_page' => $posts->perPage(),
-    //                'current_page' => $posts->currentPage(),
-    //                'last_page' => $posts->lastPage(),
-    //                'next_page_url' => $posts->nextPageUrl(),
-    //                'prev_page_url' => $posts->previousPageUrl(),
-    //            ],
-    //            'keyword' => $search,
-    //            'notifications' => ! auth()->user() ? [] : auth()->user()->unreadNotifications,
-    //        ]);
-    //    }
     public function getLatestPosts(Request $request)
     {
         return response()->json(
