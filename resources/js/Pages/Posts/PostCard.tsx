@@ -57,7 +57,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
     ];
 
     return (
-        <div className="container mx-auto px-0  mt-8 w-full max-w-screen-xl">
+        <div className="container mx-auto px-0 mt-8 w-full max-w-screen-xl">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-5 mb-6">
                 {/* Header Section */}
                 <div className="space-y-1">
@@ -90,9 +90,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                         </Link>
                     ) : (
                         <Link href="/login" className="w-full sm:w-auto">
-                            <Button className="w-full sm:w-auto flex items-center justify-center gap-2">
-                                <PlusCircle className="w-4 h-4"/>
-                                <span className="hidden sm:inline">Đặt câu hỏi tại đây</span>
+                            <Button
+                                className="w-full h-10 sm:w-auto flex items-center justify-center gap-2  bg-blue-500 hover:bg-blue-600 ">
+                                {/*<PlusCircle className="w-4 h-4"/>*/}
+                                <span className="hidden sm:inline">đặt câu hỏi tại đây</span>
                                 <span className="sm:hidden">Đặt câu hỏi</span>
                             </Button>
                         </Link>
@@ -101,20 +102,21 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
             </div>
 
             {/* Posts List */}
-            <div className="space-y-6">
+            <div className="space-y-6 items-stretch max-w-screen-2xl">
                 {posts.map((post, index) => (
-                    <div key={post.id} className="w-full min-h-[150px] flex flex-col">
+                    <div key={post.id} className="flex flex flex-col flex-1 items-stretch max-w-screen-2xl">
                         <div className="flex">
                             {/* Right side - Post content */}
                             <div className="flex-1 mb-2">
                                 <div className="pt-0">
-                                    <div className="space-y-3">
+                                    <div className="space-y-3 flex items-center mb-4">
                                         <Link href={`/posts/${post.slug}`} className="block group">
-                                            <h1 className="text-lg sm:text-xl font-bold tracking-tight group-hover:text-primary transition-colors leading-snug">
+                                            <h1 className="text-2xl font-bold text-gray-900 hover:text-primary mr-1">
                                                 {post.title}
                                             </h1>
 
-                                            <div
+
+                                            <p
                                                 className="text-sm text-muted-foreground line-clamp-2 mt-1"
                                                 dangerouslySetInnerHTML={{__html: post.content}}
                                             />

@@ -1,5 +1,5 @@
-import React from 'react';
 import { IconCloud } from "@/Components/ui/icon-cloud";
+import React from "react";
 
 const slugs = [
     "typescript",
@@ -8,13 +8,12 @@ const slugs = [
     "java",
     "react",
     "flutter",
-    "Vuejs",
+    "android",
     "html5",
     "css3",
     "nodedotjs",
     "express",
     "nextdotjs",
-    "dotnet",
     "prisma",
     "amazonaws",
     "postgresql",
@@ -26,27 +25,23 @@ const slugs = [
     "cypress",
     "docker",
     "git",
-    "Spring",
     "jira",
     "github",
     "gitlab",
     "visualstudiocode",
+    "androidstudio",
     "sonarqube",
+    "figma",
 ];
 
-export function TechnologyCloud() {
+export function IconCloudDemo() {
     const images = slugs.map(
-        (slug) => `https://cdn.simpleicons.org/${slug}/${slug}`,
+        (slug) => `https://cdn.simpleicons.org/${slug}/${slug}`
     );
 
     return (
-        <div className="relative w-full">
-            <div className="absolute inset-0 bg-gradient-to-b from-background/20 to-background/80 z-10" />
+        <div className="relative flex w-full h-[600px] items-center justify-center overflow-hidden">
             <IconCloud images={images} />
-            <div className="absolute inset-0 z-20 flex flex-col justify-end p-8 text-foreground">
-                <h2 className="text-2xl font-bold mb-2">Chào mừng trở lại!</h2>
-                <p className="text-sm opacity-90">Đăng nhập để tiếp tục hành trình với chúng tôi</p>
-            </div>
         </div>
     );
 }

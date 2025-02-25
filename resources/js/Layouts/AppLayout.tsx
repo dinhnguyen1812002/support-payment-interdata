@@ -76,24 +76,24 @@ export default function AppLayout({
       <Head title={title} />
 
       <div >
-        <nav className="sticky top-0 z-10 text-black bg-white border-b border-gray-100">
+        <nav className="sticky top-0 z-10 text-black bg-white border-b border-gray-100 dark:bg-[#0D0E12]">
           {/* <!-- Primary Navigation Menu --> */}
             <div className="px-6 sm:px-8 lg:px-7 mx-auto max-w-screen-xl  ">
             <div className="flex justify-between h-24">
               <div className="flex ">
                 {/* <!-- Logo --> */}
-                <div className="flex flex-shrink-0 items-center ">
+                <div className="max-w-[1320px] mx-auto px-4 flex justify-between items-center ">
                   <Link href={route('/')}>
-                    <ApplicationMark className="block w-auto h-9" />
-                      {/*<img alt="logo" src="	https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"*/}
-                      {/*className={"block w-auto h-7"}*/}
-                      {/*/>*/}
+                    {/*<ApplicationMark className="block w-auto h-9" />*/}
+                      <img alt="logo" src="	https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"
+                      className={"block w-auto h-7"}
+                      />
 
                   </Link>
                 </div>
 
                 {/* <!-- Navigation Links --> */}
-                <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex  ">
                   {/*<NavLink*/}
                   {/*    href={route('dashboard')}*/}
                   {/*    active={route().current('dashboard')}*/}

@@ -1,16 +1,15 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Link, useForm } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import { Button } from '@/Components/ui/button';
-import { Checkbox } from '@/Components/ui/checkbox';
-import { Alert, AlertDescription } from '@/Components/ui/alert';
-import {useRoute} from "ziggy-js";
-import AppLayout from "@/Layouts/AppLayout";
-import {Notification} from "@/types";
-import {TechnologyCloud} from "@/Components/TechnologyCloud";
 
+import {useRoute} from "ziggy-js";
+
+import {Notification} from "@/types";
+import {GalleryVerticalEnd} from "lucide-react";
+import {cn} from "@/lib/utils";
+import {Checkbox} from "@/Components/ui/checkbox";
 
 interface Props {
     canResetPassword: boolean;
@@ -19,6 +18,7 @@ interface Props {
 }
 
 export default function Login({ canResetPassword, status, notifications }: Props) {
+    const [color, setColor] = useState("#ffffff");
     const route = useRoute();
     const form = useForm({
         email: '',
@@ -34,39 +34,28 @@ export default function Login({ canResetPassword, status, notifications }: Props
     }
 
     return (
-        <AppLayout title="Login" canLogin={true} canRegister={true} notifications={notifications}>
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="flex h-full w-full max-w-5xl mx-auto shadow-lg rounded-2xl overflow-hidden">
-                    {/* Left side - Image */}
-                    <div className="hidden lg:flex lg:w-1/2 relative bg-background">
-                        <TechnologyCloud/>
-                    </div>
-                    {/*<div className="hidden lg:block lg:w-1/2 relative">*/}
-                    {/*    /!* Overlay with text *!/*/}
-                    {/*    <div className="absolute inset-0 bg-black/40 flex flex-col justify-end p-8 text-white">*/}
-                    {/*        <h2 className="text-2xl font-bold mb-2">Welcome Back!</h2>*/}
-                    {/*        <p className="text-sm opacity-90">Sign in to continue your journey with us.</p>*/}
-                    {/*    </div>*/}
-                    {/*</div>*/}
-
-                    {/* Right side - Login Form */}
-                    <div className="w-full lg:w-1/2 bg-white p-8 lg:p-12">
-                        <div className="max-w-sm mx-auto">
-                            <div className="mb-8">
-                                <h1 className="text-2xl font-bold text-gray-900">Sign in to your account</h1>
-                                <p className="text-sm text-gray-600 mt-2">
-                                    Enter your credentials to continue
+        <div className="grid min-h-svh lg:grid-cols-2">
+            <div className="flex flex-col gap-4 p-6 md:p-10">
+                <div className="flex justify-center gap-2 md:justify-start">
+                    <a href="/" className="flex items-center gap-2 font-medium">
+                        <div
+                            className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                            <GalleryVerticalEnd className="size-4"/>
+                        </div>
+                        Support ticket
+                    </a>
+                </div>
+                <div className="flex flex-1 items-center justify-center">
+                    <div className="w-full max-w-xs">
+                        <form className={cn("flex flex-col gap-6")} onSubmit={onSubmit} >
+                            <div className="flex flex-col items-center gap-2 text-center">
+                                <h1 className="text-2xl font-bold">Login to your account</h1>
+                                <p className="text-balance text-sm text-muted-foreground">
+                                    Enter your email below to login to your account
                                 </p>
                             </div>
-
-                            {status && (
-                                <Alert className="mb-6">
-                                    <AlertDescription>{status}</AlertDescription>
-                                </Alert>
-                            )}
-
-                            <form onSubmit={onSubmit} className="space-y-6">
-                                <div className="space-y-2">
+                            <div className="grid gap-6">
+                                <div className="grid gap-2">
                                     <Label htmlFor="email">Email</Label>
                                     <Input
                                         id="email"
@@ -81,15 +70,23 @@ export default function Login({ canResetPassword, status, notifications }: Props
                                     {form.errors.email && (
                                         <p className="text-sm text-destructive">{form.errors.email}</p>
                                     )}
-                                </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="password">Password</Label>
+                                </div>
+                                <div className="grid gap-2">
+                                    <div className="flex items-center">
+                                        <Label htmlFor="password">Password</Label>
+                                        {/*<a*/}
+                                        {/*    href="#"*/}
+                                        {/*    className="ml-auto text-sm underline-offset-4 hover:underline"*/}
+                                        {/*>*/}
+                                        {/*    Forgot your password?*/}
+                                        {/*</a>*/}
+                                    </div>
                                     <Input
                                         id="password"
                                         type="password"
                                         value={form.data.password}
-                                        onChange={e => form.setData('password',  e.currentTarget.value)}
+                                        onChange={e => form.setData('password', e.currentTarget.value)}
                                         required
                                         className="h-10"
                                         placeholder="Enter your password"
@@ -99,7 +96,6 @@ export default function Login({ canResetPassword, status, notifications }: Props
                                         <p className="text-sm text-destructive">{form.errors.password}</p>
                                     )}
                                 </div>
-
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-2">
                                         <Checkbox
@@ -130,28 +126,53 @@ export default function Login({ canResetPassword, status, notifications }: Props
                                 <Button
                                     type="submit"
                                     disabled={form.processing}
-                                    className={`w-full h-11 ${form.processing ? 'opacity-50' : ''}`}
-                                >
-                                    Sign in
+                                    className={`w-full  ${form.processing ? 'opacity-50' : ''}`}
+                                   >
+                                    Login
                                 </Button>
-
-                                <div className="text-center text-sm text-gray-600">
-                                    Don't have an account?{' '}
-                                    <Button
-                                        variant="link"
-                                        className="p-0 h-auto text-sm"
-                                        asChild
-                                    >
-                                        <Link href={route('register')}>
-                                            Create account
-                                        </Link>
-                                    </Button>
+                                <div
+                                    className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+                                          <span className="relative z-10 bg-background px-2 text-muted-foreground">
+                                            Or continue with
+                                          </span>
                                 </div>
-                            </form>
-                        </div>
+                                <Button variant="outline" className="w-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+                                            fill="currentColor"
+                                        />
+                                    </svg>
+                                    Login with GitHub
+                                </Button>
+                            </div>
+                            <div className="text-center text-sm">
+                                Don&apos;t have an account?{" "}
+                                {/*<a href="#" className="underline underline-offset-4">*/}
+                                {/*    Sign up*/}
+                                {/*</a>*/}
+                                <Link href={route('register')}>
+                                    Create account
+                                </Link>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-        </AppLayout>
-    );
+            <div className="relative hidden h-full w-full bg-muted lg:block">
+                {/*<img*/}
+                {/*    src="/storage/assets/develop.jpg"*/}
+                {/*    alt="Image"*/}
+                {/*    className="absolute inset-0 h-full w-full object-cover"*/}
+                {/*/>*/}
+                {/*<Particles*/}
+                {/*    className="absolute inset-0 z-0"*/}
+                {/*    quantity={100}*/}
+                {/*    ease={80}*/}
+                {/*    color={color}*/}
+                {/*    refresh*/}
+                {/*/>*/}
+            </div>
+        </div>
+    )
 }

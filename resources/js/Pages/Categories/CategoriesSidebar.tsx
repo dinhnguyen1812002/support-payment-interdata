@@ -31,11 +31,11 @@ const CategoriesSidebar: React.FC<Props> = ({
     const hasMoreCategories = categories.length > INITIAL_SHOW_COUNT;
 
     return (
-        <div className={`mt-5  w-full ${className}`}>
+        <div className={`mt-5  ${className}`}>
             {/* Header */}
             <div className="px-4 sm:px-5">
-                <h3 className="text-lg sm:text-lg font-normal text-gray-500">
-                    Danh mục
+                <h3 className="text-gray-500 uppercase text-xs font-bold ">
+                   PUBLIC
                 </h3>
             </div>
 
@@ -47,7 +47,7 @@ const CategoriesSidebar: React.FC<Props> = ({
                         variant="ghost"
                         className={`w-full justify-between hover:bg-slate-100 px-4 py-2 h-auto relative text-sm
                             ${!selectedCategory
-                            ? "border-l-4 bg-slate-100 border-l-blue-600"
+                            ? "border-l-4 bg-slate-100 border-l-blue-600  dark:bg-dark"
                             : "border-l-2 border-l-transparent"
                         }`}
                         asChild

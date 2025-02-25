@@ -23,7 +23,8 @@ const PostsIndex: React.FC<IndexProps> = ({
 
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
-            <div className="max-w-7xl mx-auto px-0">
+            <div className="max-w-7xl mx-auto px-4 flex flex-1 ">
+
                 <div className="flex space-x-4">
                     {/* Main Content Area with Search Functionality */}
                     <SearchComponent initialSearch={keyword} route="/posts/search">
@@ -41,7 +42,7 @@ const PostsIndex: React.FC<IndexProps> = ({
                             <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10 ml-[-2rem]" />
 
                             {/* Posts Content */}
-                            <div className="flex-1 min-w lg:mr-6">
+                            <div className="flex-1 min-w lg:mr-6 ">
                                 <BlogCard posts={posts} postCount={postCount}/>
                                 {pagination && pagination.total > 0 && (
                                     <div className="mt-7 flex justify-center items-center">
