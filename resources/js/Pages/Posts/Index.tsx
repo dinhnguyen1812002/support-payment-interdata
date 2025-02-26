@@ -20,32 +20,33 @@ const PostsIndex: React.FC<IndexProps> = ({
                                               notifications,
                                           }) => {
     const title = "Support AutoPay";
-
+    console.log("Categories in PostsIndex:", categories);
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
-            <div className="max-w-7xl mx-auto px-4 flex flex-1 ">
+            <div className="max-w-7xl mx-auto px-0 flex flex-1 mt-2 items-center">
 
-                <div className="flex space-x-4">
+                <div className="flex">
                     {/* Main Content Area with Search Functionality */}
                     <SearchComponent initialSearch={keyword} route="/posts/search">
-                        <div className="flex flex-1 gap-x-6">
+                        <div className="flex flex-1 gap-x-10">
                             {/* Left Sidebar */}
-                            <div className="hidden lg:block w-56 pr-6">
+                            <div className="hidden lg:block w-52 pr-2 ">
                                 <CategoriesSidebar
                                     categories={categories}
+
                                     selectedCategory={selectedCategory as string | null | undefined}
-                                    className="w-full"
+                                    className="w-full flex-shrink-0"
                                 />
                             </div>
 
                             {/* Separator */}
-                            <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10 ml-[-2rem]" />
+                            <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10 ml-[-2rem]"/>
 
                             {/* Posts Content */}
-                            <div className="flex-1 min-w lg:mr-6 ">
+                            <div className="flex-1 max-w-3xl mx-auto mt-7 px-4">
                                 <BlogCard posts={posts} postCount={postCount}/>
                                 {pagination && pagination.total > 0 && (
-                                    <div className="mt-7 flex justify-center items-center">
+                                    <div className="mt-7 flex justify-center">
                                         <Pagination
                                             current_page={pagination.current_page}
                                             last_page={pagination.last_page}
@@ -55,6 +56,7 @@ const PostsIndex: React.FC<IndexProps> = ({
                                     </div>
                                 )}
                             </div>
+
 
                             {/* Right Sidebar */}
                             <div className="hidden lg:block w-64 mt-5">

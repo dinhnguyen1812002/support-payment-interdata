@@ -78,7 +78,7 @@ export default function AppLayout({
       <div >
         <nav className="sticky top-0 z-10 text-black bg-white border-b border-gray-100 dark:bg-[#0D0E12]">
           {/* <!-- Primary Navigation Menu --> */}
-            <div className="px-6 sm:px-8 lg:px-7 mx-auto max-w-screen-xl  ">
+            <div className="px-6  sm:px-8 lg:px-7 mx-auto max-w-screen-xl  ">
             <div className="flex justify-between h-24">
               <div className="flex ">
                 {/* <!-- Logo --> */}

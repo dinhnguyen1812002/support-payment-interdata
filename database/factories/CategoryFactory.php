@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,17 +10,15 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class CategoryFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
-    public function definition(): array
+    protected $model = Category::class;
+
+    public function definition()
     {
+        $title = $this->faker->word;
+
         return [
-            'title' => $this->faker->sentence(6),
+            'title' => $this->faker->sentence(),
             'slug' => $this->faker->slug(3),
-            'description' => $this->faker->paragraph(),
         ];
     }
 }

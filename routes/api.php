@@ -13,3 +13,5 @@ Route::get('/user', function (Request $request) {
 //    ->name('notifications.read_all');
 
 // Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
+
+Route::get('cate', [\App\Http\Controllers\CategoryController::class, 'index']);

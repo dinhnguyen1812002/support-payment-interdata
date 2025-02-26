@@ -3,7 +3,7 @@ import { ScrollArea } from "@/Components/ui/scroll-area";
 import { Button } from "@/Components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "@inertiajs/react";
-
+import {extractPublic, uppercaseText} from "@/Utils/slugUtils";
 interface Category {
     id: number;
     title: string;
@@ -26,17 +26,22 @@ const CategoriesSidebar: React.FC<Props> = ({
                                             }) => {
     const [showAll, setShowAll] = useState(false);
     const INITIAL_SHOW_COUNT = 5;
+    // const visibleCategories = showAll ? categories : categories.slice(0, INITIAL_SHOW_COUNT);
+    const visibleCategories = showAll ? categories.map(cat => ({ ...cat })) : categories.slice(0, INITIAL_SHOW_COUNT);
 
-    const visibleCategories = showAll ? categories : categories.slice(0, INITIAL_SHOW_COUNT);
+    console.log(visibleCategories);
     const hasMoreCategories = categories.length > INITIAL_SHOW_COUNT;
-
+    // let txt = "public";
+    const inputStr = "cilpubxyzvpqrwy";
+    const strResult = extractPublic([inputStr]);
     return (
         <div className={`mt-5  ${className}`}>
             {/* Header */}
             <div className="px-4 sm:px-5">
-                <h3 className="text-gray-500 uppercase text-xs font-bold ">
-                   PUBLIC
-                </h3>
+                <p className="w-full text-sm font-bold  text-mutedText">
+                    { uppercaseText(strResult)}
+                    {/*{extractPublic([inputStr])}*/}
+                </p>
             </div>
 
             {/* Categories List */}
@@ -56,9 +61,10 @@ const CategoriesSidebar: React.FC<Props> = ({
                             href="/"
                             className="flex justify-between items-center w-full text-sm text-gray-600 hover:text-gray-900 py-1 sm:py-2"
                         >
+
                             <div className="flex gap-2 items-center">
-                                <span className={`font-normal ${!selectedCategory ? "text-black font-bold" : ""}`}>
-                                    Tất cả
+                                <span className={`font-bold ${!selectedCategory ? "text-customBlue font-bold" : ""}`}>
+                                    All Questions
                                 </span>
                             </div>
                             <span className="text-xs sm:text-sm text-gray-500">
@@ -88,15 +94,13 @@ const CategoriesSidebar: React.FC<Props> = ({
                                         className="flex justify-between items-center w-full text-sm text-gray-600 hover:text-gray-900 py-1 sm:py-2"
                                     >
                                         <div className="flex gap-2 items-center">
-                                            <span className={`font-normal ${isActive ? "text-blue-600" : ""}`}>
+                                            <span className={`font-normal  ${isActive ? "text-blue-600" : ""}`}>
                                                 {category.title}
                                             </span>
                                         </div>
-                                        {category.posts_count !== undefined && (
-                                            <span className="text-xs sm:text-sm text-gray-500">
-                                                {category.posts_count}
-                                            </span>
-                                        )}
+                                        <span className="text-xs sm:text-sm text-mutedText">
+                                            {category.posts_count ?? 0}
+                                        </span>
                                     </Link>
                                 </Button>
                             );
