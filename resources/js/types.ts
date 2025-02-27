@@ -175,6 +175,7 @@ export interface Notification {
     created_at: string;
 }
 export interface IndexProps {
+
     posts: BlogPost[];
     categories: Category[];
     pagination: Paginate;
@@ -182,6 +183,7 @@ export interface IndexProps {
     keyword: string;
     selectedCategory?: string | null | undefined | unknown;
     notifications: Notification[];
+    children: React.ReactNode;
 }
 export interface EditPostProps {
     post: {

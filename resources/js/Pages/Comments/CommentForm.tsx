@@ -11,15 +11,14 @@ import {getFirstTwoLetters} from "@/lib/utils";
 
 interface CommentFormProps {
     onSubmit: (content: string, parentId?: number, image?: File | null) => void;
-    currentUserAvatar: string;
     placeholder?: string;
     autoFocus?: boolean;
 }
 
 const CommentForm: React.FC<CommentFormProps> = ({
                                                      onSubmit,
-                                                     currentUserAvatar,
-                                                     placeholder = "Write a comment...",
+
+                                                     placeholder = "Your reply here",
                                                      autoFocus = false,
                                                  }) => {
     const [comment, setComment] = useState("");
@@ -55,30 +54,18 @@ const CommentForm: React.FC<CommentFormProps> = ({
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className=" space-y-4">
             <div className="flex items-start gap-4">
                 {/* Avatar */}
-                <Avatar className="h-8 w-8">
-                    <AvatarImage
-                        src={
-                            currentUserAvatar
-                                ? `/storage/${currentUserAvatar}`
-                                : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&color=7F9CF5&background=EBF4FF`
-                        }
-                        alt="{${page.props.auth.user?.name}}"
-                    />
-                    <AvatarFallback>Your</AvatarFallback>
-                </Avatar>
-
 
                 {/* Comment Input Area */}
-                <div className="flex-1 space-y-2 relative">
+                <div className=" flex-1 space-y-2 relative">
                     <Textarea
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         placeholder={placeholder}
                         autoFocus={autoFocus}
-                        className="min-h-[100px] resize-none"
+                        className="min-h-[150px] resize-none "
                     />
 
                     {/* Emoji Picker */}
@@ -139,7 +126,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                         </div>
 
                         {/* Submit Button */}
-                        <Button type="submit" disabled={!comment.trim() && !selectedImage}>
+                        <Button type="submit" disabled={!comment.trim() && !selectedImage} className="bg-blue-600 hover:bg-blue-700">
                             <Send className="w-4 h-4 mr-2" />
                             Post
                         </Button>

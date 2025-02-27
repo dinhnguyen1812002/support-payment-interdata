@@ -28,8 +28,6 @@ const CategoriesSidebar: React.FC<Props> = ({
     const INITIAL_SHOW_COUNT = 5;
     // const visibleCategories = showAll ? categories : categories.slice(0, INITIAL_SHOW_COUNT);
     const visibleCategories = showAll ? categories.map(cat => ({ ...cat })) : categories.slice(0, INITIAL_SHOW_COUNT);
-
-    console.log(visibleCategories);
     const hasMoreCategories = categories.length > INITIAL_SHOW_COUNT;
     // let txt = "public";
     const inputStr = "cilpubxyzvpqrwy";

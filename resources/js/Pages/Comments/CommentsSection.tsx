@@ -28,7 +28,7 @@ const CommentsSection = ({ initialComments, onCommentSubmit, currentUserAvatar }
     const page = useTypedPage();
     const user = page.props.auth.user;
     const name = user ? getFirstTwoLetters(user.name) : "";
-
+    let commentCount = comments.length;
     // Thêm bình luận mới vào danh sách
     const addNewComment = (newComment: Comment) => {
         if (newComment.parent_id) {
@@ -55,6 +55,7 @@ const CommentsSection = ({ initialComments, onCommentSubmit, currentUserAvatar }
         }
 
         const channel = window.Echo.channel("comments-channel");
+
 
         channel.listen(".comment.posted", (event: { comment: Comment }) => {
             console.log("Received comment:", event.comment);
@@ -83,27 +84,27 @@ const CommentsSection = ({ initialComments, onCommentSubmit, currentUserAvatar }
     };
 
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <CardTitle>Comments</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+        <div className="w-full">
+
+            <div className="space-y-6">
                 {user ? (
                     <CommentForm
                         onSubmit={content => onCommentSubmit(content)}
-                        currentUserAvatar={user.profile_photo_path ||
-                            `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&color=7F9CF5&background=EBF4FF`}
+
                     />
                 ) : (
                     <p>Đăng nhập để bình luận</p>
                 )}
-
+                <h2  className=" text-2xl font-bold text-gray-900 mb-10 hover:text-gray-700">
+                    Replies
+                    <small className="text-mutedText text-base font-semibold ml-1">({commentCount})</small>
+                </h2>
                 <InfiniteScroll
                     dataLength={comments.length}
                     next={fetchMoreComments}
                     hasMore={!!nextPage}
                     loader={<p>Đang tải thêm bình luận...</p>}
-                   
+
                 >
                     <div className="space-y-6">
                         {comments.map(comment => (
@@ -120,8 +121,8 @@ const CommentsSection = ({ initialComments, onCommentSubmit, currentUserAvatar }
                         ))}
                     </div>
                 </InfiniteScroll>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 };
 

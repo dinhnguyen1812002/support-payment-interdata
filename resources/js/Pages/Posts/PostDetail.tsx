@@ -14,6 +14,7 @@ import SearchComponent from "@/Components/Search";
 import BlogCard from "@/Pages/Posts/PostCard";
 import {Avatar, AvatarFallback, AvatarImage} from "@/Components/ui/avatar";
 import LatestPosts from "@/Pages/Posts/LatestPost";
+import MainLayout from "@/Layouts/Layout";
 
 interface BlogPost {
   next_page_url: string | null;
@@ -34,6 +35,7 @@ interface BlogPost {
 interface PostDetailProps {
   post: BlogPost;
   categories: Category[];
+  keyword: string;
   auth: {
     user: {
       id: number;
@@ -49,6 +51,7 @@ const PostDetail: React.FC<PostDetailProps> = ({
   auth,
   categories,
   notifications,
+    keyword
 }) => {
   const [comments, setComments] = useState<Comment[]>(post.comments || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -102,114 +105,114 @@ const PostDetail: React.FC<PostDetailProps> = ({
   }, [post.id]);
 
   return (
-      <AppLayout title={post.title} canLogin={true} canRegister={true} notifications={notifications}>
-          <div className="max-w-7xl mx-auto px-4">
-              <div className="flex space-x-4">
-                  {/* Left Sidebar */}
-                  <div className="hidden lg:block w-56">
-                      <CategoriesSidebar
-                          categories={categories}
-                          selectedCategory={selectedCategory as string | null | undefined}
-                          className="w-full"
-                      />
+      <AppLayout title={post.title} canLogin={true} canRegister={true} notifications={notifications}  >
+          <div className="max-w-7xl mx-auto px-0 flex flex-1 mt-2 items-center">
 
-                  </div>
-
-                  {/* Separator between Sidebar and Posts */}
-                  <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10"/>
-
+              <div className="flex">
                   {/* Main Content Area with Search Functionality */}
-                  <div className="flex-1 max-w-3xl">
-                      <div className="mt-10 space-y-6">
-                          {/* Post Details */}
-                          <div className="mb-8">
-                              <h1 className="mb-4 text-4xl font-bold text-gray-900">
-                                  {post.title}
-                              </h1>
-                              <div className="mb-12 max-w-none prose prose-lg">
-                                  <div dangerouslySetInnerHTML={{__html: post.content}}/>
-                              </div>
+                  <SearchComponent initialSearch={keyword} route="/posts/search">
+                      <div className="flex flex-1 gap-x-10">
+                          {/* Left Sidebar */}
+                          <div className="hidden lg:block w-52 pr-2 ">
+                              <CategoriesSidebar
+                                  categories={categories}
 
+                                  selectedCategory={selectedCategory as string | null | undefined}
+                                  className="w-full flex-shrink-0"
+                              />
                           </div>
 
-                          {/* Interaction Buttons */}
-                          <div className="flex items-center py-4 mb-8 justify-between">
+                          {/* Separator */}
+                          <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10 ml-[-2rem]"/>
 
-                              <div className="flex items-center space-x-4">
-                                  <Avatar className="h-9 w-9 rounded-md">
-                                      <AvatarImage
-                                          src={
-                                              post.user.profile_photo_path
-                                                  ? `/storage/${post.user.profile_photo_path}`
-                                                  : `https://ui-avatars.com/api/?name=${encodeURI(post.user.name)}&color=7F9CF5&background=EBF4FF`
-                                          }
-                                          alt={post.user.name}
-                                      />
-                                      <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                      <h3 className="font-medium text-gray-900">{post.user.name}</h3>
-                                      <div className="flex items-center text-sm text-gray-500">
+                          {/*main Content*/}
+                          <div className="flex-1 max-w-3xl">
+                              <div className="mt-5 space-y-4">
+                                  {/* Post Details */}
+                                  <div className="mb-1">
+                                      <span className="text-3xl font-bold text-gray-900 mb-0 me-1">
+                                          {post.title}
+                                      </span>
+                                      <div className="mb-6 max-w-none prose prose-lg">
+                                          <p className="text-lg font-normal text-gray-900 mb-0 mr-1"
+                                             dangerouslySetInnerHTML={{__html: post.content}}></p>
+                                      </div>
+                                  </div>
+                                  {/* Interaction Buttons */}
+                                  <div className="flex items-center mb-4 justify-between">
+                                      <div className="flex items-center space-x-2">
+                                          {/* Avatar */}
+                                          <Avatar className="h-9 w-9 rounded-md">
+                                              <AvatarImage
+                                                  src={
+                                                      post.user.profile_photo_path
+                                                          ? `/storage/${post.user.profile_photo_path}`
+                                                          : `https://ui-avatars.com/api/?name=${encodeURI(post.user.name)}&color=7F9CF5&background=EBF4FF`
+                                                  }
+                                                  alt={post.user.name}
+                                              />
+                                              <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
+                                          </Avatar>
 
-                                          <time dateTime={post.created_at}>
-                                              {new Date(post.created_at).toLocaleDateString()}
-                                          </time>
+                                          {/* User Info */}
+                                          <div className="flex flex-col h-full justify-center">
+                                              <h3 className="text-gray-800 text-sm font-semibold leading-tight mb-0.5">{post.user.name}</h3>
+                                              <p className="text-xs text-mutedText font-semibold leading-tight">{post.created_at}</p>
+                                          </div>
+                                      </div>
+
+                                      <div className="flex items-center space-x-4">
+
+                                          {post.categories.map((category) => (
+                                              <Link
+                                                  key={category.id}
+                                                  href={`/categories/${category.slug}/posts`}
+                                                  className="cursor-pointer"
+                                              >
+                                                  <Badge
+                                                      variant="outline"
+                                                      className="px-3 py-1 text-sm font-medium text-blue-800 rounded border border-blue-400 border-dashed
+                                                         dark:bg-gray-700 dark:text-blue-400 hover:border-solid hover:border-blue-600"
+                                                  >
+                                                      {category.title}
+                                                  </Badge>
+                                              </Link>
+                                          ))}
+                                          <UpvoteButton
+                                              postId={post.id}
+                                              initialUpvotes={post.upvotes_count}
+                                              initialHasUpvoted={post.has_upvoted}
+                                          />
+                                      </div>
+                                  </div>
+                                  <hr className="w-full border-t border-dashed border-gray-300 my-4 "/>
+                                  {/* Comments Section */}
+                                  <CommentsSection
+                                      initialComments={{
+                                          data: comments,
+                                          next_page_url: post.next_page_url,
+                                      }}
+                                      onCommentSubmit={handleCommentSubmit}
+                                      currentUserAvatar={userAvatar}
+                                  />
+                              </div>
+                          </div>
+
+                          {/* Right Sidebar */}
+                          <div className="hidden lg:block w-64 mt-5">
+                              <div className="top-4">
+                                  <div className="mb-6">
+                                      <div id="search-container"/>
+                                  </div>
+                                  <div className="hidden lg:block mt-5">
+                                      <div className="top-4">
+                                          <LatestPosts/>
                                       </div>
                                   </div>
                               </div>
-
-                              <div className="flex items-center space-x-4">
-
-                                  {post.categories.map((category) => (
-                                      <Link
-                                          key={category.id}
-                                          href={`/categories/${category.slug}/posts`}
-                                          className="cursor-pointer"
-                                      >
-                                          <Badge
-                                              variant="outline"
-                                              className="px-3 py-1 text-sm font-medium text-blue-800 rounded border border-blue-400 border-dashed
-          dark:bg-gray-700 dark:text-blue-400 hover:border-solid hover:border-blue-600"
-                                          >
-                                              {category.title}
-                                          </Badge>
-                                      </Link>
-                                  ))}
-                                  <UpvoteButton
-                                      postId={post.id}
-                                      initialUpvotes={post.upvotes_count}
-                                      initialHasUpvoted={post.has_upvoted}
-                                  />
-                              </div>
-
-                          </div>
-
-
-                          {/* Comments Section */}
-                          <CommentsSection
-                              initialComments={{
-                                  data: comments,
-                                  next_page_url: post.next_page_url,
-                              }}
-                              onCommentSubmit={handleCommentSubmit}
-                              currentUserAvatar={userAvatar}
-                          />
-                      </div>
-                  </div>
-
-                  {/* Right Sidebar */}
-                  <div className="hidden lg:block w-64 mt-5">
-                      <div className="top-4">
-                          <div className="mb-6">
-                              <div id="search-container"/>
-                          </div>
-                          <div className="hidden lg:block mt-5">
-                              <div className="top-4">
-                                  <LatestPosts/>
-                              </div>
                           </div>
                       </div>
-                  </div>
+                  </SearchComponent>
               </div>
           </div>
       </AppLayout>

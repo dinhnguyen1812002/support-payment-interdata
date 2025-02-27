@@ -26,9 +26,10 @@ import BlogCard from "@/Pages/Posts/PostCard";
 interface CreatePostProps {
     categories: Category[];
     notifications: Notification[];
+    keyword: string;
 }
 
-const CreatePost = ({ categories, notifications }: CreatePostProps) => {
+const CreatePost = ({ categories, notifications , keyword}: CreatePostProps) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [categorySearchFocused, setCategorySearchFocused] = useState(false);
@@ -77,37 +78,40 @@ const CreatePost = ({ categories, notifications }: CreatePostProps) => {
             category.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
             !data.categories.includes(category.id)
     );
-
+    const title = "Ask Question";
     return (
-        <AppLayout title={"Đặt Câu hỏi tại đây"} canLogin={true} canRegister={true} notifications={notifications}>
+        <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
             <div className="max-w-7xl mx-auto px-4">
-                <div className="flex space-x-4">
-                    {/* Left Sidebar */}
-                    <div className="hidden lg:block w-56">
-                        <CategoriesSidebar categories={categories}   selectedCategory={selectedCategory as string | null | undefined}
-                                           className="w-full"/>
-                    </div>
-                    {/* Separator between Sidebar and Posts */}
-                    <Separator orientation="vertical" className="hidden lg:flex h-auto mt-10 ml-[-2rem]" />
+
+                <div className="flex">
                     {/* Main Content Area with Search Functionality */}
-                    <SearchComponent
-                        initialSearch={"?????"}
-                        route="/posts/search"
-                        // pagination={pagination}
-                    >
-                        <div className="flex flex-1  mt-8">
-                            {/* Posts Content - Added more width */}
-                            <div className="flex-1 min-w lg:mr-6">
-                                <div className="">
+                    <SearchComponent initialSearch={keyword} route="/posts/search">
+                        <div className="flex flex-1 gap-x-6">
+                            {/* Left Sidebar */}
+                            <div className="hidden lg:block w-52 pr-2 ">
+                                <CategoriesSidebar
+                                    categories={categories}
+
+                                    selectedCategory={selectedCategory as string | null | undefined}
+                                    className="w-full flex-shrink-0"
+                                />
+                            </div>
+
+                            {/* Separator */}
+
+
+                            {/* main Content */}
+                            <div className="flex-[2] w-full lg:mr-6  ">
+                                <div className="border-l ">
                                     <CardHeader>
-                                        <CardTitle className="text-2xl font-semibold">Thêm bài viết</CardTitle>
+                                        <CardTitle className="text-2xl font-semibold">Ask a Questions</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <form onSubmit={handleSubmit} className="space-y-6">
                                             {/* Title Input */}
                                             <div className="space-y-1">
                                                 <Label htmlFor="title" className="text-base font-medium">
-                                                    Tiêu đề <span className="text-red-500">*</span>
+                                                   Title <span className="text-red-500">*</span>
                                                 </Label>
                                                 <Input
                                                     id="title"
@@ -128,7 +132,7 @@ const CreatePost = ({ categories, notifications }: CreatePostProps) => {
                                             {/* Content Editor */}
                                             <div className="space-y-2">
                                                 <Label htmlFor="content" className="text-base font-medium">
-                                                    Nội dung <span className="text-red-500">*</span>
+                                                    Question <span className="text-red-500">*</span>
                                                 </Label>
                                                 <div className="rounded-md ">
                                                     <ReactQuill
@@ -157,7 +161,7 @@ const CreatePost = ({ categories, notifications }: CreatePostProps) => {
                                             {/* Categories */}
                                             <div className="space-y-2 mt-10">
                                                 <Label className="text-base font-medium flex items-center mt-14 ">
-                                                    Danh mục <span className="text-red-500">*</span>
+                                                    Category <span className="text-red-500">*</span>
                                                     <span className="text-sm text-muted-foreground ml-2">
                                                 ({data.categories.length}/3)
                                             </span>
@@ -220,7 +224,7 @@ const CreatePost = ({ categories, notifications }: CreatePostProps) => {
                                                     />
                                                     <Label htmlFor="is_published"
                                                            className="font-medium cursor-pointer">
-                                                        Công khai bài viết
+                                                        Public
                                                     </Label>
                                                 </div>
                                                 <Button
@@ -242,13 +246,15 @@ const CreatePost = ({ categories, notifications }: CreatePostProps) => {
                                     </CardContent>
                                 </div>
                             </div>
-                            {/* Right Sidebar - Made narrower */}
+
+
+                            {/* Right Sidebar */}
                             <div className="hidden lg:block w-64 mt-5">
                                 <div className="top-4">
                                     <div className="mb-6">
                                         <div id="search-container"/>
                                     </div>
-                                    <div className="hidden lg:block mt-5 ">
+                                    <div className="hidden lg:block mt-5">
                                         <div className="top-4">
                                             <LatestPosts/>
                                         </div>
@@ -260,6 +266,7 @@ const CreatePost = ({ categories, notifications }: CreatePostProps) => {
                 </div>
             </div>
         </AppLayout>
+
     );
 };
 
