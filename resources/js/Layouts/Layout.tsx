@@ -3,7 +3,7 @@ import { router } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import BlogCard from "@/Pages/Posts/PostCard";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
-import { IndexProps } from "@/types";
+import {Category, IndexProps} from "@/types";
 import { Separator } from "@/Components/ui/separator";
 import SearchComponent from "@/Components/Search";
 import Pagination from "@/Components/Pagination";
@@ -11,29 +11,29 @@ import LatestPost from "@/Pages/Posts/LatestPost";
 import LatestPosts from "@/Pages/Posts/LatestPost";
 
 
-const MainLayout: React.FC<IndexProps> = ({
+const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
                                               categories = [],
                                               keyword,
                                               children,
-                                              selectedCategory,
+                                              category,
                                               notifications,
                                           }) => {
     const title = "Support AutoPay";
 
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
-            <div className="max-w-7xl mx-auto px-0 flex flex-1 mt-2 items-center">
+            <div className="max-w-7xl mx-auto px-4">
 
                 <div className="flex">
                     {/* Main Content Area with Search Functionality */}
                     <SearchComponent initialSearch={keyword} route="/posts/search">
-                        <div className="flex flex-1 gap-x-4">
+                        <div className="flex  gap-x-4">
                             {/* Left Sidebar */}
                             <div className="hidden lg:block w-52 pr-2 ">
                                 <CategoriesSidebar
                                     categories={categories}
 
-                                    selectedCategory={selectedCategory as string | null | undefined}
+                                    selectedCategory={category?.slug}
                                     className="w-full flex-shrink-0"
                                 />
                             </div>

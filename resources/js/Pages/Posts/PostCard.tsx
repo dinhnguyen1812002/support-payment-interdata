@@ -105,31 +105,33 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
             </div>
 
             {/* Posts List */}
-            <div className="space-y-1 items-stretch max-w-screen-2xl">
+            <div className="space-y-1 items-stretch w-full max-w-3xl mx-auto">
                 {posts.map((post, index) => (
-                    <div key={post.id} className="flex  flex-col flex-1 items-stretch max-w-screen-2xl">
+                    <div key={post.id}
+                         className="flex flex-col flex-1 items-stretch w-full max-w-screen-lg min-h-[150px]">
                         <div className="flex">
                             {/* Right side - Post content */}
                             <div className="flex-1 mb-2">
                                 <div className="pt-0">
                                     <div className="space-y-3 flex items-center ">
                                         <Link href={`/posts/${post.slug}`} className="block group">
-                                            <span className="text-xl font-bold text-customBlue hover:text-blue-600 mr-1">
+                                            <span
+                                                className="text-xl font-bold text-customBlue hover:text-blue-600 mr-1">
                                              {post.title}
                                             </span>
-                                            {/*<div*/}
-                                            {/*    className="text-base font-normal text-muted-foreground line-clamp-2 mt-3 "*/}
-                                            {/*    dangerouslySetInnerHTML={{__html: post.content}}*/}
-                                            {/*/>*/}
-                                            <div className="text-sm fw-normal text-gray-700 mt-3 "  dangerouslySetInnerHTML={{__html: post.content}}>
+                                            <div
+                                                className="text-base font-normal text-muted-foreground line-clamp-2 mt-3 "
+                                                dangerouslySetInnerHTML={{__html: post.content}}
+                                            />
+                                            {/*<div className="text-sm fw-normal text-gray-700 mt-3 line-clamp-2line-clamp-2 "  dangerouslySetInnerHTML={{__html: post.content}}>*/}
 
-                                            </div>
+                                            {/*</div>*/}
                                         </Link>
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between mt-2">
                                     {/* Author Info */}
-                                    <div className="flex items-center space-x-4">
+                                    <div className="flex items-center space-x-2">
                                         <div className="flex items-center py-1">
                                             <Avatar
                                                 className="flex items-center justify-center rounded-lg w-10 h-10 bg-green-100 text-green-600 text-2xl font-semibold uppercase">
@@ -179,7 +181,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                 </div>
                             </div>
                         </div>
-                        {index !== posts.length - 1 && <hr className="w-full border-t border-dashed border-gray-300 my-4 "/>}
+                        {index !== posts.length - 1 &&
+                            <hr className="w-full border-t border-dashed border-gray-300 my-4 "/>}
                     </div>
                 ))}
             </div>

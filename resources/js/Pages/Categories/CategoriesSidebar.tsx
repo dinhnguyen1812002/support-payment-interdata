@@ -38,7 +38,6 @@ const CategoriesSidebar: React.FC<Props> = ({
             <div className="px-4 sm:px-5">
                 <p className="w-full text-sm font-bold  text-mutedText">
                     { uppercaseText(strResult)}
-                    {/*{extractPublic([inputStr])}*/}
                 </p>
             </div>
 

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
@@ -10,6 +10,8 @@ import {Notification} from "@/types";
 import {GalleryVerticalEnd} from "lucide-react";
 import {cn} from "@/lib/utils";
 import {Checkbox} from "@/Components/ui/checkbox";
+import {Particles} from "@/Components/particles";
+import {useTheme} from "next-themes";
 
 interface Props {
     canResetPassword: boolean;
@@ -18,7 +20,10 @@ interface Props {
 }
 
 export default function Login({ canResetPassword, status, notifications }: Props) {
+    const { resolvedTheme } = useTheme()
     const [color, setColor] = useState("#ffffff");
+
+    // const [color, setColor] = useState("#ffffff");
     const route = useRoute();
     const form = useForm({
         email: '',
@@ -32,7 +37,9 @@ export default function Login({ canResetPassword, status, notifications }: Props
             onFinish: () => form.reset('password'),
         });
     }
-
+    useEffect(() => {
+        setColor(resolvedTheme === "dark" ? "#ffffff" : "#000000")
+    }, [resolvedTheme])
     return (
         <div className="grid min-h-svh lg:grid-cols-2">
             <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -172,6 +179,8 @@ export default function Login({ canResetPassword, status, notifications }: Props
                 {/*    color={color}*/}
                 {/*    refresh*/}
                 {/*/>*/}
+                <Particles className="absolute inset-0 z-0" quantity={100} ease={80} color={color} refresh />
+
             </div>
         </div>
     )
