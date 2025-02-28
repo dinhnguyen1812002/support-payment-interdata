@@ -45,7 +45,7 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
 
 
                             {/* Right Sidebar */}
-                            <div className="hidden lg:block w-64 mt-5">
+                            <div className="hidden lg:block w-72 mt-5">
                                 <div className="top-4">
                                     <div className="mb-6">
                                         <div id="search-container"/>

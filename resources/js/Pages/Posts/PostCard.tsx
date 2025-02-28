@@ -134,8 +134,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                     <div className="flex items-center space-x-2">
                                         <div className="flex items-center py-1">
                                             <Avatar
-                                                className="flex items-center justify-center rounded-lg w-10 h-10 bg-green-100 text-green-600 text-2xl font-semibold uppercase">
+                                                className="flex items-center justify-center rounded-lg h-9 w-9  bg-green-100 text-green-600 text-2xl font-semibold uppercase">
                                                 <AvatarImage
+                                                    className=""
                                                     src={
                                                         post.user.profile_photo_path
                                                             ? `/storage/${post.user.profile_photo_path}`

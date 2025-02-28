@@ -23,7 +23,7 @@ class CategoryController extends Controller
         return Inertia::render('Categories/CategoriesSidebar', [
             'categories' => $category,
         ]);
-//        return response()->json($category);
+        //        return response()->json($category);
     }
 
     /**

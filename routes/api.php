@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,4 +16,5 @@ Route::get('/user', function (Request $request) {
 
 // Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
 
-Route::get('cate', [\App\Http\Controllers\CategoryController::class, 'index']);
+Route::get('cate', [CategoryController::class, 'index']);
+Route::get('count', [PostController::class, 'count']);

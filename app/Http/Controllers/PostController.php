@@ -274,4 +274,11 @@ class PostController extends Controller
                 ->get()
         );
     }
+
+    public function getCountPost()
+    {
+        $post = Post::get()->totall();
+
+        return response()->json($post);
+    }
 }

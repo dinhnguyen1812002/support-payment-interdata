@@ -1,28 +1,24 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Link, useForm, Head } from '@inertiajs/react';
 import useRoute from '@/Hooks/useRoute';
 import useTypedPage from '@/Hooks/useTypedPage';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/Components/ui/card';
+
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
 import AppLayout from "@/Layouts/AppLayout";
-
-import {Alert, AlertDescription} from "@/Components/ui/alert";
 import {GalleryVerticalEnd, LoaderCircle} from "lucide-react";
-import {Notification} from "@/types";
-import {cn} from "@/lib/utils";
+import {Particles} from "@/Components/particles";
+import {useTheme} from "next-themes";
 
 
 export default function Register() {
+
+    const  {theme} = useTheme()
+
+    const  [color, setColor] = useState('#ffffff');
+
     const page = useTypedPage();
     const route = useRoute();
     const form = useForm({
@@ -32,6 +28,7 @@ export default function Register() {
         password_confirmation: '',
         terms: false,
     });
+
     const notifications:any[] =  [];
     function onSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -39,7 +36,9 @@ export default function Register() {
             onFinish: () => form.reset('password', 'password_confirmation'),
         });
     }
-
+    useEffect(() => {
+        setColor(theme === 'dark' ? '#ffffff' : '#000000')
+    },  [theme]);
     return (
 
         <div className="grid min-h-svh lg:grid-cols-2">
@@ -222,6 +221,7 @@ export default function Register() {
                 {/*    color={color}*/}
                 {/*    refresh*/}
                 {/*/>*/}
+                <Particles className="absolute inset-0 z-0" quantity={100} ease={80} color={color} refresh />
             </div>
         </div>
     );

@@ -18,6 +18,7 @@ interface Props {
     onCategorySelect?: () => void;
 }
 
+
 const CategoriesSidebar: React.FC<Props> = ({
                                                 categories,
                                                 selectedCategory,

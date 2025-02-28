@@ -116,7 +116,6 @@ const PostDetail: React.FC<PostDetailProps> = ({
                           <div className="hidden lg:block w-52 pr-2 ">
                               <CategoriesSidebar
                                   categories={categories}
-
                                   selectedCategory={selectedCategory as string | null | undefined}
                                   className="w-full flex-shrink-0"
                               />
