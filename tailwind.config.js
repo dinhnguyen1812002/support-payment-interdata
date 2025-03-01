@@ -32,7 +32,9 @@ export default {
     			foreground: 'hsl(var(--foreground))',
                 customBlue: "#071437",
                 mutedText: "#99a1b7",
-
+                customBlue1: "#4b5675",
+				contentColor :"#252f4a",
+				customBg:"#99a1b7",
     			card: {
     				DEFAULT: 'hsl(var(--card))',
     				foreground: 'hsl(var(--card-foreground))'

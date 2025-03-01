@@ -1,17 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import { Label } from '@/Components/ui/label';
 import { Input } from '@/Components/ui/input';
 import { Button } from '@/Components/ui/button';
 
-import {useRoute} from "ziggy-js";
+import { useRoute } from "ziggy-js";
 
-import {Notification} from "@/types";
-import {GalleryVerticalEnd} from "lucide-react";
-import {cn} from "@/lib/utils";
-import {Checkbox} from "@/Components/ui/checkbox";
-import {Particles} from "@/Components/particles";
-import {useTheme} from "next-themes";
+import { Notification } from "@/types";
+import { Eye, EyeClosed, EyeOff, GalleryVerticalEnd } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Checkbox } from "@/Components/ui/checkbox";
+import { Particles } from "@/Components/particles";
+import { useTheme } from "next-themes";
 
 interface Props {
     canResetPassword: boolean;
@@ -22,7 +22,7 @@ interface Props {
 export default function Login({ canResetPassword, status, notifications }: Props) {
     const { resolvedTheme } = useTheme()
     const [color, setColor] = useState("#ffffff");
-
+    const [passwordVisible, setPasswordVisible] = useState(false);
     // const [color, setColor] = useState("#ffffff");
     const route = useRoute();
     const form = useForm({
@@ -40,6 +40,11 @@ export default function Login({ canResetPassword, status, notifications }: Props
     useEffect(() => {
         setColor(resolvedTheme === "dark" ? "#ffffff" : "#000000")
     }, [resolvedTheme])
+
+
+    const togglePasswordVisibility = () => {
+        setPasswordVisible(prev => !prev);
+    };
     return (
         <div className="grid min-h-svh lg:grid-cols-2">
             <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -47,7 +52,7 @@ export default function Login({ canResetPassword, status, notifications }: Props
                     <a href="/" className="flex items-center gap-2 font-medium">
                         <div
                             className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                            <GalleryVerticalEnd className="size-4"/>
+                            <GalleryVerticalEnd className="size-4" />
                         </div>
                         Support ticket
                     </a>
@@ -82,23 +87,27 @@ export default function Login({ canResetPassword, status, notifications }: Props
                                 <div className="grid gap-2">
                                     <div className="flex items-center">
                                         <Label htmlFor="password">Password</Label>
-                                        {/*<a*/}
-                                        {/*    href="#"*/}
-                                        {/*    className="ml-auto text-sm underline-offset-4 hover:underline"*/}
-                                        {/*>*/}
-                                        {/*    Forgot your password?*/}
-                                        {/*</a>*/}
                                     </div>
-                                    <Input
-                                        id="password"
-                                        type="password"
-                                        value={form.data.password}
-                                        onChange={e => form.setData('password', e.currentTarget.value)}
-                                        required
-                                        className="h-10"
-                                        placeholder="Enter your password"
-                                        autoComplete="current-password"
-                                    />
+                                    <div className="relative">
+                                        <Input
+                                            id="password"
+                                            type={passwordVisible ? "text" : "password"}
+                                            value={form.data.password}
+                                            onChange={e => form.setData("password", e.currentTarget.value)}
+                                            required
+                                            className="h-10 pr-10"
+                                            placeholder="Enter your password"
+                                            autoComplete="current-password"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={togglePasswordVisibility}
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                        >
+              
+                                            {passwordVisible ? <EyeClosed className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
+                                    </div>
                                     {form.errors.password && (
                                         <p className="text-sm text-destructive">{form.errors.password}</p>
                                     )}
@@ -134,14 +143,14 @@ export default function Login({ canResetPassword, status, notifications }: Props
                                     type="submit"
                                     disabled={form.processing}
                                     className={`w-full  ${form.processing ? 'opacity-50' : ''}`}
-                                   >
+                                >
                                     Login
                                 </Button>
                                 <div
                                     className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                                          <span className="relative z-10 bg-background px-2 text-muted-foreground">
-                                            Or continue with
-                                          </span>
+                                    <span className="relative z-10 bg-background px-2 text-muted-foreground">
+                                        Or continue with
+                                    </span>
                                 </div>
                                 <Button variant="outline" className="w-full">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
