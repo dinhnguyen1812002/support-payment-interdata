@@ -157,7 +157,7 @@ const CreatePost = ({ categories, notifications , keyword}: CreatePostProps) => 
                                         </div>
                                         {/* Categories */}
                                         <div className="space-y-2 mt-10">
-                                            <Label className="text-base font-medium flex items-center mt-14  text-customBlue1 font-bold ">
+                                            <Label className="text-base flex items-center mt-14  text-customBlue1 font-bold ">
                                                 Category <span className="text-red-500">*</span>
                                                 <span className="text-sm text-muted-foreground ml-2">
                                                 ({data.categories.length}/3)
@@ -170,7 +170,7 @@ const CreatePost = ({ categories, notifications , keyword}: CreatePostProps) => 
                                                         variant="default"
                                                         className="px-3 py-1.5 text-sm flex items-center gap-1"
                                                     >
-                                                        <Hash className="w-3.5 h-3.5"/>
+                                                      
                                                         {category.title}
                                                         <button
                                                             type="button"
