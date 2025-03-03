@@ -22,17 +22,16 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
 
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
-            <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-[1354px] mx-auto px-4">
 
                 <div className="flex">
                     {/* Main Content Area with Search Functionality */}
                     <SearchComponent initialSearch={keyword} route="/posts/search">
                         <div className="flex  gap-x-4">
                             {/* Left Sidebar */}
-                            <div className="hidden lg:block w-52 pr-2 ">
+                            <div className="hidden lg:block w-52 pr-2 ml-[-10px]">
                                 <CategoriesSidebar
                                     categories={categories}
-
                                     selectedCategory={category?.slug}
                                     className="w-full flex-shrink-0"
                                 />

@@ -96,7 +96,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                             {/* Right side - Post content */}
                             <div className="flex-1 mb-2">
                                 <div className="pt-0">
-                                    <div className="space-y-3 flex items-center">
+                                    <div className="space-y-3 flex items-center mb-4">
                                         <Link href={`/posts/${post.slug}`} className="block group">
                                             <span
                                                 className={cn(
@@ -105,11 +105,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                                 )}>
                                                 {post.title}
                                             </span>
-                                            <div
-                                                className={cn(
-                                                    "text-base font-normal text-muted-foreground line-clamp-2 mt-3",
-                                                    "dark:text-gray-300"
-                                                )}
+                                            <p
+                                                className="text-sm font-normal text-muted-foreground line-clamp-2 mt-3 
+                                                    dark:text-gray-300"
                                                 dangerouslySetInnerHTML={{ __html: post.content }}
                                             />
                                         </Link>
@@ -147,7 +145,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                                                 "dark:text-gray-400"
                                             )}>
                                                 <time dateTime={post.created_at}>{post.created_at}</time>
-                                                <span>&middot;</span>
+                                                
                                             </div>
                                         </div>
                                     </div>

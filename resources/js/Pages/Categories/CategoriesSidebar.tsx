@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollArea } from "@/Components/ui/scroll-area";
 import { Button } from "@/Components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import {extractPublic, uppercaseText} from "@/Utils/slugUtils";
+import { aw } from "framer-motion/dist/types.d-O7VGXDJe";
+import axios from "axios";
 interface Category {
     id: number;
     title: string;
@@ -33,6 +35,23 @@ const CategoriesSidebar: React.FC<Props> = ({
     // let txt = "public";
     const inputStr = "cilpubxyzvpqrwy";
     const strResult = extractPublic([inputStr]);
+    const [totalPosts, setTotalPosts] = useState<number>(0);
+    useEffect(()=>{
+        const fetchTotalPosts = async()=>{
+            try {
+                const res = await axios.get("/api/count");
+                setTotalPosts(res.data);
+            } catch (error) {
+                console.error("Error fetching total post count:", error);
+            }
+        };
+
+        fetchTotalPosts();
+    },[]
+);
+
+
+
     return (
         <div className={`mt-5  ${className}`}>
             {/* Header */}
@@ -50,7 +69,7 @@ const CategoriesSidebar: React.FC<Props> = ({
                         variant="ghost"
                         className={`w-full justify-between hover:bg-slate-100 px-4 py-2 h-auto relative text-sm
                             ${!selectedCategory
-                            ? "border-l-4 bg-slate-100 border-l-blue-600  dark:bg-dark"
+                            ? "border-l-4 bg-slate-100 border-l-blue-500  dark:bg-dark"
                             : "border-l-2 border-l-transparent"
                         }`}
                         asChild
@@ -66,7 +85,7 @@ const CategoriesSidebar: React.FC<Props> = ({
                                 </span>
                             </div>
                             <span className="text-xs sm:text-sm text-gray-500">
-                                {categories.reduce((acc, category) => acc + (category.posts_count || 0), 0)}
+                                {totalPosts}
                             </span>
                         </Link>
                     </Button>

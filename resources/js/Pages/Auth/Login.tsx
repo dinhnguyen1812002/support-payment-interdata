@@ -142,7 +142,7 @@ export default function Login({ canResetPassword, status, notifications }: Props
                                 <Button
                                     type="submit"
                                     disabled={form.processing}
-                                    className={`w-full  ${form.processing ? 'opacity-50' : ''}`}
+                                    className={ `w-full  ${form.processing ? 'opacity-50' : ''}`}
                                 >
                                     Login
                                 </Button>

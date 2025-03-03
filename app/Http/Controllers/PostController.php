@@ -228,27 +228,29 @@ class PostController extends Controller
     {
         $search = $request->input('search', '');
         $sort = $request->input('sort', 'latest');
-
-        $posts = Post::search($search)
-            ->with(['user', 'categories'])
+    
+        // Tìm kiếm ID các bài viết phù hợp
+        $postIds = Post::search($search)->keys();
+    
+        // Truy vấn thực tế từ database với điều kiện ID
+        $posts = Post::whereIn('id', $postIds)
+            ->with(['user', 'categories']) // Eager load relationships
             ->withCount('upvotes')
-            ->when($sort === 'latest', fn ($q) => $q->latest())
-            ->when($sort === 'upvotes', fn ($q) => $q->orderBy('upvotes_count', 'desc'))
+            ->when($sort === 'latest', fn($q) => $q->latest())
+            ->when($sort === 'upvotes', fn($q) => $q->orderBy('upvotes_count', 'desc'))
             ->paginate(10)
             ->withQueryString();
-
+    
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
-
+    
         $user = auth()->user();
         $notifications = $user ? $user->unreadNotifications : [];
-
+    
         return Inertia::render('Posts/Search', [
-            'posts' => $posts->map(function ($post) {
-                return $post->toFormattedArray();
-            }),
+            'posts' => $posts->map(fn($post) => $post->toFormattedArray()),
             'categories' => $categories,
             'postCount' => $posts->total(),
             'pagination' => [
@@ -264,6 +266,7 @@ class PostController extends Controller
             'sort' => $sort,
         ]);
     }
+    
 
     public function getLatestPosts(Request $request)
     {
@@ -277,8 +280,7 @@ class PostController extends Controller
 
     public function getCountPost()
     {
-        $post = Post::get()->totall();
-
+        $post = Post::count();
         return response()->json($post);
     }
 }

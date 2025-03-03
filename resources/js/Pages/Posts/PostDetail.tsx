@@ -42,13 +42,13 @@ interface PostDetailProps {
     notifications: Notification[];
 }
 
-const PostDetail: React.FC<PostDetailProps> = ({
+const PostDetail: React.FC<PostDetailProps  > = ({
     post,
     auth,
     categories,
     notifications,
     keyword
-}) => {
+}  , category :Category) => {
     const [comments, setComments] = useState<Comment[]>(post.comments || []);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const selectedCategory = usePage().props.selectedCategory;
@@ -99,27 +99,24 @@ const PostDetail: React.FC<PostDetailProps> = ({
             };
         }
     }, [post.id]);
-
+    const title = post.title;
     return (
-        <AppLayout title={post.title} canLogin={true} canRegister={true} notifications={notifications}  >
-            <div className="max-w-7xl mx-auto px-0 flex flex-1 mt-2 items-center">
+        <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
+        <div className="max-w-[1354px] mx-auto px-4">
 
-                <div className="flex">
-                    {/* Main Content Area with Search Functionality */}
-                    <SearchComponent initialSearch={keyword} route="/posts/search">
-                        <div className="flex  gap-x-4">
-                            {/* Left Sidebar */}
-                            <div className="hidden lg:block w-52 pr-2 ">
-                                <CategoriesSidebar
-                                    categories={categories}
-                                    selectedCategory={selectedCategory as string | null | undefined}
-                                    className="w-full flex-shrink-0"
-                                />
-                            </div>
-
-                            {/* Separator */}
-                            {/*main Content*/}
-                            <div className="flex-1 max-w-3xl mx-auto px-4 border-l pl-8">
+            <div className="flex">
+                {/* Main Content Area with Search Functionality */}
+                <SearchComponent initialSearch={keyword} route="/posts/search">
+                    <div className="flex  gap-x-4">
+                        {/* Left Sidebar */}
+                        <div className="hidden lg:block w-52 pr-2 ml-[-10px]">
+                            <CategoriesSidebar
+                                categories={categories}
+                                selectedCategory={category?.slug}
+                                className="w-full flex-shrink-0"
+                            />
+                        </div>
+                        <div className="flex-1 max-w-3xl mx-auto px-4 border-l pl-8">
                                 <div className="mt-5 space-y-4">
                                     {/* Post Details */}
                                     <div className="mb-1">
@@ -192,24 +189,25 @@ const PostDetail: React.FC<PostDetailProps> = ({
                                 </div>
                             </div>
 
-                            {/* Right Sidebar */}
-                            <div className="hidden lg:block w-72 mt-5">
-                                <div className="top-4">
-                                    <div className="mb-6">
-                                        <div id="search-container" />
-                                    </div>
-                                    <div className="hidden lg:block mt-5">
-                                        <div className="top-4">
-                                            <LatestPosts />
-                                        </div>
+
+                        {/* Right Sidebar */}
+                        <div className="hidden lg:block w-72 mt-5">
+                            <div className="top-4">
+                                <div className="mb-6">
+                                    <div id="search-container"/>
+                                </div>
+                                <div className="hidden lg:block mt-5">
+                                    <div className="top-4">
+                                        <LatestPosts/>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </SearchComponent>
-                </div>
+                    </div>
+                </SearchComponent>
             </div>
-        </AppLayout>
+        </div>
+    </AppLayout>
 
 
     )

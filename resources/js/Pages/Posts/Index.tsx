@@ -77,7 +77,7 @@ const PostsIndex: React.FC<IndexProps> = ({
         //     </div>
         // </AppLayout>
         <MainLayout posts={posts} categories={categories} pagination={pagination} postCount={postCount} keyword={keyword} notifications={notifications} >
-            <div className="flex-1 max-w-3xl mx-auto mt-7 px-4 border-l pl-8">
+            <div className="flex-1 max-w-5xl  mx-auto mt-7 px-4 border-l pl-12">
                 {/* Sử dụng pl-6 để đẩy nội dung ra xa border-l */}
                 <BlogCard posts={posts} postCount={postCount} />
                 {pagination && pagination.total > 0 && (

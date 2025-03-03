@@ -17,4 +17,4 @@ Route::get('/user', function (Request $request) {
 // Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
 
 Route::get('cate', [CategoryController::class, 'index']);
-Route::get('count', [PostController::class, 'count']);
+Route::get('count', [PostController::class, 'getCountPost']);

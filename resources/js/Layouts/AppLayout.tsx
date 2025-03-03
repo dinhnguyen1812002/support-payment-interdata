@@ -78,16 +78,16 @@ export default function AppLayout({
       <div >
         <nav className="sticky top-0 z-10 text-black bg-white border-b border-gray-100 dark:bg-[#0D0E12]">
           {/* <!-- Primary Navigation Menu --> */}
-            <div className="px-6  sm:px-8 lg:px-7 mx-auto max-w-screen-xl  ">
+          <div className=" sm:px-0 lg:px-0   max-w-[1354px] mx-auto px-4 ">
             <div className="flex justify-between h-24">
               <div className="flex ">
                 {/* <!-- Logo --> */}
-                <div className="max-w-[1320px] mx-auto px-4 flex justify-between items-center ">
+                <div className="max-w-[1320px] mx-auto px-4 flex justify-between items-center  pr-14">
                   <Link href={route('/')}>
                     {/*<ApplicationMark className="block w-auto h-9" />*/}
-                      <img alt="logo" src="	https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"
-                      className={"block w-auto h-7"}
-                      />
+                    <img alt="logo" src="	https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"
+                      className={"block w-auto h-[30px]"}
+                    />
 
                   </Link>
                 </div>
@@ -333,18 +333,18 @@ export default function AppLayout({
                           <div className="flex items-center">
                             {team.id ==
                               page.props.auth.user?.current_team_id && (
-                              <svg
-                                className="mr-2 w-5 h-5 text-green-400"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                              </svg>
-                            )}
+                                <svg
+                                  className="mr-2 w-5 h-5 text-green-400"
+                                  fill="none"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                              )}
                             <div>{team.name}</div>
                           </div>
                         </ResponsiveNavLink>
@@ -356,16 +356,6 @@ export default function AppLayout({
             </div>
           </div>
         </nav>
-
-        {/* <!-- Page Heading --> */}
-        {renderHeader ? (
-          <header className="bg-white shadow dark:bg-gray-800">
-            <div className="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-              {renderHeader()}
-            </div>
-          </header>
-        ) : null}
-
         {/* <!-- Page Content --> */}
 
         <main>
@@ -378,6 +368,16 @@ export default function AppLayout({
             {children}
           </motion.div>
         </main>
+        {/* <!-- Page Heading --> */}
+        {renderHeader ? (
+          <header className="bg-white shadow dark:bg-gray-800">
+            <div className="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+              {renderHeader()}
+            </div>
+          </header>
+        ) : null}
+
+
       </div>
       <Footer />
     </div>

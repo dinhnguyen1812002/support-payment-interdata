@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import BlogCard from "@/Pages/Posts/PostCard";
 import AppLayout from "@/Layouts/AppLayout";
 import Pagination from "@/Components/Pagination";
-import {Category, Paginate, BlogPost, Notification} from "@/types";
+import { Category, Paginate, BlogPost, Notification } from "@/types";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 import SearchComponent from "@/Components/Search";
 import { Separator } from "@/Components/ui/separator";
 import LatestPosts from "@/Pages/Posts/LatestPost";
 import MainLayout from "@/Layouts/Layout";
-import {Head} from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
 
 interface Props {
     posts: BlogPost[];
@@ -26,6 +26,8 @@ const PostsIndex: React.FC<Props & { category?: Category }> = ({
     notifications = [],
     category
 }) => {
+
+    
     // Lấy danh mục hiện tại từ props (nếu có)
     const categoryTitle = category ? category.title : "All Categories";
 
@@ -34,23 +36,24 @@ const PostsIndex: React.FC<Props & { category?: Category }> = ({
 
     let postCount = posts.length;
     return (
-        <MainLayout posts={posts} categories={categories} pagination={pagination} postCount={postCount} keyword={keyword} notifications={notifications} category={category}>
+        <MainLayout posts={posts} categories={categories} pagination={pagination} 
+        postCount={postCount} keyword={keyword} notifications={notifications} category={category}>
 
             {/* Posts Content */}
-                                <div className="flex-1 max-w-3xl mx-auto mt-7 px-4 border-l pl-8">
-                                    {/* Sử dụng pl-6 để đẩy nội dung ra xa border-l */}
-                                   <BlogCard posts={posts} postCount={postCount}/>
-                                   {pagination && pagination.total > 0 && (
-                                      <div className="mt-7 flex justify-center">
-                                          <Pagination
-                                           current_page={pagination.current_page}
-                                              next_page_url={pagination.next_page_url}
-                                               prev_page_url={pagination.prev_page_url}
-                                               last_page={pagination.last_page}
-                                            />
-                                    </div>
-                                   )}
-                               </div>
+            <div className="flex-1 max-w-5xl  mx-auto mt-7 px-4 border-l pl-12">
+                {/* Sử dụng pl-6 để đẩy nội dung ra xa border-l */}
+                <BlogCard posts={posts} postCount={postCount} />
+                {pagination && pagination.total > 0 && (
+                    <div className="mt-7 flex justify-center">
+                        <Pagination
+                            current_page={pagination.current_page}
+                            next_page_url={pagination.next_page_url}
+                            prev_page_url={pagination.prev_page_url}
+                            last_page={pagination.last_page}
+                        />
+                    </div>
+                )}
+            </div>
         </MainLayout>
         // <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
         //     <div className="max-w-7xl mx-auto px-4">

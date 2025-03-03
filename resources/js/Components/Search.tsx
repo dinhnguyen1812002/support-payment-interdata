@@ -94,7 +94,8 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
                 )}
 
                 {/* Content */}
-                <div className="relative">{children}</div>
+
+                 {children}
             </div>
         </>
     );
