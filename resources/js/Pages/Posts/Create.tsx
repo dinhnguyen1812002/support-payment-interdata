@@ -114,7 +114,7 @@ const CreatePost = ({ categories, notifications, keyword }: CreatePostProps, cat
                                                     onChange={(e) => setData("title", e.target.value)}
                                                     placeholder="Your question title"
                                                     className={cn(
-                                                        "h-12",
+                                                        "h-10 font-bold text-mutedText text-sm  ",
                                                         errors.title && "ring-2 ring-red-500"
                                                     )}
                                                 />
@@ -136,7 +136,7 @@ const CreatePost = ({ categories, notifications, keyword }: CreatePostProps, cat
                                                         value={data.content}
                                                         onChange={(value) => setData("content", value)}
                                                         placeholder="Please specify your question "
-                                                        className="h-64 rounded-sm"
+                                                        className="h-64 rounded-sm text-base font-bold  text-customBlue"
                                                         modules={{
                                                             toolbar: [
                                                                 ['bold', 'italic', 'underline'],
