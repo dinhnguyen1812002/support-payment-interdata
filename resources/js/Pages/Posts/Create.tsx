@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, forwardRef } from 'react';
 import { useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import ReactQuill from 'react-quill';
@@ -20,7 +20,7 @@ import { Category, Notification } from "@/types";
 import LatestPosts from "@/Pages/Posts/LatestPost";
 
 import SearchComponent from "@/Components/Search";
-import category from "@/Pages/Posts/Category";
+import QuillEditor from '@/Components/QuillEditor';
 
 interface CreatePostProps {
     categories: Category[];
@@ -35,14 +35,15 @@ const CreatePost = ({ categories, notifications, keyword }: CreatePostProps, cat
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [categorySearchFocused, setCategorySearchFocused] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const quillRef = useRef<ReactQuill>(null);
 
+    const quillRef = useRef(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         content: '',
         is_published: true,
         categories: [] as number[],
     });
+
 
     // Handlers
     const handleCategorySelect = (categoryId: number) => {
@@ -130,7 +131,7 @@ const CreatePost = ({ categories, notifications, keyword }: CreatePostProps, cat
                                                     Question <span className="text-red-500">*</span>
                                                 </Label>
                                                 <div className="rounded-sm  ">
-                                                    <ReactQuill
+                                                    <QuillEditor
                                                         ref={quillRef}
                                                         theme="snow"
                                                         value={data.content}
@@ -140,7 +141,7 @@ const CreatePost = ({ categories, notifications, keyword }: CreatePostProps, cat
                                                         modules={{
                                                             toolbar: [
                                                                 ['bold', 'italic', 'underline'],
-                                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                                [{'list': 'ordered' }, { 'list': 'bullet' }],
                                                                 ['link', 'image'],
                                                                 ['clean']
                                                             ]
