@@ -77,6 +77,7 @@ export default function PostsTable({ posts, pagination, keyword }: PostsTablePro
 
     const confirmDelete = () => {
         if (postToDelete) {
+           
             router.delete(route('posts.destroy', postToDelete.slug), {
                 preserveState: true
             });

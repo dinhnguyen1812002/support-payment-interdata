@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Data\Post\CreatePostData;
+use App\Events\NewCommentPosted;
 use App\Events\NewQuestionCreated;
 use App\Models\Category;
+use App\Models\Comments;
 use App\Models\Post;
+use App\Notifications\NewQuestionOrAnswerNotification;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -83,10 +87,7 @@ class PostController extends Controller
             $post->categories()->attach($postData->categories);
         }
 
-        event(new NewQuestionCreated([
-            'title' => $postData->title,
-            'url' => "/posts/{$slug}",
-        ]));
+        event(new NewQuestionCreated($post));
 
         return redirect()->route('/')->with('success', 'Post created successfully!');
     }
@@ -228,29 +229,29 @@ class PostController extends Controller
     {
         $search = $request->input('search', '');
         $sort = $request->input('sort', 'latest');
-    
+
         // Tìm kiếm ID các bài viết phù hợp
         $postIds = Post::search($search)->keys();
-    
+
         // Truy vấn thực tế từ database với điều kiện ID
         $posts = Post::whereIn('id', $postIds)
             ->with(['user', 'categories']) // Eager load relationships
             ->withCount('upvotes')
-            ->when($sort === 'latest', fn($q) => $q->latest())
-            ->when($sort === 'upvotes', fn($q) => $q->orderBy('upvotes_count', 'desc'))
+            ->when($sort === 'latest', fn ($q) => $q->latest())
+            ->when($sort === 'upvotes', fn ($q) => $q->orderBy('upvotes_count', 'desc'))
             ->paginate(10)
             ->withQueryString();
-    
+
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
-    
+
         $user = auth()->user();
         $notifications = $user ? $user->unreadNotifications : [];
-    
+
         return Inertia::render('Posts/Search', [
-            'posts' => $posts->map(fn($post) => $post->toFormattedArray()),
+            'posts' => $posts->map(fn ($post) => $post->toFormattedArray()),
             'categories' => $categories,
             'postCount' => $posts->total(),
             'pagination' => [
@@ -266,7 +267,6 @@ class PostController extends Controller
             'sort' => $sort,
         ]);
     }
-    
 
     public function getLatestPosts(Request $request)
     {
@@ -281,6 +281,7 @@ class PostController extends Controller
     public function getCountPost()
     {
         $post = Post::count();
+
         return response()->json($post);
     }
 }

@@ -106,7 +106,7 @@ const CreatePost = ({ categories, notifications, keyword }: CreatePostProps, cat
                                             {/* Title Input */}
                                             <div className="space-y-1">
                                                 <Label htmlFor="title" className="text-base font-bold text-customBlue1 ">
-                                                    Title <span className="text-red-500">*</span>
+                                                    Title <span className=" font-bold text-mutedText text-sm ">*</span>
                                                 </Label>
                                                 <Input
                                                     id="title"
@@ -114,7 +114,7 @@ const CreatePost = ({ categories, notifications, keyword }: CreatePostProps, cat
                                                     onChange={(e) => setData("title", e.target.value)}
                                                     placeholder="Your question title"
                                                     className={cn(
-                                                        "h-10 font-bold text-mutedText text-sm  ",
+                                                        "h-10 ",
                                                         errors.title && "ring-2 ring-red-500"
                                                     )}
                                                 />

@@ -6,7 +6,6 @@ use App\Events\NewCommentPosted;
 use App\Models\Comments;
 use App\Models\Post;
 use App\Notifications\NewQuestionOrAnswerNotification;
-use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -32,7 +31,7 @@ class CommentsController extends Controller
     //        return back()->with('success', 'Comment added successfully!');
     //    }
 
-    public function store(Request $request, NotificationService $notificationService)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'comment' => 'required|string|max:1000',
@@ -47,38 +46,8 @@ class CommentsController extends Controller
             'parent_id' => $validated['parent_id'],
         ]);
 
-        $comment->load(['user', 'replies.user']);
-
-        // $commentData = [
-        //     'id' => $comment->id,
-        //     'comment' => $comment->comment,
-        //     'parent_id' => $comment->parent_id,
-        //     'created_at' => $comment->created_at->toISOString(),
-        //     'user' => [
-        //         'id' => $comment->user->id,
-        //         'name' => $comment->user->name,
-        //         'profile_photo_path' => $comment->user->profile_photo_path,
-        //     ],
-        //     'replies' => [],
-        // ];
-
-        $post = Post::find($request->post_id);
-        if ($post && $post->user_id !== auth()->id()) {
-            $post->user->notify(new NewQuestionOrAnswerNotification('answer', [
-                'title' => $post->title,
-                'url' => "/posts/{$post->slug}",
-            ]));
-
-            $notificationService->sendMail(
-                $post->user->email,
-                'New Answer to Your Question',
-                'Hi '.$post->user->name.',',
-                'Your question "'.$post->title.'" has received a new answer.',
-                'View Answer',
-                route('posts.show', $post->slug)
-            );
-        }
-        event(new NewCommentPosted($comment));
+        // Broadcast the event
+        broadcast(new NewCommentPosted($comment))->toOthers();
 
         return back()->with('success', 'Comment added successfully!');
     }

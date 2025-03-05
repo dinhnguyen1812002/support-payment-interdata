@@ -28,7 +28,6 @@ class UserController extends UserProfileController
                 return [
                     'id' => $post->id,
                     'title' => $post->title,
-
                     'created_at' => Carbon::parse($post->created_at)->format('d/m/Y'),
                     'is_published' => $post->is_published,
                     'comments_count' => $post->comments_count,

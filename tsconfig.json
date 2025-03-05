@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
+    "allowJs": true,
     "module": "esnext",
     "moduleResolution": "node",
     "jsx": "react",
@@ -10,10 +11,20 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./resources/js/*"]
+      "@/*": [
+        "./resources/js/*"
+      ]
     },
-    "types": ["vite/client"],
-    "typeRoots": ["./node_modules/@types", "./src/types"],
-      "include": ["src", "vite-env.d.ts"]
+    "types": [
+      "vite/client"
+    ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
+    "include": [
+      "src",
+      "vite-env.d.ts"
+    ]
   }
 }

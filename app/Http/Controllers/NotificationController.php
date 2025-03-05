@@ -28,4 +28,19 @@ class NotificationController extends Controller
 
         return back()->with('success', 'Email sent successfully!');
     }
+
+    public function sendNotification(Request $request)
+    {
+        $user = auth()->user();
+        $data = [
+            'message' => 'Bạn có một thông báo mới!',
+            'url' => '/some-url',
+            'type' => 'success',
+            'user_id' => $user->id,
+        ];
+
+        $user->notify(new NewNotification($data));
+
+        return response()->json(['message' => 'Thông báo đã được gửi!']);
+    }
 }

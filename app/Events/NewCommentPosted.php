@@ -2,8 +2,8 @@
 
 namespace App\Events;
 
-use App\Models\Comments;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -14,18 +14,23 @@ class NewCommentPosted implements ShouldBroadcast
 
     public $comment;
 
-    public function __construct(Comments $comment)
-    {
-        $this->comment = $comment->load('user:id,name,profile_photo_path');
-    }
-
     public function broadcastOn()
     {
-        return ['public'];
+        return new PrivateChannel('post.'.$this->comment->post_id);
     }
 
-    public function broadcastAs()
+    public function broadcastWith()
     {
-        return 'chat';
+        return [
+            'id' => $this->comment->id,
+            'comment' => $this->comment->comment,
+            'parent_id' => $this->comment->parent_id,
+            'created_at' => $this->comment->created_at->diffForHumans(),
+            'user' => [
+                'id' => $this->comment->user->id,
+                'name' => $this->comment->user->name,
+                'profile_photo_path' => $this->comment->user->profile_photo_path,
+            ],
+        ];
     }
 }
