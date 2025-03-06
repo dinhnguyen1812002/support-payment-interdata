@@ -64,7 +64,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
     const searchInput = (
         <div className="w-full ">
-            <Command className="rounded-lg border bg-white shadow-md w-full">
+            <Command className="rounded-lg border  shadow-md w-full">
                 <div className="flex items-center px-3 py-1.5 w-full">
                     <Search className="mr-2 h-4 w-4 shrink-0 text-gray-400" />
                     <Input
@@ -88,7 +88,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
             {/* Main content with search results */}
             <div className={cn("w-full space-y-1", isLoading && "opacity-70")}>
                 {isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white/50 z-50 w-1/2">
+                    <div className="absolute inset-0 flex items-center justify-center /50 z-50 w-1/2">
                         <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
                     </div>
                 )}

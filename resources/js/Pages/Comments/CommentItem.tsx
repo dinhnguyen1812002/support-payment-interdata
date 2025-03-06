@@ -61,7 +61,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
             {/*    />*/}
             {/*    <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>*/}
             {/*</Avatar>*/}
-            <div className="flex-1 space-y-4">
+            <div className="flex-1 space-y-4 dark:bg-[#0F1014]">
                 <Card>
                     <CardContent className="relative pt-4">
                         {/* User & Avatar Section */}
@@ -82,7 +82,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
                                 {/* User Info */}
                                 <div className="flex flex-col justify-center">
-                                    <h3 className="text-gray-800 text-sm font-semibold leading-tight mb-0.5">{comment.user.name}</h3>
+                                    <h3 className="text-gray-800 text-sm font-semibold leading-tight mb-0.5 dark:text-mutedText">{comment.user.name}</h3>
                                     <p className="text-xs text-mutedText font-semibold leading-tight">{comment.created_at}</p>
                                 </div>
                             </div>

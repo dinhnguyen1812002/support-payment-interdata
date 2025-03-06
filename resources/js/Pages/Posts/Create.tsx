@@ -83,7 +83,7 @@ const CreatePost = ({ categories, notifications, keyword }: CreatePostProps, cat
     const title = "Ask Question";
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
-            <div className="max-w-[1354px] mx-auto px-4">
+            <div className="max-w-[1354px] mx-auto lg:px-4">
 
                 <div className="flex">
                     {/* Main Content Area with Search Functionality */}
@@ -97,7 +97,8 @@ const CreatePost = ({ categories, notifications, keyword }: CreatePostProps, cat
                                     className="w-full flex-shrink-0"
                                 />
                             </div>
-                            <div className="flex-1 max-w-5xl  mx-auto  px-0 border-l  pl-7 mt-5">
+                            <div className="relative flex-1 max-w-5xl mx-auto px-0 pl-6 lg:pl-5 mt-0 lg:w-full">
+                            <div className="hidden lg:block absolute top-4 left-0 w-[1px] h-[calc(100%-2rem)] bg-gray-300"></div>
                                 <div className="">
                                     <CardHeader>
                                         <CardTitle className="text-2xl font-semibold">Ask a Questions</CardTitle>

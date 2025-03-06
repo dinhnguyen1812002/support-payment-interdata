@@ -95,7 +95,7 @@ const CommentsSection = ({ initialComments, onCommentSubmit, currentUserAvatar }
                 ) : (
                     <p>Đăng nhập để bình luận</p>
                 )}
-                <h2  className=" text-2xl font-bold text-gray-900 mb-10 hover:text-gray-700">
+                <h2  className=" text-2xl font-bold text-gray-900 mb-10 hover:text-gray-700 dark:text-[#F5F5F5]">
                     Replies
                     <small className="text-mutedText text-base font-semibold ml-1">({commentCount})</small>
                 </h2>

@@ -22,7 +22,7 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
 
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
-            <div className="max-w-[1354px] mx-auto px-4">
+            <div className="max-w-[1354px] mx-auto lg:px-4 dark:bg-[#0F1014]">
 
                 <div className="flex">
                     {/* Main Content Area with Search Functionality */}

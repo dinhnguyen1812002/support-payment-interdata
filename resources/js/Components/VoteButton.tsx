@@ -21,10 +21,10 @@ interface PostData {
 }
 
 const UpvoteButton: React.FC<UpvoteButtonProps> = ({
-                                                       postId,
-                                                       initialUpvotes,
-                                                       initialHasUpvoted,
-                                                   }) => {
+    postId,
+    initialUpvotes,
+    initialHasUpvoted,
+}) => {
     const [upvotes, setUpvotes] = useState(initialUpvotes);
     const [hasUpvoted, setHasUpvoted] = useState(initialHasUpvoted);
     const [loading, setLoading] = useState(false);
@@ -85,21 +85,22 @@ const UpvoteButton: React.FC<UpvoteButtonProps> = ({
                 <TooltipTrigger asChild>
                     <Button
                         variant="secondary"
+                        size="sm" // Làm nhỏ nút
                         onClick={toggleUpvote}
-                        className={`flex items-center transition gap-1 ${
-                            hasUpvoted ? "text-green-500" : "text-gray-600 hover:text-gray-600"
-                        }`}
+                        className={`flex items-center transition gap-1 px-2 py-1 text-sm ${hasUpvoted ? "text-green-500" : "text-gray-600 hover:text-gray-600"
+                            }`}
                         disabled={loading}
                     >
                         <ArrowUp
-                            className={`w-5 h-5 transition ${
+                            className={`w-4 h-4 transition ${ // Giảm kích thước icon
                                 hasUpvoted ? "text-green-500" : "text-gray-600"
-                            } ${loading ? "opacity-50" : ""}`}
+                                } ${loading ? "opacity-50" : ""}`}
                         />
                         <span className={getCountClassName()}>
                             {upvotes}
                         </span>
                     </Button>
+
                 </TooltipTrigger>
                 <TooltipContent>
                     {hasUpvoted ? "Bỏ vote bài viết này" : "upvote bài viết này"}

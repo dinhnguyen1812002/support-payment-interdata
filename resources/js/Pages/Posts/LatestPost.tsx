@@ -26,7 +26,7 @@ const PopularQuestions: React.FC = () => {
     <Card
       className={cn(
         "w-full max-w-md border-0 shadow-none",
-        "bg-[#f9f9f9] dark:bg-gray-800",
+        "bg-[#f9f9f9]  dark:bg-[#1B1C22]",
         "transition-colors duration-200",
       )}
     >

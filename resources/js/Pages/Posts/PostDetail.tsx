@@ -120,11 +120,11 @@ const PostDetail: React.FC<PostDetailProps  > = ({
                                 <div className="mt-5 space-y-4">
                                     {/* Post Details */}
                                     <div className="mb-1">
-                                        <span className="text-2xl font-bold text-customBlue mb-0 me-1">
+                                        <span className="text-2xl font-bold text-customBlue mb-0 me-1 dark:text-[#F5F5F5] ">
                                             {post.title}
                                         </span>
                                         <div className="mb-6 max-w-none prose prose-lg">
-                                            <p className="text-lg font-normal text-gray-800 mb-10 mr-1"
+                                            <p className="text-lg font-normal text-gray-800 mb-10 mr-1 dark:text-mutedText"
                                                 dangerouslySetInnerHTML={{ __html: post.content }}></p>
                                         </div>
                                     </div>
@@ -146,7 +146,7 @@ const PostDetail: React.FC<PostDetailProps  > = ({
 
                                             {/* User Info */}
                                             <div className="flex flex-col justify-center">
-                                                <h3 className="text-gray-800 text-sm font-semibold leading-tight mb-0.5">{post.user.name}</h3>
+                                                <h3 className="text-gray-800 text-sm font-semibold leading-tight mb-0.5 dark:text-mutedText">{post.user.name}</h3>
                                                 <p className="text-xs text-mutedText font-semibold leading-tight">{post.created_at}</p>
                                             </div>
                                         </div>
