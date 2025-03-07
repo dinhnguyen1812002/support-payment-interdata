@@ -30,7 +30,7 @@ const PostsIndex: React.FC<IndexProps> = ({
                         <div className="hidden lg:block lg:w-64">
                             <div className="sticky top-20">
                                 <CategoriesSidebar
-                                    categories={categories}
+                                  
                                     selectedCategory={selectedCategory as string | null | undefined} // Đảm bảo kiểu hợp lệ
                                     className="w-full"
                                 />
