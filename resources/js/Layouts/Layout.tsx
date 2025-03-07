@@ -9,6 +9,9 @@ import SearchComponent from "@/Components/Search";
 import Pagination from "@/Components/Pagination";
 import LatestPost from "@/Pages/Posts/LatestPost";
 import LatestPosts from "@/Pages/Posts/LatestPost";
+import Activity from "@/Components/Activity";
+import Sidebar from "@/Components/Sidebar";
+
 
 
 const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
@@ -27,16 +30,11 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
                 <div className="flex">
                     {/* Main Content Area with Search Functionality */}
                     <SearchComponent initialSearch={keyword} route="/posts/search">
-                        <div className="flex  gap-x-4">
+                        <div className="flex  gap-x-4 ">
                             {/* Left Sidebar */}
-                            <div className="hidden lg:block w-52 pr-2 ml-[-10px]">
-                                <CategoriesSidebar
-                                    categories={categories}
-                                    selectedCategory={category?.slug}
-                                    className="w-full flex-shrink-0"
-                                />
+                            <div className="hidden lg:block w-52 pr-2 ml-[-10px]  ">
+                                <Sidebar categories={[]} />
                             </div>
-
 
 
                             {/* main Content */}

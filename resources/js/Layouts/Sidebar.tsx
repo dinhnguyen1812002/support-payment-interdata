@@ -12,7 +12,7 @@ const Sidebar: React.FC<SidebarProps> = ({ categories, selectedCategory }) => {
         <div className="hidden lg:block w-64 mt-5">
             {/* Categories Sidebar */}
             <CategoriesSidebar
-                categories={categories}
+                
                 selectedCategory={selectedCategory}
                 className="w-full flex-shrink-0"
             />

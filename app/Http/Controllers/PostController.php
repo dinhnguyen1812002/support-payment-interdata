@@ -277,11 +277,11 @@ class PostController extends Controller
                 ->get()
         );
     }
-
     public function getCountPost()
     {
         $post = Post::count();
 
         return response()->json($post);
     }
+
 }

@@ -13,17 +13,17 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $category = Category::select(['id', 'title', 'slug'])
+        $perPage = $request->input('per_page', 5);
+        $page = $request->input('page', 1);
+        
+        $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
-            ->get();
-
-        return Inertia::render('Categories/CategoriesSidebar', [
-            'categories' => $category,
-        ]);
-        //        return response()->json($category);
+            ->paginate($perPage);
+            
+        return response()->json($categories);
     }
 
     /**

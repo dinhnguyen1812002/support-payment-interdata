@@ -78,8 +78,6 @@ export default function AppLayout({
           {/* <!-- Primary Navigation Menu --> */}
           <div className="max-w-[1354px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16 md:h-20 lg:h-24">
-
-
               <div className="flex items-center">
                 <div className="flex items-center shrink-0 flex-1 mr-11">
                   {/* Logo */}
@@ -92,7 +90,7 @@ export default function AppLayout({
                   </Link>
                 </div>
                 {/* Navigation Links */}
-                <div className="hidden ml-6 space-x-4 md:space-x-8 sm:flex">
+                <div className="hidden ml-6 space-x-4 md:space-x-6 sm:flex">
                   <NavLink href={route('/')} active={route().current('/')}>
                     Dashboard
                   </NavLink>

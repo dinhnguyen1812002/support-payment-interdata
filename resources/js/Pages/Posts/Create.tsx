@@ -92,7 +92,7 @@ const CreatePost = ({ categories, notifications, keyword }: CreatePostProps, cat
                             {/* Left Sidebar */}
                             <div className="hidden lg:block w-52 pr-2 ml-[-10px]">
                                 <CategoriesSidebar
-                                    categories={categories}
+                                  
                                     selectedCategory={category?.slug}
                                     className="w-full flex-shrink-0"
                                 />
