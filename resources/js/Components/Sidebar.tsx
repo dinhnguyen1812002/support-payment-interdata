@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollArea } from "@/Components/ui/scroll-area";
 import { Button } from "@/Components/ui/button";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { extractPublic, uppercaseText } from "@/Utils/slugUtils";
 import axios from "axios";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
@@ -19,40 +19,80 @@ interface Props {
     onCategorySelect?: () => void;
 }
 
-const CategoryList: React.FC<{ title: string; categories: Category[] }> = ({ title, categories }) => (
-    <div className="mt-5">
-        <div className="px-4 sm:px-5">
-            <p className="w-full text-xs font-bold text-mutedText dark:text-[#636674]">
-                {uppercaseText(title)}
-            </p>
-        </div>
-        <div className="p-0 mt-2">
-            <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)]">
-                {categories.map((category) => (
-                    <Button
-                        key={category.id}
-                        variant="ghost"
-                        className="w-full justify-between hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-2 h-auto text-sm"
-                        asChild
-                    >
-                        <Link
-                            href={`/`}
-                            className="flex justify-between items-center w-full text-sm
-                             text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-blue-600 py-1 sm:py-2"
+
+interface Category {
+    id: number;
+    title: string;
+    number?: number | null;
+}
+
+const getCategoryLink = (title: string) => {
+    const routes: Record<string, string> = {
+        "All Question": "/",
+        "Search": "/posts/search?page=1&search=fgd",
+        "Ask Question": "/posts/create",
+    };
+    return routes[title] || `/${title.toLowerCase().replace(/\s+/g, "-")}`;
+};
+
+const CategoryList: React.FC<{ title: string; categories: Category[] }> = ({ title, categories }) => {
+    const { url } = usePage();
+    const [activeLink, setActiveLink] = useState(url); // Lưu trạng thái URL hiện tại
+
+    useEffect(() => {
+        setActiveLink(url); // Cập nhật trạng thái khi URL thay đổi
+    }, [url]);
+
+    const processedCategories = useMemo(() => {
+        return categories.map((category) => {
+            const link = getCategoryLink(category.title);
+            const isActive = activeLink === "/" ? category.title === "All Question" : activeLink === link;
+            return { ...category, link, isActive };
+        });
+    }, [categories, activeLink]);
+
+    return (
+        <div className="mt-5">
+            <div className="px-4 sm:px-5">
+                <p className="w-full text-xs font-bold text-mutedText dark:text-[#636674]">
+                    {uppercaseText(title)}
+                </p>
+            </div>
+            <div className="p-0 mt-2">
+                <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)] space-y-3">
+                    {processedCategories.map(({ id, title, number, link, isActive }) => (
+                        <Button
+                            key={id}
+                            variant="ghost"
+                            className={`w-full justify-between hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-2 h-auto text-sm ${
+                                isActive ? "border-l-4 bg-gray-100 dark:bg-gray-800 border-l-blue-600" : "border-l-2 border-transparent"
+                            }`}
+                            asChild
                         >
-                            <div className="flex gap-2 items-center text-sm dark:text-[] ">
-                                <span className="text-[13.975px] font-semibold dark:text-[#9a9cae] hover:text-blue-600">{category.title}</span>
-                            </div>
-                            <span className="text-sm sm:text-sm text-mutedText dark:text-gray-400">
-                                {category.number ?? 0}
-                            </span>
-                        </Link>
-                    </Button>
-                ))}
-            </ScrollArea>
+                            <Link
+                                href={link}
+                                className="flex justify-between items-center w-full text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-blue-600 py-1 sm:py-2"
+                                onClick={() => setActiveLink(link)} // Cập nhật active khi click
+                            >
+                                <span className={`text-sm dark:text-[#9a9cae] hover:text-blue-600 font-bold ${
+                                    isActive ? "dark:text-blue-400 text-base" : ""
+                                }`}>
+                                    {title}
+                                </span>
+                                <span className="text-sm sm:text-sm text-mutedText dark:text-gray-400">
+                                    {number ?? null}
+                                </span>
+                            </Link>
+                        </Button>
+                    ))}
+                </ScrollArea>
+            </div>
         </div>
-    </div>
-);
+    );
+};
+
+
+
 
 const Sidebar: React.FC<Props> = () => {
     const [totalPosts, setTotalPosts] = useState<number>(0);
@@ -64,10 +104,10 @@ const Sidebar: React.FC<Props> = () => {
     ]);
     
     const listActivity = [
-        { id: 1, title: "My Question", number: 24 },              
-        { id: 2, title: "Resolve", number: 24 },
-        { id: 3, title: "Enrolled", number: 24 },
-        { id: 4, title: "Save", number: 24 }
+        { id: 1, title: "My Question", number: null },              
+        { id: 2, title: "Resolve", number: null },
+        { id: 3, title: "Enrolled", number: null },
+        { id: 4, title: "Save", number: null }
     ];
 
     // Fetch total posts and update the "All Question" category

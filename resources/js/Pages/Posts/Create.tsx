@@ -21,6 +21,7 @@ import LatestPosts from "@/Pages/Posts/LatestPost";
 
 import SearchComponent from "@/Components/Search";
 import QuillEditor from '@/Components/QuillEditor';
+import Sidebar from '@/Components/Sidebar';
 
 interface CreatePostProps {
     categories: Category[];
@@ -91,11 +92,7 @@ const CreatePost = ({ categories, notifications, keyword }: CreatePostProps, cat
                         <div className="flex  gap-x-4">
                             {/* Left Sidebar */}
                             <div className="hidden lg:block w-52 pr-2 ml-[-10px]">
-                                <CategoriesSidebar
-                                  
-                                    selectedCategory={category?.slug}
-                                    className="w-full flex-shrink-0"
-                                />
+                            <Sidebar categories={[]} />
                             </div>
                             <div className="relative flex-1 max-w-5xl mx-auto px-0 pl-6 lg:pl-5 mt-0 lg:w-full">
                             <div className="hidden lg:block absolute top-4 left-0 w-[1px] h-[calc(100%-2rem)] bg-gray-300"></div>

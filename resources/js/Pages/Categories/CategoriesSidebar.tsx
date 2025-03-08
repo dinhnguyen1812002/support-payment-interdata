@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollArea } from "@/Components/ui/scroll-area";
 import { Button } from "@/Components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { uppercaseText } from "@/Utils/slugUtils";
 import axios from "axios";
 
@@ -30,7 +30,8 @@ const CategoriesSidebar: React.FC<Props> = ({
     const [totalPosts, setTotalPosts] = useState<number>(0);
     const [isLoading, setIsLoading] = useState(false);
     const ITEMS_PER_PAGE = 5;
-
+    const { url } = usePage();
+    
     // Fetch categories từ API với pagination
     const fetchCategories = async (pageNum: number) => {
         setIsLoading(true);
@@ -97,8 +98,9 @@ const CategoriesSidebar: React.FC<Props> = ({
             <div className="p-0 mt-2">
                 <div className="space-y-1">
                     <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)]">
+                    
                         {categories.map((category) => {
-                            const isActive = selectedCategory === category.slug;
+                           const isActive = url.startsWith(`/categories/${category.slug}/posts`);
                             return (
                                 <Button
                                     key={category.id}

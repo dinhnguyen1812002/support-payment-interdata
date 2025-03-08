@@ -7,6 +7,7 @@ import { Separator } from "@/Components/ui/separator";
 import SearchComponent from "@/Components/Search";
 import LatestPosts from "@/Pages/Posts/LatestPost";
 import Pagination from "@/Components/Pagination";
+import Sidebar from "@/Components/Sidebar";
 
 const Search: React.FC<IndexProps> = ({
                                               posts = [],
@@ -28,11 +29,7 @@ const Search: React.FC<IndexProps> = ({
                         <div className="flex flex-1 gap-x-6"> {/* Tạo khoảng cách giữa các phần */}
                             {/* Left Sidebar */}
                             <div className="hidden lg:block w-56 pr-2"> {/* Giảm từ pr-6 xuống pr-4 */}
-                                <CategoriesSidebar
-                                    categories={categories}
-                                    selectedCategory={selectedCategory as string | null | undefined}
-                                    className="w-full"
-                                />
+                            <Sidebar categories={[]} />
                             </div>
 
                             {/* Separator */}
