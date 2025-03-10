@@ -11,6 +11,7 @@ import UpvoteButton from '@/Components/VoteButton';
 import SearchComponent from "@/Components/Search";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import LatestPosts from "@/Pages/Posts/LatestPost";
+import Sidebar from '@/Components/Sidebar';
 
 interface BlogPost {
     next_page_url: string | null;
@@ -110,11 +111,7 @@ const PostDetail: React.FC<PostDetailProps  > = ({
                     <div className="flex  gap-x-4">
                         {/* Left Sidebar */}
                         <div className="hidden lg:block w-52 pr-2 ml-[-10px]">
-                            <CategoriesSidebar
-                               
-                                selectedCategory={category?.slug}
-                                className="w-full flex-shrink-0"
-                            />
+                            <Sidebar categories={[]}/>
                         </div>
                         <div className="flex-1 max-w-3xl mx-auto px-4 border-l pl-8">
                                 <div className="mt-5 space-y-4">
@@ -126,6 +123,8 @@ const PostDetail: React.FC<PostDetailProps  > = ({
                                         <div className="mb-6 max-w-none prose prose-lg">
                                             <p className="text-lg font-normal text-gray-800 mb-10 mr-1 dark:text-mutedText"
                                                 dangerouslySetInnerHTML={{ __html: post.content }}></p>
+
+                                    
                                         </div>
                                     </div>
                                     {/* Interaction Buttons */}

@@ -88,10 +88,15 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                         <span className="text-xl font-bold text-customBlue hover:text-blue-700 dark:text-white dark:hover:text-blue-300 mr-1">
                           {post.title}
                         </span>
-                        <p
+                        {/* <p
                           className="text-sm font-normal text-gray-600 dark:text-gray-300 line-clamp-2 mt-3"
                           dangerouslySetInnerHTML={{ __html: post.content }}
-                        />
+                        /> */}
+                        <p
+                          className="text-sm font-normal text-gray-600 dark:text-gray-300 line-clamp-2 mt-3"
+                         
+
+                        >{post.content }</p>
                       </Link>
                     </div>
                   </div>

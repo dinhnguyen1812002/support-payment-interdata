@@ -58,7 +58,7 @@ const CategoryList: React.FC<{ title: string; categories: Category[] }> = ({ tit
                     {uppercaseText(title)}
                 </p>
             </div>
-            <div className="p-0 mt-2">
+            <div className="p-0 ">
                 <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)] space-y-3">
                     {processedCategories.map(({ id, title, number, link, isActive }) => (
                         <Button
