@@ -18,6 +18,8 @@ import { Separator } from "@/Components/ui/separator";
 import SearchComponent from "@/Components/Search";
 import { route } from "ziggy-js";
 import { router } from "@inertiajs/core";
+import Sidebar from '@/Components/Sidebar';
+import QuillEditor from '@/Components/QuillEditor';
 interface EditPostProps {
 
     post: {
@@ -93,44 +95,40 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
         data.categories.includes(category.id)
     );
 
-
+    let title = "Edit question";
     return (
-        <AppLayout title={'Edit your question'} canLogin={true} canRegister={true} notifications={notifications} >
-            <div className="max-w-[1354px] mx-auto px-4">
+        <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
+        <div className="max-w-[1354px] mx-auto lg:px-4">
 
-                <div className="flex">
-                    {/* Main Content Area with Search Functionality */}
-                    <SearchComponent initialSearch={keyword} route="/posts/search">
-                        <div className="flex  gap-x-4">
-                            {/* Left Sidebar */}
-                            <div className="hidden lg:block w-52 pr-2 ml-[-10px]">
-                                <CategoriesSidebar
-                                    categories={categories}
-                                    selectedCategory={category?.slug}
-                                    className="w-full flex-shrink-0"
-                                />
-                            </div>
-
-                            <div className="flex-1 max-w-5xl  mx-auto  px-0 border-l pl-12">
-                  
+            <div className="flex">
+                {/* Main Content Area with Search Functionality */}
+                <SearchComponent initialSearch={keyword} route="/posts/search">
+                    <div className="flex  gap-x-4">
+                        {/* Left Sidebar */}
+                        <div className="hidden lg:block w-52 pr-2 ml-[-10px]">
+                        <Sidebar categories={[]} />
+                        </div>
+                        <div className="relative flex-1 max-w-5xl mx-auto px-0 pl-6 lg:pl-5 mt-0 lg:w-full">
+                        <div className="hidden lg:block absolute top-4 left-0 w-[1px] h-[calc(100%-2rem)] bg-gray-300"></div>
+                            <div className="">
                                 <CardHeader>
-                                    <CardTitle className="text-2xl font-semibold">Thêm bài viết</CardTitle>
+                                    <CardTitle className="text-2xl font-semibold">Ask a Questions</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         {/* Title Input */}
                                         <div className="space-y-1">
-                                            <Label htmlFor="title" className="text-base font-medium">
-                                                Tiêu đề <span className="text-red-500">*</span>
+                                            <Label htmlFor="title" className="text-base font-bold text-customBlue1 ">
+                                                Title <span className=" font-bold text-mutedText text-sm ">*</span>
                                             </Label>
                                             <Input
                                                 id="title"
                                                 value={data.title}
                                                 onChange={(e) => setData("title", e.target.value)}
-                                                placeholder="Nhập tiêu đề bài viết của bạn"
+                                                placeholder="Your question title"
                                                 className={cn(
-                                                    "h-12",
-                                                    errors.title && "ring-2 ring-red-500"
+                                                    "h-10 dark:text-[#9a9cae]",
+                                                    errors.title && "ring-2 ring-red-500 "
                                                 )}
                                             />
                                             {errors.title && (
@@ -141,21 +139,21 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                         </div>
                                         {/* Content Editor */}
                                         <div className="space-y-2">
-                                            <Label htmlFor="content" className="text-base font-medium">
-                                                Nội dung <span className="text-red-500">*</span>
+                                            <Label htmlFor="content" className="text-base font-bold  text-customBlue1">
+                                                Question <span className="text-red-500">*</span>
                                             </Label>
-                                            <div className="rounded-lg ">
-                                                <ReactQuill
+                                            <div className="rounded-sm  ">
+                                                <QuillEditor
                                                     ref={quillRef}
                                                     theme="snow"
                                                     value={data.content}
                                                     onChange={(value) => setData("content", value)}
-                                                    placeholder="Nhập nội dung bài viết"
-                                                    className="h-64"
+                                                    placeholder="Please specify your question "
+                                                    className="h-64 rounded-sm text-base font-bold  text-customBlue1 dark:text-[#9a9cae]"
                                                     modules={{
                                                         toolbar: [
                                                             ['bold', 'italic', 'underline'],
-                                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                            [{'list': 'ordered' }, { 'list': 'bullet' }],
                                                             ['link', 'image'],
                                                             ['clean']
                                                         ]
@@ -207,13 +205,13 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                                 />
                                                 {categorySearchFocused && filteredCategories.length > 0 && (
                                                     <div
-                                                        className="absolute z-10 w-full mt-1 bg-white rounded-md border shadow-lg max-h-60 overflow-auto">
+                                                        className="absolute z-10 w-full mt-1 dark:bg-[#0F1014] text-customBlue1 rounded-md border shadow-lg max-h-60 overflow-auto">
                                                         {filteredCategories.map((category) => (
                                                             <button
                                                                 key={category.id}
                                                                 type="button"
                                                                 onClick={() => handleCategorySelect(category.id)}
-                                                                className="w-full px-4 py-2 text-left hover:bg-slate-50 flex items-center gap-2"
+                                                                className="w-full px-4 py-2 text-left hover:text-blue-500 flex items-center gap-2 "
                                                             >
                                                                 <Hash className="w-4 h-4 text-muted-foreground" />
                                                                 {category.title}
@@ -234,7 +232,7 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                                 />
                                                 <Label htmlFor="is_published"
                                                     className="font-medium cursor-pointer">
-                                                    Công khai bài viết
+                                                    Public
                                                 </Label>
                                             </div>
                                             <Button
@@ -255,26 +253,27 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                     </form>
                                 </CardContent>
                             </div>
+                        </div>
 
 
-                            {/* Right Sidebar */}
-                            <div className="hidden lg:block w-72 mt-5">
-                                <div className="top-4">
-                                    <div className="mb-6">
-                                        <div id="search-container" />
-                                    </div>
-                                    <div className="hidden lg:block mt-5">
-                                        <div className="top-4">
-                                            <LatestPosts />
-                                        </div>
+                        {/* Right Sidebar */}
+                        <div className="hidden lg:block w-72 mt-5">
+                            <div className="top-4">
+                                <div className="mb-6">
+                                    <div id="search-container" />
+                                </div>
+                                <div className="hidden lg:block mt-5">
+                                    <div className="top-4">
+                                        <LatestPosts />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </SearchComponent>
-                </div>
+                    </div>
+                </SearchComponent>
             </div>
-        </AppLayout>
+        </div>
+    </AppLayout>
 
     );
 };

@@ -23,17 +23,34 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
 
     if (posts.length === 0) {
         return (
-            <div className="text-center p-4 md:p-8">
-                <div className="space-y-1">
-                    <h2 className={cn(
-                        "text-xl md:text-2xl font-bold tracking-tight",
-                        "text-gray-900 dark:text-gray-100"
-                    )}>
-                        Tất cả câu hỏi
-                        <span className="text-gray-500 dark:text-gray-400 pl-2">({postCount})</span>
-                    </h2>
-                </div>
-            </div>
+          <div className="flex justify-between items-center flex-wrap mb-8 lg:mb-7">
+          <div className="space-y-1">
+            <span className="font-bold text-2xl text-customBlue dark:text-white">
+              No Question Ask 
+            </span>
+          </div>
+      
+          {/* Actions Section */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            {isAuthenticated ? (
+              <Link href={route('posts.create')} className="w-full sm:w-auto">
+                <Button className="inline-flex items-center justify-center rounded px-3 py-1 text-sm font-bold
+                 text-white bg-blue-600 hover:bg-blue-700  dark:hover:bg-blue-600 border-0 h-10">
+                  <span className="hidden sm:inline">Ask Question</span>
+                  <span className="sm:hidden">Ask Question</span>
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/login" className="w-full sm:w-auto">
+                <Button className="w-full h-10 sm:w-auto flex items-center justify-center gap-2 bg-blue-600
+                 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-600">
+                  <span className="hidden sm:inline">Ask Question</span>
+                  <span className="sm:hidden">Ask Question</span>
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
         )
     }
 

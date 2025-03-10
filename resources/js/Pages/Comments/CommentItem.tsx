@@ -146,20 +146,20 @@ const CommentItem: React.FC<CommentItemProps> = ({
                     </div>
                 )}
 
-                {/*{comment.replies && comment.replies.length > 0 && (*/}
-                {/*    <div className="space-y-4">*/}
-                {/*        {comment.replies?.map((reply) => (*/}
-                {/*            <CommentItem*/}
-                {/*                key={reply.id}*/}
-                {/*                comment={reply}*/}
-                {/*                onReply={onReply}*/}
-                {/*                currentUserAvatar={reply.user.profile_photo_path*/}
-                {/*                    ? `/storage/${reply.user.profile_photo_path}`*/}
-                {/*                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.user.name)}&color=7F9CF5&background=EBF4FF`}*/}
-                {/*            />*/}
-                {/*        ))}*/}
-                {/*    </div>*/}
-                {/*)}*/}
+                {comment.replies && comment.replies.length > 0 && (
+                   <div className="space-y-4">
+                      {comment.replies?.map((reply) => (
+                            <CommentItem
+                             key={reply.id}
+                               comment={reply}
+                              onReply={onReply}
+                             currentUserAvatar={reply.user.profile_photo_path
+                                 ? `/storage/${reply.user.profile_photo_path}`
+                                  : `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.user.name)}&color=7F9CF5&background=EBF4FF`}
+                          />
+                       ))}
+                   </div>
+                )}
             </div>
         </div>
     );

@@ -48,25 +48,7 @@ const CommentsSection = ({ initialComments, onCommentSubmit, currentUserAvatar }
         }
     };
 
-    useEffect(() => {
-        if (typeof window.Echo === "undefined") {
-            console.error("Echo is not initialized");
-            return;
-        }
-
-        const channel = window.Echo.channel("comments-channel");
-
-
-        channel.listen(".comment.posted", (event: { comment: Comment }) => {
-            console.log("Received comment:", event.comment);
-            addNewComment(event.comment);
-        });
-
-        return () => {
-            channel.stopListening(".comment.posted");
-            window.Echo.leaveChannel("comments-channel");
-        };
-    }, []);
+    
 
     // Fetch thêm comment khi cuộn xuống
     const fetchMoreComments = async () => {

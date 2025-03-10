@@ -47,7 +47,7 @@ class CommentsController extends Controller
         ]);
 
         // Broadcast the event
-        broadcast(new NewCommentPosted($comment))->toOthers();
+        event(new NewCommentPosted($comment));
 
         return back()->with('success', 'Comment added successfully!');
     }
@@ -96,7 +96,7 @@ class CommentsController extends Controller
             ->with(['user', 'replies.user'])
             ->latest()
             ->paginate(5); // Sử dụng paginate()
-
+        event(new NewCommentPosted($comment));
         return Inertia::render('Posts/PostDetail', [
             'post' => $post,
             'comments' => [

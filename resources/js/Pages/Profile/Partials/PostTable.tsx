@@ -34,7 +34,6 @@ import {
     AlertDialogTitle,
 } from "@/Components/ui/alert-dialog";
 import { route } from "ziggy-js";
-import {Checkbox} from "@/Components/ui/checkbox";
 import {Post} from "@/types";
 
 
@@ -66,15 +65,15 @@ export default function PostsTable({ posts, pagination, keyword }: PostsTablePro
         });
     };
     console.log(posts);
-    const handleEdit = (slug: string) => {
-        router.get(route('posts.edit', slug));
-    };
+
 
     const handleDelete = (post: Post) => {
         setPostToDelete(post);
         setDeleteDialogOpen(true);
     };
-
+    const handleEdit = (slug: string) => {
+        router.get(route('posts.edit', slug));
+    };
     const confirmDelete = () => {
         if (postToDelete) {
            
@@ -172,8 +171,12 @@ export default function PostsTable({ posts, pagination, keyword }: PostsTablePro
                                                 onClick={() => handleEdit(post.slug)}
                                                 className="h-8 w-8 hover:bg-muted"
                                             >
-                                                <Pencil className="h-4 w-4"/>
+                                                {/* <Link href={route('/')}> 
+                                                    <Pencil className="h-4 w-4"/>
+                                                </Link> */}
                                             </Button>
+
+                                             {/* <Link href={route('profile.edit')}>Profile</Link> */}
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
