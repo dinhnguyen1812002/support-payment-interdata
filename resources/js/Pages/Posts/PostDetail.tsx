@@ -87,6 +87,7 @@ const PostDetail: React.FC<PostDetailProps> = ({
     // Listen for real-time comments via Laravel Echo
     useEffect(() => {
         const channel = window.Echo.channel(`post.${post.id}.comments`);
+        console.log('run here')
 
         channel.listen('.NewCommentPosted', (event: any) => {
             console.log('Nhận comment mới:', event.comment);
