@@ -42,11 +42,11 @@ set('writable_dirs', [
 ]);
 
 // Tasks tùy chỉnh
-desc('Build frontend');
-task('build:frontend', function () {
-    // Sửa đường dẫn thành release_path thay vì deploy_path
-    run('export NVM_DIR="$HOME/.nvm" && source $NVM_DIR/nvm.sh && cd {{release_path}} && npm install && npm run build');
-});
+// desc('Build frontend');
+// task('build:frontend', function () {
+//     // Sửa đường dẫn thành release_path thay vì deploy_path
+//     run('export NVM_DIR="$HOME/.nvm" && source $NVM_DIR/nvm.sh && cd {{release_path}} && npm install && npm run build');
+// });
 
 desc('Fix assets permissions');
 task('deploy:assets', function () {
@@ -70,7 +70,7 @@ desc('Deploy the project');
 task('deploy', [
     'deploy:prepare',
     'deploy:vendors',
-    'build:frontend',
+    // 'build:frontend',
     'artisan:storage:link',
     'artisan:view:cache',
     'artisan:config:cache',
