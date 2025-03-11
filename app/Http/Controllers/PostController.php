@@ -8,12 +8,13 @@ use App\Events\NewQuestionCreated;
 use App\Models\Category;
 use App\Models\Comments;
 use App\Models\Post;
+use App\Models\User;
 use App\Notifications\NewQuestionOrAnswerNotification;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-
+use App\Notifications\NewPostNotification;
 class PostController extends Controller
 {
     public function index(Request $request)
@@ -87,7 +88,10 @@ class PostController extends Controller
             $post->categories()->attach($postData->categories);
         }
 
-        event(new NewQuestionCreated($post));
+        $users = User::all();
+        foreach ($users as $user) {
+            $user->notify(new NewPostNotification($post));
+        }
 
         return redirect()->route('/')->with('success', 'Post created successfully!');
     }

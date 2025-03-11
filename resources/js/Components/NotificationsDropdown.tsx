@@ -21,6 +21,8 @@ import { ScrollArea } from "@/Components/ui/scroll-area";
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import axios from 'axios';
+import echo from '../echo'; 
+
 interface Notification {
     id: string;
     data: {
@@ -39,15 +41,43 @@ interface NotificationsDropdownProps {
 }
 
 const NotificationsDropdown = ({
-                                   notifications,
-                                   className,
-                                   maxHeight = 400
-                               }: NotificationsDropdownProps) => {
-    const [localNotifications, setLocalNotifications] = useState(notifications);
+    notifications: initialNotifications,
+    className,
+    maxHeight = 400
+}: NotificationsDropdownProps) => {
+    const [localNotifications, setLocalNotifications] = useState(initialNotifications);
     const [isLoading, setIsLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
+    // Giả sử userId được truyền từ props hoặc context (thay đổi theo cách bạn lấy userId)
+    const userId = 1; // Thay bằng cách lấy userId thực tế (API, auth context, v.v.)
+
     const unreadCount = localNotifications.filter((n) => !n.read_at).length;
+
+    // Lắng nghe thông báo từ Reverb
+    useEffect(() => {
+        echo.private(`users.${userId}`).notification((newNotification: { id: any; message: any; url: any; type: any; }) => {
+            console.log("Thông báo mới từ Reverb:", newNotification);
+            setLocalNotifications((prev) => [
+                {
+                    id: newNotification.id || Date.now().toString(), // ID tạm nếu backend không gửi
+                    data: {
+                        message: newNotification.message,
+                        url: newNotification.url || undefined,
+                        type: newNotification.type || 'info',
+                    },
+                    read_at: null,
+                    created_at: new Date().toISOString(),
+                },
+                ...prev,
+            ]);
+        });
+
+        // Cleanup khi component unmount
+        return () => {
+            echo.leave(`users.${userId}`);
+        };
+    }, [userId]);
 
     const markAllAsRead = async () => {
         try {
@@ -143,7 +173,7 @@ const NotificationsDropdown = ({
                                     size="sm"
                                     onClick={markAllAsRead}
                                     disabled={isLoading}
-                                    className="text-sm  hover:text-blue-700"
+                                    className="text-sm hover:text-blue-700"
                                 >
                                     {isLoading && (
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -194,7 +224,7 @@ const NotificationsDropdown = ({
                                         </div>
                                         {!notification.read_at && (
                                             <div className="flex-shrink-0">
-                                                <div className="h-2 w-2  rounded-full" />
+                                                <div className="h-2 w-2 rounded-full bg-blue-500" />
                                             </div>
                                         )}
                                     </div>
@@ -202,22 +232,6 @@ const NotificationsDropdown = ({
                             )}
                         </CardContent>
                     </ScrollArea>
-
-                    {/*{localNotifications.length > 0 && (*/}
-                    {/*    <CardFooter className="border-t p-3">*/}
-                    {/*        <Button*/}
-                    {/*            variant="outline"*/}
-                    {/*            className="w-full text-sm"*/}
-                    {/*            onClick={() => {*/}
-                    {/*                if (notifications[0]?.data.url) {*/}
-                    {/*                    window.location.href = notifications[0].data.url;*/}
-                    {/*                }*/}
-                    {/*            }}*/}
-                    {/*        >*/}
-                    {/*            Xem tất cả thông báo*/}
-                    {/*        </Button>*/}
-                    {/*    </CardFooter>*/}
-                    {/*)}*/}
                 </Card>
             </DropdownMenuContent>
         </DropdownMenu>

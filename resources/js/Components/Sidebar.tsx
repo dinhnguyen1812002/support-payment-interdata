@@ -26,12 +26,16 @@ interface Category {
     number?: number | null;
 }
 
-const getCategoryLink = (title: string) => {
+const getCategoryLink = (title: string, slug?: string) => {
     const routes: Record<string, string> = {
         "All Question": "/",
-        "Search": "/posts/search?page=1&search=fgd",
         "Ask Question": "/posts/create",
     };
+    
+    if (title === "Search") {
+        return `/posts/search/${slug}`; // Chuyển hướng đến slug của bài viết
+    }
+
     return routes[title] || `/${title.toLowerCase().replace(/\s+/g, "-")}`;
 };
 

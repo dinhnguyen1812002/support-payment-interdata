@@ -31,14 +31,7 @@ import {Notification, Post, Session} from '@/types';
 import PostsTable from "@/Pages/Profile/Partials/PostTable";
 import { router } from '@inertiajs/core';
 import {route} from "ziggy-js";
-// interface Post {
-//     id: number;
-//     title: string;
-//     created_at: string;
-//     is_public: boolean;
-//     comments_count: number;
-//     slug: string;
-// }
+
 interface Props {
     sessions: Session[];
     confirmsTwoFactorAuthentication: boolean;
@@ -179,11 +172,11 @@ const ProfilePage = ({
         >
             <div className="flex h-[calc(100vh-4rem)] container">
                 {/* Sidebar */}
-                <div className="w-64 border-r bg-background">
+                <div className="w-64 border-r bg-background max-w-7xl">
                     <div className="flex items-center px-4 h-14 border-b">
                         <h2 className="text-lg font-semibold">Settings</h2>
                     </div>
-                    <ScrollArea className="h-[calc(100vh-8rem)]">
+                    <ScrollArea className="h-[calc(100vh-8rem)] ">
                         <div className="p-3 space-y-1">
                             {sidebarItems.map((item) => (
                                 <SidebarItem

@@ -3,8 +3,7 @@ import React, { PropsWithChildren } from 'react';
 import SectionTitle from '@/Components/SectionTitle';
 
 interface Props {
-  title: string;
-  description: string;
+
   renderActions?(): JSX.Element;
   onSubmit(): void;
 }
@@ -12,15 +11,14 @@ interface Props {
 export default function FormSection({
   onSubmit,
   renderActions,
-  title,
-  description,
+ 
   children,
 }: PropsWithChildren<Props>) {
   const hasActions = !!renderActions;
 
   return (
     <div className="md:grid md:grid-cols-3 md:gap-6">
-      <SectionTitle title={title} description={description} />
+      
 
       <div className="mt-5 md:mt-0 md:col-span-2">
         <form

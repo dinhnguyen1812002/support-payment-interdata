@@ -175,4 +175,9 @@ class Post extends Model
             'content' => $this->content,
         ];
     }
+
+    public function receivesBroadcastNotificationsOn()
+    {
+        return 'users.'.$this->id; 
+    }
 }

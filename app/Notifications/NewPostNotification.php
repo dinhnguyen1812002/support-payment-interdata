@@ -8,7 +8,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Post;
 
-class NewNotification extends Notification implements ShouldBroadcast
+class NewPostNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -21,7 +21,7 @@ class NewNotification extends Notification implements ShouldBroadcast
 
     public function via($notifiable)
     {
-        return ['database', 'broadcast']; // Lưu vào DB và gửi qua Reverb
+        return ['database', 'broadcast'];
     }
 
     public function toArray($notifiable)

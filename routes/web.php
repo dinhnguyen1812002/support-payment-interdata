@@ -6,7 +6,8 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UpvoteController;
 use Illuminate\Support\Facades\Route;
-
+use App\Models\Post;
+use App\Events\NewQuestionCreated;
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/latest-posts', [PostController::class, 'getLatestPosts']);
@@ -50,6 +51,13 @@ Route::middleware([
         return redirect('/');
     })->name('dashboard');
 });
+
+Route::get('/test-event', function () {
+    $post = Post::find("01jp1xepa4cv3en4axatkh9vdk"); // Replace with a valid post ID
+    event(new NewQuestionCreated($post));
+    return "Event dispatched!";
+});
+
 Route::get('/user/profile', [\App\Http\Controllers\UserController::class, 'show'])
     ->name('profile.show')
     ->middleware(['auth', 'verified']);
