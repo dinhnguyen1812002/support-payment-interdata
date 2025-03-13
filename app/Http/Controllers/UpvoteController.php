@@ -13,29 +13,29 @@ class UpvoteController extends Controller
     {
         $user = Auth::user();
 
-        // Kiểm tra nếu user đã upvote
-        if ($user == null) {
-            return redirect('/login');
+        // Kiểm tra user đã đăng nhập chưa
+        if (! $user) {
+            return redirect('/login')->with('error', 'Please login to upvote.');
         }
 
-        $alreadyUpvote = PostUpvote::where('post_id', $post->id)
+        // Tìm bản ghi upvote hiện có
+        $upvote = PostUpvote::where('post_id', $post->id)
             ->where('user_id', $user->id)
-            ->exists();
-        if ($alreadyUpvote) {
-            // Nếu đã upvote, thì xóa upvote
-            PostUpvote::where('post_id', $post->id)
-                ->where('user_id', $user->id)
-                ->delete();
+            ->first();
 
-            return redirect()->back()->with('message', 'Upvote removed.');
+        if ($upvote) {
+            // Nếu đã upvote thì xóa
+            $upvote->delete();
+
+            return redirect()->back()->with('message', 'Upvote removed successfully.');
         }
 
-        // Nếu chưa upvote, thì thêm upvote
+        // Thêm upvote mới
         PostUpvote::create([
             'post_id' => $post->id,
             'user_id' => $user->id,
         ]);
 
-        return redirect()->back()->with('message', 'Upvote added.');
+        return redirect()->back()->with('message', 'Upvote added successfully.');
     }
 }

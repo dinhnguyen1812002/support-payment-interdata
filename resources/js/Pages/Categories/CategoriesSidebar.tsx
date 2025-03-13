@@ -31,19 +31,19 @@ const CategoriesSidebar: React.FC<Props> = ({
     const [isLoading, setIsLoading] = useState(false);
     const ITEMS_PER_PAGE = 5;
     const { url } = usePage();
-    
+
     // Fetch categories từ API với pagination
     const fetchCategories = async (pageNum: number) => {
         setIsLoading(true);
         try {
             const res = await axios.get(`/api/categories?page=${pageNum}&per_page=${ITEMS_PER_PAGE}`);
-            
+
             if (pageNum === 1) {
                 setCategories(res.data.data);
             } else {
                 setCategories(prev => [...prev, ...res.data.data]);
             }
-            
+
             // Check if we've reached the end of the data
             setHasMore(res.data.data.length === ITEMS_PER_PAGE);
         } catch (error) {
@@ -98,7 +98,7 @@ const CategoriesSidebar: React.FC<Props> = ({
             <div className="p-0 mt-2">
                 <div className="space-y-1">
                     <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)]">
-                    
+
                         {categories.map((category) => {
                            const isActive = url.startsWith(`/categories/${category.slug}/posts`);
                             return (
@@ -125,7 +125,9 @@ const CategoriesSidebar: React.FC<Props> = ({
                                                 }`}
                                             >
                                                 {category.title}
+                                                {}
                                             </span>
+
                                         </div>
                                         <span className="text-xs sm:text-sm text-mutedText dark:text-gray-400">
                                             {category.posts_count ?? 0}

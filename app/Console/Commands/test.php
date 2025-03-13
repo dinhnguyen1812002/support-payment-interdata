@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Console\Commands;
+
 use App\Events\NewQuestionCreated;
-use Illuminate\Console\Command;
 use App\Models\Post;
+use Illuminate\Console\Command;
+
 class test extends Command
 {
     /**
@@ -25,8 +27,8 @@ class test extends Command
      */
     public function handle()
     {
-        $post = Post::find("01jp1xepa4cv3en4axatkh9vdk");
-       
+        $post = Post::find('01jp1xepa4cv3en4axatkh9vdk');
+
         event(new NewQuestionCreated($post));
     }
 }

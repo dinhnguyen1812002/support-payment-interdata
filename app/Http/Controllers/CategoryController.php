@@ -17,12 +17,12 @@ class CategoryController extends Controller
     {
         $perPage = $request->input('per_page', 5);
         $page = $request->input('page', 1);
-        
+
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->paginate($perPage);
-            
+
         return response()->json($categories);
     }
 
@@ -47,6 +47,14 @@ class CategoryController extends Controller
         ]);
 
         return redirect()->route('categories.index');
+    }
+
+    public function getCategories(Request $request)
+    {
+        $categories = Category::withCount('posts')
+            ->paginate($request->input('per_page', 5));
+
+        return response()->json($categories);
     }
 
     /**

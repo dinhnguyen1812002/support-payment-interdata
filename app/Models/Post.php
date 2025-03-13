@@ -178,6 +178,6 @@ class Post extends Model
 
     public function receivesBroadcastNotificationsOn()
     {
-        return 'users.'.$this->id; 
+        return 'users.'.$this->id;
     }
 }

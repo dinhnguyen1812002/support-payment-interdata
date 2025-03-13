@@ -3,18 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Data\Post\CreatePostData;
-use App\Events\NewCommentPosted;
-use App\Events\NewQuestionCreated;
 use App\Models\Category;
-use App\Models\Comments;
 use App\Models\Post;
 use App\Models\User;
-use App\Notifications\NewQuestionOrAnswerNotification;
-use App\Services\NotificationService;
+use App\Notifications\NewPostNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-use App\Notifications\NewPostNotification;
+
 class PostController extends Controller
 {
     public function index(Request $request)
@@ -281,11 +277,11 @@ class PostController extends Controller
                 ->get()
         );
     }
+
     public function getCountPost()
     {
         $post = Post::count();
 
         return response()->json($post);
     }
-
 }
