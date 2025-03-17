@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Command;
 use App\Events\NewQuestionCreated;
 use App\Models\Post;
-use Illuminate\Console\Command;
 
-class test extends Command
+class Test extends Command
 {
     /**
      * The name and signature of the console command.
@@ -27,8 +27,9 @@ class test extends Command
      */
     public function handle()
     {
-        $post = Post::find('01jp1xepa4cv3en4axatkh9vdk');
+        $post = Post::find("01jp20hjtwdnnzmb8z0zh637jm");
 
         event(new NewQuestionCreated($post));
     }
+
 }
