@@ -2,11 +2,11 @@
 
 namespace App\Notifications;
 
+use App\Models\Post;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
-use App\Models\Post;
 
 class NewPostNotification extends Notification implements ShouldBroadcast
 {
@@ -30,6 +30,10 @@ class NewPostNotification extends Notification implements ShouldBroadcast
             'post_id' => $this->post->id,
             'title' => $this->post->title,
             'message' => "Bài viết mới: {$this->post->title}",
+            'author' => $this->post->user->name,
+            'slug' => $this->post->slug,
+            'avatar' => $this->post->user->avatar, // Thêm avatar nếu có trong model User
+            'categories' => $this->post->categories->pluck('name')->toArray(),
         ];
     }
 
@@ -38,6 +42,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
         return new BroadcastMessage([
             'post_id' => $this->post->id,
             'title' => $this->post->title,
+            'slug' => $this->post->slug,
             'message' => "Bài viết mới: {$this->post->title}",
         ]);
     }

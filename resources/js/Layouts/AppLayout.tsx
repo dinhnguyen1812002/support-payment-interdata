@@ -4,9 +4,6 @@ import classNames from 'classnames';
 import React, { PropsWithChildren, useState } from 'react';
 import useRoute from '@/Hooks/useRoute';
 import useTypedPage from '@/Hooks/useTypedPage';
-import ApplicationMark from '@/Components/ApplicationMark';
-import Banner from '@/Components/Banner';
-
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Notification, Team } from '@/types';
@@ -108,6 +105,8 @@ export default function AppLayout({
                 {page.props.auth.user && (
                   <div className="hidden sm:block">
                     <NotificationsDropdown notifications={notifications} />
+
+
                   </div>
                 )}
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\UserNotificationMail;
+use App\Notifications\NewNotification;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
@@ -24,6 +25,7 @@ class NotificationController extends Controller
             'actionText' => 'View Notification',
             'actionUrl' => url('/notifications'),
         ];
+
         Mail:to($user->email)->send(new UserNotificationMail($details));
 
         return back()->with('success', 'Email sent successfully!');

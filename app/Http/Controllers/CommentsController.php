@@ -97,6 +97,7 @@ class CommentsController extends Controller
             ->latest()
             ->paginate(5); // Sử dụng paginate()
         event(new NewCommentPosted($comment));
+
         return Inertia::render('Posts/PostDetail', [
             'post' => $post,
             'comments' => [

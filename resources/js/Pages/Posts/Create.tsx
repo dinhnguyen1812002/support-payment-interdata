@@ -1,7 +1,7 @@
 import React, { useState, useRef, forwardRef } from 'react';
 import { useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
-import ReactQuill from 'react-quill';
+
 import 'react-quill/dist/quill.snow.css';
 import { CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
@@ -16,8 +16,10 @@ import { Category, Notification } from '@/types';
 import LatestPosts from '@/Pages/Posts/LatestPost';
 
 import SearchComponent from '@/Components/Search';
-import QuillEditor from '@/Components/QuillEditor';
+
 import Sidebar from '@/Components/Sidebar';
+import QuillEditor from "@/Components/QuillEditor";
+import ReactQuill from "react-quill";
 
 interface CreatePostProps {
   categories: Category[];
@@ -33,8 +35,9 @@ const CreatePost = (
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [categorySearchFocused, setCategorySearchFocused] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+    const quillRef = useRef<ReactQuill>(null);
 
-  const quillRef = useRef(null);
+
   const { data, setData, post, processing, errors, reset } = useForm({
     title: '',
     content: '',
@@ -144,8 +147,7 @@ const CreatePost = (
                           Question <span className="text-red-500">*</span>
                         </Label>
                         <div className="rounded-sm  ">
-                          <QuillEditor
-                            ref={quillRef}
+                          <ReactQuill ref={quillRef}
                             theme="snow"
                             value={data.content}
                             onChange={value => setData('content', value)}
@@ -169,7 +171,7 @@ const CreatePost = (
                         )}
                       </div>
                       {/* Categories */}
-                      <div className="space-y-2 mt-10">
+                      <div className="space-y-2 mt-10 ">
                         <Label className="text-base flex items-center mt-14  text-customBlue1 font-bold ">
                           Category <span className="text-red-500">*</span>
                           <span className="text-sm text-muted-foreground ml-2">
@@ -213,7 +215,7 @@ const CreatePost = (
                           />
                           {categorySearchFocused &&
                             filteredCategories.length > 0 && (
-                              <div className="absolute z-10 w-full mt-1 dark:bg-[#0F1014] text-customBlue1 rounded-md border shadow-lg max-h-60 overflow-auto">
+                              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-[#0F1014] text-customBlue1 rounded-md border shadow-lg max-h-60 overflow-auto">
                                 {filteredCategories.map(category => (
                                   <button
                                     key={category.id}

@@ -13,31 +13,31 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-                       [
-                           'title' => 'Technology',
-                           'slug' => 'technology',
-                           'description' => 'All about the latest technology trends and news.',
-                       ],
-                       [
-                           'title' => 'Lifestyle',
-                           'slug' => 'lifestyle',
-                           'description' => 'Tips and articles about lifestyle and personal development.',
-                       ],
-                       [
-                           'title' => 'Health',
-                           'slug' => 'health',
-                           'description' => 'Health tips and medical updates.',
-                       ],
-                       [
-                           'title' => 'Business',
-                           'slug' => 'business',
-                           'description' => 'Business news, strategies, and entrepreneurship.',
-                       ],
-                       [
-                           'title' => 'Test data',
-                           'slug' => 'test-data',
-                           'description' => 'Test data',
-                       ],
+            [
+                'title' => 'Technology',
+                'slug' => 'technology',
+                'description' => 'All about the latest technology trends and news.',
+            ],
+            [
+                'title' => 'Lifestyle',
+                'slug' => 'lifestyle',
+                'description' => 'Tips and articles about lifestyle and personal development.',
+            ],
+            [
+                'title' => 'Health',
+                'slug' => 'health',
+                'description' => 'Health tips and medical updates.',
+            ],
+            [
+                'title' => 'Business',
+                'slug' => 'business',
+                'description' => 'Business news, strategies, and entrepreneurship.',
+            ],
+            [
+                'title' => 'Test data',
+                'slug' => 'test-data',
+                'description' => 'Test data',
+            ],
             [
                 'title' => 'Education',
                 'slug' => 'education',

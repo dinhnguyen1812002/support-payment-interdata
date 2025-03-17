@@ -31,19 +31,19 @@ const CategoriesSidebar: React.FC<Props> = ({
     const [isLoading, setIsLoading] = useState(false);
     const ITEMS_PER_PAGE = 5;
     const { url } = usePage();
-    
+
     // Fetch categories từ API với pagination
     const fetchCategories = async (pageNum: number) => {
         setIsLoading(true);
         try {
             const res = await axios.get(`/api/categories?page=${pageNum}&per_page=${ITEMS_PER_PAGE}`);
-            
+
             if (pageNum === 1) {
                 setCategories(res.data.data);
             } else {
                 setCategories(prev => [...prev, ...res.data.data]);
             }
-            
+
             // Check if we've reached the end of the data
             setHasMore(res.data.data.length === ITEMS_PER_PAGE);
         } catch (error) {
@@ -97,8 +97,8 @@ const CategoriesSidebar: React.FC<Props> = ({
             {/* Categories List */}
             <div className="p-0 mt-2">
                 <div className="space-y-1">
-                    <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)]">
-                    
+                    <ScrollArea className=" overflow-y-auto">
+
                         {categories.map((category) => {
                            const isActive = url.startsWith(`/categories/${category.slug}/posts`);
                             return (
@@ -163,7 +163,7 @@ const CategoriesSidebar: React.FC<Props> = ({
                                         onClick={showLess}
                                         className="w-full text-xs sm:text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center justify-start gap-2 mt-2 px-4 py-2"
                                     >
-                                        Show Less <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                                         <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
                                     </Button>
                                 )}
                             </>
