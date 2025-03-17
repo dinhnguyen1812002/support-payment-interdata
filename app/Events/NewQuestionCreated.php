@@ -5,6 +5,7 @@ namespace App\Events;
 use App\Models\Post;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -22,8 +23,11 @@ class NewQuestionCreated implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return [new Channel('post.'.$this->post->id.'.comments')];
+        return [
+            new Channel('post.'.$this->post->id.'.comments')
+            ];
     }
+
 
     public function broadcastWith()
     {
