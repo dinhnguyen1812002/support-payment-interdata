@@ -100,14 +100,11 @@ export default function AppLayout({
               {/* Right side navigation items */}
               <div className="flex items-center space-x-2 md:space-x-4">
                 <ModeToggle />
-
-                {/* Notifications - Only show for authenticated users */}
+                  {/*<NotificationsDropdown notifications={notifications}  />*/}
+                  {/* Notifications - Only show for authenticated users */}
                 {page.props.auth.user && (
-                  <div className="hidden sm:block">
-                    <NotificationsDropdown notifications={notifications} />
 
-
-                  </div>
+                    <NotificationsDropdown notifications={notifications}  />
                 )}
 
                 {/* User Menu or Login/Register buttons */}
@@ -281,7 +278,7 @@ export default function AppLayout({
 
                   {/* Mobile notifications */}
                   <div className="px-4 py-2">
-                    <span className="text-sm text-gray-500">Notifications</span>
+
                   </div>
 
                   {/* <!-- Authentication --> */}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import {
     Card,
@@ -17,7 +17,9 @@ import {
     Bell as BellIcon,
     UserX,
     ChevronRight,
-    FileText
+    FileText,
+    Menu,
+    X
 } from 'lucide-react';
 
 import DeleteUserForm from '@/Pages/Profile/Partials/DeleteUserForm';
@@ -67,7 +69,7 @@ const SidebarItem = ({ icon, title, isActive, onClick }: SidebarItemProps) => (
         onClick={onClick}
     >
         {icon}
-        <span>{title}</span>
+        <span className="text-left">{title}</span>
         {isActive && <ChevronRight className="ml-auto w-4 h-4" />}
     </Button>
 );
@@ -80,12 +82,49 @@ const ProfilePage = ({
                          postCount,
                          pagination,
                          keyword = '',
-    notifications
+                         notifications
                      }: Props) => {
     const page = useTypedPage();
-    // const [notifications, setNotifications] = useState<Notification[]>([]);
     const [activeSection, setActiveSection] = useState('profile');
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const user = page.props.auth.user!;
+
+    // Check if we're on mobile
+    useEffect(() => {
+        const checkIfMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        checkIfMobile();
+        window.addEventListener('resize', checkIfMobile);
+
+        return () => {
+            window.removeEventListener('resize', checkIfMobile);
+        };
+    }, []);
+
+    // Close sidebar when clicking outside on mobile
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (isMobile && sidebarOpen) {
+                const sidebar = document.getElementById('sidebar');
+                const menuButton = document.getElementById('menu-button');
+
+                if (sidebar &&
+                    !sidebar.contains(event.target as Node) &&
+                    menuButton &&
+                    !menuButton.contains(event.target as Node)) {
+                    setSidebarOpen(false);
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isMobile, sidebarOpen]);
 
     const handleSearch = (searchKeyword: string) => {
         router.get(
@@ -101,6 +140,13 @@ const ProfilePage = ({
             { page: pageNumber, search: keyword },
             { preserveState: true }
         );
+    };
+
+    const handleSectionChange = (sectionId: string) => {
+        setActiveSection(sectionId);
+        if (isMobile) {
+            setSidebarOpen(false);
+        }
     };
 
     const sidebarItems = [
@@ -163,6 +209,19 @@ const ProfilePage = ({
         }
     ];
 
+    // Add overlay when sidebar is open on mobile
+    const renderOverlay = () => {
+        if (isMobile && sidebarOpen) {
+            return (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-10"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            );
+        }
+        return null;
+    };
+
     return (
         <AppLayout
             notifications={notifications}
@@ -170,13 +229,39 @@ const ProfilePage = ({
             canLogin={true}
             title={user.name}
         >
-            <div className="flex h-[calc(100vh-4rem)] container">
+            <div className="flex flex-col md:flex-row h-[calc(100vh-4rem)] container relative">
+                {/* Mobile Menu Button */}
+                <div className="md:hidden flex items-center justify-between px-4 h-14 border-b">
+                    <h2 className="text-lg font-semibold">Settings</h2>
+                    <Button
+                        id="menu-button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                        className="z-20"
+                    >
+                        {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                    </Button>
+                </div>
+
+                {/* Render overlay */}
+                {renderOverlay()}
+
                 {/* Sidebar */}
-                <div className="w-64 border-r bg-background max-w-7xl">
-                    <div className="flex items-center px-4 h-14 border-b">
+                <div
+                    id="sidebar"
+                    className={cn(
+                        "border-r bg-background md:w-64 transition-all duration-300 ease-in-out",
+                        isMobile ? "fixed h-full z-20" : "relative",
+                        isMobile && (sidebarOpen
+                            ? "left-0 w-64"
+                            : "-left-full w-0")
+                    )}
+                >
+                    <div className="hidden md:flex items-center px-4 h-14 border-b">
                         <h2 className="text-lg font-semibold">Settings</h2>
                     </div>
-                    <ScrollArea className="h-[calc(100vh-8rem)] ">
+                    <ScrollArea className="h-auto md:h-[calc(100vh-8rem)]">
                         <div className="p-3 space-y-1">
                             {sidebarItems.map((item) => (
                                 <SidebarItem
@@ -184,7 +269,7 @@ const ProfilePage = ({
                                     icon={item.icon}
                                     title={item.title}
                                     isActive={activeSection === item.id}
-                                    onClick={() => setActiveSection(item.id)}
+                                    onClick={() => handleSectionChange(item.id)}
                                 />
                             ))}
                             {page.props.jetstream.hasAccountDeletionFeatures && (
@@ -194,7 +279,7 @@ const ProfilePage = ({
                                         icon={<UserX className="w-5 h-5 text-destructive" />}
                                         title="Delete Account"
                                         isActive={activeSection === 'delete'}
-                                        onClick={() => setActiveSection('delete')}
+                                        onClick={() => handleSectionChange('delete')}
                                     />
                                 </>
                             )}
@@ -204,7 +289,7 @@ const ProfilePage = ({
 
                 {/* Main Content */}
                 <div className="overflow-y-auto flex-1">
-                    <div className="flex items-center px-6 h-14 ">
+                    <div className="flex items-center px-6 h-14">
                         <h1 className="text-lg font-semibold">
                             {sidebarItems.find(item => item.id === activeSection)?.title || 'Delete Account'}
                         </h1>

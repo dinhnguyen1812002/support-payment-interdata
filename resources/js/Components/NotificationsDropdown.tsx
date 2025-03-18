@@ -24,6 +24,7 @@ import axios from 'axios';
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar"
 import {User} from "@/types";
+import user from 'pusher-js/types/src/core/user';
 interface Notification {
     id: string;
     data: {
@@ -41,14 +42,14 @@ interface NotificationsDropdownProps {
     notifications: Notification[];
     className?: string;
     maxHeight?: number;
-    user: User
+
 }
 
 const NotificationsDropdown = ({
                                    notifications: initialNotifications,
                                    className,
                                    maxHeight = 400,
-                                   user,
+
                                }: NotificationsDropdownProps) => {
     const [localNotifications, setLocalNotifications] = useState(initialNotifications)
     const [isLoading, setIsLoading] = useState(false)
@@ -133,15 +134,7 @@ const NotificationsDropdown = ({
                     size="icon"
                     className="relative hover:bg-gray-100 focus-visible:ring-1 focus-visible:ring-gray-950"
                 >
-                    {user?.profile_photo_url ? (
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={user.profile_photo_url} alt={user.name}/>
-                            <AvatarFallback>{getUserInitials(user.name)}</AvatarFallback>
-                        </Avatar>
-                    ) : (
-
-                        <Bell  className="h-10 w-10 text-gray-600 dark:text-white"  />
-                    )}
+                    <Bell  className="h-10 w-10 text-gray-600 dark:text-white"  />
                     {unreadCount > 0 && (
                         <Badge
                             variant="destructive"

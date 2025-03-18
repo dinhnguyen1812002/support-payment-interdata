@@ -171,6 +171,7 @@ export interface Notification {
         url?: string;
         type?: 'info' | 'success' | 'warning' | 'error';
     };
+    slug: string;
     read_at: string | null;
     created_at: string;
 }
