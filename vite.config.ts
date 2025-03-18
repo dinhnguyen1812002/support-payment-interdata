@@ -9,11 +9,7 @@ export default defineConfig({
       refresh: true,
     }),
     react(),
-  ], build: {
-        manifest: true,
-        outDir: 'public/build',
-    },
-
+  ],
   resolve: {
     alias: {
       '@': '/resources/js',
