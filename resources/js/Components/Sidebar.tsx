@@ -31,7 +31,7 @@ const getCategoryLink = (title: string, slug?: string) => {
         "All Question": "/",
         "Ask Question": "/posts/create",
     };
-    
+
     if (title === "Search") {
         return `/posts/search/${slug}`; // Chuyển hướng đến slug của bài viết
     }
@@ -106,9 +106,9 @@ const Sidebar: React.FC<Props> = () => {
         { id: 3, title: "Tag", number: null },
         { id: 4, title: "Ask Question", number: null }
     ]);
-    
+
     const listActivity = [
-        { id: 1, title: "My Question", number: null },              
+        { id: 1, title: "My Question", number: null },
         { id: 2, title: "Resolve", number: null },
         { id: 3, title: "Enrolled", number: null },
         { id: 4, title: "Save", number: null }
@@ -121,12 +121,12 @@ const Sidebar: React.FC<Props> = () => {
                 const res = await axios.get("/api/count");
                 const count = res.data;
                 setTotalPosts(count);
-                
+
                 // Update the "All Question" category with the total post count
-                setPublicCategories(prev => 
-                    prev.map(category => 
-                        category.title === "All Question" 
-                            ? { ...category, number: count } 
+                setPublicCategories(prev =>
+                    prev.map(category =>
+                        category.title === "All Question"
+                            ? { ...category, number: count }
                             : category
                     )
                 );
@@ -134,15 +134,16 @@ const Sidebar: React.FC<Props> = () => {
                 console.error("Error fetching total post count:", error);
             }
         };
-        
+
         fetchTotalPosts();
     }, []);
 
     return (
         <>
-            <CategoryList title="Public" categories={publicCategories} />
-            <CategoryList title="My Activity" categories={listActivity} />
-            <CategoriesSidebar />
+                <CategoryList title="Public" categories={publicCategories} />
+                <CategoryList title="My Activity" categories={listActivity} />
+                <CategoriesSidebar />
+
         </>
     );
 };

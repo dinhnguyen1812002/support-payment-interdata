@@ -152,9 +152,10 @@ const CategoriesSidebar: React.FC<Props> = ({
                                     <Button
                                         variant="ghost"
                                         onClick={loadMore}
-                                        className="w-full text-xs sm:text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center justify-start gap-2 mt-2 px-4 py-2"
+                                        className="w-full text-xs sm:text-xs text-mutedText dark:text-gray-400
+                                        dark:hover:text-gray-100 flex items-center justify-start gap-2 mt-2 px-4 py-2"
                                     >
-                                        Show More <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
+                                       More categories <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
                                     </Button>
                                 )}
                                 {page > 1 && (
@@ -163,7 +164,7 @@ const CategoriesSidebar: React.FC<Props> = ({
                                         onClick={showLess}
                                         className="w-full text-xs sm:text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center justify-start gap-2 mt-2 px-4 py-2"
                                     >
-                                         <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
+
                                     </Button>
                                 )}
                             </>
