@@ -18,6 +18,7 @@
     @viteReactRefresh
     @vite('resources/js/app.tsx')
     @inertiaHead
+      @vite(['resources/css/app.css', 'resources/js/app.js'])
   </head>
   <body class="font-sans antialiased dark:bg-[#0F1014] ">
     @inertia

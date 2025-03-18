@@ -8,7 +8,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class NewNotification extends Notification implements ShouldBroadcast
+class NewQuestionOrAnswerNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 

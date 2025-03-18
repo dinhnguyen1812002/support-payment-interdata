@@ -1,5 +1,4 @@
 <?php
-
 namespace Deployer;
 
 require 'recipe/laravel.php';
@@ -9,6 +8,10 @@ set('application', 'support ticket');
 set('repository', 'https://github.com/dinhnguyen1812002/support-payment-interdata.git');
 set('php_fpm_version', '8.3');
 
+add('shared_files', []);
+add('shared_dirs', []);
+add('writable_dirs', []);
+
 // Cấu hình máy chủ
 host('103.20.96.236')
     ->set('remote_user', 'deployer')
@@ -17,66 +20,23 @@ host('103.20.96.236')
     ->set('timeout', 300)
     ->set('keep_releases', 5);
 
-// Các thư mục shared
-set('shared_files', [
-    '.env',
-]);
-set('shared_dirs', [
-    'storage',
-    'node_modules',
-    'public/storage',
-]);
-
-// Các thư mục writable
-set('writable_dirs', [
-    'bootstrap/cache',
-    'storage',
-    'storage/app',
-    'storage/app/public',
-    'storage/framework',
-    'storage/framework/cache',
-    'storage/framework/sessions',
-    'storage/framework/views',
-    'storage/logs',
-    'public/storage',
-]);
-
-// Tasks tùy chỉnh
-desc('Build frontend');
-task('build:frontend', function () {
-    // Sửa đường dẫn thành release_path thay vì deploy_path
-    run('export NVM_DIR="$HOME/.nvm" && source $NVM_DIR/nvm.sh && cd {{release_path}} && npm install && npm run build');
+desc('Build the assets');
+task('build', function () {
+    run('cd {{release_path}} && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && nvm use node && npm install && npm run build');
 });
 
-desc('Fix assets permissions');
-task('deploy:assets', function () {
+task('optimize', function () {
+    cd('{{release_path}}');
+    run('php artisan optimize');
+});
+desc('Fix asset permissions');
+task('fix:permissions', function () {
     run('chmod -R 755 {{release_path}}/public/build');
 });
-// task('artisan:storage:link', artisan('storage:link', ['min' => 5.3]));
-desc('Migrate database');
-task('database:migrate', function () {
-    // Sửa đường dẫn thành release_path
-    run('{{bin/php}} {{release_path}}/artisan migrate --force');
-});
-desc('Run Category seeder');
-task('database:seed:category', function () {
-    run('{{bin/php}} {{release_path}}/artisan db:seed --class=CategorySeeder --force');
-});
-task('database:seed', function () {
-    run('{{bin/php}} {{release_path}}/artisan db:seed ');
-});
-// Quá trình deploy
-desc('Deploy the project');
-task('deploy', [
-    'deploy:prepare',
-    'deploy:vendors',
-    'build:frontend',
-    'artisan:storage:link',
-    'artisan:view:cache',
-    'artisan:config:cache',
-    'artisan:migrate',
-    'deploy:publish',
-]);
 
-// Rollback nếu lỗi xảy ra
+
+after('deploy:update_code', 'build');
+after('deploy:symlink', 'optimize');
+after('build', 'fix:permissions');
+// Hooks
 after('deploy:failed', 'deploy:unlock');
