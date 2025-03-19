@@ -21,7 +21,6 @@ export default {
                     ...defaultTheme.fontFamily.sans
                 ]
     		},
-
     		borderRadius: {
     			lg: 'var(--radius)',
     			md: 'calc(var(--radius) - 2px)',
@@ -30,11 +29,11 @@ export default {
     		colors: {
     			background: 'hsl(var(--background))',
     			foreground: 'hsl(var(--foreground))',
-                customBlue: "#071437",
-                mutedText: "#99a1b7",
-                customBlue1: "#4b5675",
-				contentColor :"#252f4a",
-				customBg:"#99a1b7",
+    			customBlue: '#071437',
+    			mutedText: '#99a1b7',
+    			customBlue1: '#4b5675',
+    			contentColor: '#252f4a',
+    			customBg: '#99a1b7',
     			card: {
     				DEFAULT: 'hsl(var(--card))',
     				foreground: 'hsl(var(--card-foreground))'

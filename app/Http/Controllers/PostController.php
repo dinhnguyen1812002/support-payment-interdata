@@ -180,13 +180,14 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
+        // Kiểm tra xem user có quyền xóa không
         if ($post->user_id !== auth()->id()) {
-            return redirect()->route('/')->with('error', 'You are not authorized to delete this post!');
+            return back()->with('error', 'Bạn không có quyền xóa bài viết này!');
         }
 
         $post->delete();
 
-        return redirect()->back()->with('success', 'Post deleted successfully!');
+        return back()->with('success', 'Bài viết đã được xóa thành công!');
     }
 
     public function filterPostByCategory(Request $request, $categorySlug)

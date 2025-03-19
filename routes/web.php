@@ -14,7 +14,7 @@ Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/latest-posts', [PostController::class, 'getLatestPosts']);
 // Route::get('/posts', [PostController::class, 'getPostByUser']);
 Route::middleware(['auth'])->group(function () {
-    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
+    Route::get('/posts/create', [PostController::class, 'cr te'])->name('posts.create');
     Route::post('/new-post', [PostController::class, 'store'])->name('posts.store');
 
     Route::get('/posts/{slug}/edit', [PostController::class, 'edit'])->name('posts.edit');
@@ -52,13 +52,15 @@ Route::middleware([
         return redirect('/');
     })->name('dashboard');
 });
-
-Route::get('/test-event', function () {
-    $post = Post::find('01jp1xepa4cv3en4axatkh9vdk'); // Replace with a valid post ID
-    event(new NewQuestionCreated($post));
-
-    return 'Event dispatched!';
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/admin/dashboard', [\App\Http\Controllers\Admin\AdminController::class, 'dashboard'])->name('admin.dashboard');
 });
+// Route::get('/test-event', function () {
+//    $post = Post::find('01jp1xepa4cv3en4axatkh9vdk');
+//    event(new NewQuestionCreated($post));
+//
+//    return 'Event dispatched!';
+// });
 
 Route::get('/user/profile', [\App\Http\Controllers\UserController::class, 'show'])
     ->name('profile.show')

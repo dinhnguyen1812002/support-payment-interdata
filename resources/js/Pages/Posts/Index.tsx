@@ -47,10 +47,6 @@ const PostsIndex: React.FC<IndexProps> = ({
                 )}
             </div>
         </MainLayout>
-
-
-
-
     );
 };
 

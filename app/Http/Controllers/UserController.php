@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -46,5 +47,24 @@ class UserController extends UserProfileController
             'keyword' => $request->search ?? '',
             'notifications' => auth()->user()->unreadNotifications,
         ]);
+    }
+
+    public function assignRole(Request $request)
+    {
+        // Validate dữ liệu đầu vào
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'required|string|exists:roles,name',
+        ]);
+
+        // Tìm user theo ID
+        $user = User::findOrFail($request->user_id);
+
+        // Gán vai trò cho user
+        $user->assignRole($request->role);
+
+        return response()->json([
+            'message' => "Role '{$request->role}' has been assigned to user '{$user->name}' successfully.",
+        ], 200);
     }
 }

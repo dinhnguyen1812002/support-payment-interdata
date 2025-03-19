@@ -179,7 +179,7 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                                     <Badge
                                                         key={category.id}
                                                         variant="default"
-                                                        className="px-3 py-1.5 text-sm flex items-center gap-1"
+                                                        className="px-3 py-1.5 text-sm flex items-center gap-1 bg-blue-600"
                                                     >
                                                         <Hash className="w-3.5 h-3.5" />
                                                         {category.title}
@@ -205,7 +205,7 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                                 />
                                                 {categorySearchFocused && filteredCategories.length > 0 && (
                                                     <div
-                                                        className="absolute z-10 w-full mt-1 dark:bg-[#0F1014] text-customBlue1 rounded-md border shadow-lg max-h-60 overflow-auto">
+                                                        className="absolute z-10 w-full mt-1 bg-white dark:bg-[#0F1014] text-customBlue1 rounded-md border shadow-lg max-h-60 overflow-auto">
                                                         {filteredCategories.map((category) => (
                                                             <button
                                                                 key={category.id}

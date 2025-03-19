@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { cn } from "@/lib/utils";
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
-    CardTitle
+    CardTitle,
+    CardFooter
 } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { ScrollArea } from "@/Components/ui/scroll-area";
-import { Separator } from "@/Components/ui/separator";
+
 import {
     UserCircle,
     Lock,
     Activity,
     Bell as BellIcon,
     UserX,
-    ChevronRight,
     FileText,
     Menu,
-    X
+    X,
+    Settings,
+    ChevronRight,
+    LogOut
 } from 'lucide-react';
 
 import DeleteUserForm from '@/Pages/Profile/Partials/DeleteUserForm';
@@ -29,10 +32,12 @@ import UpdatePasswordForm from '@/Pages/Profile/Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfileInformationForm';
 import useTypedPage from '@/Hooks/useTypedPage';
 import AppLayout from '@/Layouts/AppLayout';
-import {Notification, Post, Session} from '@/types';
+import { Notification, Post, Session } from '@/types';
 import PostsTable from "@/Pages/Profile/Partials/PostTable";
 import { router } from '@inertiajs/core';
-import {route} from "ziggy-js";
+import { route } from "ziggy-js";
+import {Switch} from "@/Components/ui/switch";
+import {uppercaseText} from "@/Utils/slugUtils";
 
 interface Props {
     sessions: Session[];
@@ -57,14 +62,17 @@ interface SidebarItemProps {
     title: string;
     isActive: boolean;
     onClick: () => void;
+    variant?: "default" | "destructive";
 }
 
-const SidebarItem = ({ icon, title, isActive, onClick }: SidebarItemProps) => (
+const SidebarItem = ({ icon, title, isActive, onClick, variant = "default" }: SidebarItemProps) => (
     <Button
-        variant={isActive ? "secondary" : "ghost"}
+        variant={variant === "destructive" ? "ghost" : isActive ? "secondary" : "ghost"}
         className={cn(
-            "w-full justify-start gap-2 h-12",
-            isActive && "bg-muted font-medium"
+            "w-full justify-start gap-2 h-12 relative",
+            isActive && "bg-muted font-medium",
+            isActive && "border-l-4 border-blue-500",
+            variant === "destructive" && "text-destructive hover:text-destructive hover:bg-destructive/10"
         )}
         onClick={onClick}
     >
@@ -89,6 +97,9 @@ const ProfilePage = ({
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const user = page.props.auth.user!;
+
+    // Create refs for each section
+    const sectionRefs = useRef<{[key: string]: React.RefObject<HTMLDivElement>}>({});
 
     // Check if we're on mobile
     useEffect(() => {
@@ -147,33 +158,43 @@ const ProfilePage = ({
         if (isMobile) {
             setSidebarOpen(false);
         }
+
+        // Scroll to the section
+        const sectionElement = document.getElementById(sectionId);
+        if (sectionElement) {
+            sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     };
 
     const sidebarItems = [
         {
             id: 'profile',
-            title: 'Profile Information',
+            title: 'Profile',
             icon: <UserCircle className="w-5 h-5" />,
             component: <UpdateProfileInformationForm user={user} />
         },
         {
             id: 'security',
-            title: 'Security Settings',
+            title: 'Security',
             icon: <Lock className="w-5 h-5" />,
             component: (
                 <div className="space-y-6">
-                    <UpdatePasswordForm />
+                    <div>
+                        <h2 className="text-lg font-semibold">Password</h2>
+                        <UpdatePasswordForm />
+                    </div>
                     {page.props.jetstream.canManageTwoFactorAuthentication && (
-                        <TwoFactorAuthenticationForm
-                            requiresConfirmation={confirmsTwoFactorAuthentication}
-                        />
+                        <div>
+                            <h2 className="text-lg font-semibold">Two factor authentication</h2>
+                            <TwoFactorAuthenticationForm requiresConfirmation={confirmsTwoFactorAuthentication} />
+                        </div>
                     )}
                 </div>
             )
         },
         {
             id: 'sessions',
-            title: 'Active Sessions',
+            title: 'Sessions',
             icon: <Activity className="w-5 h-5" />,
             component: <LogoutOtherBrowserSessions sessions={sessions} />
         },
@@ -184,20 +205,40 @@ const ProfilePage = ({
             component: (
                 <Card>
                     <CardHeader>
-                        <CardTitle>Notification Preferences</CardTitle>
+                        <CardTitle>Tùy chọn thông báo</CardTitle>
                         <CardDescription>
-                            Manage how you receive notifications.
+                            Quản lý cách bạn nhận thông báo.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        {/* Add notification settings here */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h4 className="font-medium">Thông báo qua email</h4>
+                                    <p className="text-sm text-muted-foreground">Nhận thông báo qua email khi có hoạt động mới</p>
+                                </div>
+                                <div>
+                                    <Switch />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h4 className="font-medium">Thông báo trên trình duyệt</h4>
+                                    <p className="text-sm text-muted-foreground">Hiển thị thông báo trên trình duyệt</p>
+                                </div>
+                                <div>
+                                    <Switch />
+                                </div>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             )
         },
         {
             id: 'posts',
-            title: 'Câu hỏi của bạn ',
+            title: 'Your question',
             icon: <FileText className="h-5 w-5" />,
             component: (
                 <PostsTable
@@ -208,6 +249,48 @@ const ProfilePage = ({
             )
         }
     ];
+
+    // Initialize refs for each section
+    useEffect(() => {
+        const items = [...sidebarItems];
+        if (page.props.jetstream.hasAccountDeletionFeatures) {
+            items.push({
+                id: 'delete-account',
+                title: 'Delete Account',
+                icon: <UserX className="w-5 h-5" />,
+                component: <DeleteUserForm />
+            });
+        }
+
+        items.forEach(item => {
+            sectionRefs.current[item.id] = React.createRef();
+        });
+    }, []);
+
+    // Add scroll position detection to highlight correct sidebar item
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollPosition = window.scrollY + 200; // Add offset for better detection
+
+            // Find which section is currently in view
+            const sectionIds = Object.keys(sectionRefs.current);
+            for (let i = sectionIds.length - 1; i >= 0; i--) {
+                const id = sectionIds[i];
+                const element = document.getElementById(id);
+                if (element && element.offsetTop <= scrollPosition) {
+                    if (activeSection !== id) {
+                        setActiveSection(id);
+                    }
+                    break;
+                }
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, [activeSection]);
 
     // Add overlay when sidebar is open on mobile
     const renderOverlay = () => {
@@ -223,45 +306,40 @@ const ProfilePage = ({
     };
 
     return (
-        <AppLayout
-            notifications={notifications}
-            canRegister={true}
-            canLogin={true}
-            title={user.name}
-        >
-            <div className="flex flex-col md:flex-row h-[calc(100vh-4rem)] container relative">
-                {/* Mobile Menu Button */}
-                <div className="md:hidden flex items-center justify-between px-4 h-14 border-b">
-                    <h2 className="text-lg font-semibold">Settings</h2>
-                    <Button
-                        id="menu-button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setSidebarOpen(!sidebarOpen)}
-                        className="z-20"
-                    >
-                        {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-                    </Button>
-                </div>
+        <AppLayout notifications={notifications} canRegister={true} canLogin={true} title={user.name}>
+            <div className="flex max-w-[1354px] mx-auto flex-col md:flex-row h-auto">
+                {/* Mobile menu button */}
+                {isMobile && (
+                    <div className="p-4 flex justify-between items-center border-b">
+                        <h1 className="font-bold text-xl">Profile</h1>
+                        <Button
+                            id="menu-button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setSidebarOpen(!sidebarOpen)}
+                        >
+                            {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                        </Button>
+                    </div>
+                )}
 
-                {/* Render overlay */}
                 {renderOverlay()}
 
                 {/* Sidebar */}
                 <div
                     id="sidebar"
                     className={cn(
-                        "border-r bg-background md:w-64 transition-all duration-300 ease-in-out",
-                        isMobile ? "fixed h-full z-20" : "relative",
-                        isMobile && (sidebarOpen
-                            ? "left-0 w-64"
-                            : "-left-full w-0")
+                        " bg-background md:w-60 pt-4",
+                        isMobile ? "inset-y-0 left-0 transform transition-transform duration-200 ease-in-out" : "sticky top-11 h-screen"
                     )}
+                    style={isMobile ? { transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)' } : {}}
                 >
-                    <div className="hidden md:flex items-center px-4 h-14 border-b">
-                        <h2 className="text-lg font-semibold">Settings</h2>
+                    <div className="px-4 sm:px-5 py-4">
+                        <p className="w-full text-xs font-bold text-mutedText dark:text-[#636674]">
+                            {uppercaseText("dashboard")}
+                        </p>
                     </div>
-                    <ScrollArea className="h-auto md:h-[calc(100vh-8rem)]">
+                    <ScrollArea className="h-[calc(100vh-8rem)]">
                         <div className="p-3 space-y-1">
                             {sidebarItems.map((item) => (
                                 <SidebarItem
@@ -273,33 +351,55 @@ const ProfilePage = ({
                                 />
                             ))}
                             {page.props.jetstream.hasAccountDeletionFeatures && (
-                                <>
-                                    <Separator className="my-2" />
-                                    <SidebarItem
-                                        icon={<UserX className="w-5 h-5 text-destructive" />}
-                                        title="Delete Account"
-                                        isActive={activeSection === 'delete'}
-                                        onClick={() => handleSectionChange('delete')}
-                                    />
-                                </>
+                                <SidebarItem
+                                    icon={<UserX className="w-5 h-5" />}
+                                    title="Xóa tài khoản"
+                                    isActive={activeSection === 'delete-account'}
+                                    onClick={() => handleSectionChange('delete-account')}
+                                    variant="destructive"
+                                />
                             )}
+                            <SidebarItem
+                                icon={<LogOut className="w-5 h-5" />}
+                                title="Đăng xuất"
+                                isActive={false}
+                                onClick={() => router.post(route('logout'))}
+                                variant="destructive"
+                            />
                         </div>
                     </ScrollArea>
                 </div>
 
-                {/* Main Content */}
-                <div className="overflow-y-auto flex-1">
-                    <div className="flex items-center px-6 h-14">
-                        <h1 className="text-lg font-semibold">
-                            {sidebarItems.find(item => item.id === activeSection)?.title || 'Delete Account'}
-                        </h1>
-                    </div>
-                    <div className="p-6">
-                        {activeSection === 'delete'
-                            ? <DeleteUserForm />
-                            : sidebarItems.find(item => item.id === activeSection)?.component
-                        }
-                    </div>
+                {/* Main content - all sections visible */}
+                <div className={cn(
+                    "overflow-y-auto flex-1 p-6 space-y-6 border-l mt-1",
+                    isMobile ? "pt-0" : ""
+                )}>
+                    {sidebarItems.map((item) => (
+                        <Card
+                            key={item.id}
+                            id={item.id}
+                            className="p-4 border rounded-lg"
+                        >
+                            <CardHeader>
+                                <CardTitle>{item.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent>{item.component}</CardContent>
+                        </Card>
+                    ))}
+                    {page.props.jetstream.hasAccountDeletionFeatures && (
+                        <Card
+                            id="delete-account"
+                            className="p-4 border rounded-lg"
+                        >
+                            <CardHeader>
+                                <CardTitle>Xóa tài khoản</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <DeleteUserForm />
+                            </CardContent>
+                        </Card>
+                    )}
                 </div>
             </div>
         </AppLayout>

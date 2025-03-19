@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Table,
     TableBody,
@@ -52,8 +52,8 @@ interface PostsTableProps {
 }
 
 export default function PostsTable({ posts, pagination, keyword }: PostsTableProps) {
-    const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-    const [postToDelete, setPostToDelete] = React.useState<Post | null>(null);
+    const [postToDelete, setPostToDelete] = useState<Post | null>(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -76,8 +76,7 @@ export default function PostsTable({ posts, pagination, keyword }: PostsTablePro
     };
     const confirmDelete = () => {
         if (postToDelete) {
-           
-            router.delete(route('posts.destroy', postToDelete.slug), {
+            router.delete(route('posts.destroy', postToDelete.id), {
                 preserveState: true
             });
         }
@@ -171,9 +170,10 @@ export default function PostsTable({ posts, pagination, keyword }: PostsTablePro
                                                 onClick={() => handleEdit(post.slug)}
                                                 className="h-8 w-8 hover:bg-muted"
                                             >
-                                                {/* <Link href={route('/')}> 
-                                                    <Pencil className="h-4 w-4"/>
+                                                {/* <Link href={route('/')}>
+
                                                 </Link> */}
+                                                <Pencil className="h-4 w-4"/>
                                             </Button>
 
                                              {/* <Link href={route('profile.edit')}>Profile</Link> */}

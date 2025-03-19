@@ -26,10 +26,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
           <div className="flex justify-between items-center flex-wrap mb-8 lg:mb-7">
           <div className="space-y-1">
             <span className="font-bold text-2xl text-customBlue dark:text-white">
-              No Question Ask 
+              No Question Ask
             </span>
           </div>
-      
+
           {/* Actions Section */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             {isAuthenticated ? (
@@ -66,7 +66,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
               </small>
             </span>
           </div>
-      
+
           {/* Actions Section */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             {isAuthenticated ? (
@@ -88,7 +88,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
             )}
           </div>
         </div>
-      
+
         {/* Posts List */}
         <div className="space-y-1 items-stretch w-full max-w-3xl mx-auto">
           {posts.map((post, index) => (
@@ -111,7 +111,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                         /> */}
                         <p
                           className="text-sm font-normal text-gray-600 dark:text-gray-300 line-clamp-2 mt-3"
-                         
+
 
                         >{post.content }</p>
                       </Link>
@@ -133,7 +133,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                           <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                       </div>
-      
+
                       <div>
                         <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{post.user.name}</p>
                         <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
@@ -141,7 +141,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                         </div>
                       </div>
                     </div>
-      
+
                     {/* Categories + Upvote */}
                     <div className="flex items-center space-x-2">
                       {/* Categories */}
@@ -160,12 +160,12 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                             </Link>
                           ))}
                       </div>
-      
+
                       {/* Upvote Button */}
-                      <UpvoteButton 
-                        postId={post.id} 
+                      <UpvoteButton
+                        postId={post.id}
                         initialUpvotes={post.upvote_count}
-                        initialHasUpvoted={post.isUpvote} 
+                        initialHasUpvoted={post.isUpvote}
                       />
                     </div>
                   </div>

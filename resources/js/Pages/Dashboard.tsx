@@ -1,35 +1,30 @@
-import React from 'react';
-import AppLayout from '@/Layouts/AppLayout';
-import BlogCard from '@/Pages/Posts/PostCard';
+import { AppSidebar } from "@/components/app-sidebar"
+import { ChartAreaInteractive } from "@/components/chart-area-interactive"
+import { DataTable } from "@/components/data-table"
+import { SectionCards } from "@/components/section-cards"
+import { SiteHeader } from "@/components/site-header"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
-import {BlogPost, Notification} from '@/types';
+import data from "./data.json"
 
-
-
-
-interface Props {
-    posts: BlogPost[];
-    postCount: number;
-    notifications: Notification[]
-}
-
-export default function Dashboard({ posts = [], postCount, notifications }: Props) {
-    return (
-        <AppLayout
-            title="Dashboard"
-            canRegister={true}
-            canLogin={true}
-            notifications={notifications}>
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                         Pass posts to BlogCard
-                        <BlogCard posts={posts}
-                                  postCount={postCount}
-                        />
-                    </div>
-                </div>
+export default function Page() {
+  return (
+    <SidebarProvider>
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <SectionCards />
+              <div className="px-4 lg:px-6">
+                <ChartAreaInteractive />
+              </div>
+              <DataTable data={data} />
             </div>
-        </AppLayout>
-    );
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  )
 }

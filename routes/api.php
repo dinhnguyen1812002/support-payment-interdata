@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\UserController;
 use App\Models\Post;
 use App\Models\User;
 use App\Notifications\NewPostNotification;
@@ -46,3 +47,7 @@ Route::get('/test-notification', function () {
 
     return response()->json(['message' => 'Thông báo đã được gửi!']);
 });
+
+Route::post('/users/assign-role', [UserController::class, 'assignRole'])
+    ->middleware(['auth:sanctum', 'verified'])
+    ->name('users.assign-role');
