@@ -1,6 +1,6 @@
 import { MailIcon, PlusCircleIcon, type LucideIcon } from "lucide-react"
 
-import { Button } from "@/Components/ui/button"
+
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -9,6 +9,7 @@ import {
   SidebarMenuItem,
 } from "@/Components/ui/sidebar"
 import React from "react"
+import {Link} from "@inertiajs/react";
 
 export function NavMain({
   items,
@@ -45,8 +46,10 @@ export function NavMain({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton tooltip={item.title}>
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
+                  {item.icon && <item.icon />}
+                  <Link href={item.url} >
+                      <span>{item.title}</span>
+                  </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

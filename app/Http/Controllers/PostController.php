@@ -285,4 +285,33 @@ class PostController extends Controller
 
         return response()->json($post);
     }
+
+    public function topVotedPosts(Request $request)
+    {
+        $limit = $request->query('limit', 5);
+
+        $posts = Post::with(['user:id,name,profile_photo_path'])
+            ->withCount('upvotes')
+            ->orderBy('upvotes_count', 'desc')
+            ->take($limit)
+            ->get();
+
+        return response()->json([
+            'data' => $posts->map(function ($post) {
+                return [
+                    'id' => $post->id,
+                    'name' => $post->user->name,
+                    'title' => $post->title,
+                    'status' => $post->is_published ? 'private' : 'public',
+                    'vote' => $post->upvotes_count,
+                    'comment' => $post->comments()->count(),
+                    'user' => [
+                        'name' => $post->user->name,
+                        'profile_photo_path' => $post->user->profile_photo_path,
+                        'email' => $post->user->email,
+                    ],
+                ];
+            }),
+        ]);
+    }
 }

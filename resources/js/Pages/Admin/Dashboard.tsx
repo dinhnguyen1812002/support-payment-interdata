@@ -1,95 +1,46 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"
-import { DataTable } from "@/components/data-table"
-import { SectionCards } from "@/components/section-cards"
-import { SiteHeader } from "@/components/site-header"
-import { SidebarInset, SidebarProvider } from "@/Components/ui/sidebar"
+import { AppSidebar } from '@/Components/dashboard/app-sidebar';
+import {SidebarInset, SidebarProvider} from '@/Components/ui/sidebar';
+import { PageProps } from '@inertiajs/core';
+import React from 'react';
+import {SiteHeader} from "@/Components/dashboard/site-header";
+import {SectionCards} from "@/Components/dashboard/section-cards";
+import {DataTable} from "@/Components/dashboard/data-table";
 
-import React from "react"
-import PostsTable from "@/Pages/Profile/Partials/PostTable";
-import {Notification, Post, Session} from "@/types";
-
-interface Props {
-    sessions: Session[];
-    confirmsTwoFactorAuthentication: boolean;
-    posts: Post[];
-    categories: any[];
-    postCount: number;
-    pagination: {
-        total: number;
-        per_page: number;
-        current_page: number;
-        last_page: number;
-        next_page_url: string | null;
-        prev_page_url: string | null;
-    };
-    keyword?: string;
-    notifications: Notification[];
+interface User {
+    name: string;
+    email: string;
+    profile_photo_path: string | null;
 }
 
-interface SidebarItemProps {
-    icon: React.ReactNode;
+interface Post {
+    id: number;
     title: string;
-    isActive: boolean;
-    onClick: () => void;
-    variant?: "default" | "destructive";
+    status: string;
+    vote: string;
+    comment: number;
+    user: User;
 }
 
-// export default function Page()=>({}) {
-//     return (
-//         <SidebarProvider>
-//             <AppSidebar variant="inset" />
-//             <SidebarInset>
-//                 <SiteHeader />
-//                 <div className="flex flex-1 flex-col">
-//                     <div className="@container/main flex flex-1 flex-col gap-2">
-//                         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-//                             <SectionCards />
-//                             <div className="px-4 lg:px-6">
-//                                 <ChartAreaInteractive />
-//                             </div>
-//                             <PostsTable
-//                                 posts={{data:posts}}
-//                                 pagination={pagination}
-//                                 keyword={keyword}
-//                             />
-//                             )
-//                         </div>
-//                     </div>
-//                 </div>
-//             </SidebarInset>
-//         </SidebarProvider>
-//     )
-// }
-const ProfilePage = ({
-                         posts,
-                         pagination,
-                         keyword = '',
-                     }: Props) => {
+interface DashboardProps extends PageProps {
+    posts: Post[];
+    user: User;
+}
+
+export default function Page({ posts, user }: DashboardProps) {
     return (
-
         <SidebarProvider>
-                        <AppSidebar variant="inset" />
-                        <SidebarInset>
-                            <SiteHeader />
-                            <div className="flex flex-1 flex-col">
-                                <div className="@container/main flex flex-1 flex-col gap-2">
-                                    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                                        <SectionCards />
-                                        <div className="px-4 lg:px-6">
-                                            <ChartAreaInteractive />
-                                        </div>
-                                        <PostsTable
-                                            posts={{data:posts}}
-                                            pagination={pagination}
-                                            keyword={keyword}
-                                        />
-                                        )
-                                    </div>
-                                </div>
-                            </div>
-                        </SidebarInset>
-                    </SidebarProvider>
+            <AppSidebar variant="inset" />
+            <SidebarInset>
+                <SiteHeader />
+                <div className="flex flex-1 flex-col">
+                    <div className="@container/main flex flex-1 flex-col gap-2">
+                        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+                            <SectionCards />
+                            <DataTable data={posts} />
+                        </div>
+                    </div>
+                </div>
+            </SidebarInset>
+        </SidebarProvider>
     );
-
 }

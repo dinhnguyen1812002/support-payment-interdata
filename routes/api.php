@@ -34,7 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 Route::get('categories', [CategoryController::class, 'index']);
 Route::get('count', [PostController::class, 'getCountPost']);
-
+Route::get('/top-voted-posts', [PostController::class, 'topVotedPosts']);
 Route::get('/test-notification', function () {
     $user = User::find(1); // User ID cần tồn tại
     $post = Post::find('01jnz291ec0j11gj752pgk2mc4'); // Post ID cần tồn tại

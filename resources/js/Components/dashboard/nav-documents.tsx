@@ -1,4 +1,4 @@
-"use client"
+
 
 import {
   FolderIcon,
@@ -12,7 +12,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/Components/ui/dropdown-menu"
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -21,7 +21,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@/Components/ui/sidebar"
+import React from "react"
 
 export function NavDocuments({
   items,

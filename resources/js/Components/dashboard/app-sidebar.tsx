@@ -18,19 +18,20 @@ import {
     ChartColumnStacked
 } from "lucide-react"
 
-import { NavDocuments } from "@/Components/nav-documents"
-import { NavMain } from "@/Components/nav-main"
-import { NavSecondary } from "@/Components/nav-secondary"
-import { NavUser } from "@/Components/nav-user"
+import { NavDocuments } from "@/Components/dashboard/nav-documents"
+import { NavMain } from "@/Components/dashboard/nav-main"
+import { NavSecondary } from "@/Components/dashboard/nav-secondary"
+import { NavUser } from "@/Components/dashboard/nav-user"
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/Components/ui/sidebar"
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem
+} from '@/Components/ui/sidebar'
+
 
 const data = {
   user: {
@@ -46,12 +47,12 @@ const data = {
     },
     {
       title: "Post",
-      url: "/admin/dashboard/post",
+      url: "/admin/posts",
       icon: ListIcon,
     },
     {
       title: "Categories",
-      url: "/admin/dashboard/post",
+      url: "/admin/dashboard/categories",
       icon: ChartColumnStacked,
     },
 

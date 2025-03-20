@@ -3,13 +3,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Badge } from "@/Components/ui/badge";
 import { Link } from "@inertiajs/react";
 import useTypedPage from "@/Hooks/useTypedPage";
-import { Clock, PenLine, PlusCircle, TrendingUp } from 'lucide-react';
-import { Button } from '@/Components/ui/button';
+
 import { BlogPost } from "@/types";
 import { generateSlug } from "@/Utils/slugUtils";
 import UpvoteButton from "@/Components/VoteButton";
 import { route } from "ziggy-js";
-import { cn } from "@/lib/utils";
+
+import {Button} from "@/Components/ui/button";
 
 interface BlogCardProps {
     posts: BlogPost[];

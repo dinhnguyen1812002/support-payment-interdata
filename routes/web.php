@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\NewQuestionCreated;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\NotificationController;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/latest-posts', [PostController::class, 'getLatestPosts']);
+
 // Route::get('/posts', [PostController::class, 'getPostByUser']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/posts/create', [PostController::class, 'cr te'])->name('posts.create');
@@ -53,7 +55,8 @@ Route::middleware([
     })->name('dashboard');
 });
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-    Route::get('/admin/dashboard', [\App\Http\Controllers\Admin\AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin/posts', [AdminController::class, 'getAllPost'])->name('admin.posts');
 });
 // Route::get('/test-event', function () {
 //    $post = Post::find('01jp1xepa4cv3en4axatkh9vdk');
