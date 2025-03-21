@@ -1,14 +1,7 @@
 import React from "react";
-import { router } from "@inertiajs/react";
-import AppLayout from "@/Layouts/AppLayout";
 import BlogCard from "@/Pages/Posts/PostCard";
-import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 import { IndexProps } from "@/types";
-import { Separator } from "@/Components/ui/separator";
-import SearchComponent from "@/Components/Search";
 import Pagination from "@/Components/Pagination";
-import LatestPost from "@/Pages/Posts/LatestPost";
-import LatestPosts from "@/Pages/Posts/LatestPost";
 import MainLayout from "@/Layouts/Layout";
 
 const PostsIndex: React.FC<IndexProps> = ({

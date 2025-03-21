@@ -53,7 +53,7 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { toast } from "sonner"
 import { z } from "zod"
 
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useIsMobile } from "@/Hooks/use-mobile"
 import { Badge } from "@/Components/ui/badge"
 import { Button } from "@/Components/ui/button"
 import {

@@ -17,7 +17,7 @@ export function SectionCards() {
         const fetchTotalPosts = async () => {
             try {
                 const res = await axios.get("/api/count");
-                const count = res.data; // Nếu API trả về {"total": 123}, dùng res.data.total
+                const count = res.data;
                 setTotalPosts(count);
             } catch (error) {
                 console.error("Error fetching total post count:", error);

@@ -102,9 +102,9 @@ const Sidebar: React.FC<Props> = () => {
     const [totalPosts, setTotalPosts] = useState<number>(0);
     const [publicCategories, setPublicCategories] = useState<Category[]>([
         { id: 1, title: "All Question", number: 0 },
-        { id: 2, title: "Search", number: null },
-        { id: 3, title: "Tag", number: null },
-        { id: 4, title: "Ask Question", number: null }
+
+        { id: 2, title: "search", number: null },
+        { id:3, title: "Ask Question", number: null }
     ]);
 
     const listActivity = [
@@ -141,7 +141,7 @@ const Sidebar: React.FC<Props> = () => {
     return (
         <>
                 <CategoryList title="Public" categories={publicCategories} />
-                <CategoryList title="My Activity" categories={listActivity} />
+                {/*<CategoryList title="My Activity" categories={listActivity} />*/}
                 <CategoriesSidebar />
 
         </>

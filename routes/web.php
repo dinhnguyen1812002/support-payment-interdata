@@ -16,7 +16,7 @@ Route::get('/latest-posts', [PostController::class, 'getLatestPosts']);
 
 // Route::get('/posts', [PostController::class, 'getPostByUser']);
 Route::middleware(['auth'])->group(function () {
-    Route::get('/posts/create', [PostController::class, 'cr te'])->name('posts.create');
+    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/new-post', [PostController::class, 'store'])->name('posts.store');
 
     Route::get('/posts/{slug}/edit', [PostController::class, 'edit'])->name('posts.edit');
@@ -57,7 +57,12 @@ Route::middleware([
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/admin/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/posts', [AdminController::class, 'getAllPost'])->name('admin.posts');
+    Route::get('/admin/categories', [AdminController::class, 'getAllCategory'])->name('admin.categories');
+    Route::post('/admin/create-category', [CategoryController::class, 'store'])->name('admin.categories.store');
+    Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
+    Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 });
+
 // Route::get('/test-event', function () {
 //    $post = Post::find('01jp1xepa4cv3en4axatkh9vdk');
 //    event(new NewQuestionCreated($post));

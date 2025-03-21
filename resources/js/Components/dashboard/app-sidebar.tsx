@@ -42,7 +42,7 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/admin/dashboard",
+      url: "/admin/",
       icon: LayoutDashboardIcon,
     },
     {
@@ -52,13 +52,13 @@ const data = {
     },
     {
       title: "Categories",
-      url: "/admin/dashboard/categories",
+      url: "/admin/categories",
       icon: ChartColumnStacked,
     },
 
     {
       title: "User",
-      url: "/admin/dashboard/post",
+      url: "/admin/user",
       icon: ContactRound,
     },
   ],

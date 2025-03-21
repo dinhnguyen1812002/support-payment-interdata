@@ -17,25 +17,25 @@ const useRealTimeNotifications = (setLocalNotifications: SetNotificationsType) =
         });
 
         // Lắng nghe sự kiện từ channel "questions"
-        window.Echo.channel("questions")
-            .listen(".new-question", (data: { title: string; url: string }) => {
-                console.log("New question received:", data);
-
-                // Cập nhật danh sách thông báo mới
-                setLocalNotifications((prev) => [
-                    {
-                        id: Date.now().toString(),
-                        data: {
-                            message: `Có một câu hỏi mới: ${data.title}`,
-                            url: data.url,
-                            type: "info",
-                        },
-                        read_at: null,
-                        created_at: new Date().toISOString(),
-                    },
-                    ...prev,
-                ]);
-            });
+        // window.Echo.channel("questions")
+        //     .listen(".new-question", (data: { title: string; url: string }) => {
+        //         console.log("New question received:", data);
+        //
+        //         // Cập nhật danh sách thông báo mới
+        //         setLocalNotifications((prev) => [
+        //             {
+        //                 id: Date.now().toString(),
+        //                 data: {
+        //                     message: `Có một câu hỏi mới: ${data.title}`,
+        //                     url: data.url,
+        //                     type: "info",
+        //                 },
+        //                 read_at: null,
+        //                 created_at: new Date().toISOString(),
+        //             },
+        //             ...prev,
+        //         ]);
+        //     });
 
         return () => {
             window.Echo.leaveChannel("questions");

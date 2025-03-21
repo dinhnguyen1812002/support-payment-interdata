@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -51,7 +52,7 @@ class AdminController extends Controller
     public function getAllPost(Request $request)
     {
         $posts = Post::with(['user:id,name,profile_photo_path,email'])
-            ->withCount(['upvotes', 'comments']) // Đếm số vote và comment
+            ->withCount(['upvotes', 'comments'])
             ->latest()
             ->paginate(10);
 
@@ -61,7 +62,7 @@ class AdminController extends Controller
                     'id' => $post->id,
                     'title' => $post->title,
                     'slug' => $post->slug,
-                    'status' => $post->is_published ? 'public' : 'private',
+                    'status' => $post->is_published ? 'published' : 'draft',
                     'votes' => $post->upvotes_count,
                     'comments' => $post->comments_count,
                     'createdAt' => $post->created_at->toISOString(),
@@ -69,21 +70,50 @@ class AdminController extends Controller
                     'user' => [
                         'id' => $post->user->id,
                         'name' => $post->user->name,
-                        'profile_photo_path' => $post->user->profile_photo_path,
                         'email' => $post->user->email,
+                        'avatarUrl' => $post->user->profile_photo_path
+                            ? asset('storage/'.$post->user->profile_photo_path)
+                            : 'https://ui-avatars.com/api/?name='.urlencode($post->user->name).'&color=7F9CF5&background=EBF4FF',
                     ],
                 ];
-            }),
+            })->values()->all(),
             'pagination' => [
+                'total' => $posts->total(),
+                'per_page' => $posts->perPage(),
                 'current_page' => $posts->currentPage(),
                 'last_page' => $posts->lastPage(),
-                'per_page' => $posts->perPage(),
-                'total' => $posts->total(),
                 'next_page_url' => $posts->nextPageUrl(),
                 'prev_page_url' => $posts->previousPageUrl(),
             ],
         ]);
     }
 
+    public function getAllCategory(Request $request)
+    {
 
+        $categories = Category::select(['id', 'title', 'slug', 'description'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->paginate(10);
+
+        return Inertia::render('Admin/Categories', [
+            'data' => $categories->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'title' => $category->title,
+                    'slug' => $category->slug,
+                    'description' => $category->description,
+                    'posts_count' => $category->posts_count,
+                ];
+            })->values()->all(),
+            'pagination' => [
+                'current_page' => $categories->currentPage(),
+                'last_page' => $categories->lastPage(),
+                'per_page' => $categories->perPage(),
+                'total' => $categories->total(),
+                'next_page_url' => $categories->nextPageUrl(),
+                'prev_page_url' => $categories->previousPageUrl(),
+            ],
+        ]);
+    }
 }

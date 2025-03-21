@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Data\Category\CategoryData;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -46,7 +47,7 @@ class CategoryController extends Controller
             'description' => $categoryData->description,
         ]);
 
-        return redirect()->route('categories.index');
+        return redirect()->route('admin.categories');
     }
 
     /**
@@ -70,7 +71,18 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        // Xác thực dữ liệu đầu vào
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:categories,slug,'.$category->id,
+            'description' => 'nullable|string',
+        ]);
+
+        // Cập nhật danh mục
+        $category->update($validated);
+
+        // Chuyển hướng về trang danh sách với thông báo thành công
+        return Redirect::route('admin.categories')->with('success', 'Category updated successfully.');
     }
 
     /**
@@ -78,6 +90,10 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        // Xóa danh mục
+        $category->delete();
+
+        // Chuyển hướng về trang danh sách với thông báo thành công
+        return Redirect::route('admin.categories')->with('success', 'Category deleted successfully.');
     }
 }

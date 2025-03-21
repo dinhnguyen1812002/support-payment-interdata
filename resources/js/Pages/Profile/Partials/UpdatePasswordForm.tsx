@@ -41,10 +41,8 @@ export default function UpdatePasswordForm() {
   return (
     <FormSection
       onSubmit={updatePassword}
-      title={'Update Password'}
-      description={
-        'Ensure your account is using a long, random password to stay secure.'
-      }
+
+
       renderActions={() => (
         <>
           <ActionMessage on={form.recentlySuccessful} className="mr-3">

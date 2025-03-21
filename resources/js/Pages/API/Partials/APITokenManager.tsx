@@ -97,10 +97,7 @@ export default function APITokenManager({
       {/* <!-- Generate API Token --> */}
       <FormSection
         onSubmit={createApiToken}
-        title={'Create API Token'}
-        description={
-          'API tokens allow third-party services to authenticate with our application on your behalf.'
-        }
+
         renderActions={() => (
           <>
             <ActionMessage

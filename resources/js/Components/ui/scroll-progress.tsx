@@ -1,7 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import { motion, useScroll, useSpring } from "motion/react";
-
+import React from 'react';
 interface ScrollProgressProps {
   className?: string;
 }
@@ -23,7 +23,6 @@ export default function ScrollProgress({ className }: ScrollProgressProps) {
       )}
       style={{
         scaleX,
-      }}
-    />
+      }}></motion.div>
   );
 }

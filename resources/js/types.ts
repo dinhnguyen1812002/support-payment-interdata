@@ -119,6 +119,7 @@ export interface Category {
     id: number;
     title: string;
     slug: string;
+    description:string;
     posts_count?: number;
 }
 export interface Comment {

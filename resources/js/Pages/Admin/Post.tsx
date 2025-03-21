@@ -1,36 +1,65 @@
-import React from "react";
-import { SidebarProvider, SidebarInset } from "@/Components/ui/sidebar";
+import React, { useState } from "react";
+import { DataTable } from "@/Components/dashboard/Post/data-table";
+import { columns } from "@/Components/dashboard/Post/columns";
+import { usePage } from "@inertiajs/react";
+import {SidebarInset, SidebarProvider} from "@/Components/ui/sidebar";
 import {AppSidebar} from "@/Components/dashboard/app-sidebar";
 import {SiteHeader} from "@/Components/dashboard/site-header";
-import {DataTable} from "@/Components/dashboard/data-table";
-import Pagination from "@/Components/Pagination";
-import {Paginate} from "@/types";
+import {SectionCards} from "@/Components/dashboard/section-cards";
+import {Inertia} from "@inertiajs/inertia";
 
-
-interface Post {
-    id: number;
+export type Post = {
+    id: string;
     title: string;
-    slug: string;
-    status: string;
+    slug: string
+    status: "published" | "private";
     votes: number;
     comments: number;
     createdAt: string;
     updatedAt: string;
     user: {
-        id: number;
+        id: string;
         name: string;
-        profile_photo_path: string | null;
         email: string;
+        avatarUrl: string;
     };
-}
+};
 
+// Định nghĩa type cho pagination
+type Pagination = {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    next_page_url: string | null;
+    prev_page_url: string | null;
+};
 
-interface Props {
-    data: Post[];
-    pagination: Paginate;
-}
+export default function PostsPage() {
+    const { props } = usePage();
+    const initialData = props.data as Post[];
+    const initialPagination = props.pagination as Pagination;
 
-export default function PostsPage({ data, pagination }: Props) {
+    // Sử dụng state để quản lý data và pagination
+    const [data, setData] = useState(initialData);
+    const [pagination, setPagination] = useState(initialPagination);
+
+    // Hàm xử lý chuyển trang
+    const handlePageChange = (url: string | null) => {
+        if (url) {
+            Inertia.visit(url, {
+                preserveState: true,
+                preserveScroll: true,
+                only: ['data', 'pagination'], // Chỉ cập nhật data và pagination
+                onSuccess: (page) => {
+                    // Cập nhật state với dữ liệu mới từ server
+                    setData(page.props.data as Post[]);
+                    setPagination(page.props.pagination as Pagination);
+                },
+            });
+        }
+    };
+
     return (
         <SidebarProvider>
             <AppSidebar variant="inset" />
@@ -38,18 +67,14 @@ export default function PostsPage({ data, pagination }: Props) {
                 <SiteHeader />
                 <div className="flex flex-1 flex-col">
                     <div className="@container/main flex flex-1 flex-col gap-2">
-                        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                            <DataTable data={data} />
-                            {pagination && pagination.total > 0 && (
-                                <div className="mt-5 sm:mt-6 md:mt-7 flex justify-center">
-                                    <Pagination
-                                        current_page={pagination.current_page}
-                                        next_page_url={pagination.next_page_url}
-                                        prev_page_url={pagination.prev_page_url}
-                                        last_page={pagination.last_page}
-                                    />
-                                </div>
-                            )}
+                        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 ml-4">
+
+                            <DataTable
+                                columns={columns}
+                                data={data}
+                                pagination={pagination}
+                                onPageChange={handlePageChange}
+                            />
                         </div>
                     </div>
                 </div>
