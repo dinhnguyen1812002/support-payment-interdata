@@ -70,7 +70,7 @@ export default function CategoryDialogForm({
                                                onSuccess,
                                                isStandalone
                                            }: CategoryFormProps) {
-    // Initialize the form with react-hook-form
+
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -112,7 +112,7 @@ export default function CategoryDialogForm({
         }
     }
 
-    // Generate slug from title
+
     const generateSlug = (title: string) => {
         const slug = title
             .toLowerCase()
@@ -125,6 +125,7 @@ export default function CategoryDialogForm({
 
     // Handle dialog close
     const handleDialogClose = () => {
+        form.reset();
         onOpenChange(false)
     }
 
@@ -146,7 +147,7 @@ export default function CategoryDialogForm({
                         <FormField
                             control={form.control}
                             name="title"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Title</FormLabel>
                                     <FormControl>
@@ -154,20 +155,18 @@ export default function CategoryDialogForm({
                                             placeholder="Enter category title"
                                             {...field}
                                             onChange={(e) => {
-                                                field.onChange(e)
-                                                // Only auto-generate slug if creating new and slug is empty
-                                                if (!isEditing && !form.getValues("slug")) {
-                                                    generateSlug(e.target.value)
-                                                }
+                                                const titleValue = e.target.value;
+                                                field.onChange(titleValue);
+                                                generateSlug(titleValue);
                                             }}
                                         />
                                     </FormControl>
-                                    <FormDescription>The name of your category as it will appear on the
-                                        site.</FormDescription>
-                                    <FormMessage/>
+                                    <FormDescription>The name of your category as it will appear on the site.</FormDescription>
+                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
+
 
                         <FormField
                             control={form.control}

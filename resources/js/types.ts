@@ -155,7 +155,9 @@ export interface BlogPost {
     isUpvote: boolean;
     totalComment:number;
 
+    has_upvoted: boolean;
 }
+
 // export interface Notification {
 //
 //     id: string;

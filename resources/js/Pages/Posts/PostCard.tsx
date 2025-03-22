@@ -165,7 +165,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts = [], postCount }) => {
                       <UpvoteButton
                         postId={post.id}
                         initialUpvotes={post.upvote_count}
-                        initialHasUpvoted={post.isUpvote}
+                        initialHasUpvoted={post.has_upvoted}
+
                       />
                     </div>
                   </div>

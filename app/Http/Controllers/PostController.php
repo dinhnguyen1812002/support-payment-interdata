@@ -273,6 +273,8 @@ class PostController extends Controller
     {
         return response()->json(
             Post::select(['id', 'title', 'slug'])
+                ->withCount('upvotes')
+                ->orderBy('upvotes_count', 'desc')
                 ->latest()
                 ->limit(5)
                 ->get()

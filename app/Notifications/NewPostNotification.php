@@ -30,9 +30,13 @@ class NewPostNotification extends Notification implements ShouldBroadcast
             'post_id' => $this->post->id,
             'title' => $this->post->title,
             'message' => "Bài viết mới: {$this->post->title}",
-            'author' => $this->post->user->name,
             'slug' => $this->post->slug,
-            'avatar' => $this->post->user->avatar, // Thêm avatar nếu có trong model User
+            'user' => [
+                'name' => $this->post->user->name,
+                'profile_photo_url' => $this->post->user->profile_photo_path
+                    ? asset('storage/'.$this->post->user->profile_photo_path)
+                    : 'https://ui-avatars.com/api/?name='.urlencode($this->post->user->name).'&color=7F9CF5&background=EBF4FF',
+            ],
             'categories' => $this->post->categories->pluck('name')->toArray(),
         ];
     }

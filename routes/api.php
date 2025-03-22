@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 Route::get('categories', [CategoryController::class, 'index']);
+
 Route::get('count', [PostController::class, 'getCountPost']);
 Route::get('/top-voted-posts', [PostController::class, 'topVotedPosts']);
 Route::get('/test-notification', function () {

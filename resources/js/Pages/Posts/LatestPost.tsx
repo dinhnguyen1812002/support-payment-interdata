@@ -32,7 +32,7 @@ const PopularQuestions: React.FC = () => {
     >
       <CardHeader className="pb-4">
         <CardTitle className={cn("text-xl font-bold", "text-[#2C3E50] dark:text-gray-100")}>
-          Popular Questions
+          Top Voted
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">

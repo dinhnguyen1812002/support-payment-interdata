@@ -105,6 +105,7 @@ export default function AppLayout({
                 {page.props.auth.user && (
 
                     <NotificationsDropdown notifications={notifications}  />
+
                 )}
 
                 {/* User Menu or Login/Register buttons */}

@@ -197,26 +197,24 @@ export default function Categories() {
                                                         <TableCell className="max-w-[300px] truncate">{category.description}</TableCell>
                                                         <TableCell className="text-center">{category.posts_count}</TableCell>
                                                         <TableCell>
-                                                            <DropdownMenu>
-                                                                <DropdownMenuTrigger asChild>
-                                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                                        <MoreHorizontal className="h-4 w-4" />
-                                                                    </Button>
-                                                                </DropdownMenuTrigger>
-                                                                <DropdownMenuContent align="end">
-                                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                                    <DropdownMenuItem onClick={() => handleEdit(category)}>
-                                                                        <Pencil className="mr-2 h-4 w-4" /> Edit
-                                                                    </DropdownMenuItem>
-                                                                    <DropdownMenuSeparator />
-                                                                    <DropdownMenuItem
-                                                                        onClick={() => handleDelete(category)}
-                                                                        className="text-destructive focus:text-destructive"
-                                                                    >
-                                                                        <Trash className="mr-2 h-4 w-4" /> Delete
-                                                                    </DropdownMenuItem>
-                                                                </DropdownMenuContent>
-                                                            </DropdownMenu>
+                                                            <div className="flex items-center space-x-2">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-8 w-8"
+                                                                    onClick={() => handleEdit(category)}
+                                                                >
+                                                                    <Pencil className="h-4 w-4" />
+                                                                </Button>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-8 w-8"
+                                                                    onClick={() => handleDelete(category)}
+                                                                >
+                                                                    <Trash className="h-4 w-4" />
+                                                                </Button>
+                                                            </div>
                                                         </TableCell>
                                                     </TableRow>
                                                 ))
@@ -246,8 +244,8 @@ export default function Categories() {
                                             Previous
                                         </Button>
                                         <span className="text-sm">
-                      Page {pagination.current_page} of {pagination.last_page}
-                    </span>
+                                          Page {pagination.current_page} of {pagination.last_page}
+                                        </span>
                                         <Button
                                             variant="outline"
                                             size="sm"
