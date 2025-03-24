@@ -88,6 +88,7 @@ class Post extends Model
     public static function getPosts($search = '', $perPage = 6, $sort = 'latest')
     {
         $query = self::query()
+            ->where('is_published', true)
             ->with(['user', 'categories'])
             ->withCount('upvotes');
 

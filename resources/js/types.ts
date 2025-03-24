@@ -154,7 +154,6 @@ export interface BlogPost {
     upvote_count: number;
     isUpvote: boolean;
     totalComment:number;
-
     has_upvoted: boolean;
 }
 
@@ -170,11 +169,15 @@ export interface BlogPost {
 export interface Notification {
     id: string;
     data: {
+        post_id?: number;
+        title?: string;
         message: string;
-        url?: string;
-        type?: 'info' | 'success' | 'warning' | 'error';
+        slug?: string;
+        name?: string;
+        profile_photo_url?: string;
+        categories?: string[];
+        comment_id?: string;
     };
-    slug: string;
     read_at: string | null;
     created_at: string;
 }

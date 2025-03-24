@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 import CommentsSection from '@/Pages/Comments/CommentsSection';
-import CategoriesSidebar from '@/Pages/Categories/CategoriesSidebar';
 import { Badge } from '@/Components/ui/badge';
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
@@ -12,16 +11,14 @@ import SearchComponent from "@/Components/Search";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import LatestPosts from "@/Pages/Posts/LatestPost";
 import Sidebar from '@/Components/Sidebar';
+import SearchInput from "@/Components/search-input";
 
 interface BlogPost {
     next_page_url: string | null;
     id: string;
     title: string;
     content: string;
-    user: {
-        name: string;
-        profile_photo_path: string;
-    };
+    user: { name: string; profile_photo_path: string };
     categories: Category[];
     created_at: string;
     comments: Comment[];
@@ -33,26 +30,27 @@ interface PostDetailProps {
     post: BlogPost;
     categories: Category[];
     keyword: string;
-    auth: {
-        user: {
-            id: number;
-            name: string;
-            profile_photo_path: string;
-        };
-    };
+    auth: { user: { id: number; name: string; profile_photo_path: string } };
     notifications: Notification[];
 }
 
+// Define the expected shape of the Echo event
+interface NewCommentEvent {
+    comment: Comment;
+}
+
 const PostDetail: React.FC<PostDetailProps> = ({
-    post,
-    auth,
-    categories,
-    notifications,
-    keyword
-}) => {
+                                                   post,
+                                                   auth,
+                                                   categories,
+                                                   notifications,
+                                                   keyword
+                                               }) => {
     const [comments, setComments] = useState<Comment[]>(post.comments || []);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const selectedCategory = usePage().props.selectedCategory;
+    const { props } = usePage();
+    const selectedCategory = props.selectedCategory;
+    const currentUser = auth?.user || null;
 
     const userAvatar = auth?.user?.profile_photo_path
         ? `/storage/${auth.user.profile_photo_path}`
@@ -61,51 +59,55 @@ const PostDetail: React.FC<PostDetailProps> = ({
     const authorAvatar = post.user.profile_photo_path
         ? `/storage/${post.user.profile_photo_path}`
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name)}&color=7F9CF5&background=EBF4FF`;
+    const handleSearch = (value: string) => {
+        if (value.trim()) {
+            router.get("/posts/search", { search: value, page: 1 });
+        }
+    };
 
     // Submit a new comment
     const handleCommentSubmit = (content: string, parentId?: number) => {
-        setIsSubmitting(true);
-    
         router.post(
             route('comments.store'),
-            { comment: content, post_id: post.id, parent_id: parentId || null },
+            {
+                comment: content,
+                post_id: post.id,
+                parent_id: parentId || null
+            },
             {
                 preserveScroll: true,
                 onSuccess: () => {
-                    setIsSubmitting(false);
-                    window.location.reload(); // Reload lại trang sau khi bình luận thành công
+                    location.reload()
                 },
                 onError: errors => {
                     console.error('Error submitting comment:', errors);
-                    setIsSubmitting(false);
                 },
             },
         );
     };
-    
 
     // Listen for real-time comments via Laravel Echo
     useEffect(() => {
+        if (!window.Echo) return;
+
         const channel = window.Echo.channel(`post.${post.id}.comments`);
-        console.log('Nhận comment mới:');
-        channel.listen('.NewCommentPosted', (event: any) => {
-            console.log('Nhận comment mới:', event.comment);
-            // Cập nhật state comments ngay lập tức khi nhận được comment mới
-            setComments((prevComments) => {
-                // Kiểm tra xem comment đã tồn tại chưa để tránh trùng lặp
+
+        channel.listen('.NewCommentPosted', (event: { comment: Comment }) => {
+
+            setComments(prevComments => {
                 if (!prevComments.some(comment => comment.id === event.comment.id)) {
-                    return [...prevComments, event.comment];
+                    return [event.comment, ...prevComments];
                 }
                 return prevComments;
             });
         });
 
-        // Cleanup khi component unmount
         return () => {
             channel.stopListening('.NewCommentPosted');
             window.Echo.leaveChannel(`post.${post.id}.comments`);
         };
-    }, [post.id]);
+    }, [post.id, setComments]);
+
 
     const title = post.title;
 
@@ -132,10 +134,7 @@ const PostDetail: React.FC<PostDetailProps> = ({
                                     <div className="flex items-center mb-4 justify-between">
                                         <div className="flex items-center space-x-2">
                                             <Avatar className="h-9 w-9 rounded-md">
-                                                <AvatarImage
-                                                    src={authorAvatar}
-                                                    alt={post.user.name}
-                                                />
+                                                <AvatarImage src={authorAvatar} alt={post.user.name} />
                                                 <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
                                             </Avatar>
                                             <div className="flex flex-col justify-center">
@@ -145,15 +144,8 @@ const PostDetail: React.FC<PostDetailProps> = ({
                                         </div>
                                         <div className="flex items-center space-x-4">
                                             {post.categories.map((category) => (
-                                                <Link
-                                                    key={category.id}
-                                                    href={`/categories/${category.slug}/posts`}
-                                                    className="cursor-pointer"
-                                                >
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="px-3 py-1 text-sm font-medium text-blue-800 rounded border border-blue-400 border-dashed dark:bg-gray-700 dark:text-blue-400 hover:border-solid hover:border-blue-600"
-                                                    >
+                                                <Link key={category.id} href={`/categories/${category.slug}/posts`} className="cursor-pointer">
+                                                    <Badge variant="outline" className="px-3 py-1 text-sm font-medium text-blue-800 rounded border border-blue-400 border-dashed dark:bg-gray-700 dark:text-blue-400 hover:border-solid hover:border-blue-600">
                                                         {category.title}
                                                     </Badge>
                                                 </Link>
@@ -167,19 +159,20 @@ const PostDetail: React.FC<PostDetailProps> = ({
                                     </div>
                                     <hr className="w-full border-t border-dashed border-gray-300 mt-4 mb-10" />
                                     <CommentsSection
-                                        initialComments={{
-                                            data: comments,
-                                            next_page_url: post.next_page_url,
-                                        }}
+                                        initialComments={{ data: comments, next_page_url: post.next_page_url }}
                                         onCommentSubmit={handleCommentSubmit}
-                                        currentUserAvatar={userAvatar}
+                                        postId={post.id}
+                                        currentUser={currentUser}
                                     />
                                 </div>
                             </div>
                             <div className="hidden lg:block w-72 mt-5">
                                 <div className="top-4">
                                     <div className="mb-6">
-                                        <div id="search-container" />
+                                        <SearchInput
+                                            placeholder="Tìm kiếm..."
+                                            onSearch={handleSearch}
+                                        />
                                     </div>
                                     <div className="hidden lg:block mt-5">
                                         <div className="top-4">

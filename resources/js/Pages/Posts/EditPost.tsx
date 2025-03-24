@@ -20,6 +20,7 @@ import { route } from "ziggy-js";
 import { router } from "@inertiajs/core";
 import Sidebar from '@/Components/Sidebar';
 import QuillEditor from '@/Components/QuillEditor';
+import SearchInput from '@/Components/search-input';
 interface EditPostProps {
 
     post: {
@@ -76,6 +77,11 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
             category.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
             !data.categories.includes(category.id)
     );
+    const handleSearch = (value: string) => {
+        if (value.trim()) {
+            router.get("/posts/search", { search: value, page: 1 });
+        }
+    };
 
     // Handle category selection
     const handleCategorySelect = (categoryId: number) => {
@@ -225,6 +231,7 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                         <div className="flex flex-col sm:flex-row gap-4 pt-5">
                                             <div className="flex-1 flex items-center p-4 rounded-lg">
                                                 <Switch
+                                                    disabled={true}
                                                     id="is_published"
                                                     checked={data.is_published}
                                                     onCheckedChange={(checked) => setData("is_published", checked)}
@@ -260,7 +267,10 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                         <div className="hidden lg:block w-72 mt-5">
                             <div className="top-4">
                                 <div className="mb-6">
-                                    <div id="search-container" />
+                                    <SearchInput
+                                        placeholder="Tìm kiếm..."
+                                        onSearch={handleSearch}
+                                    />
                                 </div>
                                 <div className="hidden lg:block mt-5">
                                     <div className="top-4">

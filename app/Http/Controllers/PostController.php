@@ -19,6 +19,7 @@ class PostController extends Controller
         $sort = $request->input('sort', 'latest');
 
         $posts = Post::getPosts($search, 6, $sort);
+
         $totalComment = Post::withCount('comments')->count();
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')

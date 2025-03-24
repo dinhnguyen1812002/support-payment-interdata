@@ -1,136 +1,107 @@
-import React, { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
-import { Textarea } from "@/Components/ui/textarea";
-import { Button } from "@/Components/ui/button";
-import { Send, Image, Smile } from "lucide-react";
-import EmojiPicker from "emoji-picker-react";
-import useTypedPage from "@/Hooks/useTypedPage";
-import {getFirstTwoLetters} from "@/lib/utils";
-
+import React, { useState, useRef } from 'react';
+import { Textarea } from '@/Components/ui/textarea';
+import { Button } from '@/Components/ui/button';
+import { Send, Smile } from 'lucide-react';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/Components/ui/popover';
+import EmojiPicker from 'emoji-picker-react';
+import {useComments} from "@/Context/CommentsContext";
 
 
 interface CommentFormProps {
-    onSubmit: (content: string, parentId?: number, image?: File | null) => void;
+    onSubmit: (content: string) => void;
     placeholder?: string;
+    buttonText?: string;
     autoFocus?: boolean;
 }
 
 const CommentForm: React.FC<CommentFormProps> = ({
                                                      onSubmit,
-
-                                                     placeholder = "Your reply here",
+                                                     placeholder = "Write your comment here...",
+                                                     buttonText = "Submit",
                                                      autoFocus = false,
                                                  }) => {
     const [comment, setComment] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const [selectedImage, setSelectedImage] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const page = useTypedPage();
+    const { isLoading, setIsLoading } = useComments();
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
     // Handle Emoji Selection
     const handleEmojiClick = (emojiObject: any) => {
         setComment((prev) => prev + emojiObject.emoji);
         setShowEmojiPicker(false);
-    };
-    const name= getFirstTwoLetters(page.props.auth.user!.name);
-    // Handle Image Selection
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setSelectedImage(file);
-            setImagePreview(URL.createObjectURL(file));
+        // Focus back on textarea after emoji selection
+        if (textareaRef.current) {
+            textareaRef.current.focus();
         }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!comment.trim() && !selectedImage) return;
+        if (!comment.trim() || isLoading) return;
 
-        // Pass content and image to the parent onSubmit
-        onSubmit(comment, undefined, selectedImage);
-
+        setIsLoading(true);
+        onSubmit(comment);
         setComment("");
-        setSelectedImage(null);
-        setImagePreview(null);
+        setIsLoading(false);
     };
 
     return (
-        <form onSubmit={handleSubmit} className=" space-y-4">
-            <div className="flex items-start gap-4">
-                {/* Avatar */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex flex-col space-y-2 relative">
+                <Textarea
+                    ref={textareaRef}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder={placeholder}
+                    autoFocus={autoFocus}
+                    className="min-h-24 resize-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100"
+                    disabled={isLoading}
+                />
 
-                {/* Comment Input Area */}
-                <div className=" flex-1 space-y-2 relative">
-                    <Textarea
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        placeholder={placeholder}
-                        autoFocus={autoFocus}
-                        className="min-h-[150px] resize-none "
-                    />
-
-                    {/* Emoji Picker */}
-                    {showEmojiPicker && (
-                        <div className="absolute z-10 bottom-full left-0 mb-2">
-                            <EmojiPicker
-                                onEmojiClick={handleEmojiClick}
-
-                            />
-                        </div>
-                    )}
-
-                    {/* Image Preview */}
-                    {imagePreview && (
-                        <div className="mt-2 relative">
-                            <img
-                                src={imagePreview}
-                                alt="Preview"
-                                className="w-32 h-32 object-cover rounded-md"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setSelectedImage(null);
-                                    setImagePreview(null);
-                                }}
-                                className="absolute top-1 right-1 bg-red-500 text-white text-xs p-1 rounded-full"
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                                >
+                                    <Smile className="w-5 h-5" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent
+                                className="p-0 border-none w-auto"
+                                side="top"
+                                sideOffset={5}
                             >
-                                ✕
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            {/* Emoji Button */}
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setShowEmojiPicker((prev) => !prev)}
-                            >
-                                <Smile className="w-5 h-5" />
-                            </Button>
-
-                            {/* Image Upload Button */}
-                            {/* <label htmlFor="image-upload" className="cursor-pointer">
-                                <Image className="w-5 h-5" />
-                                <input
-                                    type="file"
-                                    id="image-upload"
-                                    accept="image/*"
-                                    className="hidden"
-                                    onChange={handleImageChange}
-                                />
-                            </label> */}
-                        </div>
-
-                        {/* Submit Button */}
-                        <Button type="submit" disabled={!comment.trim() && !selectedImage} className="bg-blue-600 hover:bg-blue-700">
-                            <Send className="w-4 h-4 mr-2" />
-                            Post
-                        </Button>
+                                <EmojiPicker onEmojiClick={handleEmojiClick} />
+                            </PopoverContent>
+                        </Popover>
                     </div>
+
+                    <Button
+                        type="submit"
+                        disabled={!comment.trim() || isLoading}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                        {isLoading ? (
+                            <div className="flex items-center space-x-2">
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                <span>Posting...</span>
+                            </div>
+                        ) : (
+                            <>
+                                <Send className="w-4 h-4 mr-2" />
+                                {buttonText}
+                            </>
+                        )}
+                    </Button>
                 </div>
             </div>
         </form>

@@ -6,6 +6,7 @@ use App\Models\Post;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class NewPostNotification extends Notification implements ShouldBroadcast
@@ -21,7 +22,17 @@ class NewPostNotification extends Notification implements ShouldBroadcast
 
     public function via($notifiable)
     {
-        return ['database', 'broadcast'];
+        return ['mail', 'database', 'broadcast']; // Thêm 'mail'
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->subject("Câu hỏi mới: {$this->post->title}")
+            ->line("Có một câu hỏi mới từ {$this->post->user->name}:")
+            ->line($this->post->title)
+            ->action('Xem bài viết', url('/posts/'.$this->post->slug))
+            ->line('Cảm ơn bạn đã theo dõi!');
     }
 
     public function toArray($notifiable)
@@ -29,14 +40,12 @@ class NewPostNotification extends Notification implements ShouldBroadcast
         return [
             'post_id' => $this->post->id,
             'title' => $this->post->title,
-            'message' => "Bài viết mới: {$this->post->title}",
+            'message' => "New Question : {$this->post->title}",
             'slug' => $this->post->slug,
-            'user' => [
-                'name' => $this->post->user->name,
-                'profile_photo_url' => $this->post->user->profile_photo_path
-                    ? asset('storage/'.$this->post->user->profile_photo_path)
-                    : 'https://ui-avatars.com/api/?name='.urlencode($this->post->user->name).'&color=7F9CF5&background=EBF4FF',
-            ],
+            'name' => $this->post->user->name,
+            'profile_photo_url' => $this->post->user->profile_photo_path
+                ? asset('storage/'.$this->post->user->profile_photo_path)
+                : 'https://ui-avatars.com/api/?name='.urlencode($this->post->user->name).'&color=7F9CF5&background=EBF4FF',
             'categories' => $this->post->categories->pluck('name')->toArray(),
         ];
     }

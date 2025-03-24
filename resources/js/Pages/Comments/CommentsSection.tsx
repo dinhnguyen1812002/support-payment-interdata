@@ -1,58 +1,31 @@
-import React, { useState, useEffect } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
-import CommentForm from "@/Pages/Comments/CommentForm";
-import CommentItem from "@/Pages/Comments/CommentItem";
-import useTypedPage from "@/Hooks/useTypedPage";
-import { getFirstTwoLetters } from "@/lib/utils";
-import { User } from "@/types";
+import React, { useEffect } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
-interface Comment {
-    id: number;
-    user: User;
-    comment: string;
-    created_at: string;
-    parent_id?: number | null;
-    replies?: Comment[];
-}
+
+
+import { Loader2 } from 'lucide-react';
+import {CommentsProvider, useComments} from '@/Context/CommentsContext';
+
+import {CommentsResponse, Comment, User} from "@/types/CommentTypes";
+import CommentList from "@/Pages/Comments/CommentList";
+import CommentForm from "@/Pages/Comments/CommentForm";
 
 interface CommentsSectionProps {
-    initialComments: { data: Comment[], next_page_url: string | null };
+    initialComments: CommentsResponse;
     onCommentSubmit: (content: string, parentId?: number) => void;
-    currentUserAvatar: string;
+    postId: string;
+    currentUser: User | null;
 }
 
-const CommentsSection = ({ initialComments, onCommentSubmit, currentUserAvatar }: CommentsSectionProps) => {
-    const [comments, setComments] = useState<Comment[]>(initialComments.data);
-    const [nextPage, setNextPage] = useState<string | null>(initialComments.next_page_url);
-    const page = useTypedPage();
-    const user = page.props.auth.user;
-    const name = user ? getFirstTwoLetters(user.name) : "";
-    let commentCount = comments.length;
-    // Thêm bình luận mới vào danh sách
-    const addNewComment = (newComment: Comment) => {
-        if (newComment.parent_id) {
-            setComments(prevComments =>
-                prevComments.map(comment => {
-                    if (comment.id === newComment.parent_id) {
-                        return {
-                            ...comment,
-                            replies: [...(comment.replies || []), newComment],
-                        };
-                    }
-                    return comment;
-                })
-            );
-        } else {
-            setComments(prevComments => [{ ...newComment, replies: [] }, ...prevComments]);
-        }
-    };
+const CommentsContent: React.FC<Omit<CommentsSectionProps, 'initialComments'>> = ({
+                                                                                      onCommentSubmit,
+                                                                                      postId,
+                                                                                      currentUser
+                                                                                  }) => {
+    const { comments, nextPage, setComments, setNextPage, isLoading, addComment } = useComments();
 
-    
-
-    // Fetch thêm comment khi cuộn xuống
     const fetchMoreComments = async () => {
-        if (!nextPage) return;
+        if (!nextPage || isLoading) return;
 
         try {
             const response = await fetch(nextPage);
@@ -65,46 +38,80 @@ const CommentsSection = ({ initialComments, onCommentSubmit, currentUserAvatar }
         }
     };
 
+    // Listen for real-time comments via Laravel Echo
+    useEffect(() => {
+        if (!window.Echo) return;
+
+        const channel = window.Echo.channel(`post.${postId}.comments`);
+
+        channel.listen('.NewCommentPosted', (event: { comment: Comment }) => {
+            setComments(prevComments => {
+                if (!prevComments.some(comment => comment.id === event.comment.id)) {
+                    addComment(event.comment);
+                }
+                return prevComments;
+            });
+        });
+
+        return () => {
+            channel.stopListening('.NewCommentPosted');
+            window.Echo.leaveChannel(`post.${postId}.comments`);
+        };
+    }, [postId, setComments]);
+
+    const commentCount = comments.length;
+
     return (
-        <div className="w-full">
+        <div className="w-full space-y-6">
+            {currentUser ? (
+                <CommentForm onSubmit={content => onCommentSubmit(content)} />
+            ) : (
+                <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-center">
+                    <p className="text-gray-700 dark:text-gray-300">Sign in to leave a comment</p>
+                </div>
+            )}
 
-            <div className="space-y-6">
-                {user ? (
-                    <CommentForm
-                        onSubmit={content => onCommentSubmit(content)}
-
-                    />
-                ) : (
-                    <p>Đăng nhập để bình luận</p>
-                )}
-                <h2  className=" text-2xl font-bold text-gray-900 mb-10 hover:text-gray-700 dark:text-[#F5F5F5]">
-                    Replies
-                    <small className="text-mutedText text-base font-semibold ml-1">({commentCount})</small>
+            <div className="flex items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    Comments
                 </h2>
+                <span className="ml-2 text-base font-semibold text-gray-500 dark:text-gray-400">
+          ({commentCount})
+        </span>
+            </div>
+
+            {commentCount === 0 ? (
+                <div className="py-8 text-center">
+                    <p className="text-gray-500 dark:text-gray-400">Be the first to comment!</p>
+                </div>
+            ) : (
                 <InfiniteScroll
                     dataLength={comments.length}
                     next={fetchMoreComments}
                     hasMore={!!nextPage}
-                    loader={<p>Đang tải thêm bình luận...</p>}
-
+                    loader={
+                        <div className="py-4 flex justify-center">
+                            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                        </div>
+                    }
+                    endMessage={
+                        <div className="py-4 text-center text-gray-500 dark:text-gray-400 text-sm">
+                            No more comments to load
+                        </div>
+                    }
                 >
-                    <div className="space-y-6">
-                        {comments.map(comment => (
-                            <CommentItem
-                                key={comment.id}
-                                comment={comment}
-                                onReply={onCommentSubmit}
-                                currentUserAvatar={
-                                    comment.user.profile_photo_path
-                                        ? `/storage/${comment.user.profile_photo_path}`
-                                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user.name)}&color=7F9CF5&background=EBF4FF`
-                                }
-                            />
-                        ))}
-                    </div>
+                    <CommentList comments={comments} onReply={onCommentSubmit} currentUser={currentUser} />
                 </InfiniteScroll>
-            </div>
+            )}
         </div>
+    );
+};
+
+const CommentsSection: React.FC<CommentsSectionProps> = ({ initialComments, ...props }) => {
+    return (
+        <CommentsProvider initialComments={initialComments}>
+            <CommentsContent {...props} />
+        </CommentsProvider>
     );
 };
 

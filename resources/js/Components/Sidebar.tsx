@@ -58,7 +58,7 @@ const CategoryList: React.FC<{ title: string; categories: Category[] }> = ({ tit
     return (
         <div className="mt-5">
             <div className="px-4 sm:px-5">
-                <p className="w-full text-xs font-bold text-mutedText dark:text-[#636674]">
+                <p className="w-full text-[0.8rem]  font-bold text-mutedText dark:text-[#636674]">
                     {uppercaseText(title)}
                 </p>
             </div>
@@ -75,7 +75,8 @@ const CategoryList: React.FC<{ title: string; categories: Category[] }> = ({ tit
                         >
                             <Link
                                 href={link}
-                                className="flex justify-between items-center w-full text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-blue-600 py-1 sm:py-2"
+                                className="flex justify-between items-center w-full text-sm
+                                text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-blue-600 py-1 sm:py-2"
                                 onClick={() => setActiveLink(link)} // Cập nhật active khi click
                             >
                                 <span className={`text-sm dark:text-[#9a9cae] hover:text-blue-600 font-bold ${
@@ -103,7 +104,7 @@ const Sidebar: React.FC<Props> = () => {
     const [publicCategories, setPublicCategories] = useState<Category[]>([
         { id: 1, title: "All Question", number: 0 },
 
-        { id: 2, title: "search", number: null },
+        { id: 2, title: "Search", number: null },
         { id:3, title: "Ask Question", number: null }
     ]);
 
@@ -141,7 +142,7 @@ const Sidebar: React.FC<Props> = () => {
     return (
         <>
                 <CategoryList title="Public" categories={publicCategories} />
-                {/*<CategoryList title="My Activity" categories={listActivity} />*/}
+                <CategoryList title="My Activity" categories={listActivity} />
                 <CategoriesSidebar />
 
         </>

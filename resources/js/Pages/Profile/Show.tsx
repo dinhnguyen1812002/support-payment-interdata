@@ -335,7 +335,7 @@ const ProfilePage = ({
                     style={isMobile ? { transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)' } : {}}
                 >
                     <div className="px-4 sm:px-5 py-4">
-                        <p className="w-full text-xs font-bold text-mutedText dark:text-[#636674]">
+                        <p className="w-full text-[0.8rem] font-bold text-mutedText dark:text-[#636674]">
                             {uppercaseText("dashboard")}
                         </p>
                     </div>
@@ -376,19 +376,19 @@ const ProfilePage = ({
                     isMobile ? "pt-0" : ""
                 )}>
                     {sidebarItems.map((item) => (
-                        <Card
+                        <div
                             key={item.id}
                             id={item.id}
-                            className="p-4 border rounded-lg"
+                            className="p-4 border rounded-lg border-none"
                         >
                             <CardHeader>
                                 <CardTitle>{item.title}</CardTitle>
                             </CardHeader>
                             <CardContent>{item.component}</CardContent>
-                        </Card>
+                        </div>
                     ))}
                     {page.props.jetstream.hasAccountDeletionFeatures && (
-                        <Card
+                        <div
                             id="delete-account"
                             className="p-4 border rounded-lg"
                         >
@@ -398,7 +398,7 @@ const ProfilePage = ({
                             <CardContent>
                                 <DeleteUserForm />
                             </CardContent>
-                        </Card>
+                        </div>
                     )}
                 </div>
             </div>

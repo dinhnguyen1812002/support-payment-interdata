@@ -11,6 +11,7 @@ import LatestPost from "@/Pages/Posts/LatestPost";
 import LatestPosts from "@/Pages/Posts/LatestPost";
 import Activity from "@/Components/Activity";
 import Sidebar from "@/Components/Sidebar";
+import SearchInput from "@/Components/search-input";
 
 
 
@@ -22,6 +23,11 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
                                               notifications,
                                           }) => {
     const title = "Support AutoPay";
+    const handleSearch = (value: string) => {
+        if (value.trim()) {
+            router.get("/posts/search", { search: value, page: 1 });
+        }
+    };
 
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
@@ -45,7 +51,10 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
                             <div className="hidden lg:block w-72 mt-5">
                                 <div className="top-4">
                                     <div className="mb-6">
-                                        <div id="search-container"/>
+                                        <SearchInput
+                                            placeholder="Tìm kiếm..."
+                                            onSearch={handleSearch}
+                                        />
                                     </div>
                                     <div className="hidden lg:block mt-5">
                                         <div className="top-4">

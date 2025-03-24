@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\NewCommentPosted;
 use App\Models\Comments;
 use App\Models\Post;
+use App\Notifications\NewCommentNotification;
 use App\Notifications\NewQuestionOrAnswerNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -45,9 +46,13 @@ class CommentsController extends Controller
             'user_id' => auth()->id(),
             'parent_id' => $validated['parent_id'],
         ]);
-
+        $comment->load('user');
         // Broadcast the event
-        event(new NewCommentPosted($comment));
+        $postOwner = $comment->post->user;
+        if ($postOwner->id !== auth()->id()) {
+            $postOwner->notify(new NewCommentNotification($comment));
+        }
+        broadcast(new NewCommentPosted($comment))->toOthers();
 
         return back()->with('success', 'Comment added successfully!');
     }
@@ -96,7 +101,6 @@ class CommentsController extends Controller
             ->with(['user', 'replies.user'])
             ->latest()
             ->paginate(5); // Sử dụng paginate()
-        event(new NewCommentPosted($comment));
 
         return Inertia::render('Posts/PostDetail', [
             'post' => $post,

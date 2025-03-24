@@ -89,7 +89,7 @@ const CategoriesSidebar: React.FC<Props> = ({
         <div className={`mt-5 ${className}`}>
             {/* Header */}
             <div className="px-4 sm:px-5">
-                <p className="w-full text-xs font-bold text-mutedText dark:text-[#636674]">
+                <p className="w-full text-[0.8rem] font-bold text-mutedText dark:text-[#636674]">
                     {uppercaseText("categories")}
                 </p>
 

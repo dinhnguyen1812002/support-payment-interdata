@@ -1,5 +1,5 @@
 import React, { useState, useRef, forwardRef } from 'react';
-import { useForm } from '@inertiajs/react';
+import {router, useForm} from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 
 import 'react-quill/dist/quill.snow.css';
@@ -20,6 +20,7 @@ import SearchComponent from '@/Components/Search';
 import Sidebar from '@/Components/Sidebar';
 import QuillEditor from "@/Components/QuillEditor";
 import ReactQuill from "react-quill";
+import SearchInput from "@/Components/search-input";
 
 interface CreatePostProps {
   categories: Category[];
@@ -41,7 +42,7 @@ const CreatePost = (
   const { data, setData, post, processing, errors, reset } = useForm({
     title: '',
     content: '',
-    is_published: true,
+    is_published: false,
     categories: [] as number[],
   });
 
@@ -83,6 +84,11 @@ const CreatePost = (
       category.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
       !data.categories.includes(category.id),
   );
+    const handleSearch = (value: string) => {
+        if (value.trim()) {
+            router.get("/posts/search", { search: value, page: 1 });
+        }
+    };
   const title = 'Ask Question';
   return (
     <AppLayout
@@ -237,6 +243,7 @@ const CreatePost = (
                       <div className="flex flex-col sm:flex-row gap-4 pt-5">
                         <div className="flex-1 flex items-center p-4 rounded-lg">
                           <Switch
+                              disabled={true}
                             id="is_published"
                             checked={data.is_published}
                             onCheckedChange={checked =>
@@ -275,7 +282,10 @@ const CreatePost = (
               <div className="hidden lg:block w-72 mt-5">
                 <div className="top-4">
                   <div className="mb-6">
-                    <div id="search-container" />
+                      <SearchInput
+                          placeholder="Tìm kiếm..."
+                          onSearch={handleSearch}
+                      />
                   </div>
                   <div className="hidden lg:block mt-5">
                     <div className="top-4">

@@ -41,10 +41,12 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
                                                              children,
                                                              pagination = null,
                                                          }) => {
-    const [searchTerm, setSearchTerm] = useState<string>(initialSearch);
+    const { url } = usePage<{ url: string }>();
+    const params = new URLSearchParams(url.split("?")[1]);
+    const initialSearchFromURL = params.get("search") || "";
+    const [searchTerm, setSearchTerm] = useState<string>(initialSearchFromURL);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const debouncedSearch = useDebounce(searchTerm, 300);
-    const { url } = usePage<{ url: string }>();
 
     useEffect(() => {
         if (debouncedSearch !== initialSearch) {
@@ -92,8 +94,6 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
                         <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
                     </div>
                 )}
-
-                {/* Content */}
 
                  {children}
             </div>
