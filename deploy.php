@@ -9,7 +9,7 @@ set('repository', 'https://github.com/dinhnguyen1812002/support-payment-interdat
 set('php_fpm_version', '8.3');
 
 host('103.20.96.236')
-    ->set('remote_user', 'root')
+    ->set('remote_user', 'deployer')
     ->set('deploy_path', '~/var/www/support-ticket')
     ->set('ssh_multiplexing', false)
     ->set('timeout', 300)

@@ -284,7 +284,7 @@ class PostController extends Controller
 
     public function getCountPost()
     {
-        $post = Post::count();
+        $post = Post::where("is_published", true)->count();
 
         return response()->json($post);
     }
