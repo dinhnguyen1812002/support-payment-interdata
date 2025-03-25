@@ -1,5 +1,4 @@
 <?php
-
 namespace Deployer;
 
 require 'recipe/laravel.php';
@@ -17,7 +16,9 @@ host('103.20.96.236')
 
 desc('Build the assets');
 task('build', function () {
-    run('cd {{release_path}} && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && nvm use node && npm ci && npm run build || echo "Build failed"');
+    run('cd {{release_path}} && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && nvm install 18 && nvm use 18');
+    run('cd {{release_path}} && npm ci');
+    run('cd {{release_path}} && npm run build');
 });
 
 desc('Fix permissions');

@@ -22,5 +22,5 @@
   <body class="font-sans antialiased dark:bg-[#0F1014] ">
     @inertia
   </body>
-
+  <script type="module" src="/@vite/client"></script>
 </html>
