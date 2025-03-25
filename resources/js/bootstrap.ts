@@ -27,6 +27,11 @@ import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
+const pusher = new Pusher(import.meta.env.PUSHER_APP_KEY, {
+    cluster : "api1",
+    forceTLS: true
+})
+
 window.Echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
