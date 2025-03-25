@@ -31,6 +31,12 @@ const pusher = new Pusher(import.meta.env.PUSHER_APP_KEY, {
     cluster : "api1",
     forceTLS: true
 })
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: import.meta.env.VITE_PUSHER_APP_KEY,
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+    forceTLS: true
+});
 
 window.Echo = new Echo({
     broadcaster: 'reverb',
