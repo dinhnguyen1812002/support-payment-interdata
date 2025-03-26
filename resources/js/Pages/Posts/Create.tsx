@@ -38,7 +38,7 @@ const CreatePost = (
   const [searchTerm, setSearchTerm] = useState('');
     const quillRef = useRef<ReactQuill>(null);
 
-
+const ref = useRef();
   const { data, setData, post, processing, errors, reset } = useForm({
     title: '',
     content: '',

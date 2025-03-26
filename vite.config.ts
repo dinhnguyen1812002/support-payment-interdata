@@ -11,9 +11,9 @@ export default defineConfig({
 
       react(),
   ],
-    build: {
-        outDir: 'public/build',
-    },
+    // build: {
+    //     outDir: 'public/build',
+    // },
   resolve: {
     alias: {
       '@': '/resources/js',

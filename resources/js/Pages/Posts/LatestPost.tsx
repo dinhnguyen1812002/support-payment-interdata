@@ -38,47 +38,46 @@ const PopularQuestions: React.FC = () => {
       <CardContent className="p-0">
         <div className="space-y-1">
           {questions.map((question) => (
-            <a
-              key={question.id}
-              href={`/posts/${question.slug}`}
-              className={cn(
-                "flex items-start gap-3 p-3 rounded-lg",
-                "text-customBlue dark:text-blue-300",
-                "font-semibold text-base",
-                "hover:text-blue-600 dark:hover:text-blue-400",
-                "group transition-colors duration-200",
-              )}
-            >
-              <button
-                className={cn(
-                  "flex items-center justify-center",
-                  "w-5 h-5 rounded-lg",
-                  "bg-gray-300 dark:bg-gray-600",
-                  "group-hover:bg-blue-100 dark:group-hover:bg-blue-700",
-                  "transition-colors duration-200",
-                )}
-              >
-                <ChevronRight
+              <a
+                  key={question.id}
+                  href={`/posts/${question.slug}`}
                   className={cn(
-                    "w-3 h-3",
-                    "text-[#071437] dark:text-gray-300",
-                    "group-hover:text-blue-600 dark:group-hover:text-blue-300",
-                    "transition-colors duration-200",
+                      "flex items-start gap-3 p-3 rounded-lg",
+                      "text-mutedText dark:text-blue-300",
+                      "font-semibold text-base",
+                      "hover:text-blue-600 dark:hover:text-blue-400",
+                      "group transition-colors duration-200"
                   )}
-                />
-              </button>
-
-              <span
-                className={cn(
-                  "text-[#516A8B] dark:text-gray-300",
-                  "font-medium leading-5 flex-1",
-                  "group-hover:text-blue-600 dark:group-hover:text-blue-400",
-                  "transition-colors duration-200",
-                )}
               >
-                {question.title}
-              </span>
-            </a>
+                  <button
+                      className={cn(
+                          "flex items-center justify-center self-start", // Thêm self-start để luôn ở đầu
+                          "w-5 h-5 rounded-sm",
+                          "bg-gray-300 dark:bg-gray-600",
+                          "transition-colors duration-200"
+                      )}
+                  >
+                      <ChevronRight
+                          className={cn(
+                              "w-3 h-3",
+                              "text-[#071437] dark:text-gray-300",
+                              "transition-colors duration-200"
+                          )}
+                      />
+                  </button>
+
+                  <span
+                      className={cn(
+                          "text-[#071437] dark:text-gray-300",
+                          "font-medium leading-5 flex-1",
+                          "group-hover:text-blue-600 dark:group-hover:text-blue-400",
+                          "transition-colors duration-200"
+                      )}
+                  >
+                    {question.title}
+                  </span>
+              </a>
+
           ))}
         </div>
       </CardContent>

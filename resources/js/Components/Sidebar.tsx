@@ -68,7 +68,7 @@ const CategoryList: React.FC<{ title: string; categories: Category[] }> = ({ tit
                         <Button
                             key={id}
                             variant="ghost"
-                            className={`w-full justify-between hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-2 h-auto text-sm ${
+                            className={`w-full justify-between hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-2 h-auto text-sm pt-6 mb-1 ${
                                 isActive ? "border-l-4 bg-gray-100 dark:bg-gray-800 border-l-blue-600" : "border-l-2 border-transparent"
                             }`}
                             asChild

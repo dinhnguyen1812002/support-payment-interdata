@@ -73,10 +73,10 @@ export default function AppLayout({
       <div>
         <nav className="sticky top-0 z-10 text-black bg-white border-b  dark:bg-[#0D0E12] dark:text-gray-200">
           {/* <!-- Primary Navigation Menu --> */}
-          <div className="max-w-[1354px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1354px] mx-auto px-4 sm:px-6 lg:px-3">
             <div className="flex justify-between h-16 md:h-20 lg:h-24">
               <div className="flex items-center">
-                <div className="flex items-center shrink-0 flex-1 mr-11">
+                <div className="flex items-center shrink-0 flex-1 mr-14">
                   {/* Logo */}
                   <Link href={route('/')}>
                     <img

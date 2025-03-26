@@ -284,7 +284,7 @@ class PostController extends Controller
 
     public function getCountPost()
     {
-        $post = Post::where("is_published", true)->count();
+        $post = Post::where('is_published', true)->count();
 
         return response()->json($post);
     }
@@ -315,6 +315,42 @@ class PostController extends Controller
                     ],
                 ];
             }),
+        ]);
+    }
+
+    public function globleSearch(Request $request)
+    {
+        // Validate the search query
+        $request->validate([
+            'query' => 'nullable|string|max:255',
+        ]);
+
+        // If no query, return empty results
+        if (! $request->filled('query')) {
+            return response()->json([
+                'results' => [],
+                'total' => 0,
+            ]);
+        }
+
+        // Perform search across multiple fields
+        $query = $request->input('query');
+        $results = Post::where('title', 'like', "%{$query}%")
+            ->orWhere('content', 'like', "%{$query}%")
+            ->limit(10) // Limit to 10 results
+            ->get()
+            ->map(function ($post) {
+                return [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'excerpt' => \Str::limit($post->content, 100),
+                    'url' => route('posts.show', $post->slug),
+                ];
+            });
+
+        return response()->json([
+            'results' => $results,
+            'total' => $results->count(),
         ]);
     }
 }
