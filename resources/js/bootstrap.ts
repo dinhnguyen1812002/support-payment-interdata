@@ -30,14 +30,13 @@ window.Pusher = Pusher;
 const pusher = new Pusher('dc6075fd63be4fdb6d63', {
     cluster: 'ap1',
 });
-console.log(import.meta.env.VITE_PUSHER_APP_KEY as string)
+
 window.Echo = new Echo({
     broadcaster: 'pusher',
     key: import.meta.env.VITE_PUSHER_APP_KEY,
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     forceTLS: true
 });
-console.log(import.meta.env.VITE_REVERB_APP_KEY as string)
 window.Echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,

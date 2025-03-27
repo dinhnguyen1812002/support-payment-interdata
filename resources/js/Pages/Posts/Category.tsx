@@ -27,7 +27,7 @@ const PostsIndex: React.FC<Props & { category?: Category }> = ({
     category
 }) => {
 
-    
+
     // Lấy danh mục hiện tại từ props (nếu có)
     const categoryTitle = category ? category.title : "All Categories";
 
@@ -36,15 +36,16 @@ const PostsIndex: React.FC<Props & { category?: Category }> = ({
 
     let postCount = posts.length;
     return (
-        <MainLayout posts={posts} categories={categories} pagination={pagination} 
+        <MainLayout posts={posts} categories={categories} pagination={pagination}
         postCount={postCount} keyword={keyword} notifications={notifications} category={category}>
 
             {/* Posts Content */}
-            <div className="flex-1 max-w-5xl  mx-auto mt-7 px-4 border-l pl-12">
-                {/* Sử dụng pl-6 để đẩy nội dung ra xa border-l */}
+            <div className="flex-1 w-full max-w-5xl mx-auto mt-4 sm:mt-5 md:mt-7 px-4 sm:px-6 md:px-4 dark:bg-[#0F1014] lg:border-l lg:pl-8 xl:pl-9">
+
                 <BlogCard posts={posts} postCount={postCount} />
+
                 {pagination && pagination.total > 0 && (
-                    <div className="mt-7 flex justify-center">
+                    <div className="mt-5 sm:mt-6 md:mt-7 flex justify-center">
                         <Pagination
                             current_page={pagination.current_page}
                             next_page_url={pagination.next_page_url}

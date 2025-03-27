@@ -5,46 +5,42 @@ namespace App\Http\Controllers\Search;
 use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class SearchController extends Controller
 {
-    public function search(Request $request)
+    public function globleSearch(Request $request)
     {
-        $query = $request->input('q', ''); // Từ khóa tìm kiếm
+        // Validate the search query
+        $request->validate([
+            'query' => 'nullable|string|max:255',
+        ]);
 
-        // Truy vấn các bài viết public khớp với từ khóa
-        $posts = Post::where('is_published', true)
-            ->where(function ($q) use ($query) {
-                $q->where('title', 'like', "%{$query}%")
-                    ->orWhere('content', 'like', "%{$query}%");
-            })
-            ->with('user') // Load thông tin user
-            ->withCount('comments') // Đếm số bình luận
-            ->withCount('upvotes') // Đếm số vote
-            ->limit(10) // Giới hạn 10 kết quả
+        // If no query, return empty results
+        if (! $request->filled('query')) {
+            return response()->json([
+                'results' => [],
+                'total' => 0,
+            ]);
+        }
+        // Perform search across multiple fields
+        $query = $request->input('query');
+        $results = Post::where('title', 'like', "%{$query}%")
+            ->orWhere('content', 'like', "%$query%")
+            ->limit(10)
             ->get()
             ->map(function ($post) {
                 return [
                     'id' => $post->id,
                     'title' => $post->title,
-                    'slug' => $post->slug,
-                    'content' => substr(strip_tags($post->content), 0, 100).'...',
-                    'user' => [
-                        'name' => $post->user->name,
-                        'profile_photo_path' => $post->user->profile_photo_path
-                            ? asset('storage/'.$post->user->profile_photo_path)
-                            : 'https://ui-avatars.com/api/?name='.urlencode($post->user->name).'&color=7F9CF5&background=EBF4FF',
-                    ],
-                    'upvotes_count' => $post->upvotes_count,
-                    'comments_count' => $post->comments_count,
+                    'excerpt' => \Str::limit($post->content, 100),
+                    'url' => route('posts.show', $post->slug),
+                    'create_at' => $post->created_at->toIso8601String(), // Chuyển đổi format date
                 ];
             });
 
-        // Trả về dữ liệu qua Inertia
-        return Inertia::render('Search/Results', [
-            'searchResults' => $posts,
-            'query' => $query,
+        return response()->json([
+            'results' => $results,
+            'total' => $results->count(),
         ]);
     }
 }

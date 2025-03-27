@@ -6,7 +6,6 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
-use App\Http\Controllers\Search\SearchController;
 use App\Http\Controllers\UpvoteController;
 use App\Models\Post;
 use Illuminate\Support\Facades\Route;
@@ -74,5 +73,3 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 Route::get('/user/profile', [\App\Http\Controllers\UserController::class, 'show'])
     ->name('profile.show')
     ->middleware(['auth', 'verified']);
-
-Route::get('/search', [SearchController::class, 'search'])->name('search.posts');

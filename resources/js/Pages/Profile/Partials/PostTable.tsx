@@ -64,8 +64,6 @@ export default function PostsTable({ posts, pagination, keyword }: PostsTablePro
             preserveState: true
         });
     };
-    console.log(posts);
-
 
     const handleDelete = (post: Post) => {
         setPostToDelete(post);

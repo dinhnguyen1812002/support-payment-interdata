@@ -1,14 +1,6 @@
 
 
-import  React from "react"
-import {
-    Calculator,
-    Calendar,
-    CreditCard,
-    Settings,
-    Smile,
-    User,
-} from "lucide-react"
+import React from "react"
 
 import {
     CommandDialog,
@@ -17,8 +9,6 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
-    CommandSeparator,
-    CommandShortcut,
 } from "@/Components/ui/command"
 
 export function CommandDialogDemo() {
@@ -36,52 +26,67 @@ export function CommandDialogDemo() {
         return () => document.removeEventListener("keydown", down)
     }, [])
 
+    // Sample data with title, content, and createdAt
+    const searchItems = [
+        {
+            title: "Getting Started Guide",
+            content: "Learn how to set up your new project with our framework",
+            createdAt: "2023-05-12T10:30:00Z",
+        },
+        {
+            title: "API Documentation",
+            content: "Complete reference for all available endpoints and parameters",
+            createdAt: "2023-06-24T14:15:00Z",
+        },
+        {
+            title: "User Management",
+            content: "How to handle user authentication and authorization",
+            createdAt: "2023-07-03T09:45:00Z",
+        },
+        {
+            title: "Performance Optimization",
+            content: "Tips and tricks to make your application faster",
+            createdAt: "2023-08-17T16:20:00Z",
+        },
+        {
+            title: "Deployment Guide",
+            content: "Step-by-step instructions for deploying to production",
+            createdAt: "2023-09-05T11:10:00Z",
+        },
+    ]
+
+    // Format date to a more readable format
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString)
+        return date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        })
+    }
+
     return (
         <>
-            <p className="text-sm text-muted-foreground">
-                Press{" "}
-                <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                    <span className="text-xs">⌘</span>J
-                </kbd>
-            </p>
             <CommandDialog open={open} onOpenChange={setOpen}>
-                <CommandInput placeholder="Type a command or search..." />
+                <CommandInput placeholder="Search documents..." className="border-none focus:ring-0" />
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
-                    <CommandGroup heading="Suggestions">
-                        <CommandItem>
-                            <Calendar />
-                            <span>Calendar</span>
-                        </CommandItem>
-                        <CommandItem>
-                            <Smile />
-                            <span>Search Emoji</span>
-                        </CommandItem>
-                        <CommandItem>
-                            <Calculator />
-                            <span>Calculator</span>
-                        </CommandItem>
-                    </CommandGroup>
-                    <CommandSeparator />
-                    <CommandGroup heading="Settings">
-                        <CommandItem>
-                            <User />
-                            <span>Profile</span>
-                            <CommandShortcut>⌘P</CommandShortcut>
-                        </CommandItem>
-                        <CommandItem>
-                            <CreditCard />
-                            <span>Billing</span>
-                            <CommandShortcut>⌘B</CommandShortcut>
-                        </CommandItem>
-                        <CommandItem>
-                            <Settings />
-                            <span>Settings</span>
-                            <CommandShortcut>⌘S</CommandShortcut>
-                        </CommandItem>
+                    <CommandGroup heading="Search Results">
+                        {searchItems.map((item, index) => (
+                            <CommandItem key={index} className="flex flex-col items-start py-3">
+                                <div className="flex flex-col w-full">
+                                    <div className="flex justify-between items-center w-full">
+                                        <span className="font-medium">{item.title}</span>
+                                        <span className="text-xs text-muted-foreground">{formatDate(item.createdAt)}</span>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{item.content}</p>
+                                </div>
+                            </CommandItem>
+                        ))}
                     </CommandGroup>
                 </CommandList>
             </CommandDialog>
         </>
     )
 }
+

@@ -107,7 +107,7 @@ const ref = useRef();
                 <Sidebar categories={[]} />
               </div>
               <div className="relative flex-1 max-w-5xl mx-auto px-0 pl-6 lg:pl-5 mt-0 lg:w-full">
-                <div className="hidden lg:block absolute top-4 left-0 w-[1px] h-[calc(100%-2rem)] bg-gray-300"></div>
+                <div className="hidden lg:block absolute top-4 left-0 w-[1px] h-[calc(100%-2rem)] border-l "></div>
                 <div className="">
                   <CardHeader>
                     <CardTitle className="text-2xl font-semibold">
@@ -133,7 +133,7 @@ const ref = useRef();
                           onChange={e => setData('title', e.target.value)}
                           placeholder="Your question title"
                           className={cn(
-                            'h-10 ',
+                            'h-10 dark:text-[#9a9cae]',
                             errors.title && 'ring-2 ring-red-500',
                           )}
                         />
@@ -153,21 +153,21 @@ const ref = useRef();
                           Question <span className="text-red-500">*</span>
                         </Label>
                         <div className="rounded-sm  ">
-                          <ReactQuill ref={quillRef}
-                            theme="snow"
-                            value={data.content}
-                            onChange={value => setData('content', value)}
-                            placeholder="Please specify your question "
-                            className="h-64 rounded-sm text-base font-bold  text-customBlue"
-                            modules={{
-                              toolbar: [
-                                ['bold', 'italic', 'underline'],
-                                [{ list: 'ordered' }, { list: 'bullet' }],
-                                ['link', 'image'],
-                                ['clean'],
-                              ],
-                            }}
-                          />
+                            <QuillEditor
+                                ref={quillRef}
+                                theme="snow"
+                                value={data.content}
+                                onChange={(value) => setData("content", value)}
+                                className="h-64 rounded-sm text-base font-bold  text-customBlue1 dark:text-[#9a9cae]"
+                                modules={{
+                                    toolbar: [
+                                        ['bold', 'italic', 'underline'],
+                                        [{'list': 'ordered' }, { 'list': 'bullet' }],
+                                        ['link', 'image'],
+                                        ['clean']
+                                    ]
+                                }}
+                            />
                         </div>
                         {errors.content && (
                           <p className="text-sm text-red-500 flex items-center">
@@ -181,7 +181,8 @@ const ref = useRef();
                         <Label className="text-base flex items-center mt-14  text-customBlue1 font-bold ">
                           Category <span className="text-red-500">*</span>
                           <span className="text-sm text-muted-foreground ml-2">
-                            ({data.categories.length}/3)
+                            {/*({data.categories.length}/3)*/}
+                              Please choose least one
                           </span>
                         </Label>
                         <div className="flex flex-wrap gap-2 mb-2">

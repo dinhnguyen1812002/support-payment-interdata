@@ -1,6 +1,6 @@
 
 
-import { useState } from "react"
+import {useEffect, useState } from "react"
 import { Bell, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/Components/ui/dropdown-menu"
@@ -14,6 +14,7 @@ import axios from "axios"
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar"
 import { Tabs, TabsList, TabsTrigger } from "@/Components/ui/tabs"
 import React from "react"
+import useTypedPage from "@/Hooks/useTypedPage";
 
 interface Notification {
     id: string
@@ -46,10 +47,29 @@ const NotificationsDropdown = ({
     const [localNotifications, setLocalNotifications] = useState(
         initialNotifications.map((notification) => ({
             ...notification,
-            // Determine notification type based on available properties
             type: notification.data.comment_id ? "comment" : notification.data.post_id ? "post" : "other",
         })),
     )
+    const  currentUserId = useTypedPage().props.auth?.user?.id;
+    useEffect(() => {
+        if (!window.Echo || !currentUserId) return;
+
+        const channel = window.Echo.private(`user.${currentUserId}`);
+        channel.listen('NewCommentNotification', (event:any) => {
+            setLocalNotifications(prev => {
+                if (!prev.some(n => n.id === event.id)) {
+                    return [event, ...prev];
+                }
+                return prev;
+            });
+        });
+
+        return () => {
+            channel.stopListening('NewCommentNotification');
+            window.Echo.leave(`user.${currentUserId}`);
+        };
+    }, [currentUserId]);
+
     const [isLoading, setIsLoading] = useState(false)
     const [isOpen, setIsOpen] = useState(false)
     const [activeTab, setActiveTab] = useState("all")

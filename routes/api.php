@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\Search\SearchController;
 use App\Http\Controllers\UserController;
 use App\Models\Post;
 use App\Models\User;
@@ -34,20 +35,22 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 Route::get('categories', [CategoryController::class, 'index']);
 
+Route::get('/global-search', [SearchController::class, 'globleSearch'])->name('search.posts');
+
 Route::get('count', [PostController::class, 'getCountPost']);
 Route::get('/top-voted-posts', [PostController::class, 'topVotedPosts']);
-Route::get('/test-notification', function () {
-    $user = User::find(1); // User ID cần tồn tại
-    $post = Post::find('01jnz291ec0j11gj752pgk2mc4'); // Post ID cần tồn tại
-
-    if (! $user || ! $post) {
-        return response()->json(['error' => 'User hoặc Post không tồn tại'], 404);
-    }
-
-    $user->notify(new NewPostNotification($post));
-
-    return response()->json(['message' => 'Thông báo đã được gửi!']);
-});
+// Route::get('/test-notification', function () {
+//    $user = User::find(1); // User ID cần tồn tại
+//    $post = Post::find('01jnz291ec0j11gj752pgk2mc4'); // Post ID cần tồn tại
+//
+//    if (! $user || ! $post) {
+//        return response()->json(['error' => 'User hoặc Post không tồn tại'], 404);
+//    }
+//
+//    $user->notify(new NewPostNotification($post));
+//
+//    return response()->json(['message' => 'Thông báo đã được gửi!']);
+// });
 
 Route::post('/users/assign-role', [UserController::class, 'assignRole'])
     ->middleware(['auth:sanctum', 'verified'])

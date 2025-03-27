@@ -38,7 +38,7 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
                     <SearchComponent initialSearch={keyword} route="/posts/search">
                         <div className="flex  gap-x-4 ">
                             {/* Left Sidebar */}
-                            <div className="hidden lg:block w-52 pr-2 ml-[-10px]  ">
+                            <div className="hidden lg:block lg:w-52 pr-2 ml-3 ">
                                 <Sidebar categories={[]} />
                             </div>
 

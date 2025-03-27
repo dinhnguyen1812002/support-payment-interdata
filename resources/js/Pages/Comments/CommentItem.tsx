@@ -109,10 +109,10 @@ const CommentItem: React.FC<CommentItemProps> = ({
                                                 Delete
                                             </DropdownMenuItem>
                                         )}
-                                        <DropdownMenuItem>
-                                            <Flag className="w-4 h-4 mr-2" />
-                                            Report
-                                        </DropdownMenuItem>
+                                        {/*<DropdownMenuItem>*/}
+                                        {/*    <Flag className="w-4 h-4 mr-2" />*/}
+                                        {/*    Report*/}
+                                        {/*</DropdownMenuItem>*/}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>

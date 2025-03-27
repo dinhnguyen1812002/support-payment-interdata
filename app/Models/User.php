@@ -69,4 +69,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comments::class);
     }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin'; // Giả sử cột 'role' trong bảng users
+    }
 }

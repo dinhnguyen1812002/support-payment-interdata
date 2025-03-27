@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Models\User;
 use App\Notifications\NewPostNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -181,10 +182,9 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
-        // Kiểm tra xem user có quyền xóa không
-        if ($post->user_id !== auth()->id()) {
-            return back()->with('error', 'Bạn không có quyền xóa bài viết này!');
-        }
+        //        if (! Gate::allows('delete', $post)) {
+        // //            return back()->with('error', 'Bạn không có quyền xóa bài viết này!');
+        // //        }
 
         $post->delete();
 
@@ -315,42 +315,6 @@ class PostController extends Controller
                     ],
                 ];
             }),
-        ]);
-    }
-
-    public function globleSearch(Request $request)
-    {
-        // Validate the search query
-        $request->validate([
-            'query' => 'nullable|string|max:255',
-        ]);
-
-        // If no query, return empty results
-        if (! $request->filled('query')) {
-            return response()->json([
-                'results' => [],
-                'total' => 0,
-            ]);
-        }
-
-        // Perform search across multiple fields
-        $query = $request->input('query');
-        $results = Post::where('title', 'like', "%{$query}%")
-            ->orWhere('content', 'like', "%{$query}%")
-            ->limit(10) // Limit to 10 results
-            ->get()
-            ->map(function ($post) {
-                return [
-                    'id' => $post->id,
-                    'title' => $post->title,
-                    'excerpt' => \Str::limit($post->content, 100),
-                    'url' => route('posts.show', $post->slug),
-                ];
-            });
-
-        return response()->json([
-            'results' => $results,
-            'total' => $results->count(),
         ]);
     }
 }

@@ -26,6 +26,10 @@ import ModeToggle from '@/Components/mode-toggle';
 
 import { Toaster } from '@/Components/ui/sonner';
 import { motion } from 'framer-motion';
+import {SearchCommandDialog} from "@/Components/command-dialog";
+import {CommandDialogDemo} from "@/Pages/Search/Results";
+import MobileSidebarToggle from "@/Components/toggle-side-bar";
+import MobileSidebar from "@/Components/MobileSidebar";
 
 interface Props {
   title: string;
@@ -47,7 +51,7 @@ export default function AppLayout({
   const route = useRoute();
   const [showingNavigationDropdown, setShowingNavigationDropdown] =
     useState(false);
-
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   function switchToTeam(e: React.FormEvent, team: Team) {
     e.preventDefault();
     router.put(
@@ -70,22 +74,34 @@ export default function AppLayout({
     <div>
       <Head title={title} />
 
+        <MobileSidebar
+            isMobileSidebarOpen={isMobileSidebarOpen}
+            setIsMobileSidebarOpen={setIsMobileSidebarOpen}
+        />
       <div>
         <nav className="sticky top-0 z-10 text-black bg-white border-b  dark:bg-[#0D0E12] dark:text-gray-200">
           {/* <!-- Primary Navigation Menu --> */}
           <div className="max-w-[1354px] mx-auto px-4 sm:px-6 lg:px-3">
             <div className="flex justify-between h-16 md:h-20 lg:h-24">
               <div className="flex items-center">
-                <div className="flex items-center shrink-0 flex-1 mr-14">
-                  {/* Logo */}
-                  <Link href={route('/')}>
-                    <img
-                      alt="logo"
-                      src="https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"
-                      className="block w-auto h-[24px] md:h-[28px] lg:h-[30px]"
-                    />
-                  </Link>
-                </div>
+                  <div className="flex items-center shrink-0 flex-1  mr-14 space-x-2 sm:space-x-4">
+                      {/* Nút mở Sidebar (Mobile) */}
+                      <div className="lg:hidden flex-shrink-0">
+                          <MobileSidebarToggle
+                              isMobileSidebarOpen={isMobileSidebarOpen}
+                              setIsMobileSidebarOpen={setIsMobileSidebarOpen}
+                          />
+                      </div>
+
+                      {/* Logo */}
+                      <Link href={route('/')}>
+                          <img
+                              alt="logo"
+                              src="https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"
+                              className="block w-auto h-[24px] md:h-[28px] lg:h-[30px] flex-shrink-0"
+                          />
+                      </Link>
+                  </div>
                 {/* Navigation Links */}
                 <div className="hidden ml-6 space-x-4 md:space-x-6 sm:flex">
                   <NavLink href={route('/')} active={route().current('/')}>
@@ -354,13 +370,14 @@ export default function AppLayout({
 
         {/* <!-- Page Content --> */}
         <main>
+
           <Toaster position="top-right" />
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {children}
+                  {children}
           </motion.div>
         </main>
 
