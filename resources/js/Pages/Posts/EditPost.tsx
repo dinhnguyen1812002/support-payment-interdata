@@ -231,7 +231,7 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                         <div className="flex flex-col sm:flex-row gap-4 pt-5">
                                             <div className="flex-1 flex items-center p-4 rounded-lg">
                                                 <Switch
-                                                    disabled={true}
+                                                    disabled={false}
                                                     id="is_published"
                                                     checked={data.is_published}
                                                     onCheckedChange={(checked) => setData("is_published", checked)}

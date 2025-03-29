@@ -243,8 +243,7 @@ const ref = useRef();
                       {/* Action Buttons */}
                       <div className="flex flex-col sm:flex-row gap-4 pt-5">
                         <div className="flex-1 flex items-center p-4 rounded-lg">
-                          <Switch
-                              disabled={true}
+                          <Switch disabled={false}
                             id="is_published"
                             checked={data.is_published}
                             onCheckedChange={checked =>

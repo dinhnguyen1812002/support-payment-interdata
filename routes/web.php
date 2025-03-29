@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Oauth\SocialAuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UpvoteController;
 use App\Models\Post;
@@ -73,3 +74,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 Route::get('/user/profile', [\App\Http\Controllers\UserController::class, 'show'])
     ->name('profile.show')
     ->middleware(['auth', 'verified']);
+
+Route::get('/auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
+
+Route::get('/auth/github', [SocialAuthController::class, 'redirectToGithub'])->name('auth.github');
+Route::get('/auth/github/callback', [SocialAuthController::class, 'handleGithubCallback']);
