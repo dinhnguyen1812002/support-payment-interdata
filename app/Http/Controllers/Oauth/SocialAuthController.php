@@ -34,7 +34,7 @@ class SocialAuthController extends Controller
                 Auth::login($user);
             }
 
-            return redirect('/dashboard');
+            return redirect('/');
         } catch (\Exception $e) {
             return redirect('/login')->with('error', 'Đăng nhập bằng Google thất bại.');
         }
@@ -66,7 +66,7 @@ class SocialAuthController extends Controller
                 Auth::login($user);
             }
 
-            return redirect('/dashboard');
+            return redirect('/');
         } catch (\Exception $e) {
             return redirect('/login')->with('error', 'Đăng nhập bằng GitHub thất bại.');
         }

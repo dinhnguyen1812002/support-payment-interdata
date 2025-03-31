@@ -43,7 +43,6 @@ export default function Login({ canResetPassword, status, notifications }: Props
         });
     }
 
-    // Function to open OAuth popup and handle postMessage
     const handleSocialLogin = (provider: 'google' | 'github') => {
         const width = 600;
         const height = 600;
@@ -62,17 +61,26 @@ export default function Login({ canResetPassword, status, notifications }: Props
 
             const { success, token, error } = event.data;
             if (success && token) {
-                // Handle successful login (e.g., redirect or set token)
                 console.log(`${provider} login successful, token:`, token);
-                window.location.href = '/dashboard'; // Redirect to dashboard
+                // Redirect to "/" after successful login
+                window.location.href = '/';
             } else if (error) {
                 console.error(`${provider} login failed:`, error);
+                // Optionally show an error message to the user
             }
-            popup?.close();
+            popup?.close(); // Ensure popup closes even on error
             window.removeEventListener('message', handleMessage);
         };
 
         window.addEventListener('message', handleMessage);
+
+        // Cleanup listener if popup is closed manually
+        const checkPopupClosed = setInterval(() => {
+            if (popup?.closed) {
+                clearInterval(checkPopupClosed);
+                window.removeEventListener('message', handleMessage);
+            }
+        }, 500);
     };
 
     return (
