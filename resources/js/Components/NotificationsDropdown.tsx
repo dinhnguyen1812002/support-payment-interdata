@@ -1,120 +1,144 @@
-
-
-import {useEffect, useState } from "react"
-import { Bell, Loader2 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/Components/ui/dropdown-menu"
-import { Badge } from "@/Components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card"
-import { Button } from "@/Components/ui/button"
-import { ScrollArea } from "@/Components/ui/scroll-area"
-import { format } from "date-fns"
-import { vi } from "date-fns/locale"
-import axios from "axios"
-import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar"
-import { Tabs, TabsList, TabsTrigger } from "@/Components/ui/tabs"
-import React from "react"
+import { useEffect, useState } from "react";
+import { Bell, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/Components/ui/dropdown-menu";
+import { Badge } from "@/Components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Button } from "@/Components/ui/button";
+import { ScrollArea } from "@/Components/ui/scroll-area";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
+import axios from "axios";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
+import { Tabs, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import useTypedPage from "@/Hooks/useTypedPage";
+import React from "react";
+import {Link} from "@inertiajs/react";
 
 interface Notification {
-    id: string
+    id: string;
     data: {
-        post_id?: number
-        title?: string
-        message: string
-        slug?: string
-        name?: string
-        profile_photo_url?: string
-        categories?: string[]
-        comment_id?: string
-    }
-    read_at: string | null
-    created_at: string
-    type?: "post" | "comment" | "other"
+        post_id?: number;
+        title?: string;
+        message: string;
+        slug?: string;
+        name?: string;
+        profile_photo_url?: string;
+        categories?: string[];
+        comment_id?: string;
+    };
+    read_at: string | null;
+    created_at: string;
+    type?: "post" | "comment" | "other";
 }
 
 interface NotificationsDropdownProps {
-    notifications: Notification[]
-    className?: string
-    maxHeight?: number
+    notifications: Notification[];
+    className?: string;
+    maxHeight?: number;
 }
 
 const NotificationsDropdown = ({
-                                   notifications: initialNotifications,
+                                   notifications: initialNotifications = [],
                                    className,
                                    maxHeight = 400,
                                }: NotificationsDropdownProps) => {
-    const [localNotifications, setLocalNotifications] = useState(
-        initialNotifications.map((notification) => ({
-            ...notification,
-            type: notification.data.comment_id ? "comment" : notification.data.post_id ? "post" : "other",
-        })),
-    )
-    const  currentUserId = useTypedPage().props.auth?.user?.id;
+    const [localNotifications, setLocalNotifications] = useState<Notification[]>([]);
+    const { props } = useTypedPage();
+    const currentUserId = props.auth?.user?.id;
+
+    // Khởi tạo danh sách thông báo từ props ban đầu
+    useEffect(() => {
+        setLocalNotifications(
+            initialNotifications.map((notification) => ({
+                ...notification,
+                type: notification.data.comment_id ? "comment" : notification.data.post_id ? "post" : "other",
+            })),
+        );
+    }, [initialNotifications]);
+
+    // Lắng nghe thông báo mới qua Laravel Echo
     useEffect(() => {
         if (!window.Echo || !currentUserId) return;
 
         const channel = window.Echo.private(`user.${currentUserId}`);
-        channel.listen('NewCommentNotification', (event:any) => {
-            setLocalNotifications(prev => {
-                if (!prev.some(n => n.id === event.id)) {
-                    return [event, ...prev];
+
+        channel.listen("NewPostNotification", (event: any) => {
+            const newNotification: Notification = {
+                id: event.id,
+                data: {
+                    post_id: event.post_id,
+                    title: event.title,
+                    message: event.message,
+                    slug: event.slug,
+                    name: event.name,
+                    profile_photo_url: event.profile_photo_url,
+                    categories: event.categories,
+                },
+                read_at: null,
+                created_at: event.created_at,
+                type: "post",
+            };
+
+            setLocalNotifications((prev) => {
+                // Tránh trùng lặp thông báo
+                if (!prev.some((n) => n.id === newNotification.id)) {
+                    return [newNotification, ...prev];
                 }
                 return prev;
             });
         });
 
+        // Dọn dẹp khi component unmount
         return () => {
-            channel.stopListening('NewCommentNotification');
+            channel.stopListening("NewPostNotification");
             window.Echo.leave(`user.${currentUserId}`);
         };
     }, [currentUserId]);
 
-    const [isLoading, setIsLoading] = useState(false)
-    const [isOpen, setIsOpen] = useState(false)
-    const [activeTab, setActiveTab] = useState("all")
+    const [isLoading, setIsLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState("all");
 
-    const unreadCount = localNotifications.filter((n) => !n.read_at).length
+    const unreadCount = localNotifications.filter((n) => !n.read_at).length;
 
     const markAllAsRead = async () => {
         try {
-            setIsLoading(true)
-            await axios.post("/notifications/read-all")
+            setIsLoading(true);
+            await axios.post("/notifications/read-all");
             setLocalNotifications((prev) =>
                 prev.map((notification) => ({ ...notification, read_at: new Date().toISOString() })),
-            )
+            );
         } catch (error) {
-            console.error("Error marking notifications as read:", error)
+            console.error("Error marking notifications as read:", error);
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
-    }
+    };
 
     const formatTimeAgo = (date: string) => {
-        const now = new Date()
-        const notificationDate = new Date(date)
-        const diffInHours = Math.floor((now.getTime() - notificationDate.getTime()) / (1000 * 60 * 60))
+        const now = new Date();
+        const notificationDate = new Date(date);
+        const diffInHours = Math.floor((now.getTime() - notificationDate.getTime()) / (1000 * 60 * 60));
 
         if (diffInHours < 24) {
-            return format(notificationDate, "HH:mm", { locale: vi })
+            return format(notificationDate, "HH:mm", { locale: vi });
         } else if (diffInHours < 48) {
-            return "Hôm qua"
+            return "Hôm qua";
         } else {
-            return format(notificationDate, "dd/MM/yyyy", { locale: vi })
+            return format(notificationDate, "dd/MM/yyyy", { locale: vi });
         }
-    }
+    };
 
-    // Filter notifications based on active tab
     const filteredNotifications = localNotifications.filter((notification) => {
-        if (activeTab === "all") return true
-        if (activeTab === "post") return notification.type === "post"
-        if (activeTab === "comment") return notification.type === "comment"
-        return false
-    })
+        if (activeTab === "all") return true;
+        if (activeTab === "post") return notification.type === "post";
+        if (activeTab === "comment") return notification.type === "comment";
+        return false;
+    });
 
-    // Count notifications by type
-    const postCount = localNotifications.filter((n) => n.type === "post").length
-    const commentCount = localNotifications.filter((n) => n.type === "comment").length
+    const postCount = localNotifications.filter((n) => n.type === "post").length;
+    const commentCount = localNotifications.filter((n) => n.type === "comment").length;
 
     return (
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -135,7 +159,7 @@ const NotificationsDropdown = ({
                 <Card className={cn("w-full border-0 shadow-none", className)}>
                     <CardHeader className="border-b py-3 flex flex-col gap-2">
                         <div className="flex justify-between items-center">
-                            <CardTitle className="text-lg">Notification</CardTitle>
+                            <CardTitle className="text-lg">Thông Báo</CardTitle>
                             {unreadCount > 0 && (
                                 <Button
                                     variant="ghost"
@@ -144,59 +168,63 @@ const NotificationsDropdown = ({
                                     disabled={isLoading}
                                     className="text-sm hover:text-blue-700"
                                 >
-                                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Mark all as read
+                                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Đánh dấu tất cả là đã đọc
                                 </Button>
                             )}
                         </div>
-
                         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
                             <TabsList className="grid grid-cols-3 w-full">
                                 <TabsTrigger value="all" className="text-sm">
-                                    All ({localNotifications.length})
+                                    Tất cả ({localNotifications.length})
                                 </TabsTrigger>
                                 <TabsTrigger value="post" className="text-sm">
-                                    New Post ({postCount})
+                                    Bài viết mới ({postCount})
                                 </TabsTrigger>
                                 <TabsTrigger value="comment" className="text-sm">
-                                    Comment ({commentCount})
+                                    Bình luận ({commentCount})
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
                     </CardHeader>
-
                     <ScrollArea className={`max-h-[${maxHeight}px]`}>
                         <CardContent className="p-0">
                             {filteredNotifications.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-8 text-gray-500">
                                     <Bell className="h-12 w-12 mb-2 text-gray-400" />
-                                    <p>No Notifications</p>
+                                    <p>Không có thông báo</p>
                                 </div>
                             ) : (
                                 filteredNotifications.map((notification) => (
                                     <div
                                         key={notification.id}
                                         className={cn(
-                                            "flex items-start gap-3 p-4  transition-colors cursor-pointer border-b last:border-0",
-                                            !notification.read_at && "",
+                                            "flex items-start gap-3 p-4 transition-colors cursor-pointer border-b last:border-0",
+                                            !notification.read_at && "bg-gray-50 dark:bg-gray-800",
                                         )}
                                     >
                                         <div className="flex flex-col items-center">
                                             <Avatar className="h-9 w-9 border rounded-lg">
-                                                <AvatarImage src={notification.data.profile_photo_url} alt={notification.data.name || "User"} />
+                                                <AvatarImage
+                                                    src={notification.data.profile_photo_url}
+                                                    alt={notification.data.name || "User"}
+                                                />
                                                 <AvatarFallback className="bg-primary/10 text-primary">
                                                     {notification.data.name?.[0]}
                                                 </AvatarFallback>
                                             </Avatar>
-                                            <p className="text-xs text-gray-600  mt-1">{notification.data.name}</p>
+                                            <p className="text-xs text-gray-600 mt-1">{notification.data.name}</p>
                                         </div>
 
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium">{notification.data.title}</p>
-                                            <p className="text-sm">{notification.data.message}</p>
-                                            <p className="text-xs text-gray-500 mt-1">{formatTimeAgo(notification.created_at)}</p>
-                                        </div>
+                                        <Link href={`/posts/${notification.data.slug}`} className="block group">
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium">{notification.data.title}</p>
+                                                <p className="text-sm">{notification.data.message}</p>
+                                                <p className="text-xs text-gray-500 mt-1">{formatTimeAgo(notification.created_at)}</p>
+                                            </div>
+                                        </Link>
+
                                     </div>
-
                                 ))
                             )}
                         </CardContent>
@@ -204,8 +232,7 @@ const NotificationsDropdown = ({
                 </Card>
             </DropdownMenuContent>
         </DropdownMenu>
-    )
-}
+    );
+};
 
-export default NotificationsDropdown
-
+export default NotificationsDropdown;

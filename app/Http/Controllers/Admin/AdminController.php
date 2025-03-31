@@ -62,7 +62,7 @@ class AdminController extends Controller
                     'id' => $post->id,
                     'title' => $post->title,
                     'slug' => $post->slug,
-                    'status' => $post->is_published ? 'published' : 'draft',
+                    'status' => $post->is_published ? 'published' : 'private',
                     'votes' => $post->upvotes_count,
                     'comments' => $post->comments_count,
                     'createdAt' => $post->created_at->toISOString(),

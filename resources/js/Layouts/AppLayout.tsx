@@ -132,8 +132,8 @@ export default function AppLayout({
                         variant="ghost"
                         className="flex relative gap-1 md:gap-3 items-center p-1 md:px-3 h-10 md:h-16 rounded-lg"
                       >
-                        <div className="hidden md:block mr-2 text-sm">
-                          <span className="text-gray-500 dark:text-gray-400">
+                        <div className="hidden md:block mr-2 text-sm text-left">
+                          <span className="text-gray-500 dark:text-gray-400 ">
                             Hello, <br />{' '}
                           </span>
                           <span className="font-medium">

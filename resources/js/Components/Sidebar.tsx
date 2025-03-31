@@ -162,7 +162,7 @@ const Sidebar: React.FC<Props> = () => {
             {/* Nút mở sidebar trên mobile */}
 
             <CategoryList title="Public" categories={publicCategories} setOpen={setOpen} />
-            <CategoryList title="My Activity" categories={listActivity} />
+            {/*<CategoryList title="My Activity" categories={listActivity} />*/}
             <CategoriesSidebar />
             <SearchCommandDialog open={open} setOpen={setOpen} />
 

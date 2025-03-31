@@ -84,20 +84,17 @@ export const columns: ColumnDef<Post>[] = [
             </div>
         },
     },
-
     {
         accessorKey: "status",
         header: "Status",
         cell: ({ row }) => {
-            const status = row.getValue("status") as string
-
+            const status = row.getValue("status") as string;
             return (
-                <Checkbox >
-
-                </Checkbox>
-            )
+                <Checkbox checked={status === "published"}  onCheckedChange={checked => false} />
+            );
         },
     },
+
     {
         accessorKey: "votes",
         header: ({ column }) => {

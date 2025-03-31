@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Post;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -53,10 +54,22 @@ class NewPostNotification extends Notification implements ShouldBroadcast
     public function toBroadcast($notifiable)
     {
         return new BroadcastMessage([
+            'id' => $this->id, // Include notification ID
             'post_id' => $this->post->id,
             'title' => $this->post->title,
             'slug' => $this->post->slug,
             'message' => "Bài viết mới: {$this->post->title}",
+            'name' => $this->post->user->name,
+            'profile_photo_url' => $this->post->user->profile_photo_path
+                ? asset('storage/'.$this->post->user->profile_photo_path)
+                : 'https://ui-avatars.com/api/?name='.urlencode($this->post->user->name).'&color=7F9CF5&background=EBF4FF',
+            'categories' => $this->post->categories->pluck('name')->toArray(),
+            'created_at' => now()->toIso8601String(),
         ]);
+    }
+
+    public function broadcastOn()
+    {
+        return new PrivateChannel('user.' . $this->post->user_id);
     }
 }

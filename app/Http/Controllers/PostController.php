@@ -46,7 +46,7 @@ class PostController extends Controller
                 'prev_page_url' => $posts->previousPageUrl(),
             ],
             'keyword' => $search,
-            'notifications' => $notifications,
+//            'notifications' => $notifications,
             'sort' => $sort,
         ]);
     }
@@ -82,11 +82,12 @@ class PostController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        if (! empty($postData->categories)) {
+        if (!empty($postData->categories)) {
             $post->categories()->attach($postData->categories);
         }
 
-        $users = User::all();
+        // Notify all users except the creator
+        $users = User::where('id', '!=', auth()->id())->get();
         foreach ($users as $user) {
             $user->notify(new NewPostNotification($post));
         }
@@ -120,7 +121,7 @@ class PostController extends Controller
                 'has_upvoted' => $hasUpvoted,
             ],
             'categories' => $categories,
-            'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
+//            'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
         ]);
     }
 

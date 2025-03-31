@@ -184,8 +184,8 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                                 {selectedCategoryObjects.map((category) => (
                                                     <Badge
                                                         key={category.id}
-                                                        variant="default"
-                                                        className="px-3 py-1.5 text-sm flex items-center gap-1 bg-blue-600"
+                                                        variant="outline"
+                                                        className="px-3 py-1.5 text-sm flex items-center gap-1 "
                                                     >
                                                         <Hash className="w-3.5 h-3.5" />
                                                         {category.title}

@@ -86,20 +86,16 @@ const CategoriesSidebar: React.FC<Props> = ({
     }, []);
 
     return (
-        <div className={`mt-5 ${className}`}>
+        <div className={`mt-5 `}>
             {/* Header */}
             <div className="px-4 sm:px-5">
-                <p className="w-full text-[0.8rem] font-bold text-mutedText dark:text-[#636674]">
-                    {uppercaseText("categories")}
-                </p>
-
+                <p className="w-full text-[0.8rem] font-bold text-mutedText dark:text-[#636674]">{uppercaseText('categorise')}</p>
             </div>
 
             {/* Categories List */}
-            <div className="p-0 mt-2">
+            <div className="p-1 mt-2">
                 <div className="space-y-1">
-                    <ScrollArea className=" overflow-y-auto">
-
+                    <ScrollArea className="overflow-y-auto">
                         {categories.map((category) => {
                            const isActive = url.startsWith(`/categories/${category.slug}/posts`);
                             return (
@@ -165,7 +161,7 @@ const CategoriesSidebar: React.FC<Props> = ({
                                         onClick={showLess}
                                         className="w-full text-xs sm:text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 flex items-center justify-start gap-2 mt-2 px-4 py-2"
                                     >
-
+                                        <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
                                     </Button>
                                 )}
                             </>
