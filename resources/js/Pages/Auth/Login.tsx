@@ -56,19 +56,19 @@ export default function Login({ canResetPassword, status, notifications }: Props
         );
 
         const handleMessage = (event: MessageEvent) => {
-            // Verify the origin for security
             if (event.origin !== window.location.origin) return;
 
             const { success, token, error } = event.data;
             if (success && token) {
-                console.log(`${provider} login successful, token:`, token);
-                // Redirect to "/" after successful login
-                window.location.href = '/';
+                console.log(`OAuth login successful, token:`, token);
+                localStorage.setItem('authToken', token); // Lưu token nếu cần
+                window.location.href = '/'; // Chuyển hướng sau khi login thành công
             } else if (error) {
-                console.error(`${provider} login failed:`, error);
-                // Optionally show an error message to the user
+                console.error(`OAuth login failed:`, error);
+                alert('Login failed. Please try again.');
             }
-            popup?.close(); // Ensure popup closes even on error
+
+            popup?.close();
             window.removeEventListener('message', handleMessage);
         };
 
