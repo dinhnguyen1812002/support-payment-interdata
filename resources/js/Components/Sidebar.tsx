@@ -23,9 +23,10 @@ interface Props {
 
 const getCategoryLink = (title: string) => {
     const routes: Record<string, string> = {
-        "All Question": "/",
+        "All Questions": "/",
         "Ask Question": "/posts/create",
-        "My Question": ""
+        "My Questions": "",
+        "Search": "",
     };
     return routes[title] || `/${title.toLowerCase().replace(/\s+/g, "-")}`;
 };
@@ -48,13 +49,11 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title, categories, s
         const pathname = new URL(window.location.href).pathname;
         return categories.map((category) => {
             const link = getCategoryLink(category.title);
-            const isActive = pathname === "/" ? category.title === "All Question" : pathname === link;
+            const isActive = pathname === "/" ? category.title === "All Questions" : pathname === link;
             return { ...category, link, isActive };
         });
     }, [categories, activeLink]);
 
-    const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-    const shortcutKey = isMac ? "⌘ + K" : "Ctrl + K";
     const handleCategoryClick = (title: string, link: string) => {
         if (title === "Search" && setOpen) {
             setOpen(true);
@@ -62,37 +61,48 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title, categories, s
             setActiveLink(link);
         }
     };
-
+    const keyCmd = navigator.userAgent.indexOf('Mac OS X') ? "ctrl + k" : "⌘ + K";
     return (
-        <div className="mt-5">
-            <div className="px-4 sm:px-5">
-                <p className="w-full text-[0.8rem] font-bold text-mutedText dark:text-[#636674]">{uppercaseText(title)}</p>
+
+            <div className="mt-5">
+                <div className="px-4 sm:px-5">
+                    <p className="w-full text-xs font-semibold text-gray-400 mb-2">{uppercaseText(title)}</p>
+                </div>
+                <div className="p-0">
+                    <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)]">
+                        {processedCategories.map(({ id, title, number, link, isActive }) => (
+                            <div
+                                key={id}
+                                className={`flex items-center px-4 py-2  hover:bg-gray-100 hover:text-blue-500 rounded-md transition mt-1 ${
+                                    isActive ? "border-l-4 border-blue-500 bg-gray-100 hover:text-blue-500" : ""
+                                }`}
+                            >
+                                {title === "Search" ? (
+                                    <div className="w-full flex items-center justify-between" onClick={() => handleCategoryClick(title, link)}>
+                                    <span className={`text-sm font-medium transition-colors ${isActive ?
+                                        "text-gray-600" : "hover:text-blue-500"}`}>
+                                        {title}
+
+                                    </span >
+                                        <span className="text-sm text-gray-400">{keyCmd}</span>
+                                    </div>
+                                ) : (
+                                    <Link href={link} className="w-full flex h-5 items-center justify-between " onClick={() => handleCategoryClick(title, link)}>
+                                          <span className={`text-sm font-medium transition-colors ${isActive ?
+                                              "text-gray-600" : "hover:text-blue-500"}`}>
+                                        {title}
+
+                                    </span >
+                                        {number !== null && number !== undefined && (
+                                            <span className="text-sm text-gray-400 ">{number.toLocaleString()}</span>
+                                        )}
+                                    </Link>
+                                )}
+                            </div>
+                        ))}
+                    </ScrollArea>
+                </div>
             </div>
-            <div className="p-0">
-                <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)] space-y-3">
-                    {processedCategories.map(({ id, title, number, link, isActive }) => (
-                        <Button
-                            key={id}
-                            variant="ghost"
-                            className={`w-full flex items-center justify-between rounded-l-lg px-4 py-2 text-sm transition mt-1
-                                ${isActive ? "border-l-4 border-blue-600 bg-gray-100 dark:bg-gray-800" : "border-l-2 border-transparent"}`}
-                        >
-                            {title === "Search" ? (
-                                <div className="w-full flex items-center justify-between" onClick={() => handleCategoryClick(title, link)}>
-                                    <span className={`text-sm font-bold dark:text-[#9a9cae] hover:text-blue-400 ${isActive ? "dark:text-blue-400 text-base" : ""}`}>{title}</span>
-                                    <span className="text-sm text-mutedText dark:text-gray-400">{shortcutKey}</span>
-                                </div>
-                            ) : (
-                                <Link href={link} className="w-full flex items-center justify-between" onClick={() => handleCategoryClick(title, link)}>
-                                    <span className={`text-sm font-bold dark:text-[#9a9cae] hover:text-blue-400 ${isActive ? "dark:text-blue-400 text-base" : ""}`}>{title}</span>
-                                    <span className="text-sm text-mutedText dark:text-gray-400">{number ?? null}</span>
-                                </Link>
-                            )}
-                        </Button>
-                    ))}
-                </ScrollArea>
-            </div>
-        </div>
     );
 };
 
@@ -100,9 +110,10 @@ const Sidebar: React.FC<Props> = () => {
     const [open, setOpen] = useState(false);
     const [totalPosts, setTotalPosts] = useState<number>(0);
     const [publicCategories, setPublicCategories] = useState<Category[]>([
-        { id: 1, title: "All Question", number: 0 },
+        { id: 1, title: "All Questions", number: 6234 },
         { id: 2, title: "Search", number: null },
-        { id: 3, title: "Ask Question", number: null }
+        // { id: 3, title: "Tags", number: null },
+        { id: 4, title: "Ask Question", number: null }
     ]);
 
     useEffect(() => {
@@ -123,7 +134,7 @@ const Sidebar: React.FC<Props> = () => {
                 const count = res.data;
                 setTotalPosts(count);
                 setPublicCategories((prev) =>
-                    prev.map((category) => (category.title === "All Question" ? { ...category, number: count } : category))
+                    prev.map((category) => (category.title === "All Questions" ? { ...category, number: count } : category))
                 );
             } catch (error) {
                 console.error("Error fetching total post count:", error);
@@ -133,11 +144,11 @@ const Sidebar: React.FC<Props> = () => {
     }, []);
 
     return (
-        <>
-            <CategoryList title="Public" categories={publicCategories} setOpen={setOpen} />
+        <div className="w-56 p-2">
+            <CategoryList title="PUBLIC" categories={publicCategories} setOpen={setOpen} />
             <CategoriesSidebar />
             <SearchCommandDialog open={open} setOpen={setOpen} />
-        </>
+        </div>
     );
 };
 

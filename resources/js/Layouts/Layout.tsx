@@ -31,14 +31,14 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
 
     return (
         <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>
-            <div className="max-w-[1354px] mx-auto lg:px-4 dark:bg-[#0F1014]">
+            <div className="max-w-[1400px] mx-auto lg:px-4 dark:bg-[#0F1014]">
 
                 <div className="flex">
                     {/* Main Content Area with Search Functionality */}
                     <SearchComponent initialSearch={keyword} route="/posts/search">
                         <div className="flex  gap-x-4 ">
                             {/* Left Sidebar */}
-                            <div className="hidden lg:block lg:w-52 pr-2 ml-3 ">
+                            <div className="hidden lg:block  pr-2 ml-3 ">
                                 <Sidebar categories={[]} />
                             </div>
 
@@ -48,7 +48,7 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
 
 
                             {/* Right Sidebar */}
-                            <div className="hidden lg:block w-72 mt-5">
+                            <div className="hidden lg:block w-full mt-5">
                                 <div className="top-4">
                                     <div className="mb-6">
                                         <SearchInput
