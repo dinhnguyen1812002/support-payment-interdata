@@ -166,6 +166,21 @@ export interface BlogPost {
 //     };
 //     read_at: string | null;
 // }
+// export interface Notification {
+//     id: string;
+//     data: {
+//         post_id?: number;
+//         title?: string;
+//         message: string;
+//         slug?: string;
+//         name?: string;
+//         profile_photo_url?: string;
+//         categories?: string[];
+//         comment_id?: string;
+//     };
+//     read_at: string | null;
+//     created_at: string;
+// }\
 export interface Notification {
     id: string;
     data: {
@@ -176,10 +191,10 @@ export interface Notification {
         name?: string;
         profile_photo_url?: string;
         categories?: string[];
-        comment_id?: string;
     };
     read_at: string | null;
     created_at: string;
+    type: "post" | "other";
 }
 export interface IndexProps {
 
