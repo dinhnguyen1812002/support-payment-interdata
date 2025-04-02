@@ -48,7 +48,7 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
 
 
                             {/* Right Sidebar */}
-                            <div className="hidden lg:block w-full mt-5">
+                            <div className="hidden lg:block mt-5 ">
                                 <div className="top-4">
                                     <div className="mb-6">
                                         <SearchInput
@@ -56,7 +56,7 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
                                             onSearch={handleSearch}
                                         />
                                     </div>
-                                    <div className="hidden lg:block mt-5">
+                                    <div className="hidden lg:block max-w-[300px] mt-5">
                                         <div className="top-4">
                                             <LatestPosts/>
                                         </div>

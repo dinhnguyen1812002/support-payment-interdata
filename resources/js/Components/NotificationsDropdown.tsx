@@ -12,8 +12,8 @@ import axios from "axios";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import useTypedPage from "@/Hooks/useTypedPage";
+import { Link } from "@inertiajs/react";
 import React from "react";
-import {Link} from "@inertiajs/react";
 
 interface Notification {
     id: string;
@@ -25,11 +25,10 @@ interface Notification {
         name?: string;
         profile_photo_url?: string;
         categories?: string[];
-        comment_id?: string;
     };
     read_at: string | null;
     created_at: string;
-    type?: "post" | "comment" | "other";
+    type: "post" | "other";
 }
 
 interface NotificationsDropdownProps {
@@ -44,22 +43,25 @@ const NotificationsDropdown = ({
                                    maxHeight = 400,
                                }: NotificationsDropdownProps) => {
     const [localNotifications, setLocalNotifications] = useState<Notification[]>([]);
-    const { props } = useTypedPage();
+    const { props } = useTypedPage<{ auth: { user: { id: number; role: string } } }>();
     const currentUserId = props.auth?.user?.id;
+    const isAdmin = props.auth?.user?.role === 'admin';
 
     // Khởi tạo danh sách thông báo từ props ban đầu
     useEffect(() => {
-        setLocalNotifications(
-            initialNotifications.map((notification) => ({
-                ...notification,
-                type: notification.data.comment_id ? "comment" : notification.data.post_id ? "post" : "other",
-            })),
-        );
-    }, [initialNotifications]);
+        if (isAdmin) {
+            setLocalNotifications(
+                initialNotifications.map((notification) => ({
+                    ...notification,
+                    type: notification.data.post_id ? "post" : "other",
+                })),
+            );
+        }
+    }, [initialNotifications, isAdmin]);
 
-    // Lắng nghe thông báo mới qua Laravel Echo
+    // Lắng nghe thông báo mới qua Reverb
     useEffect(() => {
-        if (!window.Echo || !currentUserId) return;
+        if (!isAdmin || !window.Echo || !currentUserId) return;
 
         const channel = window.Echo.private(`user.${currentUserId}`);
 
@@ -81,7 +83,6 @@ const NotificationsDropdown = ({
             };
 
             setLocalNotifications((prev) => {
-                // Tránh trùng lặp thông báo
                 if (!prev.some((n) => n.id === newNotification.id)) {
                     return [newNotification, ...prev];
                 }
@@ -89,16 +90,16 @@ const NotificationsDropdown = ({
             });
         });
 
-        // Dọn dẹp khi component unmount
         return () => {
             channel.stopListening("NewPostNotification");
             window.Echo.leave(`user.${currentUserId}`);
         };
-    }, [currentUserId]);
+    }, [currentUserId, isAdmin]);
 
     const [isLoading, setIsLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("all");
+
 
     const unreadCount = localNotifications.filter((n) => !n.read_at).length;
 
@@ -133,12 +134,10 @@ const NotificationsDropdown = ({
     const filteredNotifications = localNotifications.filter((notification) => {
         if (activeTab === "all") return true;
         if (activeTab === "post") return notification.type === "post";
-        if (activeTab === "comment") return notification.type === "comment";
         return false;
     });
 
     const postCount = localNotifications.filter((n) => n.type === "post").length;
-    const commentCount = localNotifications.filter((n) => n.type === "comment").length;
 
     return (
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -174,15 +173,12 @@ const NotificationsDropdown = ({
                             )}
                         </div>
                         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-                            <TabsList className="grid grid-cols-3 w-full">
+                            <TabsList className="grid grid-cols-2 w-full">
                                 <TabsTrigger value="all" className="text-sm">
                                     Tất cả ({localNotifications.length})
                                 </TabsTrigger>
                                 <TabsTrigger value="post" className="text-sm">
                                     Bài viết mới ({postCount})
-                                </TabsTrigger>
-                                <TabsTrigger value="comment" className="text-sm">
-                                    Bình luận ({commentCount})
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
@@ -223,7 +219,6 @@ const NotificationsDropdown = ({
                                                 <p className="text-xs text-gray-500 mt-1">{formatTimeAgo(notification.created_at)}</p>
                                             </div>
                                         </Link>
-
                                     </div>
                                 ))
                             )}
