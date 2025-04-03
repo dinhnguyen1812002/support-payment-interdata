@@ -70,6 +70,6 @@ class NewPostNotification extends Notification implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new PrivateChannel('user.' . $this->post->user_id);
+        return new PrivateChannel('user.'.$this->post->user_id);
     }
 }

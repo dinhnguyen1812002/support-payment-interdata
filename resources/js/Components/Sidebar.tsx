@@ -68,7 +68,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title, categories, s
                 <div className="px-4 sm:px-5">
                     <p className="w-full text-xs font-semibold text-gray-400 mb-2">{uppercaseText(title)}</p>
                 </div>
-                <div className="p-0">
+                <div className="p-1">
                     <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)]">
                         {processedCategories.map(({ id, title, number, link, isActive }) => (
                             <div

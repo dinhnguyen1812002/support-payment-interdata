@@ -8,6 +8,7 @@ use App\Models\Post;
 use App\Models\User;
 use App\Notifications\NewPostNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -46,7 +47,7 @@ class PostController extends Controller
                 'prev_page_url' => $posts->previousPageUrl(),
             ],
             'keyword' => $search,
-//            'notifications' => $notifications,
+            //            'notifications' => $notifications,
             'sort' => $sort,
         ]);
     }
@@ -82,7 +83,7 @@ class PostController extends Controller
             'user_id' => auth()->id(),
         ]);
 
-        if (!empty($postData->categories)) {
+        if (! empty($postData->categories)) {
             $post->categories()->attach($postData->categories);
         }
 
@@ -121,7 +122,7 @@ class PostController extends Controller
                 'has_upvoted' => $hasUpvoted,
             ],
             'categories' => $categories,
-//            'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
+            //            'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
         ]);
     }
 
@@ -285,9 +286,14 @@ class PostController extends Controller
 
     public function getCountPost()
     {
-        $post = Post::where('is_published', true)->count();
+        $user = Auth::user();
+        if ($user && $user->hasRole('admin')) {
+            $postCount = Post::count();
+        } else {
+            $postCount = Post::where('is_published', true)->count();
+        }
 
-        return response()->json($post);
+        return response()->json($postCount);
     }
 
     public function topVotedPosts(Request $request)

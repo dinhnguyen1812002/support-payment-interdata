@@ -100,6 +100,7 @@ export default function AppLayout({
                               src="https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"
                               className="block w-auto h-[24px] md:h-[28px] lg:h-[30px] flex-shrink-0"
                           />
+
                       </Link>
                   </div>
                 {/* Navigation Links */}
