@@ -6,6 +6,7 @@ use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,11 +21,11 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(UrlGenerator $url): void
+    public function boot(): void
     {
-//        if ($this->app->isProduction()) {
-//            $url->forceScheme('https');
-//        }
+        if (env('APP_ENV') === 'production') {
+            URL::forceScheme('https');
+        }
 
         Inertia::share('notifications', function () {
             return Auth::check() ? Auth::user()->unreadNotifications : [];
