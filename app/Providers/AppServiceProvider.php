@@ -22,9 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(UrlGenerator $url): void
     {
-        if ($this->app->isProduction()) {
-            $url->forceScheme('https');
-        }
+//        if ($this->app->isProduction()) {
+//            $url->forceScheme('https');
+//        }
 
         Inertia::share('notifications', function () {
             return Auth::check() ? Auth::user()->unreadNotifications : [];
