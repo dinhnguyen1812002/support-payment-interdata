@@ -8,9 +8,9 @@ const Footer = () => {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="mt-5 flex w-full max-w-5xl mx-auto  sm:mt-5 md:mt-7 px-4 sm:px-6 md:px-4 dark:bg-[#0F1014]  lg:pl-8 xl:pl-12">
+        <footer className="mt-5 flex w-full max-w-5xl mx-auto  sm:mt-5 md:mt-7 px-4 sm:px-6 md:px-4 dark:bg-[#0F1014]  lg:pl-8 xl:pl-12 sticky">
             <div className="container px-4 py-8 mx-auto">
-            
+
 
                 {/* Copyright */}
                 <div className="flex flex-col justify-between items-center space-y-4 md:flex-row md:space-y-0">

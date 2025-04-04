@@ -84,7 +84,7 @@ export default function AppLayout({
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-3">
             <div className="flex justify-between h-16 md:h-20 lg:h-24">
               <div className="flex items-center">
-                  <div className="flex items-center shrink-0 flex-1  mr-14 space-x-2 sm:space-x-4">
+                  <div className="flex items-center shrink-0 flex-1  mr-14 space-x-2 sm:space-x-4 p-3">
                       {/* Nút mở Sidebar (Mobile) */}
                       <div className="lg:hidden flex-shrink-0">
                           <MobileSidebarToggle
