@@ -95,22 +95,23 @@ export default function AppLayout({
 
                       {/* Logo */}
                       <Link href={route('/')}>
-                          <img
-                              alt="logo"
-                              src="https://preview.keenthemes.com/metronic8/demo5/assets/media/logos/demo5.svg"
-                              className="block w-auto h-[24px] md:h-[28px] lg:h-[30px] flex-shrink-0"
-                          />
+                          {/*<img*/}
+                          {/*    alt="logo"*/}
+                          {/*    src="https://interdata.vn/assets/LogoNewSlogan-07.png"*/}
+                          {/*    className="block w-auto h-full md:h-[40px] lg:h-[40px] flex-shrink-0"*/}
+                          {/*/>*/}
 
+                          <p className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-500 text-transparent bg-clip-text hover:from-indigo-600 hover:to-blue-500 transition-all duration-300 transform hover:scale-105">Support</p>
                       </Link>
                   </div>
-                {/* Navigation Links */}
-                <div className="hidden ml-6 space-x-4 md:space-x-6 sm:flex">
-                  <NavLink href={route('/')} active={route().current('/')}>
-                    Dashboard
-                  </NavLink>
-                  <NavLink href={route('posts.create')} active={route().current('posts.create')}>
-                    Create Post
-                  </NavLink>
+                  {/* Navigation Links */}
+                  <div className="hidden ml-6 space-x-4 md:space-x-6 sm:flex">
+                      <NavLink href={route('/')} active={route().current('/')}>
+                          Dashboard
+                      </NavLink>
+                      <NavLink href={route('posts.create')} active={route().current('posts.create')}>
+                          Create Post
+                      </NavLink>
                 </div>
               </div>
 
