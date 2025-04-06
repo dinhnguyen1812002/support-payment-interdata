@@ -14,11 +14,16 @@ class AssignRole extends Seeder
     public function run()
     {
 
-        $user = User::create([
-            'name' => 'Admin User',
-            'email' => 'dinhnguyen1812002@gmail.com',
-            'password' => bcrypt('4H.Jydh4k&3JJCA'),
-        ]);
+        $user = User::find(1);
+
+        if (! $user) {
+
+            $user = User::create([
+                'name' => 'Admin User',
+                'email' => 'dinhnguyen1812002@gmail.com',
+                'password' => bcrypt('4H.Jydh4k&3JJCA'),
+            ]);
+        }
 
         $role = Role::firstOrCreate(['name' => 'admin']);
 

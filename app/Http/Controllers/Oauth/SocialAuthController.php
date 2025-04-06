@@ -72,7 +72,10 @@ class SocialAuthController extends Controller
                 Auth::login($user);
             }
 
-            return redirect('/');
+            return view('auth/social-callback', [
+                'data' => ['success' => true, 'token' => auth()->user()->createToken('authToken')->plainTextToken],
+                'origin' => config('app.url'),
+            ]);
         } catch (\Exception $e) {
             return redirect('/login')->with('error', 'Đăng nhập bằng GitHub thất bại.');
         }
