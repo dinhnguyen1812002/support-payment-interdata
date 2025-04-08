@@ -23,7 +23,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
 
     public function via($notifiable)
     {
-        return ['mail', 'database', 'broadcast']; // Thêm 'mail'
+        return [ 'database']; // Thêm 'mail'
     }
 
     public function toMail($notifiable)

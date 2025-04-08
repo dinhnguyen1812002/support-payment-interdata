@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Data\Post\CreatePostData;
+use App\Events\NewQuestionCreated;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
@@ -88,11 +89,7 @@ class PostController extends Controller
             $post->categories()->attach($postData->categories);
         }
 
-        // Notify all users except the creator
-        $users = User::where('id', '!=', auth()->id())->get();
-        foreach ($users as $user) {
-            $user->notify(new NewPostNotification($post));
-        }
+        broadcast(new NewQuestionCreated($post))->toOthers();
 
         return redirect()->route('/')->with('success', 'Post created successfully!');
     }

@@ -10,7 +10,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewCommentNotification extends Notification implements ShouldBroadcast
+class NewCommentNotification extends Notification
 {
     use Queueable;
 
@@ -50,29 +50,5 @@ class NewCommentNotification extends Notification implements ShouldBroadcast
                 : 'https://ui-avatars.com/api/?name='.urlencode($this->comment->user->name).'&color=7F9CF5&background=EBF4FF',
             'comment_id' => $this->comment->id,
         ];
-    }
-
-    public function toBroadcast($notifiable)
-    {
-        return new BroadcastMessage([
-            'comment' => [
-                'id' => $this->comment->id,
-                'comment' => $this->comment->comment,
-                'user' => [
-                    'name' => $this->comment->user->name,
-                    'profile_photo_url' => $this->comment->user->profile_photo_path
-                        ? asset('storage/'.$this->comment->user->profile_photo_path)
-                        : 'https://ui-avatars.com/api/?name='.urlencode($this->comment->user->name).'&color=7F9CF5&background=EBF4FF',
-                ],
-                'parent_id' => $this->comment->parent_id,
-                'post_id' => $this->comment->post_id,
-                'created_at' => $this->comment->created_at->toISOString(),
-            ],
-        ]);
-    }
-
-    public function broadcastOn()
-    {
-        return new PrivateChannel('user.'.$this->comment->post->user->id);
     }
 }

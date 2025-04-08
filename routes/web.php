@@ -85,3 +85,4 @@ Route::get('/auth/github/callback', [SocialAuthController::class, 'handleGithubC
 //    ->name('auth.{provider}');
 // Route::get('auth/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])
 //    ->name('auth.{provider}.callback');
+Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

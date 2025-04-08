@@ -13,7 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import useTypedPage from "@/Hooks/useTypedPage";
 import { Link } from "@inertiajs/react";
-import React from "react";
+import  React from 'react'
+import {ReactBabelOptions} from "@vitejs/plugin-react";
 
 interface Notification {
     id: string;
@@ -28,7 +29,7 @@ interface Notification {
     };
     read_at: string | null;
     created_at: string;
-    type: "post" | "other";
+    type: "post" | "comment";
 }
 
 interface NotificationsDropdownProps {
@@ -42,66 +43,30 @@ const NotificationsDropdown = ({
                                    className,
                                    maxHeight = 400,
                                }: NotificationsDropdownProps) => {
-    const [localNotifications, setLocalNotifications] = useState<Notification[]>([]);
+    const [localNotifications, setLocalNotifications] = useState<Notification[]>(initialNotifications);
     const { props } = useTypedPage<{ auth: { user: { id: number; role: string } } }>();
     const currentUserId = props.auth?.user?.id;
-    const isAdmin = props.auth?.user?.role === 'admin';
-
-    // Khởi tạo danh sách thông báo từ props ban đầu
-    useEffect(() => {
-        if (isAdmin) {
-            setLocalNotifications(
-                initialNotifications.map((notification) => ({
-                    ...notification,
-                    type: notification.data.post_id ? "post" : "other",
-                })),
-            );
-        }
-    }, [initialNotifications, isAdmin]);
-
-    // Lắng nghe thông báo mới qua Reverb
-    useEffect(() => {
-        if (!isAdmin || !window.Echo || !currentUserId) return;
-
-        const channel = window.Echo.private(`user.${currentUserId}`);
-
-        channel.listen("NewPostNotification", (event: any) => {
-            const newNotification: Notification = {
-                id: event.id,
-                data: {
-                    post_id: event.post_id,
-                    title: event.title,
-                    message: event.message,
-                    slug: event.slug,
-                    name: event.name,
-                    profile_photo_url: event.profile_photo_url,
-                    categories: event.categories,
-                },
-                read_at: null,
-                created_at: event.created_at,
-                type: "post",
-            };
-
-            setLocalNotifications((prev) => {
-                if (!prev.some((n) => n.id === newNotification.id)) {
-                    return [newNotification, ...prev];
-                }
-                return prev;
-            });
-        });
-
-        return () => {
-            channel.stopListening("NewPostNotification");
-            window.Echo.leave(`user.${currentUserId}`);
-        };
-    }, [currentUserId, isAdmin]);
 
     const [isLoading, setIsLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("all");
 
-
     const unreadCount = localNotifications.filter((n) => !n.read_at).length;
+
+    useEffect(() => {
+
+        // Listen for new notifications via Echo
+        const channel = window.Echo.channel('notifications');
+        channel.listen('.new-question-created', (e: Notification) => {
+            setLocalNotifications((prev) => [e, ...prev]); // Add new notification to the top
+        });
+
+        // Cleanup on unmount
+        return () => {
+            channel.stopListening('.new-question-created');
+            window.Echo.leave('notifications');
+        };
+    }, []);
 
     const markAllAsRead = async () => {
         try {
@@ -154,7 +119,7 @@ const NotificationsDropdown = ({
                     )}
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[380px] p-0">
+            <DropdownMenuContent align="end" className="w-[450px] p-0">
                 <Card className={cn("w-full border-0 shadow-none", className)}>
                     <CardHeader className="border-b py-3 flex flex-col gap-2">
                         <div className="flex justify-between items-center">
@@ -172,12 +137,15 @@ const NotificationsDropdown = ({
                                 </Button>
                             )}
                         </div>
-                        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-                            <TabsList className="grid grid-cols-2 w-full">
+                        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-[400px]">
+                            <TabsList className="grid grid-cols-3 w-full">
                                 <TabsTrigger value="all" className="text-sm">
                                     Tất cả ({localNotifications.length})
                                 </TabsTrigger>
                                 <TabsTrigger value="post" className="text-sm">
+                                    Bài viết mới ({postCount})
+                                </TabsTrigger>
+                                <TabsTrigger value="comment" className="text-sm">
                                     Bài viết mới ({postCount})
                                 </TabsTrigger>
                             </TabsList>
@@ -211,7 +179,6 @@ const NotificationsDropdown = ({
                                             </Avatar>
                                             <p className="text-xs text-gray-600 mt-1">{notification.data.name}</p>
                                         </div>
-
                                         <Link href={`/posts/${notification.data.slug}`} className="block group">
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium">{notification.data.title}</p>
