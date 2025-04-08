@@ -83,8 +83,8 @@ export default function AppLayout({
           {/* <!-- Primary Navigation Menu --> */}
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-3">
             <div className="flex justify-between h-16 md:h-20 lg:h-24">
-              <div className="flex items-center">
-                  <div className="flex items-center shrink-0 flex-1  mr-14 space-x-2 sm:space-x-4 p-3">
+              <div className="flex items-center gapp-x-8 ">
+                  <div className="flex items-center shrink-0 flex-1 space-x-2 sm:space-x-4 p-8">
                       {/* Nút mở Sidebar (Mobile) */}
                       <div className="lg:hidden flex-shrink-0">
                           <MobileSidebarToggle
@@ -101,19 +101,24 @@ export default function AppLayout({
                           {/*    className="block w-auto h-full md:h-[40px] lg:h-[40px] flex-shrink-0"*/}
                           {/*/>*/}
 
-                          <p className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-500 text-transparent bg-clip-text hover:from-indigo-600 hover:to-blue-500 transition-all duration-300 transform hover:scale-105">Support</p>
+                          <p className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r
+                          from-blue-600 to-indigo-500 text-transparent bg-clip-text hover:from-indigo-600
+                          hover:to-blue-500 transition-all duration-300 transform hover:scale-105">Support</p>
                       </Link>
                   </div>
                   {/* Navigation Links */}
-                  <div className="hidden ml-6 space-x-4 md:space-x-6 sm:flex">
-                      <NavLink href={route('/')} active={route().current('/')}>
-                          Dashboard
-                      </NavLink>
-                      <NavLink href={route('posts.create')} active={route().current('posts.create')}>
-                          Create Post
-                      </NavLink>
-                </div>
               </div>
+                <div className="flex items-center shrink-0 flex-1 space-x-3 sm:space-x-4 flex-1 w-full max-w-4xl
+                px-4 sm:px-6 md:px-4 lg:pl-8 xl:pl-9">
+                    <div className="hidden ml-6 space-x-4 md:space-x-6 sm:flex">
+                        <NavLink href={route('/')} active={route().current('/')}>
+                            Dashboard
+                        </NavLink>
+                        <NavLink href={route('posts.create')} active={route().current('posts.create')}>
+                            Create Post
+                        </NavLink>
+                    </div>
+                </div>
 
               {/* Right side navigation items */}
               <div className="flex items-center space-x-2 md:space-x-4">

@@ -10,6 +10,7 @@ import {
     CommandItem,
     CommandList,
 } from "@/Components/ui/command"
+import { format } from "date-fns"
 
 interface SearchResult {
     id: string,
@@ -38,7 +39,7 @@ export function SearchCommandDialog({ open, setOpen }: SearchCommandDialogProps)
 
         setIsLoading(true)
         try {
-            const response = await axios.get('http://localhost:8000/api/global-search', {
+            const response = await axios.get('/api/global-search', {
                 params: { query }
             })
             setSearchResults(response.data.results)
@@ -56,15 +57,14 @@ export function SearchCommandDialog({ open, setOpen }: SearchCommandDialogProps)
         return doc.body.textContent || ''
     }
 
-    // Format date
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString)
-        return date.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        })
-    }
+    // const formatDate = (dateString: string) => {
+    //     const date = new Date(dateString)
+    //     return date.toLocaleDateString("en-US", {
+    //         year: "numeric",
+    //         month: "short",
+    //         day: "numeric",
+    //     })
+    // }
 
     return (
         <CommandDialog open={open} onOpenChange={setOpen}>
@@ -97,7 +97,8 @@ export function SearchCommandDialog({ open, setOpen }: SearchCommandDialogProps)
                                         <div className="flex justify-between items-center">
                                             <span className="font-medium">{item.title}</span>
                                             <span className="text-xs text-muted-foreground">
-                                                {formatDate(item.create_at)}
+                                               {format(new Date(item.create_at ), "MM/dd/yyyy")}
+
                                             </span>
                                         </div>
                                         <p className="text-sm text-muted-foreground mt-1 line-clamp-2">

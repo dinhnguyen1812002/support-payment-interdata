@@ -15,7 +15,7 @@ use Inertia\Inertia;
 
 class PostController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): \Inertia\Response
     {
         $search = $request->input('search', '');
         $sort = $request->input('sort', 'latest');
@@ -38,6 +38,7 @@ class PostController extends Controller
             'totalComment' => $totalComment,
             'categories' => $categories,
             'postCount' => $posts->total(),
+            'upvotes_count' => $posts->total(),
             'pagination' => [
                 'total' => $posts->total(),
                 'per_page' => $posts->perPage(),
@@ -47,7 +48,7 @@ class PostController extends Controller
                 'prev_page_url' => $posts->previousPageUrl(),
             ],
             'keyword' => $search,
-            //            'notifications' => $notifications,
+            'notifications' => $notifications,
             'sort' => $sort,
         ]);
     }

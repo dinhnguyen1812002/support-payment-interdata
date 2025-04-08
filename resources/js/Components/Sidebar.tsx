@@ -80,7 +80,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title, categories, s
                                 {title === "Search" ? (
                                     <div className="w-full flex items-center justify-between dark:text-[#9a9cae] " onClick={() => handleCategoryClick(title, link)}>
                                     <span className={`text-sm font-medium transition-colors  dark:text-[#9a9cae]${isActive ?
-                                        "text-blue-600 dark:text-blue-400 dark:hover:text-blue-600 " : "hover:text-blue-500 "}`}>
+                                        "dark:text-blue-400 dark:hover:text-blue-600 " : "hover:text-blue-500 "}`}>
                                         {title}
 
                                     </span >
@@ -89,7 +89,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title, categories, s
                                 ) : (
                                     <Link href={link} className="w-full flex h-5 items-center justify-between  dark:text-[#9a9cae]" onClick={() => handleCategoryClick(title, link)}>
                                           <span className={`text-sm font-medium transition-colors   ${isActive ?
-                                              "text-blue-600 dark:text-blue-400 dark:hover:text-blue-600" : "hover:text-blue-500"}`}>
+                                              " dark:text-blue-400 dark:hover:text-blue-600" : "hover:text-blue-500"}`}>
                                         {title}
 
                                     </span >

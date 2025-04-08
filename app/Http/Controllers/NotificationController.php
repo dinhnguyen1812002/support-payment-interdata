@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Mail\UserNotificationMail;
-use App\Notifications\NewQuestionOrAnswerNotification;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
@@ -41,7 +40,7 @@ class NotificationController extends Controller
             'user_id' => $user->id,
         ];
 
-        $user->notify(new NewQuestionOrAnswerNotification($data));
+
 
         return response()->json(['message' => 'Thông báo đã được gửi!']);
     }
