@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\NewCommentPosted;
+use App\Events\NewCommentCreated;
 use App\Models\Comments;
 use App\Models\Post;
 use App\Notifications\NewCommentNotification;
-use App\Notifications\NewQuestionOrAnswerNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -52,48 +51,11 @@ class CommentsController extends Controller
         if ($postOwner->id !== auth()->id()) {
             $postOwner->notify(new NewCommentNotification($comment));
         }
-        broadcast(new NewCommentPosted($comment))->toOthers();
-
+        broadcast(new NewCommentCreated($comment));
         return back()->with('success', 'Comment added successfully!');
     }
 
-    // public function show(Post $post)
-    // {
-    //     $comments = $post->comments()
-    //         ->whereNull('parent_id') // Get only parent comments
-    //         ->with(['user', 'replies.user'])
-    //         ->latest()
-    //         ->get()
-    //         ->map(function ($comment) {
-    //             return [
-    //                 'id' => $comment->id,
-    //                 'comment' => $comment->comment,
-    //                 'created_at' => $comment->created_at->diffForHumans(),
-    //                 'user' => [
-    //                     'id' => $comment->user->id,
-    //                     'name' => $comment->user->name,
-    //                     'profile_photo_path' => $comment->user->profile_photo_path,
-    //                 ],
-    //                 'replies' => $comment->replies->map(function ($reply) {
-    //                     return [
-    //                         'id' => $reply->id,
-    //                         'comment' => $reply->comment,
-    //                         'created_at' => $reply->created_at->diffForHumans(),
-    //                         'user' => [
-    //                             'id' => $reply->user->id,
-    //                             'name' => $reply->user->name,
-    //                             'profile_photo_path' => $reply->user->profile_photo_path,
-    //                         ],
-    //                     ];
-    //                 }),
-    //             ];
-    //         });
 
-    //     return Inertia::render('Posts/PostDetail', [
-    //         'post' => $post,
-    //         'comments' => $comments,
-    //     ]);
-    // }
     public function show(Post $post)
     {
         $comments = $post->comments()

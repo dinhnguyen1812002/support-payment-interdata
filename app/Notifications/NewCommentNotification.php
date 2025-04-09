@@ -3,10 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Comments;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -23,7 +20,7 @@ class NewCommentNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['mail', 'database']; // Gửi qua email và lưu vào database
+        return ['mail', 'database', 'broadcast'];
     }
 
     public function toMail($notifiable)
@@ -38,6 +35,21 @@ class NewCommentNotification extends Notification
     }
 
     public function toArray($notifiable)
+    {
+        return [
+            'post_id' => $this->comment->post_id,
+            'title' => $this->comment->post->title,
+            'message' => "You have new comment in {$this->comment->post->title}",
+            'slug' => $this->comment->post->slug,
+            'name' => $this->comment->user->name,
+            'profile_photo_url' => $this->comment->user->profile_photo_path
+                ? asset('storage/'.$this->comment->user->profile_photo_path)
+                : 'https://ui-avatars.com/api/?name='.urlencode($this->comment->user->name).'&color=7F9CF5&background=EBF4FF',
+            'comment_id' => $this->comment->id,
+        ];
+    }
+
+    public function toBroadcast($notifiable)
     {
         return [
             'post_id' => $this->comment->post_id,

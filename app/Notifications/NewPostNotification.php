@@ -14,19 +14,19 @@ class NewPostNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
-    public $post;
+    public Post $post;
 
     public function __construct(Post $post)
     {
         $this->post = $post;
     }
 
-    public function via($notifiable)
+    public function via($notifiable): array
     {
-        return [ 'database']; // Thêm 'mail'
+        return ['database', 'broadcast'];
     }
 
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
         return (new MailMessage)
             ->subject("Câu hỏi mới: {$this->post->title}")
@@ -36,7 +36,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
             ->line('Cảm ơn bạn đã theo dõi!');
     }
 
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
         return [
             'post_id' => $this->post->id,
@@ -51,7 +51,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
         ];
     }
 
-    public function toBroadcast($notifiable)
+    public function toBroadcast($notifiable): BroadcastMessage
     {
         return new BroadcastMessage([
             'id' => $this->id, // Include notification ID
@@ -68,7 +68,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
         ]);
     }
 
-    public function broadcastOn()
+    public function broadcastOn(): PrivateChannel
     {
         return new PrivateChannel('user.'.$this->post->user_id);
     }

@@ -88,6 +88,10 @@ class PostController extends Controller
         if (! empty($postData->categories)) {
             $post->categories()->attach($postData->categories);
         }
+        $users = User::all();
+        foreach ($users as $user) {
+            $user->notify(new NewPostNotification($post));
+        }
 
         broadcast(new NewQuestionCreated($post))->toOthers();
 

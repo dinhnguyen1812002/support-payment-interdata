@@ -3,15 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Mail\UserNotificationMail;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
     public function markAllAsRead()
     {
-        auth()->user()->unreadNotifications->markAsRead();
+        $user = auth()->user();
 
-        return response()->json(['message' => 'All notifications marked as read.']);
+        if ($user instanceof User) {
+            $user->unreadNotifications->markAsRead();
+
+            return response()->json(['message' => 'All notifications marked as read.']);
+        }
+
+        return response()->json([
+            'message' => 'All notifications marked as read.',
+        ]);
     }
 
     public function sendEmailNotification(Request $request)
@@ -39,8 +48,6 @@ class NotificationController extends Controller
             'type' => 'success',
             'user_id' => $user->id,
         ];
-
-
 
         return response()->json(['message' => 'Thông báo đã được gửi!']);
     }

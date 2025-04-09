@@ -60,6 +60,9 @@ const NotificationsDropdown = ({
         channel.listen('.new-question-created', (e: Notification) => {
             setLocalNotifications((prev) => [e, ...prev]); // Add new notification to the top
         });
+        channel.listen('.new-comment-created', (e:Notification)=>{
+            setLocalNotifications((prev) => [e,...prev]);
+        })
 
         // Cleanup on unmount
         return () => {
@@ -99,6 +102,7 @@ const NotificationsDropdown = ({
     const filteredNotifications = localNotifications.filter((notification) => {
         if (activeTab === "all") return true;
         if (activeTab === "post") return notification.type === "post";
+        if (activeTab === "comment") return notification.type === "comment";
         return false;
     });
 
@@ -140,13 +144,13 @@ const NotificationsDropdown = ({
                         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-[400px]">
                             <TabsList className="grid grid-cols-3 w-full">
                                 <TabsTrigger value="all" className="text-sm">
-                                    Tất cả ({localNotifications.length})
+                                    All ({localNotifications.length})
                                 </TabsTrigger>
                                 <TabsTrigger value="post" className="text-sm">
-                                    Bài viết mới ({postCount})
+                                   New Question ({postCount})
                                 </TabsTrigger>
                                 <TabsTrigger value="comment" className="text-sm">
-                                    Bài viết mới ({postCount})
+                                   Comment({postCount})
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>

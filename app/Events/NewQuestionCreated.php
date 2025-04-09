@@ -19,10 +19,12 @@ class NewQuestionCreated implements ShouldBroadcast
     {
         $this->post = $post;
     }
+
     public function via($notifiable)
     {
         return ['database']; // Lưu vào cơ sở dữ liệu
     }
+
     public function broadcastOn()
     {
         // Use a public channel for simplicity; adjust as needed
@@ -45,8 +47,8 @@ class NewQuestionCreated implements ShouldBroadcast
                 'slug' => $this->post->slug,
                 'name' => $this->post->user->name,
                 'profile_photo_url' => $this->post->user->profile_photo_path
-                    ? asset('storage/' . $this->post->user->profile_photo_path)
-                    : 'https://ui-avatars.com/api/?name=' . urlencode($this->post->user->name) . '&color=7F9CF5&background=EBF4FF',
+                    ? asset('storage/'.$this->post->user->profile_photo_path)
+                    : 'https://ui-avatars.com/api/?name='.urlencode($this->post->user->name).'&color=7F9CF5&background=EBF4FF',
                 'categories' => $this->post->categories->pluck('name')->toArray(),
             ],
             'read_at' => null,
