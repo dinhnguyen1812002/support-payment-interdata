@@ -52,9 +52,9 @@ class CommentsController extends Controller
             $postOwner->notify(new NewCommentNotification($comment));
         }
         broadcast(new NewCommentCreated($comment));
+
         return back()->with('success', 'Comment added successfully!');
     }
-
 
     public function show(Post $post)
     {

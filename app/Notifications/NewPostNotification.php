@@ -65,6 +65,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
                 : 'https://ui-avatars.com/api/?name='.urlencode($this->post->user->name).'&color=7F9CF5&background=EBF4FF',
             'categories' => $this->post->categories->pluck('name')->toArray(),
             'created_at' => now()->toIso8601String(),
+            'type' => 'post',
         ]);
     }
 

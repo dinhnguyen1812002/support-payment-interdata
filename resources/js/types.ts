@@ -195,7 +195,7 @@ export interface Notification {
     };
     read_at: string | null;
     created_at: string;
-    type: "post" | "other";
+    type: string;
 }
 export interface IndexProps {
 

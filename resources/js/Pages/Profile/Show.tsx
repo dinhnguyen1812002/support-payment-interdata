@@ -36,8 +36,8 @@ import { Notification, Post, Session } from '@/types';
 import PostsTable from "@/Pages/Profile/Partials/PostTable";
 import { router } from '@inertiajs/core';
 import { route } from "ziggy-js";
-import {Switch} from "@/Components/ui/switch";
-import {uppercaseText} from "@/Utils/slugUtils";
+import { Switch } from "@/Components/ui/switch";
+import { uppercaseText } from "@/Utils/slugUtils";
 
 interface Props {
     sessions: Session[];
@@ -95,30 +95,36 @@ const ProfilePage = ({
     const page = useTypedPage();
     const [activeSection, setActiveSection] = useState('profile');
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
+    const [screenSize, setScreenSize] = useState({
+        isMobile: false,
+        isTablet: false
+    });
     const user = page.props.auth.user!;
 
     // Create refs for each section
     const sectionRefs = useRef<{[key: string]: React.RefObject<HTMLDivElement>}>({});
 
-    // Check if we're on mobile
+    // Check screen size
     useEffect(() => {
-        const checkIfMobile = () => {
-            setIsMobile(window.innerWidth < 768);
+        const checkScreenSize = () => {
+            setScreenSize({
+                isMobile: window.innerWidth < 640,
+                isTablet: window.innerWidth >= 640 && window.innerWidth < 1024
+            });
         };
 
-        checkIfMobile();
-        window.addEventListener('resize', checkIfMobile);
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
 
         return () => {
-            window.removeEventListener('resize', checkIfMobile);
+            window.removeEventListener('resize', checkScreenSize);
         };
     }, []);
 
-    // Close sidebar when clicking outside on mobile
+    // Close sidebar when clicking outside on mobile or tablet
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (isMobile && sidebarOpen) {
+            if ((screenSize.isMobile || screenSize.isTablet) && sidebarOpen) {
                 const sidebar = document.getElementById('sidebar');
                 const menuButton = document.getElementById('menu-button');
 
@@ -135,7 +141,7 @@ const ProfilePage = ({
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isMobile, sidebarOpen]);
+    }, [screenSize, sidebarOpen]);
 
     const handleSearch = (searchKeyword: string) => {
         router.get(
@@ -155,7 +161,7 @@ const ProfilePage = ({
 
     const handleSectionChange = (sectionId: string) => {
         setActiveSection(sectionId);
-        if (isMobile) {
+        if (screenSize.isMobile || screenSize.isTablet) {
             setSidebarOpen(false);
         }
 
@@ -292,12 +298,12 @@ const ProfilePage = ({
         };
     }, [activeSection]);
 
-    // Add overlay when sidebar is open on mobile
+    // Add overlay when sidebar is open on mobile or tablet
     const renderOverlay = () => {
-        if (isMobile && sidebarOpen) {
+        if ((screenSize.isMobile || screenSize.isTablet) && sidebarOpen) {
             return (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-10"
+                    className="fixed inset-0 bg-black bg-opacity-50 z-20"
                     onClick={() => setSidebarOpen(false)}
                 />
             );
@@ -307,16 +313,17 @@ const ProfilePage = ({
 
     return (
         <AppLayout notifications={notifications} canRegister={true} canLogin={true} title={user.name}>
-            <div className="flex max-w-[1354px] mx-auto flex-col md:flex-row h-auto">
-                {/* Mobile menu button */}
-                {isMobile && (
-                    <div className="p-4 flex justify-between items-center border-b">
-                        <h1 className="font-bold text-xl">Profile</h1>
+            <div className="flex max-w-7xl mx-auto flex-col lg:flex-row min-h-screen">
+                {/* Mobile/Tablet header */}
+                {(screenSize.isMobile || screenSize.isTablet) && (
+                    <div className="sticky top-0 z-10 p-4 flex justify-between items-center border-b bg-background">
+                        <h1 className="font-bold text-xl">{activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}</h1>
                         <Button
                             id="menu-button"
                             variant="ghost"
                             size="icon"
                             onClick={() => setSidebarOpen(!sidebarOpen)}
+                            aria-label="Toggle menu"
                         >
                             {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                         </Button>
@@ -329,14 +336,16 @@ const ProfilePage = ({
                 <div
                     id="sidebar"
                     className={cn(
-                        " bg-background md:w-60 pt-4",
-                        isMobile ? "inset-y-0 left-0 transform transition-transform duration-200 ease-in-out" : "sticky top-11 h-screen"
+                        "bg-background z-30 lg:min-h-screen",
+                        screenSize.isMobile || screenSize.isTablet
+                            ? "fixed inset-y-0 left-0 w-64 transform transition-transform duration-200 ease-in-out"
+                            : "sticky top-16 h-screen w-60 overflow-y-auto border-r"
                     )}
-                    style={isMobile ? { transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)' } : {}}
+                    style={(screenSize.isMobile || screenSize.isTablet) ? { transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)' } : {}}
                 >
                     <div className="px-4 sm:px-5 py-4">
-                        <p className="w-full text-[0.8rem] font-bold text-mutedText dark:text-[#636674]">
-                            {uppercaseText("dashboard")}
+                        <p className="w-full text-xs font-bold text-mutedText uppercase dark:text-gray-400">
+                            Dashboard
                         </p>
                     </div>
                     <ScrollArea className="h-[calc(100vh-8rem)]">
@@ -370,32 +379,34 @@ const ProfilePage = ({
                     </ScrollArea>
                 </div>
 
-                {/* Main content - all sections visible */}
+                {/* Main content */}
                 <div className={cn(
-                    "overflow-y-auto flex-1 p-6 space-y-6 border-l mt-1",
-                    isMobile ? "pt-0" : ""
+                    "flex-1 p-4 sm:p-6 space-y-6",
+                    (screenSize.isMobile || screenSize.isTablet) ? "pt-2" : "border-l"
                 )}>
                     {sidebarItems.map((item) => (
                         <div
                             key={item.id}
                             id={item.id}
-                            className="p-4 border rounded-lg border-none"
+                            className="p-2 sm:p-4 border rounded-lg shadow-sm"
                         >
-                            <CardHeader>
-                                <CardTitle>{item.title}</CardTitle>
+                            <CardHeader className="px-2 sm:px-4 py-2 sm:py-4">
+                                <CardTitle className="text-lg sm:text-xl">{item.title}</CardTitle>
                             </CardHeader>
-                            <CardContent>{item.component}</CardContent>
+                            <CardContent className="px-2 sm:px-4 py-2 sm:py-4">
+                                {item.component}
+                            </CardContent>
                         </div>
                     ))}
                     {page.props.jetstream.hasAccountDeletionFeatures && (
                         <div
                             id="delete-account"
-                            className="p-4 border rounded-lg"
+                            className="p-2 sm:p-4 border rounded-lg shadow-sm"
                         >
-                            <CardHeader>
-                                <CardTitle>Xóa tài khoản</CardTitle>
+                            <CardHeader className="px-2 sm:px-4 py-2 sm:py-4">
+                                <CardTitle className="text-lg sm:text-xl">Delete Account</CardTitle>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="px-2 sm:px-4 py-2 sm:py-4">
                                 <DeleteUserForm />
                             </CardContent>
                         </div>

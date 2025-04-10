@@ -69,6 +69,8 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts: initialPosts = [], postCount
                             ({postCount})
                         </small>
                     </span>
+
+
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                     {isAuthenticated ? (

@@ -17,7 +17,6 @@ class AssignRole extends Seeder
         $user = User::find(1);
 
         if (! $user) {
-
             $user = User::create([
                 'name' => 'Admin User',
                 'email' => 'dinhnguyen1812002@gmail.com',

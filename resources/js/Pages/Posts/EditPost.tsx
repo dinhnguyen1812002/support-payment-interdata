@@ -253,7 +253,7 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                                         Đang xử lý...
                                                     </div>
                                                 ) : (
-                                                    "Thêm bài viết"
+                                                    "Update your question"
                                                 )}
                                             </Button>
                                         </div>

@@ -11,16 +11,16 @@ class NewCommentNotification extends Notification
 {
     use Queueable;
 
-    public $comment;
+    public Comments $comment;
 
     public function __construct(Comments $comment)
     {
         $this->comment = $comment;
     }
 
-    public function via($notifiable)
+    public function via($notifiable): array
     {
-        return ['mail', 'database', 'broadcast'];
+        return ['database', 'broadcast'];
     }
 
     public function toMail($notifiable)
@@ -46,6 +46,7 @@ class NewCommentNotification extends Notification
                 ? asset('storage/'.$this->comment->user->profile_photo_path)
                 : 'https://ui-avatars.com/api/?name='.urlencode($this->comment->user->name).'&color=7F9CF5&background=EBF4FF',
             'comment_id' => $this->comment->id,
+            'abcdef' => 'comment',
         ];
     }
 
@@ -61,6 +62,7 @@ class NewCommentNotification extends Notification
                 ? asset('storage/'.$this->comment->user->profile_photo_path)
                 : 'https://ui-avatars.com/api/?name='.urlencode($this->comment->user->name).'&color=7F9CF5&background=EBF4FF',
             'comment_id' => $this->comment->id,
+            'type' => 'comment',
         ];
     }
 }
