@@ -51,7 +51,7 @@ const PostDetail: React.FC<PostDetailProps> = ({
     const { props } = usePage();
     const selectedCategory = props.selectedCategory;
     const currentUser = auth?.user || null;
-
+    const [body, setBody] = useState('');
     const userAvatar = auth?.user?.profile_photo_path
         ? `/storage/${auth.user.profile_photo_path}`
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(auth?.user?.name || 'Guest')}&color=7F9CF5&background=EBF4FF`;
@@ -65,6 +65,9 @@ const PostDetail: React.FC<PostDetailProps> = ({
         }
     };
 
+
+
+
     // Submit a new comment
     const handleCommentSubmit = (content: string, parentId?: number) => {
         router.post(
@@ -75,39 +78,14 @@ const PostDetail: React.FC<PostDetailProps> = ({
                 parent_id: parentId || null
             },
             {
+                onSuccess: () => setBody(''),
                 preserveScroll: true,
-                onSuccess: () => {
-                    location.reload()
-                },
                 onError: errors => {
                     console.error('Error submitting comment:', errors);
                 },
             },
         );
     };
-
-    // Listen for real-time comments via Laravel Echo
-    useEffect(() => {
-        if (!window.Echo) return;
-
-        const channel = window.Echo.channel(`post.${post.id}.comments`);
-
-        channel.listen('.NewCommentPosted', (event: { comment: Comment }) => {
-
-            setComments(prevComments => {
-                if (!prevComments.some(comment => comment.id === event.comment.id)) {
-                    return [event.comment, ...prevComments];
-                }
-                return prevComments;
-            });
-        });
-
-        return () => {
-            channel.stopListening('.NewCommentPosted');
-            window.Echo.leaveChannel(`post.${post.id}.comments`);
-        };
-    }, [post.id, setComments]);
-
 
     const title = post.title;
 

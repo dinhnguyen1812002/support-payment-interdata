@@ -24,40 +24,20 @@ const CommentsContent: React.FC<Omit<CommentsSectionProps, 'initialComments'>> =
                                                                                   }) => {
     const { comments, nextPage, setComments, setNextPage, isLoading, addComment } = useComments();
 
-    const fetchMoreComments = async () => {
-        if (!nextPage || isLoading) return;
 
-        try {
-            const response = await fetch(nextPage);
-            const data = await response.json();
-
-            setComments(prev => [...prev, ...data.data]);
-            setNextPage(data.next_page_url);
-        } catch (error) {
-            console.error("Error loading more comments:", error);
-        }
-    };
 
     // Listen for real-time comments via Laravel Echo
     useEffect(() => {
-        if (!window.Echo) return;
-
-        const channel = window.Echo.channel(`post.${postId}.comments`);
-
-        channel.listen('.NewCommentPosted', (event: { comment: Comment }) => {
-            setComments(prevComments => {
-                if (!prevComments.some(comment => comment.id === event.comment.id)) {
-                    addComment(event.comment);
-                }
-                return prevComments;
-            });
+        const channel = window.Echo.channel(`post.${postId}`);
+        channel.listen('CommentPosted', (e: { comment: Comment }) => {
+            setComments((prev) => [e.comment, ...prev]);
         });
 
         return () => {
-            channel.stopListening('.NewCommentPosted');
-            window.Echo.leaveChannel(`post.${postId}.comments`);
+            channel.stopListening('CommentPosted');
+            window.Echo.leaveChannel(`post.${postId}`);
         };
-    }, [postId, setComments]);
+    }, [postId]);
 
     const commentCount = comments.length;
 
@@ -85,23 +65,8 @@ const CommentsContent: React.FC<Omit<CommentsSectionProps, 'initialComments'>> =
                     <p className="text-gray-500 dark:text-gray-400">Be the first to comment!</p>
                 </div>
             ) : (
-                <InfiniteScroll
-                    dataLength={comments.length}
-                    next={fetchMoreComments}
-                    hasMore={!!nextPage}
-                    loader={
-                        <div className="py-4 flex justify-center">
-                            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-                        </div>
-                    }
-                    endMessage={
-                        <div className="py-4 text-center text-gray-500 dark:text-gray-400 text-sm">
-                            No more comments to load
-                        </div>
-                    }
-                >
-                    <CommentList comments={comments} onReply={onCommentSubmit} currentUser={currentUser} />
-                </InfiniteScroll>
+
+                <CommentList comments={comments} onReply={onCommentSubmit} currentUser={currentUser} />
             )}
         </div>
     );

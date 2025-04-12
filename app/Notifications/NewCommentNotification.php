@@ -20,7 +20,7 @@ class NewCommentNotification extends Notification
 
     public function via($notifiable): array
     {
-        return ['database', 'broadcast'];
+        return ['mail', 'database', 'broadcast'];
     }
 
     public function toMail($notifiable)

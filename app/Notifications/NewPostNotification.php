@@ -23,7 +23,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
 
     public function via($notifiable): array
     {
-        return ['database', 'broadcast'];
+        return ['database', 'broadcast', 'mail'];
     }
 
     public function toMail($notifiable): MailMessage

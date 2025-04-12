@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CommentPosted;
 use App\Events\NewCommentCreated;
 use App\Models\Comments;
 use App\Models\Post;
@@ -47,11 +48,12 @@ class CommentsController extends Controller
         ]);
         $comment->load('user');
         // Broadcast the event
+        broadcast(new CommentPosted($comment))->toOthers();
+        broadcast(new NewCommentCreated($comment));
         $postOwner = $comment->post->user;
         if ($postOwner->id !== auth()->id()) {
             $postOwner->notify(new NewCommentNotification($comment));
         }
-        broadcast(new NewCommentCreated($comment));
 
         return back()->with('success', 'Comment added successfully!');
     }
