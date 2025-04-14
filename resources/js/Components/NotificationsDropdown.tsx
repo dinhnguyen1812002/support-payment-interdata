@@ -227,7 +227,9 @@ const NotificationsDropdown = ({
                                                         {notification.data.name?.[0] || "U"}
                                                     </AvatarFallback>
                                                 </Avatar>
-                                                <p className="text-xs text-gray-600 mt-1">{notification.data.name}</p>
+                                                <p className="text-xs text-gray-600 mt-1 text-center break-words max-w-[80px]">
+                                                    {notification.data.name}
+                                                </p>
                                             </div>
                                             <Link href={`/posts/${notification.data.slug}`} className="block group flex-1">
                                                 <div className="flex-1 min-w-0">
