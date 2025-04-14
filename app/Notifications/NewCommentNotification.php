@@ -46,7 +46,7 @@ class NewCommentNotification extends Notification
                 ? asset('storage/'.$this->comment->user->profile_photo_path)
                 : 'https://ui-avatars.com/api/?name='.urlencode($this->comment->user->name).'&color=7F9CF5&background=EBF4FF',
             'comment_id' => $this->comment->id,
-            'abcdef' => 'comment',
+            'type_notification' => 'comment',
         ];
     }
 

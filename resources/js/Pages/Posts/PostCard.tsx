@@ -91,7 +91,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts: initialPosts = [], postCount
                 </div>
             </div>
 
-            <div className="space-y-1 items-stretch w-full max-w-3xl mx-auto">
+            <div className="space-y-1 items-stretch w-full max-w-5xl mx-auto">
                 {posts.map((post, index) => (
                     <div
                         key={post.id}

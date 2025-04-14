@@ -53,11 +53,11 @@ class NewCommentCreated implements ShouldBroadcast
                     ? asset('storage/'.$this->comment->user->profile_photo_path)
                     : 'https://ui-avatars.com/api/?name='.urlencode($this->comment->user->name).'&color=7F9CF5&background=EBF4FF',
                 'categories' => $this->comment->post->categories->pluck('name')->toArray(),
-                'abcdef' => 'comment',
+                'type_notification' => 'comment',
             ],
             'read_at' => null,
             'created_at' => $this->comment->created_at->toISOString(),
-            'abcdef' => 'comment',
+            'type_notification' => 'comment',
         ];
     }
 }

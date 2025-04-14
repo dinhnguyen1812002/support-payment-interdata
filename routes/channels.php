@@ -31,3 +31,7 @@ Broadcast::channel('notifications-comment.{userId}', function ($user, $userId) {
 Broadcast::channel('post.{postId}', function ($user, $postId) {
     return true; // Allow all users to listen; restrict as needed
 });
+
+Broadcast::channel('reply.{postId}', function ($user, $postId) {
+    return true; // Allow all users to listen; restrict as needed
+});

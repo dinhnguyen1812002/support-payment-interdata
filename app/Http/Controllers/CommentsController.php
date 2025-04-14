@@ -49,7 +49,7 @@ class CommentsController extends Controller
         $comment->load('user');
         // Broadcast the event
         broadcast(new CommentPosted($comment))->toOthers();
-        broadcast(new NewCommentCreated($comment));
+        broadcast(new NewCommentCreated($comment))->toOthers();
         $postOwner = $comment->post->user;
         if ($postOwner->id !== auth()->id()) {
             $postOwner->notify(new NewCommentNotification($comment));

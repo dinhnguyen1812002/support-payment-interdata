@@ -123,7 +123,7 @@ export interface Category {
     posts_count?: number;
 }
 export interface Comment {
-    id: number;
+    id: string;
     comment: string;
     user: User;
     created_at: string;

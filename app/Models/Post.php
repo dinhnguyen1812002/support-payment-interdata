@@ -145,7 +145,7 @@ class Post extends Model
                 'profile_photo_path' => $comment->user->profile_photo_path,
             ],
             'comment' => $comment->comment,
-            'created_at' => $comment->created_at->diffForHumans(),
+            'created_at' => $comment->created_at,
             'parent_id' => $comment->parent_id,
             'replies' => $comment->allReplies->map(function ($reply) {
                 return $this->formatComment($reply);

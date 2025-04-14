@@ -5,11 +5,11 @@ export interface User {
 }
 
 export interface Comment {
-    id: number;
+    id: string;
     user: User;
     comment: string;
     created_at: string;
-    parent_id?: number | null;
+    parent_id?: string
     replies?: Comment[];
 }
 

@@ -75,7 +75,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
                                     <h3 className="text-gray-800 text-sm font-semibold leading-tight mb-0.5 dark:text-gray-200">
                                         {comment.user.name}
                                     </h3>
-                                    <p className="text-xs text-mutedText font-semibold leading-tight">{comment.created_at}</p>
+                                    <p className="text-xs text-mutedText font-semibold leading-tight">
+                                        {formatTimeAgo(comment.created_at)}
+                                    </p>
                                 </div>
                             </div>
 

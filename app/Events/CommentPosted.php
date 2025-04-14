@@ -27,6 +27,7 @@ class CommentPosted implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
+
             'comment' => $this->comment->load('user'), // Include user data
         ];
     }

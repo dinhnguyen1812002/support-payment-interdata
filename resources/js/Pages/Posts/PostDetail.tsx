@@ -5,13 +5,14 @@ import CommentsSection from '@/Pages/Comments/CommentsSection';
 import { Badge } from '@/Components/ui/badge';
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-import { Category, Notification, Comment } from '@/types';
+import { Category, Notification } from '@/types';
 import UpvoteButton from '@/Components/VoteButton';
 import SearchComponent from "@/Components/Search";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import LatestPosts from "@/Pages/Posts/LatestPost";
 import Sidebar from '@/Components/Sidebar';
 import SearchInput from "@/Components/search-input";
+import {Comment} from "@/types/CommentTypes";
 
 interface BlogPost {
     next_page_url: string | null;
@@ -144,7 +145,7 @@ const PostDetail: React.FC<PostDetailProps> = ({
                                     />
                                 </div>
                             </div>
-                            <div className="hidden lg:block w-72 mt-5">
+                            <div className="hidden lg:block mt-5 w-72">
                                 <div className="top-4">
                                     <div className="mb-6">
                                         <SearchInput

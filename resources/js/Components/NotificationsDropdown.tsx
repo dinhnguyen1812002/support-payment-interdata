@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Bell, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {cn, formatTimeAgo} from "@/lib/utils";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -41,12 +41,12 @@ interface Notification {
         name?: string;
         profile_photo_url?: string;
         categories?: Category[];
-        abcdef?: string;
+        type_notification?: string;
     };
     read_at: string | null;
     created_at: string;
     type: "post" | "comment";
-    abcdef?: string;
+    type_notification?: string;
 }
 
 interface NotificationsDropdownProps {
@@ -58,7 +58,7 @@ interface NotificationsDropdownProps {
 const NotificationsDropdown = ({
                                    notifications: initialNotifications = [],
                                    className,
-                                   maxHeight = 400,
+                                   maxHeight = 500,
                                }: NotificationsDropdownProps) => {
     const [localNotifications, setLocalNotifications] = useState<Notification[]>(initialNotifications);
     const [activeAlert, setActiveAlert] = useState<string | null>(null);
@@ -73,7 +73,7 @@ const NotificationsDropdown = ({
     const commentCount = localNotifications.filter((n) => n.type === "comment").length;
 
     const determineNotificationType = (notification: Notification): "post" | "comment" => {
-        if (notification.abcdef === "comment" || notification.data?.abcdef === "comment") {
+        if (notification.type_notification === "comment" || notification.data?.type_notification === "comment") {
             return "comment";
         }
         return "post";
@@ -131,19 +131,7 @@ const NotificationsDropdown = ({
         }
     };
 
-    const formatTimeAgo = (date: string) => {
-        const now = new Date();
-        const notificationDate = new Date(date);
-        const diffInHours = Math.floor((now.getTime() - notificationDate.getTime()) / (1000 * 60 * 60));
 
-        if (diffInHours < 24) {
-            return format(notificationDate, "HH:mm", { locale: vi });
-        } else if (diffInHours < 48) {
-            return "Hôm qua";
-        } else {
-            return format(notificationDate, "dd/MM/yyyy", { locale: vi });
-        }
-    };
 
     const filteredNotifications = localNotifications.filter((notification) => {
         if (activeTab === "all") return true;
@@ -213,7 +201,7 @@ const NotificationsDropdown = ({
                                 </TabsList>
                             </Tabs>
                         </CardHeader>
-                        <ScrollArea style={{ maxHeight: maxHeight }}>
+                        <ScrollArea className="h-[300px] w-full ">
                             <CardContent className="p-0">
                                 {filteredNotifications.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-8 text-gray-500">

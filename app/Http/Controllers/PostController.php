@@ -23,12 +23,12 @@ class PostController extends Controller
 
         $posts = Post::getPosts($search, 6, $sort);
 
-        $totalComment = Post::withCount('comments')->count();
+        $totalComment = Post::withCount('comments');
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
-
+        $postCount = Post::sum('id');
         $user = auth()->user();
         $notifications = $user ? $user->unreadNotifications : [];
 
@@ -38,7 +38,7 @@ class PostController extends Controller
             }),
             'totalComment' => $totalComment,
             'categories' => $categories,
-            'postCount' => $posts->total(),
+            'postCount' => $postCount,
             'upvotes_count' => $posts->total(),
             'pagination' => [
                 'total' => $posts->total(),
@@ -286,14 +286,15 @@ class PostController extends Controller
         );
     }
 
-    public function getCountPost()
+    public function getCountPost(): \Illuminate\Http\JsonResponse
     {
-        $user = Auth::user();
-        if ($user && $user->hasRole('admin')) {
-            $postCount = Post::count();
-        } else {
-            $postCount = Post::where('is_published', true)->count();
-        }
+        //        $user = Auth::user();
+        //        if ($user && $user->hasRole('admin')) {
+        //            $postCount = Post::count();
+        //        } else {
+        //            $postCount = Post::where('is_published', true)->count();
+        //        }
+        $postCount = Post::count();
 
         return response()->json($postCount);
     }

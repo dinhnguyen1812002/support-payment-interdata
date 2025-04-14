@@ -30,7 +30,8 @@ const CommentsContent: React.FC<Omit<CommentsSectionProps, 'initialComments'>> =
     useEffect(() => {
         const channel = window.Echo.channel(`post.${postId}`);
         channel.listen('CommentPosted', (e: { comment: Comment }) => {
-            setComments((prev) => [e.comment, ...prev]);
+
+            addComment(e.comment);
         });
 
         return () => {

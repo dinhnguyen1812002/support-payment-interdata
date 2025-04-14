@@ -24,8 +24,5 @@ class RolesAndPermissionsSeeder extends Seeder
         $adminRole = Role::create(['name' => 'admin']);
         $userRole = Role::create(['name' => 'user']);
 
-        // Gán quyền cho vai trò
-        $adminRole->givePermissionTo(['view posts', 'create posts', 'edit posts', 'delete posts', 'view admin dashboard']);
-        $userRole->givePermissionTo(['view posts']);
     }
 }

@@ -11,6 +11,7 @@ import {
     CommandList,
 } from "@/Components/ui/command"
 import { format } from "date-fns"
+import {DialogTitle} from "@/Components/ui/dialog";
 
 interface SearchResult {
     id: string,
@@ -68,9 +69,11 @@ export function SearchCommandDialog({ open, setOpen }: SearchCommandDialogProps)
 
     return (
         <CommandDialog open={open} onOpenChange={setOpen}>
+            <DialogTitle className="hidden">Search</DialogTitle>
             <Command shouldFilter={false}>
+
                 <CommandInput
-                    placeholder="Search documents..."
+                    placeholder="Ascertaining the solution"
                     value={searchQuery}
                     onValueChange={(value) => {
                         setSearchQuery(value)
