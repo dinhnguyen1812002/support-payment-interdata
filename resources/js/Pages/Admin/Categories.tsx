@@ -167,9 +167,17 @@ export default function Categories() {
                                             type="search"
                                             placeholder="Search categories..."
                                             value={searchTerm}
+
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                             className="flex-1"
                                         />
+                                        {/*<Input*/}
+                                        {/*    placeholder="Filter by title..."*/
+                                        }
+                                        {/*    value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}*/}
+                                        {/*    onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}*/}
+                                        {/*    className="max-w-sm"*/}
+                                        {/*/>*/}
                                         <Button type="submit" variant="outline" size="icon">
                                             <Search className="h-4 w-4" />
                                             <span className="sr-only">Search</span>

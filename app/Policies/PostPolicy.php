@@ -4,12 +4,15 @@ namespace App\Policies;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Providers\AuthServiceProvider;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PostPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
+    use HandlesAuthorization;
     public function viewAny(User $user): bool
     {
         return false;
@@ -18,9 +21,15 @@ class PostPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Post $post): bool
+    public function view(User $user, Post $post)
     {
-        return false;
+        // Anyone can view published posts
+        if ($post->is_published) {
+            return true;
+        }
+
+        // Only admin users or the post author can view unpublished posts
+        return $user->hasRole('admin') || $user->id === $post->user_id;
     }
 
     /**
@@ -61,5 +70,15 @@ class PostPolicy
     public function forceDelete(User $user, Post $post): bool
     {
         return false;
+    }
+    public function receiveNotification(User $user, Post $post)
+    {
+        // For public posts, anyone can receive notifications
+        if ($post->is_published) {
+            return true;
+        }
+
+        // For private posts, only admins should receive notifications
+        return $user->hasRole('admin');
     }
 }

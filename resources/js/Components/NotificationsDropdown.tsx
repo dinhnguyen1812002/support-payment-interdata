@@ -218,7 +218,7 @@ const NotificationsDropdown = ({
                                             )}
                                         >
                                             <div className="flex flex-col items-center">
-                                                <Avatar className="h-10 w-10 border rounded-lg">
+                                                <Avatar className="h-12 w-12 border rounded-lg">
                                                     <AvatarImage
                                                         src={notification.data.profile_photo_url}
                                                         alt={notification.data.name || "User"}

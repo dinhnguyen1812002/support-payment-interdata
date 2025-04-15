@@ -76,6 +76,6 @@ class User extends Authenticatable
 
     public function isAdmin()
     {
-        return $this->role === 'admin'; // Giả sử cột 'role' trong bảng users
+        return $this->hasRole('admin');
     }
 }

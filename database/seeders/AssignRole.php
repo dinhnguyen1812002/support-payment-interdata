@@ -14,7 +14,7 @@ class AssignRole extends Seeder
     public function run()
     {
 
-        $user = User::find(112);
+        $user = User::find(1);
 
         if (! $user) {
             $user = User::create([
