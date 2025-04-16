@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\Search\SearchController;
+use App\Http\Controllers\Ticket\TicketController;
 use App\Http\Controllers\UserController;
 use App\Models\Post;
 use App\Models\User;
@@ -55,3 +56,10 @@ Route::get('/top-voted-posts', [PostController::class, 'topVotedPosts']);
 Route::post('/users/assign-role', [UserController::class, 'assignRole'])
     ->middleware(['auth:sanctum', 'verified'])
     ->name('users.assign-role');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/support-ticket/submit', [TicketController::class, 'submitTicket'])->name('ticket.submit');
+
+});
+Route::post('/webhook/support-ticket', [TicketController::class, 'handleWebhook'])
+    ->middleware(\App\Http\Middleware\VerifyWebhook::class)->name('webhook');

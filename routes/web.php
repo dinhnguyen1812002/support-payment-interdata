@@ -90,3 +90,4 @@ Route::get('/notifications', [NotificationController::class, 'index'])->name('no
 Route::get('/preview-email', function () {
     return view('mail.notification');
 });
+Route::get("/form" , [\App\Http\Controllers\Ticket\TicketController::class , 'showForm']);

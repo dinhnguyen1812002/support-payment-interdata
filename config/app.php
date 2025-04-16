@@ -66,7 +66,7 @@ return [
     */
 
     'timezone' => env('APP_TIMEZONE', 'UTC'),
-
+    'webhook_secret' => env('WEBHOOK_SECRET', 'your-secret-key'),
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

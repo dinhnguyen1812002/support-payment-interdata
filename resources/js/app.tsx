@@ -27,7 +27,6 @@ createInertiaApp({
     const root = createRoot(el);
     return root.render(
       <RouteContext.Provider value={(window as any).route}>
-
         <ThemeProvider>
               <ScrollProgress  />
               <App {...props} />

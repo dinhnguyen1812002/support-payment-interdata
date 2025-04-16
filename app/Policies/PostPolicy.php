@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Post;
 use App\Models\User;
-use App\Providers\AuthServiceProvider;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PostPolicy
@@ -13,6 +12,7 @@ class PostPolicy
      * Determine whether the user can view any models.
      */
     use HandlesAuthorization;
+
     public function viewAny(User $user): bool
     {
         return false;
@@ -71,6 +71,7 @@ class PostPolicy
     {
         return false;
     }
+
     public function receiveNotification(User $user, Post $post)
     {
         // For public posts, anyone can receive notifications

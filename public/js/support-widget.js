@@ -1,0 +1,1 @@
+import{f as o,j as r}from "../build/assets/client-BfoGT8x0.js";import e from "../build/assets/Form-B0OwDsrb.js";const t=document.getElementById("support-widget");t&&o.createRoot(t).render(r.jsx(e,{}));
