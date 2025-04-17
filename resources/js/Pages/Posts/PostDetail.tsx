@@ -5,7 +5,7 @@ import CommentsSection from '@/Pages/Comments/CommentsSection';
 import { Badge } from '@/Components/ui/badge';
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-import { Category, Notification } from '@/types';
+import {Category, Notification, Tag} from '@/types';
 import UpvoteButton from '@/Components/VoteButton';
 import SearchComponent from "@/Components/Search";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
@@ -25,6 +25,7 @@ interface BlogPost {
     comments: Comment[];
     has_upvoted: boolean;
     upvotes_count: number;
+    tags: Tag[];
 }
 
 interface PostDetailProps {
@@ -65,10 +66,6 @@ const PostDetail: React.FC<PostDetailProps> = ({
             router.get("/posts/search", { search: value, page: 1 });
         }
     };
-
-
-
-
     // Submit a new comment
     const handleCommentSubmit = (content: string, parentId?: number) => {
         router.post(
@@ -129,6 +126,14 @@ const PostDetail: React.FC<PostDetailProps> = ({
                                                     </Badge>
                                                 </Link>
                                             ))}
+                                            {post.tags.map((tags) => (
+                                                    <Badge variant="secondary" className="px-3 py-1 text-sm
+                                                    font-medium  rounded-lg dark:bg-gray-700 dark:text-blue-400 hover:border-solid
+                                                   ">
+                                                        {tags.name}
+                                                    </Badge>
+                                            ))}
+
                                             <UpvoteButton
                                                 postId={post.id}
                                                 initialUpvotes={post.upvotes_count}

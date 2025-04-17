@@ -4,7 +4,7 @@ import {CommentsResponse, Comment, User} from "@/types/CommentTypes";
 
 interface CommentListProps {
     comments: Comment[];
-    onReply: (content: string, parentId: number) => void;
+    onReply: (content: string, parentId?: number)  => void;
     currentUser: User | null;
     depth?: number;
 }

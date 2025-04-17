@@ -240,9 +240,9 @@ const NotificationsDropdown = ({
                                                         {/*<ba className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">*/}
                                                         {/*    {notification.type === "comment" ? "Comment" : "Question"}*/}
                                                         {/*</ba>*/}
-                                                        <Badge variant="outline" className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ">
-                                                            {notification.type === "comment" ? "Comment" : "Question"}
-                                                        </Badge>
+                                                        {/*<Badge variant="outline" className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ">*/}
+                                                        {/*    {notification.type === "comment" ? "Comment" : "Question"}*/}
+                                                        {/*</Badge>*/}
                                                     </p>
                                                 </div>
                                             </Link>

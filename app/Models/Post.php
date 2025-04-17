@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -21,6 +22,11 @@ class Post extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'post_tag', 'post_id', 'tag_id');
     }
 
     // Quan hệ với categories
@@ -68,19 +74,27 @@ class Post extends Model
             'content' => $this->getExcerpt(),
             'slug' => $this->slug,
             'upvote_count' => $this->upvotes_count,
+            'is_published' => $this->is_published,
+            'user' => $this->user ? [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+            ] : null,
+            'tags' => $this->tags->map(function ($tag) {
+                return [
+                    'id' => $tag->id,
+                    'name' => $tag->name,
+                ];
+            })->toArray(),
             'categories' => $this->categories->map(function ($category) {
                 return [
                     'id' => $category->id,
                     'title' => $category->title,
+                    'slug' => $category->slug,
                 ];
-            }),
-            'user' => [
-                'id' => $this->user->id,
-                'name' => $this->user->name,
-                'profile_photo_path' => $this->user->profile_photo_path,
-            ],
-            'created_at' => $this->created_at->diffForHumans(),
-            'published_at' => $this->published_at,
+            })->toArray(),
+            'comments_count' => $this->comments_count,
+            'created_at' => $this->created_at->toDateTimeString(),
+            // Add other fields as needed
         ];
     }
 
@@ -89,7 +103,7 @@ class Post extends Model
     {
         $query = self::query()
             ->where('is_published', true)
-            ->with(['user', 'categories'])
+            ->with(['user', 'tags', 'categories'])
             ->withCount('upvotes');
 
         if ($search) {
@@ -115,7 +129,7 @@ class Post extends Model
     // Lấy bài viết theo slug với các thông tin liên quan
     public static function getPostBySlug($slug)
     {
-        return self::with(['user:id,name,profile_photo_path', 'categories:id,title,slug'])
+        return self::with(['user:id,name,profile_photo_path', 'categories:id,title,slug', 'tags:id,name'])
             ->withCount(['upvotes', 'comments'])
             ->where('slug', $slug)
             ->firstOrFail();

@@ -18,7 +18,7 @@ import {formatTimeAgo, getAvatarUrl} from "@/lib/utils";
 
 interface CommentItemProps {
     comment: Comment;
-    onReply: (content: string, parentId: number) => void;
+    onReply: (content: string, parentId: string) => void;
     currentUser: User | null;
     depth?: number;
 }
@@ -62,7 +62,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
     return (
         <div className={`flex gap-4 ${indentationClass}`}>
             <div className="flex-1 space-y-4">
-                <Card className="overflow-hidden dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+                <Card className="overflow-hidden dark:bg-black border-gray-200 dark:border-gray-700">
                     <CardContent className="relative pt-4">
                         <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center space-x-3">
@@ -89,6 +89,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
                                     className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                                 >
                                     <MessageCircle className="w-4 h-4" />
+                                    Reply
                                 </Button>
 
                                 <DropdownMenu>

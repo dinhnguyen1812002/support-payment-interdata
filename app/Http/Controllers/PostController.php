@@ -6,11 +6,10 @@ use App\Data\Post\CreatePostData;
 use App\Events\NewQuestionCreated;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\tag;
 use App\Models\User;
 use App\Notifications\NewPostNotification;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -21,17 +20,31 @@ class PostController extends Controller
         $search = $request->input('search', '');
         $sort = $request->input('sort', 'latest');
 
+        // Fetch posts with tags and other relationships
         $posts = Post::getPosts($search, 6, $sort);
 
-        $totalComment = Post::withCount('comments');
+        // Note: This line seems incorrect; it creates a query but doesn't execute it
+        // $totalComment = Post::withCount('comments');
+        // Replace with actual count or remove if not needed
+        $totalComment = Post::withCount('comments')->count();
 
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
-        $postCount = Post::sum('id');
+
+        $tags = Tag::select(['id', 'name'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
+
+        // This seems incorrect; summing IDs doesn't give a meaningful count
+        // $postCount = Post::sum('id');
+        // Replace with actual post count
+        $postCount = Post::count();
+
         $user = auth()->user();
-        $notifications = $user ? $user->unreadNotifications : [];
+        $notifications = $user?->unreadNotifications ?? [];
 
         return Inertia::render('Posts/Index', [
             'posts' => $posts->map(function ($post) {
@@ -39,8 +52,9 @@ class PostController extends Controller
             }),
             'totalComment' => $totalComment,
             'categories' => $categories,
+            'tags' => $tags,
             'postCount' => $postCount,
-            'upvotes_count' => $posts->total(),
+            'upvotes_count' => $posts->total(), // Verify if this is correct
             'pagination' => [
                 'total' => $posts->total(),
                 'per_page' => $posts->perPage(),
@@ -55,20 +69,26 @@ class PostController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): \Inertia\Response
     {
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
 
+        $tag = Tag::select(['id', 'name'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
+
         return Inertia::render('Posts/Create', [
             'categories' => $categories,
+            'tags' => $tag,
             'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
         ]);
     }
 
-    public function store(CreatePostData $postData)
+    public function store(CreatePostData $postData): \Illuminate\Http\RedirectResponse
     {
         $slug = Str::slug($postData->title);
 
@@ -89,7 +109,9 @@ class PostController extends Controller
         if (! empty($postData->categories)) {
             $post->categories()->attach($postData->categories);
         }
-
+        if (! empty($postData->tags)) {
+            $post->tags()->attach($postData->tags);
+        }
         $users = User::all();
 
         foreach ($users as $user) {
@@ -103,14 +125,17 @@ class PostController extends Controller
         return redirect()->route('/')->with('success', 'Post created successfully!');
     }
 
-    public function show($slug)
+    public function show(string $slug): \Inertia\Response
     {
         $post = Post::getPostBySlug($slug);
         $categories = Category::select(['id', 'title', 'slug'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
-
+        $tag = Tag::select(['id', 'name'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
         $comments = $post->getFormattedComments();
         $hasUpvoted = auth()->check() ? $post->isUpvotedBy(auth()->id()) : false;
 
@@ -124,16 +149,18 @@ class PostController extends Controller
                 'published_at' => $post->published_at,
                 'user' => $post->user,
                 'categories' => $post->categories,
+                'tags' => $post->tags,
                 'comments' => $comments,
                 'upvotes_count' => $post->upvotes_count,
                 'has_upvoted' => $hasUpvoted,
             ],
             'categories' => $categories,
+            'tag' => $tag,
             //            'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
         ]);
     }
 
-    public function edit($slug)
+    public function edit(string $slug): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
         $post = Post::where('slug', $slug)->with('user', 'categories')->firstOrFail();
 
@@ -142,6 +169,10 @@ class PostController extends Controller
         }
 
         $categories = Category::select(['id', 'title', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
+        $tags = Tag::select(['id', 'name'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
@@ -154,6 +185,7 @@ class PostController extends Controller
                 'slug' => $post->slug,
                 'is_published' => $post->is_published,
                 'categories' => $post->categories->pluck('id'),
+                'tágs' => $post->tags->pluck('id'),
                 'user' => [
                     'id' => $post->user->id,
                     'name' => $post->user->name,
@@ -162,12 +194,13 @@ class PostController extends Controller
                 'created_at' => $post->created_at->toDateTimeString(),
                 'updated_at' => $post->updated_at->toDateTimeString(),
             ],
+            'tags' => $tags,
             'categories' => $categories,
-            'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
+
         ]);
     }
 
-    public function update(CreatePostData $request, Post $post)
+    public function update(CreatePostData $request, Post $post): \Illuminate\Http\RedirectResponse
     {
         if ($post->user_id !== auth()->id()) {
             return redirect()->route('/')->with('error', 'You are not authorized to update this post!');
@@ -185,11 +218,13 @@ class PostController extends Controller
         if (! empty($postData->categories)) {
             $post->categories()->sync($postData->categories);
         }
-
+        if (! empty($postData->tags)) {
+            $post->tags()->sync($postData->tags);
+        }
         return redirect()->back()->with('success', 'Post updated successfully!');
     }
 
-    public function destroy(Post $post)
+    public function destroy(Post $post): \Illuminate\Http\RedirectResponse
     {
         //        if (! Gate::allows('delete', $post)) {
         // //            return back()->with('error', 'Bạn không có quyền xóa bài viết này!');
@@ -200,7 +235,7 @@ class PostController extends Controller
         return back()->with('success', 'Bài viết đã được xóa thành công!');
     }
 
-    public function filterPostByCategory(Request $request, $categorySlug)
+    public function filterPostByCategory(Request $request, $categorySlug): \Inertia\Response
     {
         $category = Category::where('slug', $categorySlug)->firstOrFail();
         $posts = Post::byCategorySlug($categorySlug)
@@ -236,7 +271,7 @@ class PostController extends Controller
         ]);
     }
 
-    public function search(Request $request)
+    public function search(Request $request): \Inertia\Response
     {
         $search = $request->input('search', '');
         $sort = $request->input('sort', 'latest');
@@ -279,7 +314,7 @@ class PostController extends Controller
         ]);
     }
 
-    public function getLatestPosts(Request $request)
+    public function getLatestPosts(Request $request): \Illuminate\Http\JsonResponse
     {
         return response()->json(
             Post::select(['id', 'title', 'slug'])
@@ -304,7 +339,7 @@ class PostController extends Controller
         return response()->json($postCount);
     }
 
-    public function topVotedPosts(Request $request)
+    public function topVotedPosts(Request $request): \Illuminate\Http\JsonResponse
     {
         $limit = $request->query('limit', 5);
 

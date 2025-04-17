@@ -16,6 +16,7 @@ use Inertia\Inertia;
 class TicketController extends Controller
 {
     use HandlesAuthorization;
+
     public function showForm()
     {
         return Inertia::render('Ticket/Form');

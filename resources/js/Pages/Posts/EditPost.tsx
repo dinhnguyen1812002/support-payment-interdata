@@ -7,12 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Com
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Switch } from "@/Components/ui/switch";
-import { Loader2, PenLine, Globe2, Eye, Hash, X, AlertCircle } from 'lucide-react';
+import {Loader2, PenLine, Globe2, Eye, Hash, X, AlertCircle, Send, CircleAlert} from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Button } from '@/Components/ui/button';
 import { Badge } from "@/Components/ui/badge";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
-import { BlogPost, Category, Notification } from "@/types";
+import {BlogPost, Category, Notification, Tag} from "@/types";
 import LatestPosts from "@/Pages/Posts/LatestPost";
 import { Separator } from "@/Components/ui/separator";
 import SearchComponent from "@/Components/Search";
@@ -21,6 +21,8 @@ import { router } from "@inertiajs/core";
 import Sidebar from '@/Components/Sidebar';
 import QuillEditor from '@/Components/QuillEditor';
 import SearchInput from '@/Components/search-input';
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/Components/ui/tooltip";
+import SingleTagInput from "@/Components/tag-input";
 interface EditPostProps {
 
     post: {
@@ -30,28 +32,38 @@ interface EditPostProps {
         slug: string;
         is_published: boolean;
         categories?: number[];
+        tags?: number[];
     };
+    tags: Tag[];
     keyword: string;
     categories: Category[];
     notifications: Notification[]
 
 }
 
-
-
 const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, category: Category) => {
     const [categorySearchFocused, setCategorySearchFocused] = useState(false);
     const quillRef = useRef<ReactQuill>(null);
+
     const { data, setData, put, processing, errors, reset } = useForm({
         title: post.title || '',
         content: post.content || '',
         is_published: post.is_published || false,
         categories: post.categories || [],
+        tags: post.tags || [],
     });
+    const [selectedTag, setSelectedTag] = React.useState<number | null>(null);
     const [showCategories, setShowCategories] = useState(false);
 
     const [searchTerm, setSearchTerm] = useState('');
-
+    const handleTagSelect = (tagId: number | null) => {
+        if (tagId !== null) {
+            setData('tags', [tagId]); // This is correct: sends [tagId]
+        } else {
+            setData('tags', []); // This is correct: sends empty array
+        }
+        setSelectedTag(tagId);
+    };
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -174,10 +186,38 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                         </div>
                                         {/* Categories */}
                                         <div className="space-y-2 mt-10">
+                                            <Label className="text-base flex items-center mt-14 text-customBlue1 font-bold">
+                                                Tags
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <CircleAlert className="ml-2 w-3 h-3 text-red-500" />
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>Choose one tag</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            </Label>
+
+                                            <SingleTagInput
+                                                options={} // Ensure tags is an array of objects with id and name
+                                                selectedTag={selectedTag}
+                                                setSelectedTag={(tagId) => handleTagSelect(tagId)}
+                                                placeholder="Choose a tag..."
+                                            />
+
+                                            {errors.tags && (
+                                                <p className="text-sm text-red-500 flex items-center mt-1">
+                                                    <AlertCircle className="w-4 h-4 mr-1" /> {errors.tags}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className="space-y-2 mt-10">
                                             <Label className="text-base font-medium flex items-center mt-14 ">
-                                                Danh mục <span className="text-red-500">*</span>
+                                               Category <span className="text-red-500">*</span>
                                                 <span className="text-sm text-muted-foreground ml-2">
-                                                    ({data.categories.length}/3)
+                                                    ({data.categories.length})
                                                 </span>
                                             </Label>
                                             <div className="flex flex-wrap gap-2 mb-2">
@@ -253,7 +293,12 @@ const EditPost = ({ post, categories, notifications, keyword }: EditPostProps, c
                                                         Đang xử lý...
                                                     </div>
                                                 ) : (
-                                                    "Update your question"
+                                                    <p className="flex items-center">
+                                                        <Send className="w-4 h-4 mr-2" />
+                                                        Update
+                                                    </p>
+
+
                                                 )}
                                             </Button>
                                         </div>

@@ -122,6 +122,11 @@ export interface Category {
     description:string;
     posts_count?: number;
 }
+export interface Tag{
+    id: number;
+    name: string;
+    posts_count?: number;
+}
 export interface Comment {
     id: string;
     comment: string;
@@ -143,6 +148,7 @@ export interface BlogPost {
     content: string;
     slug: string;
     categories: Category[];
+    tags: Tag[];
     user: {
         id: number;
         name: string;

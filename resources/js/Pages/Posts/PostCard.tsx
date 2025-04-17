@@ -58,7 +58,6 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts: initialPosts = [], postCount
             </div>
         );
     }
-
     return (
         <div className="w-full min-h-screen flex flex-col flex-1">
             <div className="flex justify-between items-center flex-wrap mb-8 lg:mb-7">
@@ -69,8 +68,6 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts: initialPosts = [], postCount
                             ({postCount})
                         </small>
                     </span>
-
-
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                     {isAuthenticated ? (
@@ -134,6 +131,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts: initialPosts = [], postCount
                                         </div>
                                     </div>
                                     <div className="flex items-center space-x-2">
+
                                         <div className="flex flex-wrap gap-2">
                                             {post.categories &&
                                                 post.categories.map((category) => (
@@ -147,6 +145,22 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts: initialPosts = [], postCount
                                                     </Link>
                                                 ))}
                                         </div>
+
+                                        {post.tags &&
+                                            post.tags.map((tags) => (
+
+                                                    <Badge
+                                                        key={tags.id}
+                                                        variant="secondary"
+                                                        className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 rounded-md   dark:bg-[#0F1014]"
+                                                    >
+                                                        {tags.name}
+                                                    </Badge>
+
+                                            ))}
+                                        {/*<div className="flex flex-wrap gap-2">*/}
+                                        {/*   <Badge> {post.tags.name}</Badge>*/}
+                                        {/*</div>*/}
                                         <UpvoteButton
                                             postId={post.id}
                                             initialUpvotes={post.upvote_count}

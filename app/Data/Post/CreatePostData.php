@@ -19,5 +19,9 @@ class CreatePostData extends Data
 
         #[Rule('required|array')]
         public array $categories,
+
+        #[Rule('required|array')]
+
+        public array $tags, // Change from string to array
     ) {}
 }
