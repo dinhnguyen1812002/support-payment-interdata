@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\Search\SearchController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\Ticket\TicketController;
 use App\Http\Controllers\UserController;
 use App\Models\Post;
@@ -35,6 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 Route::get('categories', [CategoryController::class, 'index']);
+
+Route::get('/tags', [TagController::class, 'index']);
 
 Route::get('/global-search', [SearchController::class, 'globleSearch'])->name('search.posts');
 

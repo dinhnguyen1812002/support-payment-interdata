@@ -7,6 +7,7 @@ import axios from "axios";
 import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 import { SearchCommandDialog } from "@/Components/command-dialog";
 import { Menu } from "lucide-react";
+import TagBar from "@/Pages/Tags/TagBar";
 
 interface Category {
     id: number;
@@ -62,47 +63,47 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title, categories, s
         }
     };
     const keyCmd = navigator.userAgent.indexOf('Mac OS X') ? "ctrl + k" : "⌘ + K";
-    return (
 
-            <div className="mt-5 ">
-                <div className="px-4 sm:px-5">
-                    <p className="w-full text-xs font-semibold text-gray-400 mb-2 ">{uppercaseText(title)}</p>
-                </div>
-                <div className="p-1">
-                    <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)]">
-                        {processedCategories.map(({ id, title, number, link, isActive }) => (
-                            <div
-                                key={id}
-                                className={`flex items-center px-4 py-2  hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition mt-1 ${
-                                    isActive ? "border-l-4 border-blue-500 bg-gray-100 hover:text-blue-500  dark:bg-[#1B1C22]" : ""
-                                }`}
-                            >
-                                {title === "Search" ? (
-                                    <div className="w-full flex items-center justify-between dark:text-[#9a9cae] " onClick={() => handleCategoryClick(title, link)}>
+    return (
+        <div className="mt-5 ">
+            <div className="px-4 sm:px-5">
+                <p className="w-full text-xs font-semibold text-gray-400 mb-2 ">{uppercaseText(title)}</p>
+            </div>
+            <div className="p-1">
+                <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)]">
+                    {processedCategories.map(({ id, title, number, link, isActive }) => (
+                        <div
+                            key={id}
+                            className={`flex items-center px-4 py-2  hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition mt-1 ${
+                                isActive ? "border-l-4 border-blue-500 bg-gray-100 hover:text-blue-500  dark:bg-[#1B1C22]" : ""
+                            }`}
+                        >
+                            {title === "Search" ? (
+                                <div className="w-full flex items-center justify-between dark:text-[#9a9cae] " onClick={() => handleCategoryClick(title, link)}>
                                     <span className={`text-sm font-medium transition-colors  dark:text-[#9a9cae]${isActive ?
                                         "dark:text-blue-400 dark:hover:text-blue-600 " : "hover:text-blue-500 "}`}>
                                         {title}
 
                                     </span >
-                                        <span className="text-sm text-gray-400">{keyCmd}</span>
-                                    </div>
-                                ) : (
-                                    <Link href={link} className="w-full flex h-5 items-center justify-between  dark:text-[#9a9cae]" onClick={() => handleCategoryClick(title, link)}>
+                                    <span className="text-sm text-gray-400">{keyCmd}</span>
+                                </div>
+                            ) : (
+                                <Link href={link} className="w-full flex h-5 items-center justify-between  dark:text-[#9a9cae]" onClick={() => handleCategoryClick(title, link)}>
                                           <span className={`text-sm font-medium transition-colors   ${isActive ?
                                               " dark:text-blue-400 dark:hover:text-blue-600" : "hover:text-blue-500"}`}>
                                         {title}
 
                                     </span >
-                                        {number !== null && number !== undefined && (
-                                            <span className="text-sm text-gray-400 ">{number.toLocaleString()}</span>
-                                        )}
-                                    </Link>
-                                )}
-                            </div>
-                        ))}
-                    </ScrollArea>
-                </div>
+                                    {number !== null && number !== undefined && (
+                                        <span className="text-sm text-gray-400 ">{number.toLocaleString()}</span>
+                                    )}
+                                </Link>
+                            )}
+                        </div>
+                    ))}
+                </ScrollArea>
             </div>
+        </div>
     );
 };
 
@@ -146,6 +147,7 @@ const Sidebar: React.FC<Props> = () => {
     return (
         <div className="w-56 p-2">
             <CategoryList title="PUBLIC" categories={publicCategories} setOpen={setOpen} />
+            <TagBar />
             <CategoriesSidebar />
             <SearchCommandDialog open={open} setOpen={setOpen} />
         </div>

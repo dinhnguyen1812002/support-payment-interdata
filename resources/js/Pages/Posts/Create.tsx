@@ -146,13 +146,13 @@ const CreatePost = (
                                             <div className="space-y-1">
                                                 <Label
                                                     htmlFor="title"
-                                                    className="text-base font-bold text-customBlue1"
+                                                    className="text-base font-bold text-customBlue1 flex"
                                                 >
                                                     Title{' '}
                                                     <TooltipProvider>
                                                         <Tooltip>
                                                             <TooltipTrigger asChild>
-                                                                <CircleAlert className="ml-2 w-3 h-3 text-red-500" />
+                                                                <span className="text-red-500 mr-1">*</span>
                                                             </TooltipTrigger>
                                                             <TooltipContent>
                                                                 <p>Please enter a title</p>
@@ -182,16 +182,17 @@ const CreatePost = (
                                             <div className="space-y-2">
                                                 <Label
                                                     htmlFor="content"
-                                                    className="text-base font-bold text-customBlue1"
+                                                    className="text-base font-bold text-customBlue1 flex"
                                                 >
                                                     Question
                                                     <TooltipProvider>
                                                         <Tooltip>
                                                             <TooltipTrigger asChild>
-                                                                <CircleAlert className="ml-2 w-3 h-3 text-red-500" />
+
+                                                                <span className="text-red-500 mr-1">*</span>
                                                             </TooltipTrigger>
                                                             <TooltipContent>
-                                                                <p>Enter your question</p>
+                                                                <p className="tt">Enter your question</p>
                                                             </TooltipContent>
                                                         </Tooltip>
                                                     </TooltipProvider>
@@ -228,7 +229,7 @@ const CreatePost = (
                                                     <TooltipProvider>
                                                         <Tooltip>
                                                             <TooltipTrigger asChild>
-                                                                <CircleAlert className="ml-2 w-3 h-3 text-red-500" />
+                                                                <span className="text-red-500 mr-1">*</span>
                                                             </TooltipTrigger>
                                                             <TooltipContent>
                                                                 <p>Choose one tag</p>
@@ -258,7 +259,7 @@ const CreatePost = (
                                                     <TooltipProvider>
                                                         <Tooltip>
                                                             <TooltipTrigger asChild>
-                                                                <CircleAlert className="ml-2 w-3 h-3 text-red-500"/>
+                                                                <span className="text-red-500 mr-1">*</span>
                                                             </TooltipTrigger>
                                                             <TooltipContent>
                                                                 <p>Choose at least one</p>

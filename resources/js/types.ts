@@ -207,6 +207,7 @@ export interface IndexProps {
 
     posts: BlogPost[];
     categories: Category[];
+    tags: Tag[];
     pagination: Paginate;
     postCount: number;
     keyword: string;

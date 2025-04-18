@@ -32,6 +32,10 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/posts/search', [PostController::class, 'search'])->name('posts.search');
 Route::get('/categories/{categorySlug}/posts', [PostController::class, 'filterPostByCategory'])
     ->name('categories.posts.index');
+
+Route::get('/tags/{tagsSlug}/posts', [PostController::class, 'filterPostByTag'])
+    ->name('tags.posts.index');
+
 Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
 
 Route::post('/posts/{post}/upvote', [UpvoteController::class, 'upvote'])

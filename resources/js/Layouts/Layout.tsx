@@ -18,6 +18,7 @@ import SearchInput from "@/Components/search-input";
 const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
                                               categories = [],
                                               keyword,
+                                              tags,
                                               children,
                                               category,
                                               notifications,
@@ -39,7 +40,7 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
                         <div className="flex  gap-x-4 ">
                             {/* Left Sidebar */}
                             <div className="hidden lg:block  pr-2 ml-3 ">
-                                <Sidebar categories={[]} />
+                                <Sidebar categories={[]} tags={tags} />
                             </div>
 
 

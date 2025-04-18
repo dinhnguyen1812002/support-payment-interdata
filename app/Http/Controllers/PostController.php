@@ -19,13 +19,11 @@ class PostController extends Controller
     {
         $search = $request->input('search', '');
         $sort = $request->input('sort', 'latest');
+        $tag = $request->input('tag', null); // Note: Changed 'tags' to 'tag' for consistency
 
         // Fetch posts with tags and other relationships
-        $posts = Post::getPosts($search, 6, $sort);
+        $posts = Post::getPosts($search, 6, $sort, $tag);
 
-        // Note: This line seems incorrect; it creates a query but doesn't execute it
-        // $totalComment = Post::withCount('comments');
-        // Replace with actual count or remove if not needed
         $totalComment = Post::withCount('comments')->count();
 
         $categories = Category::select(['id', 'title', 'slug'])
@@ -38,9 +36,6 @@ class PostController extends Controller
             ->orderBy('posts_count', 'desc')
             ->get();
 
-        // This seems incorrect; summing IDs doesn't give a meaningful count
-        // $postCount = Post::sum('id');
-        // Replace with actual post count
         $postCount = Post::count();
 
         $user = auth()->user();
@@ -54,9 +49,9 @@ class PostController extends Controller
             'categories' => $categories,
             'tags' => $tags,
             'postCount' => $postCount,
-            'upvotes_count' => $posts->total(), // Verify if this is correct
+            'upvotes_count' => $posts->sum('upvotes_count'),
             'pagination' => [
-                'total' => $posts->total(),
+                'total' => $posts->total(), // Use total() for paginated results
                 'per_page' => $posts->perPage(),
                 'current_page' => $posts->currentPage(),
                 'last_page' => $posts->lastPage(),
@@ -66,6 +61,7 @@ class PostController extends Controller
             'keyword' => $search,
             'notifications' => $notifications,
             'sort' => $sort,
+            'selectedTag' => $tag,
         ]);
     }
 
@@ -162,7 +158,7 @@ class PostController extends Controller
 
     public function edit(string $slug): \Inertia\Response|\Illuminate\Http\RedirectResponse
     {
-        $post = Post::where('slug', $slug)->with('user', 'categories')->firstOrFail();
+        $post = Post::where('slug', $slug)->with(['user', 'categories', 'tags'])->firstOrFail();
 
         if ($post->user_id !== auth()->id()) {
             return redirect()->route('/')->with('error', 'You are not authorized to update this post!');
@@ -184,8 +180,8 @@ class PostController extends Controller
                 'content' => $post->content,
                 'slug' => $post->slug,
                 'is_published' => $post->is_published,
-                'categories' => $post->categories->pluck('id'),
-                'tágs' => $post->tags->pluck('id'),
+                'categories' => $post->categories->pluck('id')->toArray(),
+                'tags' => $post->tags->pluck('id')->toArray(),
                 'user' => [
                     'id' => $post->user->id,
                     'name' => $post->user->name,
@@ -196,7 +192,8 @@ class PostController extends Controller
             ],
             'tags' => $tags,
             'categories' => $categories,
-
+            'keyword' => request()->input('search', ''),
+            'notifications' => auth()->check() ? auth()->user()->unreadNotifications : [],
         ]);
     }
 
@@ -221,6 +218,7 @@ class PostController extends Controller
         if (! empty($postData->tags)) {
             $post->tags()->sync($postData->tags);
         }
+
         return redirect()->back()->with('success', 'Post updated successfully!');
     }
 
@@ -257,6 +255,49 @@ class PostController extends Controller
                 'slug' => $category->slug,
             ],
             'categories' => $categories,
+            'posts' => $posts->map(function ($post) {
+                return $post->toFormattedArray();
+            }),
+            'pagination' => [
+                'total' => $posts->total(),
+                'per_page' => $posts->perPage(),
+                'current_page' => $posts->currentPage(),
+                'last_page' => $posts->lastPage(),
+                'next_page_url' => $posts->nextPageUrl(),
+                'prev_page_url' => $posts->previousPageUrl(),
+            ],
+        ]);
+    }
+
+    public function filterPostByTag(Request $request, $tagsSlug): \Inertia\Response
+    {
+        $tag = Tag::Where('slug', $tagsSlug)->firstOrFail();
+        $posts = Post::byTagsSlug($tagsSlug)
+            ->with(['user', 'categories'])
+            ->withCount('upvotes')
+            ->orderBy('upvotes_count', 'desc')
+            ->latest()
+            ->paginate(6);
+
+        $categories = Category::select(['id', 'title', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
+
+        $tags = Tag::select(['id', 'name', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->get();
+
+        return Inertia::render('Posts/Tags', [
+            'tag' => [
+                'id' => $tag->id,
+                'name' => $tag->title,
+                'slug' => $tag->slug,
+            ],
+
+            'categories' => $categories,
+            'tags' => $tags,
             'posts' => $posts->map(function ($post) {
                 return $post->toFormattedArray();
             }),

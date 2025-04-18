@@ -99,7 +99,7 @@ class Post extends Model
     }
 
     // Phương thức lấy danh sách bài viết với tìm kiếm, phân trang và sắp xếp
-    public static function getPosts($search = '', $perPage = 6, $sort = 'latest')
+    public static function getPosts($search = '', $perPage = 6, $sort = 'latest', $tag = null)
     {
         $query = self::query()
             ->where('is_published', true)
@@ -109,6 +109,12 @@ class Post extends Model
         if ($search) {
             $query->where('title', 'like', "%{$search}%")
                 ->orWhere('content', 'like', "%{$search}%");
+        }
+
+        if ($tag) {
+            $query->whereHas('tags', function ($q) use ($tag) {
+                $q->where('tags.id', $tag);
+            });
         }
 
         if ($sort === 'latest') {
@@ -172,6 +178,13 @@ class Post extends Model
     {
         return $query->whereHas('categories', function ($q) use ($categorySlug) {
             $q->where('slug', $categorySlug);
+        });
+    }
+
+    public function scopeByTagsSlug(Builder $query, $tagSlug)
+    {
+        return $query->whereHas('tags', function ($q) use ($tagSlug) {
+            $q->where('slug', $tagSlug);
         });
     }
 

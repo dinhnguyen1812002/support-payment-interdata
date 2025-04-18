@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import BlogCard from "@/Pages/Posts/PostCard";
-import AppLayout from "@/Layouts/AppLayout";
+
 import Pagination from "@/Components/Pagination";
 import { Category, Paginate, BlogPost, Notification, Tag } from "@/types";
-import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
-import SearchComponent from "@/Components/Search";
-import { Separator } from "@/Components/ui/separator";
-import LatestPosts from "@/Pages/Posts/LatestPost";
+
 import MainLayout from "@/Layouts/Layout";
-import { Head } from "@inertiajs/react";
+
 
 interface Props {
     posts: BlogPost[];
@@ -20,26 +17,20 @@ interface Props {
 }
 
 const PostsIndex: React.FC<Props & { category?: Category }> = ({
-    posts = [],
-    categories = [],
-    tags= [],
-    pagination,
-    keyword,
-    notifications = [],
-    category,
-}) => {
+                                                                   posts = [],
+                                                                   categories = [],
+                                                                   tags= [],
+                                                                   pagination,
+                                                                   keyword,
+                                                                   notifications = [],
+                                                                   category,
+                                                               }) => {
 
-
-    // Lấy danh mục hiện tại từ props (nếu có)
-    const categoryTitle = category ? category.title : "All Categories";
-
-    // Cập nhật title
-    const title = `Danh mục - ${categoryTitle}`;
 
     let postCount = posts.length;
     return (
         <MainLayout posts={posts} categories={categories} pagination={pagination} tags={tags}
-        postCount={postCount} keyword={keyword} notifications={notifications} category={category}>
+                    postCount={postCount} keyword={keyword} notifications={notifications} category={category}>
 
             {/* Posts Content */}
             <div className="flex-1 w-full max-w-5xl mx-auto mt-4 sm:mt-5 md:mt-7 px-4 sm:px-6 md:px-4 dark:bg-[#0F1014] lg:border-l lg:pl-8 xl:pl-9">

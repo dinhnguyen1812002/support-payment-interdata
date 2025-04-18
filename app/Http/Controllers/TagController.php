@@ -10,9 +10,17 @@ class TagController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $perPage = $request->input('per_page', 5);
+        $page = $request->input('page', 1);
+
+        $tags = Tag::select(['id', 'name', 'slug'])
+            ->withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->paginate($perPage);
+
+        return response()->json($tags);
     }
 
     /**
