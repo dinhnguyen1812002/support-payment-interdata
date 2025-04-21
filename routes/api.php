@@ -66,3 +66,5 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 Route::post('/webhook/support-ticket', [TicketController::class, 'handleWebhook'])
     ->middleware(\App\Http\Middleware\VerifyWebhook::class)->name('webhook');
+
+Route::post('/ticket', [TicketController::class, 'store']);

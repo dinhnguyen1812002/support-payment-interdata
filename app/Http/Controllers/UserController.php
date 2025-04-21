@@ -67,4 +67,49 @@ class UserController extends UserProfileController
             'message' => "Role '{$request->role}' has been assigned to user '{$user->name}' successfully.",
         ], 200);
     }
+
+    public function index(Request $request): \Inertia\Response
+    {
+        $search = $request->input('search', '');
+
+        $users = User::query()
+            ->select(['id', 'name', 'email', 'profile_photo_path', 'created_at'])
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->with(['roles:name']) // Eager-load roles
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Users/Index', [
+            'users' => [
+                'data' => collect($users->items())->map(function ($user) {
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'profile_photo_path' => $user->profile_photo_path,
+                        'created_at' => $user->created_at->toDateTimeString(),
+                        'roles' => $user->roles->pluck('name')->toArray(),
+                    ];
+                }),
+
+                'total' => $users->total(),
+                'per_page' => $users->perPage(),
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'next_page_url' => $users->nextPageUrl(),
+                'prev_page_url' => $users->previousPageUrl(),
+            ],
+            'keyword' => $search,
+            'notifications' => auth()->check() ? auth()->user()->unreadNotifications->map(function ($notification) {
+                return [
+                    'id' => $notification->id,
+                    'data' => $notification->data,
+                ];
+            })->toArray() : [],
+        ]);
+    }
 }

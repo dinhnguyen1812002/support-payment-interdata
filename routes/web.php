@@ -8,6 +8,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Oauth\SocialAuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UpvoteController;
+use App\Http\Controllers\UserController;
 use App\Models\Post;
 use Illuminate\Support\Facades\Route;
 
@@ -95,3 +96,5 @@ Route::get('/preview-email', function () {
     return view('mail.notification');
 });
 Route::get('/form', [\App\Http\Controllers\Ticket\TicketController::class, 'showForm']);
+
+Route::get('/users', [UserController::class, 'index'])->name('users.index');

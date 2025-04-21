@@ -58,7 +58,7 @@ const data = {
 
     {
       title: "User",
-      url: "/admin/user",
+      url: "/users",
       icon: ContactRound,
     },
   ],

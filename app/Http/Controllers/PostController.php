@@ -168,6 +168,7 @@ class PostController extends Controller
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
+
         $tags = Tag::select(['id', 'name'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')

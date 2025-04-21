@@ -93,7 +93,7 @@ class Post extends Model
                 ];
             })->toArray(),
             'comments_count' => $this->comments_count,
-            'created_at' => $this->created_at->toDateTimeString(),
+            'created_at' => $this->created_at->diffForHumans(),
             // Add other fields as needed
         ];
     }
