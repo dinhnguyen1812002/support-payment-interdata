@@ -15,8 +15,9 @@ import { CreateDepartmentDialog } from "./Create"
 
 
 interface Department {
-    id: number
+    id: string
     name: string
+    slug: string
     description: string | null
     created_at: string
 }
@@ -107,7 +108,7 @@ export default function DepartmentCards({ departments, keyword = "", notificatio
                                                     <CardHeader>
                                                         <CardTitle className="text-lg uppercase">{department.name}</CardTitle>
                                                         <Badge variant="outline" className="w-fit">
-                                                            Created: {formatDate(department.created_at)}
+                                                           Created at: {formatDate(department.created_at)}
                                                         </Badge>
                                                     </CardHeader>
                                                     <CardContent>
@@ -135,7 +136,7 @@ export default function DepartmentCards({ departments, keyword = "", notificatio
                                                             size="sm"
                                                             onClick={() => {
                                                                 if (confirm("Are you sure you want to delete this department?")) {
-                                                                    Inertia.delete(`/departments/${department.id}`, {
+                                                                    Inertia.delete(`/departments/${department.slug}`, {
                                                                         onSuccess: () => {
                                                                             Inertia.reload()
                                                                         },

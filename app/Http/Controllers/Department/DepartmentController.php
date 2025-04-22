@@ -72,4 +72,57 @@ class DepartmentController extends Controller
 
         return redirect()->route('departments.index')->with('success', 'Department created successfully.');
     }
+    public function show(Departments $department)
+    {
+
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        return Inertia::render('Departments/Show', [
+            'department' => $department,
+        ]);
+    }
+
+    public function edit(Departments $department)
+    {
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        return Inertia::render('Departments/Edit', [
+            'department' => $department,
+        ]);
+    }
+
+    public function update(Request $request, Departments $department)
+    {
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:departments,name,'.$department->id,
+            'description' => 'nullable|string',
+        ]);
+
+        $department->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'slug' => Str::slug($validated['name']),
+        ]);
+
+        return redirect()->route('departments.index')->with('success', 'Department updated successfully.');
+    }
+
+    public function destroy(Departments $department)
+    {
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        $department->delete();
+
+        return redirect()->route('departments.index')->with('success', 'Department deleted successfully.');
+    }
 }
