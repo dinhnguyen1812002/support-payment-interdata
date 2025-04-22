@@ -17,10 +17,12 @@ class Departments extends Model
     {
         return $this->belongsToMany(User::class, 'department_user', 'department_id', 'user_id');
     }
+
     public function posts()
     {
         return $this->hasMany(Post::class);
     }
+
     public static function getDepartmentsWithPostCount()
     {
         return self::select(['id', 'name', 'slug'])

@@ -68,10 +68,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     public function departments(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Departments::class, 'department_user', 'user_id', 'department_id');
     }
+
     public function comments()
     {
         return $this->hasMany(Comments::class);
@@ -86,5 +88,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(Post::class, 'assignee_id');
     }
-
 }

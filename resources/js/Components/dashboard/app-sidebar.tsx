@@ -1,21 +1,21 @@
 import * as React from "react"
 import {
-  ArrowUpCircleIcon,
-  BarChartIcon,
-  CameraIcon,
-  ClipboardListIcon,
-  DatabaseIcon,
-  FileCodeIcon,
-  FileIcon,
-  FileTextIcon,
-  FolderIcon,
-  HelpCircleIcon,
-  LayoutDashboardIcon,
-  ListIcon,
-  SearchIcon,
-  SettingsIcon,
+    ArrowUpCircleIcon,
+    BarChartIcon,
+    CameraIcon,
+    ClipboardListIcon,
+    DatabaseIcon,
+    FileCodeIcon,
+    FileIcon,
+    FileTextIcon,
+    FolderIcon,
+    HelpCircleIcon,
+    LayoutDashboardIcon,
+    ListIcon,
+    SearchIcon,
+    SettingsIcon,
     ContactRound,
-    ChartColumnStacked
+    ChartColumnStacked, Boxes
 } from "lucide-react"
 
 import { NavDocuments } from "@/Components/dashboard/nav-documents"
@@ -61,6 +61,11 @@ const data = {
       url: "/users",
       icon: ContactRound,
     },
+      {
+          title: "Department",
+          url: "/departments",
+          icon: Boxes,
+      },
   ],
   navClouds: [
     {

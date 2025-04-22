@@ -4,6 +4,7 @@ use App\Events\NewQuestionCreated;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\Department\DepartmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Oauth\SocialAuthController;
 use App\Http\Controllers\PostController;
@@ -15,7 +16,9 @@ use Illuminate\Support\Facades\Route;
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/latest-posts', [PostController::class, 'getLatestPosts']);
-
+Route::middleware(['auth'])->group(function () {
+    Route::resource('departments', DepartmentController::class)->names('departments');
+});
 // Route::get('/posts', [PostController::class, 'getPostByUser']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -98,3 +101,5 @@ Route::get('/preview-email', function () {
 Route::get('/form', [\App\Http\Controllers\Ticket\TicketController::class, 'showForm']);
 
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
+
+

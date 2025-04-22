@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Ticket;
 
 use App\Http\Controllers\Controller;
 use App\Mail\TicketCreated;
+use App\Models\Departments;
 use App\Models\Post;
 use App\Models\User;
 use App\Notifications\PostCreatedNotification;
@@ -12,7 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class TicketController extends Controller
 {
@@ -125,5 +128,58 @@ class TicketController extends Controller
             'message' => 'Ticket created successfully',
             'post' => $post->toFormattedArray(),
         ], 201);
+    }
+
+    public function show(Departments $department)
+    {
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        return Inertia::render('Departments/Show', [
+            'department' => $department,
+        ]);
+    }
+
+    public function edit(Departments $department)
+    {
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        return Inertia::render('Departments/Edit', [
+            'department' => $department,
+        ]);
+    }
+
+    public function update(Request $request, Departments $department)
+    {
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:departments,name,'.$department->id,
+            'description' => 'nullable|string',
+        ]);
+
+        $department->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'slug' => Str::slug($validated['name']),
+        ]);
+
+        return redirect()->route('departments.index')->with('success', 'Department updated successfully.');
+    }
+
+    public function destroy(Departments $department)
+    {
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        $department->delete();
+
+        return redirect()->route('departments.index')->with('success', 'Department deleted successfully.');
     }
 }
