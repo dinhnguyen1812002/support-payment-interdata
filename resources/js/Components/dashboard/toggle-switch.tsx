@@ -21,7 +21,6 @@ export default function ThemeSwitch() {
             size="sm"
             type="single"
             value={theme}
-
         >
             <ToggleGroupItem className="rounded-full" value="dark" aria-label="Toggle dark" onClick={() => setTheme("dark")}>
                 <MoonStar size={16} />

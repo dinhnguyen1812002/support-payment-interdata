@@ -65,7 +65,7 @@ export default function UsersTable({ users, keyword = "", notifications = [] }: 
     };
 
     return (
-        <Card className="w-full">
+        <div className="w-full">
             <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <CardTitle>Users</CardTitle>
                 <div className="relative w-full sm:w-64">
@@ -156,6 +156,6 @@ export default function UsersTable({ users, keyword = "", notifications = [] }: 
                 </div>
 
             </CardContent>
-        </Card>
+        </div>
     );
 }

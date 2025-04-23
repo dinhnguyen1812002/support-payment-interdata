@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Ticket;
 
 use App\Http\Controllers\Controller;
 use App\Mail\TicketCreated;
-use App\Models\Departments;
 use App\Models\Post;
 use App\Models\User;
 use App\Notifications\PostCreatedNotification;
@@ -13,9 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
-use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class TicketController extends Controller
 {
@@ -129,6 +126,4 @@ class TicketController extends Controller
             'post' => $post->toFormattedArray(),
         ], 201);
     }
-
-
 }

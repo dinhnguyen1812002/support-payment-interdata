@@ -72,8 +72,10 @@ class DepartmentController extends Controller
 
         return redirect()->route('departments.index')->with('success', 'Department created successfully.');
     }
-    public function show(Departments $department)
+
+    public function show(string $slug)
     {
+        $department = Departments::where('slug', $slug)->firstOrFail();
 
         if (! auth()->user()->hasRole('admin')) {
             throw UnauthorizedException::forRoles(['admin']);
@@ -86,6 +88,7 @@ class DepartmentController extends Controller
 
     public function edit(Departments $department)
     {
+
         if (! auth()->user()->hasRole('admin')) {
             throw UnauthorizedException::forRoles(['admin']);
         }

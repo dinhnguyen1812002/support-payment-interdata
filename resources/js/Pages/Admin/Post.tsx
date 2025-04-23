@@ -75,6 +75,7 @@ export default function PostsPage() {
                                 pagination={pagination}
                                 onPageChange={handlePageChange}
                             />
+
                         </div>
                     </div>
                 </div>

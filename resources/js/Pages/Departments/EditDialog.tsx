@@ -33,7 +33,7 @@ export function CreateDepartmentDialog({ open, onOpenChange }: CreateDepartmentD
         setIsSubmitting(true)
 
         // @ts-ignore
-        Inertia.post('/departments', formData, {
+        Inertia.put('/departments', formData, {
             onError: (errors) => {
                 setErrors(errors)
                 setIsSubmitting(false)

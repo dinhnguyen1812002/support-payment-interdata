@@ -1,25 +1,26 @@
 
-import React, { useState } from "react"
+
+import React,{ useState } from "react"
 import { Input } from "@/Components/ui/input"
 import { Button } from "@/Components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/Components/ui/card"
-import { Search, ChevronLeft, ChevronRight, Plus, Eye, Pencil, Trash2 } from "lucide-react"
+import { Search, ChevronLeft, ChevronRight, Plus, Eye, Pencil, Trash2, Calendar } from "lucide-react"
 import { Inertia } from "@inertiajs/inertia"
 import { Link } from "@inertiajs/react"
-
-import { SidebarInset, SidebarProvider } from "@/Components/ui/sidebar"
-import { AppSidebar } from "@/Components/dashboard/app-sidebar"
-import { SiteHeader } from "@/Components/dashboard/site-header"
-import { Badge } from "@/Components/ui/badge"
-import { CreateDepartmentDialog } from "./Create"
-
+import DepartmentDialog from "@/Pages/Departments/department-form"
+import {AppSidebar} from "@/Components/dashboard/app-sidebar";
+import {SidebarInset, SidebarProvider} from "@/Components/ui/sidebar";
+import {SiteHeader} from "@/Components/dashboard/site-header";
+import {DataTable} from "@/Components/dashboard/Post/data-table";
+import {columns} from "@/Components/dashboard/Post/columns";
 
 interface Department {
-    id: string
+    id: number
     name: string
-    slug: string
     description: string | null
     created_at: string
+
+    slug: string
 }
 
 interface Props {
@@ -38,10 +39,24 @@ interface Props {
 
 export default function DepartmentCards({ departments, keyword = "", notifications = [] }: Props) {
     const [search, setSearch] = useState(keyword)
-    const [createDialogOpen, setCreateDialogOpen] = useState(false)
+    const [dialogOpen, setDialogOpen] = useState(false)
+    const [dialogMode, setDialogMode] = useState<"create" | "edit">("create")
+    const [selectedDepartment, setSelectedDepartment] = useState<Department | undefined>(undefined)
 
     const handleSearch = () => {
         Inertia.get("/departments", { search }, { preserveState: true })
+    }
+
+    const openCreateDialog = () => {
+        setDialogMode("create")
+        setSelectedDepartment(undefined)
+        setDialogOpen(true)
+    }
+
+    const openEditDialog = (department: Department) => {
+        setDialogMode("edit")
+        setSelectedDepartment(department)
+        setDialogOpen(true)
     }
 
     if (!departments || !departments.data) {
@@ -64,136 +79,135 @@ export default function DepartmentCards({ departments, keyword = "", notificatio
     }
 
     return (
-        <SidebarProvider>
-            <AppSidebar variant="inset" />
-            <SidebarInset>
-                <SiteHeader />
-                <div className="flex flex-1 flex-col">
-                    <div className="@container/main flex flex-1 flex-col gap-2">
-                        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4">
-                            <div className="w-full border-none">
-                                <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                    <CardTitle>Departments</CardTitle>
-                                    <div className="flex gap-4 w-full sm:w-auto">
-                                        <div className="relative flex-1 sm:w-64">
-                                            <Input
-                                                type="search"
-                                                placeholder="Search departments..."
-                                                value={search}
-                                                onChange={(e) => setSearch(e.target.value)}
-                                                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                                                className="pr-8"
-                                            />
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="absolute right-0 top-0 h-full"
-                                                onClick={handleSearch}
-                                            >
-                                                <Search className="h-4 w-4" />
-                                                <span className="sr-only">Search</span>
+
+            <SidebarProvider>
+                <AppSidebar variant="inset" />
+                <SidebarInset>
+                    <SiteHeader />
+                    <div className="flex flex-1 flex-col">
+                        <div className="@container/main flex flex-1 flex-col gap-2">
+                            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 ml-4">
+
+                                <div className="w-full">
+                                    <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2">
+                                        <CardTitle>Departments</CardTitle>
+                                        <div className="flex gap-4 w-full sm:w-auto">
+                                            <div className="relative flex-1 sm:w-64">
+                                                <Input
+                                                    type="search"
+                                                    placeholder="Search departments..."
+                                                    value={search}
+                                                    onChange={(e) => setSearch(e.target.value)}
+                                                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                                                    className="pr-8"
+                                                />
+                                                <Button variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={handleSearch}>
+                                                    <Search className="h-4 w-4" />
+                                                    <span className="sr-only">Search</span>
+                                                </Button>
+                                            </div>
+                                            <Button variant="ghost" size="sm" onClick={openCreateDialog}>
+                                                <Plus className="h-4 w-4 mr-2" />
+                                                Create
                                             </Button>
                                         </div>
-                                        <Button variant="outline" size="sm" onClick={() => setCreateDialogOpen(true)}>
-                                            <Plus className="h-4 w-4 mr-2" />
-                                            Create Department
-                                        </Button>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    {departments.data.length > 0 ? (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            {departments.data.map((department) => (
-                                                <Card key={department.id} className="h-full">
-                                                    <CardHeader>
-                                                        <CardTitle className="text-lg uppercase">{department.name}</CardTitle>
-                                                        <Badge variant="outline" className="w-fit">
-                                                           Created at: {formatDate(department.created_at)}
-                                                        </Badge>
-                                                    </CardHeader>
-                                                    <CardContent>
-                                                        <p className="text-muted-foreground min-h-[60px]">
-                                                            {department.description || "No description available"}
-                                                        </p>
-                                                    </CardContent>
-                                                    <CardFooter className="flex justify-between gap-2">
-                                                        <div className="flex gap-2">
-                                                            <Link href={`/departments/${department.id}`}>
-                                                                <Button variant="outline" size="sm">
-                                                                    <Eye className="h-4 w-4 mr-1" />
-                                                                    View
+                                    </CardHeader>
+                                    <CardContent>
+                                        {departments.data.length > 0 ? (
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                                {departments.data.map((department) => (
+                                                    <Card key={department.id} className="h-full overflow-hidden border shadow-sm">
+                                                        <CardHeader className="p-3 pb-2">
+                                                            <CardTitle className="text-base truncate uppercase">{department.name}</CardTitle>
+
+                                                        </CardHeader>
+                                                        <CardContent className="p-3 pt-0">
+                                                            <p className="text-xs text-muted-foreground line-clamp-2 h-8">
+                                                                {department.description || "No description available"}
+                                                            </p>
+                                                        </CardContent>
+                                                        <CardFooter className="p-2 flex justify-between gap-1 border-t bg-muted/10">
+                                                            <div className="flex gap-1">
+                                                                <Link href={`/departments/${department.slug}`}>
+                                                                    <Button variant="ghost" size="sm" className="h-7 px-2">
+                                                                        <Eye className="h-3.5 w-3.5" />
+                                                                    </Button>
+                                                                </Link>
+                                                                <Button variant="ghost" size="sm" className="h-7 px-2" onClick={() => openEditDialog(department)}>
+                                                                    <Pencil className="h-3.5 w-3.5" />
                                                                 </Button>
-                                                            </Link>
-                                                            <Link href={`/departments/${department.id}/edit`}>
-                                                                <Button variant="outline" size="sm">
-                                                                    <Pencil className="h-4 w-4 mr-1" />
-                                                                    Edit
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="h-7 px-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                                    onClick={() => {
+                                                                        if (confirm("Are you sure you want to delete this department?")) {
+                                                                            Inertia.delete(`/departments/${department.id}`, {
+                                                                                onSuccess: () => {
+                                                                                    Inertia.reload()
+                                                                                },
+                                                                            })
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <Trash2 className="h-3.5 w-3.5" />
                                                                 </Button>
-                                                            </Link>
-                                                        </div>
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                if (confirm("Are you sure you want to delete this department?")) {
-                                                                    Inertia.delete(`/departments/${department.slug}`, {
-                                                                        onSuccess: () => {
-                                                                            Inertia.reload()
-                                                                        },
-                                                                    })
-                                                                }
-                                                            }}
-                                                        >
-                                                            <Trash2 className="h-4 w-4 mr-1" />
-                                                            Delete
-                                                        </Button>
-                                                    </CardFooter>
-                                                </Card>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center justify-center h-24 border rounded-md">
-                                            <p className="text-muted-foreground">No departments found.</p>
-                                        </div>
-                                    )}
+                                                            </div>
+                                                            <div className="flex items-center text-xs text-muted-foreground mt-1">
+                                                                <Calendar className="h-3 w-3 mr-1" />
+                                                                {formatDate(department.created_at)}
+                                                            </div>
+                                                        </CardFooter>
+                                                    </Card>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-center h-24 border rounded-md">
+                                                <p className="text-muted-foreground">No departments found.</p>
+                                            </div>
+                                        )}
 
-                                    <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => departments.prev_page_url && Inertia.get(departments.prev_page_url)}
-                                            disabled={!departments.prev_page_url}
-                                            className="w-full sm:w-auto"
-                                        >
-                                            <ChevronLeft className="h-4 w-4 mr-2" />
-                                            Previous
-                                        </Button>
+                                        <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => departments.prev_page_url && Inertia.get(departments.prev_page_url)}
+                                                disabled={!departments.prev_page_url}
+                                                className="w-full sm:w-auto"
+                                            >
+                                                <ChevronLeft className="h-4 w-4 mr-2" />
+                                                Previous
+                                            </Button>
 
-                                        <div className="text-sm text-muted-foreground">
-                                            Page {departments.current_page} of {departments.last_page} (Total: {departments.total}{" "}
-                                            departments)
+                                            <div className="text-sm text-muted-foreground">
+                                                Page {departments.current_page} of {departments.last_page} (Total: {departments.total} departments)
+                                            </div>
+
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => departments.next_page_url && Inertia.get(departments.next_page_url)}
+                                                disabled={!departments.next_page_url}
+                                                className="w-full sm:w-auto"
+                                            >
+                                                Next
+                                                <ChevronRight className="h-4 w-4 ml-2" />
+                                            </Button>
                                         </div>
+                                    </CardContent>
+                                </div>
 
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => departments.next_page_url && Inertia.get(departments.next_page_url)}
-                                            disabled={!departments.next_page_url}
-                                            className="w-full sm:w-auto"
-                                        >
-                                            Next
-                                            <ChevronRight className="h-4 w-4 ml-2" />
-                                        </Button>
-                                    </div>
-                                </CardContent>
+                                <DepartmentDialog
+                                    open={dialogOpen}
+                                    onOpenChange={setDialogOpen}
+                                    department={selectedDepartment}
+                                    mode={dialogMode}
+                                />
+
                             </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Create Department Dialog */}
-                <CreateDepartmentDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} />
-            </SidebarInset>
-        </SidebarProvider>
+                </SidebarInset>
+            </SidebarProvider>
     )
 }

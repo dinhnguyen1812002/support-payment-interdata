@@ -16,9 +16,7 @@ use Illuminate\Support\Facades\Route;
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/latest-posts', [PostController::class, 'getLatestPosts']);
-Route::middleware(['auth'])->group(function () {
-    Route::resource('departments', DepartmentController::class)->names('departments');
-});
+
 // Route::get('/posts', [PostController::class, 'getPostByUser']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -102,4 +100,8 @@ Route::get('/form', [\App\Http\Controllers\Ticket\TicketController::class, 'show
 
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/departments/{slug}', [DepartmentController::class, 'show']);
 
+    Route::resource('departments', DepartmentController::class)->names('departments');
+});

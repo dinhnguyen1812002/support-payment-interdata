@@ -1,10 +1,14 @@
-export function generateSlug(title: string): string {
-    return title
+export function generateSlug(text: string): string {
+    return text
         .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric characters with dashes
-        .replace(/^-+|-+$/g, '');   // Remove leading or trailing dashes
+        .normalize('NFD')                     // Tách chữ và dấu
+        .replace(/[\u0300-\u036f]/g, '')     // Loại bỏ dấu
+        .replace(/[^\p{L}\p{N}\s-]/gu, '')   // Loại bỏ ký tự đặc biệt, chỉ giữ chữ, số, khoảng trắng, dấu -
+        .replace(/[\s_-]+/g, '-')             // Thay khoảng trắng, dấu _ hoặc - thành dấu -
+        .replace(/^-+|-+$/g, '');             // Loại bỏ dấu - thừa ở đầu và cuối
 }
+
+
 
 export function uppercaseText(text :string):string {
     return text.toUpperCase();
