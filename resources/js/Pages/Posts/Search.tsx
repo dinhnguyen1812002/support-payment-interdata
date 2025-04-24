@@ -18,6 +18,7 @@ const Search: React.FC<IndexProps> = ({
                                               keyword,
                                               selectedCategory,
                                               notifications,
+                                            tags = [],
                                           }) => {
     const title = "Support AutoPay";
 
@@ -29,6 +30,7 @@ const Search: React.FC<IndexProps> = ({
             postCount={postCount}
             keyword={keyword}
             notifications={notifications}
+            tags={tags}
         >
             <div className="flex-1 w-full max-w-5xl mx-auto mt-4 sm:mt-5 md:mt-7 px-4 sm:px-6 md:px-4 dark:bg-[#0F1014] lg:border-l lg:pl-8 xl:pl-9">
 

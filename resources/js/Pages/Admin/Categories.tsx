@@ -149,7 +149,7 @@ export default function Categories() {
         <SidebarProvider>
             <AppSidebar variant="inset" />
             <SidebarInset>
-                <SiteHeader />
+                <SiteHeader title={"Category"} />
                 <div className="flex flex-1 flex-col">
                     <div className="@container/main flex flex-1 flex-col gap-2">
                         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 rounded-lg ml-4">

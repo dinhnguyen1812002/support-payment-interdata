@@ -1,44 +1,42 @@
-
-import  React from "react"
-import { useState, useEffect } from "react"
-import { Inertia } from "@inertiajs/inertia"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/Components/ui/dialog"
-import { Input } from "@/Components/ui/input"
-import { Textarea } from "@/Components/ui/textarea"
-import { Button } from "@/Components/ui/button"
-import { Label } from "@/Components/ui/label"
-import { generateSlug } from "@/Utils/slugUtils"
+import React, { useState, useEffect } from "react";
+import { router } from "@inertiajs/react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/Components/ui/dialog";
+import { Input } from "@/Components/ui/input";
+import { Textarea } from "@/Components/ui/textarea";
+import { Button } from "@/Components/ui/button";
+import { Label } from "@/Components/ui/label";
+import { generateSlug } from "@/Utils/slugUtils";
 
 interface Department {
-    id?: number
-    name: string
-    description: string | null
-    slug?: string
+    id?: number;
+    name: string;
+    description: string | null;
+    slug?: string;
 }
 
-interface FormData {
-    name: string
-    description: string
+interface DepartmentFormData {
+    name: string;
+    description: string;
 }
 
 interface DepartmentDialogProps {
-    open: boolean
-    onOpenChange: (open: boolean) => void
-    department?: Department // Dữ liệu department cho edit
-    mode: "create" | "edit" // Chế độ create hoặc edit
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    department?: Department; // Data for editing
+    mode: "create" | "edit";
 }
 
 export default function DepartmentDialog({ open, onOpenChange, department, mode }: DepartmentDialogProps) {
-    const [formData, setFormData] = useState<FormData>({
+    const [formData, setFormData] = useState<DepartmentFormData>({
         name: department?.name || "",
         description: department?.description || "",
-    })
+    });
 
     // Separate state for the display-only slug
-    const [displaySlug, setDisplaySlug] = useState<string>("")
-    const [errors, setErrors] = useState<Partial<FormData>>({})
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [slugManuallyEdited, setSlugManuallyEdited] = useState(false)
+    const [displaySlug, setDisplaySlug] = useState<string>("");
+    const [errors, setErrors] = useState<Partial<DepartmentFormData>>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
     // Update formData when department changes (for edit)
     useEffect(() => {
@@ -46,65 +44,71 @@ export default function DepartmentDialog({ open, onOpenChange, department, mode 
             setFormData({
                 name: department.name || "",
                 description: department.description || "",
-            })
+            });
             // Initialize display slug from department if available
-            setDisplaySlug(department.slug || generateSlug(department.name || ""))
+            setDisplaySlug(department.slug || generateSlug(department.name || ""));
         } else {
-            setFormData({ name: "", description: "" })
-            setDisplaySlug("")
+            setFormData({ name: "", description: "" });
+            setDisplaySlug("");
         }
-        setSlugManuallyEdited(false)
-    }, [department])
+        setSlugManuallyEdited(false);
+    }, [department]);
 
     // Update slug when name changes (unless manually edited)
     useEffect(() => {
         if (!slugManuallyEdited && formData.name) {
-            setDisplaySlug(generateSlug(formData.name))
+            setDisplaySlug(generateSlug(formData.name));
         }
-    }, [formData.name, slugManuallyEdited])
+    }, [formData.name, slugManuallyEdited]);
 
     const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsSubmitting(true)
+        e.preventDefault();
+        setIsSubmitting(true);
 
-        const method = mode === "create" ? Inertia.post : Inertia.put
-        const url = mode === "create" ? "/departments" : `/departments/${department?.id}`
+        const payload = {
+            name: formData.name,
+            description: formData.description,
+        };
 
-        // @ts-ignore - Only submit the formData, not the displaySlug
-        method(url, formData, {
-            onError: (errors) => {
-                setErrors(errors)
-                setIsSubmitting(false)
-            },
-            onSuccess: () => {
-                setFormData({ name: "", description: "" })
-                setDisplaySlug("")
-                setErrors({})
-                setIsSubmitting(false)
-                onOpenChange(false) // Đóng dialog
-            },
-        })
-    }
+        router.visit(
+            mode === "create" ? "/departments" : `/departments/${department?.id}`,
+            {
+                method: mode === "create" ? "post" : "put",
+                data: payload,
+                onError: (errors) => {
+                    setErrors(errors);
+                    setIsSubmitting(false);
+                },
+                onSuccess: () => {
+                    setFormData({ name: "", description: "" });
+                    setDisplaySlug("");
+                    setErrors({});
+                    setIsSubmitting(false);
+                    onOpenChange(false); // Close dialog
+                },
+            }
+        );
+    };
 
     const handleClose = () => {
-        setFormData({ name: "", description: "" })
-        setDisplaySlug("")
-        setErrors({})
-        setSlugManuallyEdited(false)
-        onOpenChange(false)
-    }
+        setFormData({ name: "", description: "" });
+        setDisplaySlug("");
+        setErrors({});
+        setSlugManuallyEdited(false);
+        onOpenChange(false);
+    };
 
     const handleRegenerateSlug = () => {
         if (formData.name) {
-            setDisplaySlug(generateSlug(formData.name))
-            setSlugManuallyEdited(false)
+            setDisplaySlug(generateSlug(formData.name));
+            setSlugManuallyEdited(false);
         }
-    }
+    };
 
     const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setDisplaySlug(e.target.value)
-        setSlugManuallyEdited(true)
-    }
+        setDisplaySlug(e.target.value);
+        setSlugManuallyEdited(true);
+    };
 
     return (
         <Dialog open={open} onOpenChange={handleClose}>
@@ -185,5 +189,5 @@ export default function DepartmentDialog({ open, onOpenChange, department, mode 
                 </form>
             </DialogContent>
         </Dialog>
-    )
+    );
 }
