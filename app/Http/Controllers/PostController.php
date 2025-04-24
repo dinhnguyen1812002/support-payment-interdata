@@ -6,7 +6,7 @@ use App\Data\Post\CreatePostData;
 use App\Events\NewQuestionCreated;
 use App\Models\Category;
 use App\Models\Post;
-use App\Models\tag;
+use App\Models\Tag;
 use App\Models\User;
 use App\Notifications\NewPostNotification;
 use Illuminate\Http\Request;
