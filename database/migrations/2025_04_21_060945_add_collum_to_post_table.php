@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('status')->default('open'); // open, in_progress, resolved, closed
             $table->string('priority')->default('medium'); // low, medium, high
             $table->foreignId('assignee_id')->nullable()->constrained('users')->onDelete('set null'); // Người được giao
-            $table->softDeletes();
         });
     }
 
