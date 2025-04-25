@@ -388,7 +388,7 @@ const ProfilePage = ({
                         <div
                             key={item.id}
                             id={item.id}
-                            className="p-2 sm:p-4 border rounded-lg shadow-sm"
+                            className="p-2 sm:p-4 border rounded-lg shadow-xs"
                         >
                             <CardHeader className="px-2 sm:px-4 py-2 sm:py-4">
                                 <CardTitle className="text-lg sm:text-xl">{item.title}</CardTitle>
@@ -401,7 +401,7 @@ const ProfilePage = ({
                     {page.props.jetstream.hasAccountDeletionFeatures && (
                         <div
                             id="delete-account"
-                            className="p-2 sm:p-4 border rounded-lg shadow-sm"
+                            className="p-2 sm:p-4 border rounded-lg shadow-xs"
                         >
                             <CardHeader className="px-2 sm:px-4 py-2 sm:py-4">
                                 <CardTitle className="text-lg sm:text-xl">Delete Account</CardTitle>

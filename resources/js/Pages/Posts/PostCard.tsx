@@ -92,7 +92,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ posts: initialPosts = [], postCount
                 {posts.map((post, index) => (
                     <div
                         key={post.id}
-                        className="flex flex-col flex-1 items-stretch w-full max-w-screen-lg min-h-[150px] border-gray-200 dark:border-gray-700"
+                        className="flex flex-col flex-1 items-stretch w-full max-w-(--breakpoint-lg) min-h-[150px] border-gray-200 dark:border-gray-700"
                     >
                         <div className="flex">
                             <div className="flex-1 mb-2">

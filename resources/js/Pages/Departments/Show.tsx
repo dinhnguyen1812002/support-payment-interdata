@@ -107,7 +107,7 @@ export default function DepartmentShow({ department }: Props) {
     return (
         <TooltipProvider>
             <AppLayout>
-                <div className="shadow-sm w-full">
+                <div className="shadow-xs w-full">
                     <Tabs defaultValue="all" className="w-full">
                         <div className="border-b px-4 py-2 bg-muted/20 h-16">
                             <TabsList>

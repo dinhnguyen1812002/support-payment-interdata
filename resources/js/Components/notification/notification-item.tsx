@@ -22,8 +22,8 @@ export default function NotificationItem({
                                          }: NotificationItemProps) {
     return (
         <div className="flex items-start space-x-2 p-2 hover:bg-muted/50 rounded-md transition-colors">
-            {!isRead && <Circle className="h-1.5 w-1.5 mt-3 fill-blue-500 text-blue-500 flex-shrink-0" />}
-            <Avatar className="h-8 w-8 flex-shrink-0">
+            {!isRead && <Circle className="h-1.5 w-1.5 mt-3 fill-blue-500 text-blue-500 shrink-0" />}
+            <Avatar className="h-8 w-8 shrink-0">
                 <AvatarImage src={userAvatar} alt="User avatar" />
                 <AvatarFallback>{userInitials}</AvatarFallback>
             </Avatar>

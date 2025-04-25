@@ -62,7 +62,7 @@ const PostsIndex: React.FC<Props & { category?: Category }> = ({
         //                             categories={categories}
         //
         //                             selectedCategory={category?.slug}
-        //                             className="w-full flex-shrink-0"
+        //                             className="w-full shrink-0"
         //                         />
         //                     </div>
         //

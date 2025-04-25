@@ -39,7 +39,7 @@
             <!-- CTA Button -->
             <div class="mt-8 mb-8 text-center">
                 <a href="{{ $details['actionUrl'] }}"
-                   class="inline-flex items-center justify-center px-8 py-3 rounded-lg bg-primary text-white font-medium shadow-sm hover:bg-primary/90 transition-all duration-200 hover:shadow-md active:transform active:scale-95">
+                   class="inline-flex items-center justify-center px-8 py-3 rounded-lg bg-primary text-white font-medium shadow-xs hover:bg-primary/90 transition-all duration-200 hover:shadow-md active:transform active:scale-95">
                     {{ $details['actionText'] }}
                 </a>
             </div>

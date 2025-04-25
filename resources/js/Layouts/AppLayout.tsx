@@ -86,7 +86,7 @@ export default function AppLayout({
               <div className="flex items-center gapp-x-8 ">
                   <div className="flex items-center shrink-0 flex-1 space-x-2 sm:space-x-4 p-8">
                       {/* Nút mở Sidebar (Mobile) */}
-                      <div className="lg:hidden flex-shrink-0">
+                      <div className="lg:hidden shrink-0">
                           <MobileSidebarToggle
                               isMobileSidebarOpen={isMobileSidebarOpen}
                               setIsMobileSidebarOpen={setIsMobileSidebarOpen}
@@ -98,10 +98,10 @@ export default function AppLayout({
                           {/*<img*/}
                           {/*    alt="logo"*/}
                           {/*    src="https://interdata.vn/assets/LogoNewSlogan-07.png"*/}
-                          {/*    className="block w-auto h-full md:h-[40px] lg:h-[40px] flex-shrink-0"*/}
+                          {/*    className="block w-auto h-full md:h-[40px] lg:h-[40px] shrink-0"*/}
                           {/*/>*/}
 
-                          <p className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r
+                          <p className="text-2xl md:text-3xl font-extrabold bg-linear-to-r
                           from-blue-600 to-indigo-500 text-transparent bg-clip-text hover:from-indigo-600
                           hover:to-blue-500 transition-all duration-300 transform hover:scale-105">Support</p>
                       </Link>
@@ -211,7 +211,7 @@ export default function AppLayout({
                     onClick={() =>
                       setShowingNavigationDropdown(!showingNavigationDropdown)
                     }
-                    className="inline-flex justify-center items-center p-2 text-gray-400 rounded-md transition duration-150 ease-in-out dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400"
+                    className="inline-flex justify-center items-center p-2 text-gray-400 rounded-md transition duration-150 ease-in-out dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-hidden focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400"
                   >
                     <svg
                       className="w-6 h-6"
@@ -273,7 +273,7 @@ export default function AppLayout({
               <div className="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
                 <div className="flex items-center px-4">
                   {page.props.jetstream.managesProfilePhotos ? (
-                    <div className="flex-shrink-0 mr-3">
+                    <div className="shrink-0 mr-3">
                       <img
                         className="object-cover w-10 h-10 rounded-full"
                         src={page.props.auth.user?.profile_photo_url}
@@ -390,7 +390,7 @@ export default function AppLayout({
 
         {/* <!-- Page Heading --> */}
         {renderHeader ? (
-          <header className="bg-white shadow dark:bg-gray-800">
+          <header className="bg-white shadow-sm dark:bg-gray-800">
             <div className="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
               {renderHeader()}
             </div>

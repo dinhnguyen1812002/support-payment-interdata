@@ -17,7 +17,7 @@ export default function Banner() {
             'bg-red-700': style == 'danger',
           })}
         >
-          <div className="max-w-screen-xl mx-auto py-2 px-3 sm:px-6 lg:px-8">
+          <div className="max-w-(--breakpoint-xl) mx-auto py-2 px-3 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between flex-wrap">
               <div className="w-0 flex-1 flex items-center min-w-0">
                 <span
@@ -73,11 +73,11 @@ export default function Banner() {
                 </p>
               </div>
 
-              <div className="flex-shrink-0 sm:ml-3">
+              <div className="shrink-0 sm:ml-3">
                 <button
                   type="button"
                   className={classNames(
-                    '-mr-1 flex p-2 rounded-md focus:outline-none sm:-mr-2 transition',
+                    '-mr-1 flex p-2 rounded-md focus:outline-hidden sm:-mr-2 transition',
                     {
                       'hover:bg-indigo-600 focus:bg-indigo-600':
                         style == 'success',

@@ -116,7 +116,7 @@ export default function DepartmentCards({ departments, keyword = "", notificatio
                                         {departments.data.length > 0 ? (
                                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                                 {departments.data.map((department) => (
-                                                    <Card key={department.id} className="h-full overflow-hidden border shadow-sm">
+                                                    <Card key={department.id} className="h-full overflow-hidden border shadow-xs">
                                                         <CardHeader className="p-3 pb-2">
                                                             <CardTitle className="text-base truncate uppercase">{department.name}</CardTitle>
 

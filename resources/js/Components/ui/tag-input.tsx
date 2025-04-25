@@ -86,7 +86,7 @@ export function TagInput({
                                 e.stopPropagation()
                                 handleRemoveTag(tag.id)
                             }}
-                            className="rounded-full outline-none ring-offset-background focus:ring-1 focus:ring-ring focus:ring-offset-2"
+                            className="rounded-full outline-hidden ring-offset-background focus:ring-1 focus:ring-ring focus:ring-offset-2"
                         >
                             <X className="h-3 w-3" />
                             <span className="sr-only">Remove {tag.text}</span>
@@ -107,7 +107,7 @@ export function TagInput({
                         onFocus={() => setOpen(true)}
                         onBlur={() => setOpen(false)}
                         disabled={disabled}
-                        className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed"
+                        className="flex-1 bg-transparent outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed"
                         placeholder={tags.length === 0 ? placeholder : ""}
                         {...props}
                     />

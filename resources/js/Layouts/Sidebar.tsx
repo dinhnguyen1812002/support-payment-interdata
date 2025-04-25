@@ -14,7 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ categories, selectedCategory }) => {
             <CategoriesSidebar
                 
                 selectedCategory={selectedCategory}
-                className="w-full flex-shrink-0"
+                className="w-full shrink-0"
             />
 
             {/* Latest Posts Section */}

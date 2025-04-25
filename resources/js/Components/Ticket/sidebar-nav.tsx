@@ -170,7 +170,7 @@ function NavItem({ item, collapsed, active }: NavItemProps) {
                         href={item.href}
                         className={cn(
                             'flex h-10 w-10 mx-auto items-center justify-center rounded-md',
-                            'hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                            'hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                             active ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground'
                         )}
                     >
@@ -189,7 +189,7 @@ function NavItem({ item, collapsed, active }: NavItemProps) {
             href={item.href}
             className={cn(
                 'flex h-10 items-center rounded-md px-3 text-sm font-medium',
-                'hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                'hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
                 active ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
             )}
         >

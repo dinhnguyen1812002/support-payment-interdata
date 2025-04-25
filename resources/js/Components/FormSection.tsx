@@ -27,7 +27,7 @@ export default function FormSection({
         >
           <div
             className={classNames(
-              'px-4 py-5 bg-white dark:bg-gray-800 sm:p-6 shadow',
+              'px-4 py-5 bg-white dark:bg-gray-800 sm:p-6 shadow-sm',
               hasActions
                 ? 'sm:rounded-tl-md sm:rounded-tr-md'
                 : 'sm:rounded-md',
