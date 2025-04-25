@@ -313,7 +313,7 @@ const ProfilePage = ({
 
     return (
         <AppLayout notifications={notifications} canRegister={true} canLogin={true} title={user.name}>
-            <div className="flex max-w-7xl mx-auto flex-col lg:flex-row min-h-screen">
+            <div className="flex max-w-7xl mx-auto flex-col lg:flex-row min-h-screen dark:bg-[#0D0E12] ">
                 {/* Mobile/Tablet header */}
                 {(screenSize.isMobile || screenSize.isTablet) && (
                     <div className="sticky top-0 z-10 p-4 flex justify-between items-center border-b bg-background">
@@ -336,7 +336,7 @@ const ProfilePage = ({
                 <div
                     id="sidebar"
                     className={cn(
-                        "bg-background z-30 lg:min-h-screen",
+                        "dark:bg-[#0D0E12]  z-30 lg:min-h-screen",
                         screenSize.isMobile || screenSize.isTablet
                             ? "fixed inset-y-0 left-0 w-64 transform transition-transform duration-200 ease-in-out"
                             : "sticky top-16 h-screen w-60 overflow-y-auto border-r"

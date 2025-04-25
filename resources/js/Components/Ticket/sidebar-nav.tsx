@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { cn } from '@/lib/utils';
 import {
-    ChevronLeft,
-    ChevronRight,
     LayoutDashboard,
-    Settings,
     Users,
-    BarChart3,
     FileText,
-    HelpCircle,
+    BarChart3,
+    Settings,
     Bell,
+    HelpCircle,
+    PanelLeftOpen,
+    PanelLeftClose
 } from 'lucide-react';
-import { ScrollArea } from '@/Components/ui/scroll-area';
-import { Button } from '@/Components/ui/button';
-import { Separator } from '@/Components/ui/separator';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/Components/ui/tooltip';
+import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/Components/ui/scroll-area";
+import { Button } from "@/Components/ui/button";
+import { Separator } from "@/Components/ui/separator";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/Components/ui/tooltip";
 
 // Define navigation items
 interface NavItem {
@@ -44,8 +44,8 @@ const navigationItems: NavSection[] = [
         title: 'Management',
         items: [
             {
-                title: 'Users',
-                href: '/users',
+                title: 'Employee',
+                href: '/nhan-su',
                 icon: <Users className="h-5 w-5" />,
             },
             {
@@ -82,75 +82,71 @@ const navigationItems: NavSection[] = [
     },
 ];
 
-interface SidebarNavProps extends React.HTMLAttributes<HTMLDivElement> {
-    defaultCollapsed?: boolean;
-    title?: string;
-}
-
-export function SidebarNav({
-                               className,
-                               defaultCollapsed = false,
-                           }: SidebarNavProps) {
-    const [collapsed, setCollapsed] = useState(defaultCollapsed);
-
+export default function CollapsibleSidebar() {
+    const [collapsed, setCollapsed] = useState(false);
     // Simulate active path (would typically come from a router)
     const activePath = '/dashboard';
 
     return (
-        <div
-            className={cn(
-                'group relative flex flex-col border-r bg-background transition-all duration-300 ease-in-out',
-                collapsed ? 'w-16' : 'w-64',
-                className
-            )}
+        <div className="flex h-screen dark:bg-[#0F1014]">
+            <div
+                className={cn(
+                    "group relative flex flex-col  transition-all duration-300 ease-in-out border-r",
+                    collapsed ? "w-16" : "w-64"
+                )}
+            >
+                <div className="flex h-16 items-center justify-between border-b px-4">
+                    <div className={cn("transition-opacity duration-300",
+                        collapsed ? "opacity-0 invisible hidden" : "opacity-100 visible")}
+                    >
+                        <h2 className="text-lg font-semibold">Support</h2>
+                    </div>
 
-        >
-            <div className="flex h-16 items-center justify-between border-b px-4">
-                <div className={cn("transition-opacity duration-300", collapsed ? "opacity-0 invisible hidden" : "opacity-100 visible")}>
-                    <h2 className="text-lg font-semibold">Support</h2>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-md"
+                        onClick={() => setCollapsed(!collapsed)}
+                        aria-label={collapsed ? "Expand sidebar hidden" : "Collapse sidebar"}
+                    >
+                        {collapsed ? (
+                            <PanelLeftClose className="h-4 w-4" />
+                        ) : (
+                            <PanelLeftOpen className="h-4 w-4" />
+                        )}
+                    </Button>
                 </div>
 
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-md"
-                    onClick={() => setCollapsed(!collapsed)}
-                    aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-                >
-                    {collapsed ? (
-                        <ChevronRight className="h-4 w-4" />
-                    ) : (
-                        <ChevronLeft className="h-4 w-4" />
-                    )}
-                </Button>
+                <ScrollArea className="flex-1">
+                    <nav className="flex flex-col gap-2 p-2">
+                        {navigationItems.map((section, sectionIndex) => (
+                            <div key={sectionIndex} className="mb-2">
+                                {section.title && !collapsed && (
+                                    <div className="px-2 py-1.5">
+                                        <p className="text-xs font-medium text-muted-foreground">{section.title}</p>
+                                    </div>
+                                )}
+                                {section.title && collapsed && (
+                                    <Separator className="mx-2 my-2" />
+                                )}
+                                <div className="grid gap-1">
+                                    {section.items.map((item, itemIndex) => (
+                                        <NavItem
+                                            key={itemIndex}
+                                            item={item}
+                                            collapsed={collapsed}
+                                            active={activePath === item.href}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </nav>
+                </ScrollArea>
             </div>
 
-            <ScrollArea className="flex-1">
-                <nav className="flex flex-col gap-2 p-2">
-                    {navigationItems.map((section, sectionIndex) => (
-                        <div key={sectionIndex} className="mb-2">
-                            {section.title && !collapsed && (
-                                <div className="px-2 py-1.5">
-                                    <p className="text-xs font-medium text-muted-foreground">{section.title}</p>
-                                </div>
-                            )}
-                            {section.title && collapsed && (
-                                <Separator className="mx-2 my-2" />
-                            )}
-                            <div className="grid gap-1">
-                                {section.items.map((item, itemIndex) => (
-                                    <NavItem
-                                        key={itemIndex}
-                                        item={item}
-                                        collapsed={collapsed}
-                                        active={activePath === item.href}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </nav>
-            </ScrollArea>
+            {/* Main content area */}
+
         </div>
     );
 }
@@ -170,7 +166,7 @@ function NavItem({ item, collapsed, active }: NavItemProps) {
                         href={item.href}
                         className={cn(
                             'flex h-10 w-10 mx-auto items-center justify-center rounded-md',
-                            'hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+                            'hover:bg-accent hover:text-accent-foreground',
                             active ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground'
                         )}
                     >
@@ -189,7 +185,7 @@ function NavItem({ item, collapsed, active }: NavItemProps) {
             href={item.href}
             className={cn(
                 'flex h-10 items-center rounded-md px-3 text-sm font-medium',
-                'hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring',
+                'hover:bg-accent hover:text-accent-foreground',
                 active ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
             )}
         >

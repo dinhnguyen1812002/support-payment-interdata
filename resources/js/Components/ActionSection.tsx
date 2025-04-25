@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function ActionSection({
- 
+
   children,
 }: PropsWithChildren<Props>) {
   return (
@@ -15,7 +15,7 @@ export default function ActionSection({
       {/* <SectionTitle title={title} description={description} /> */}
 
       <div className="mt-5 md:mt-0 md:col-span-2">
-        <div className="px-4 py-5 sm:p-6 bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
+        <div className="px-4 py-5 sm:p-6 bg-white dark:bg-[#0D0E12]  shadow-sm sm:rounded-lg">
           {children}
         </div>
       </div>

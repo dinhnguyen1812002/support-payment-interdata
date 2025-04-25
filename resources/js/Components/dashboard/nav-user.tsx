@@ -79,8 +79,8 @@ export function NavUser({user}: NavUserProps) {
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-medium">{page.props.auth.user?.name}</span>
                                     <span className="truncate text-xs text-muted-foreground">
-                    {page.props.auth.user?.email}
-                  </span>
+                                        {page.props.auth.user?.email}
+                                    </span>
                                 </div>
                             </div>
                         </DropdownMenuLabel>
