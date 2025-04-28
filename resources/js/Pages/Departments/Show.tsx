@@ -7,101 +7,43 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar"
 import { Button } from "@/Components/ui/button"
 import { Search, Filter, Mail, ArrowLeft } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger } from "@/Components/ui/tabs"
-import UpvoteButton from "@/Components/VoteButton"
-import { Card } from "@/Components/ui/card"
+import { Notification ,Department } from "@/types"
+import useTypedPage from "@/Hooks/useTypedPage"
+import PostContent from "@/Components/post-content"
+import {router} from "@inertiajs/core";
+import {route} from "ziggy-js";
 
-interface Department {
-    id: number
-    name: string
-    description: string | null
-    created_at: string
-}
-
-interface Email {
-    id: string
-    sender: string
-    initials: string
-    email: string
-    subject: string
-    preview: string
-    date: string
-    shortDate: string
-    labels: string[]
-    read: boolean
-}
-
-interface Post {
-    id: string
-    title: string
-    content: string
-    user: { name: string; profile_photo_path: string }
-    categories: { id: number; name: string }[]
-    created_at: string
-    upvotes_count: number
-    has_upvoted: boolean
-    comments: any[]
-}
+import {Post} from "@/types/Post";
 
 interface Props {
-    department: Department
+    notifications: Notification[];
+    department: Department;
+    posts: Post[];
+    auth: { user: { id: number; name: string; profile_photo_path: string } };
 }
 
-export default function DepartmentShow({ department }: Props) {
-    const emails: Email[] = [
-        {
-            id: "1",
-            sender: "William Smith",
-            initials: "WS",
-            email: "williamsmith@example.com",
-            subject: "Meeting Tomorrow",
-            preview: "Let's have a meeting tomorrow to discuss the project...",
-            date: "Oct 22, 2023, 9:00:00 AM",
-            shortDate: "over 1 year ago",
-            labels: ["meeting", "work", "important"],
-            read: false,
-        },
-        {
-            id: "2",
-            sender: "Alice Smith",
-            initials: "AS",
-            email: "alicesmith@example.com",
-            subject: "Re: Project Update",
-            preview: "Thank you for the project update. It looks great!",
-            date: "Oct 20, 2023, 2:30:00 PM",
-            shortDate: "over 1 year ago",
-            labels: ["work", "important"],
-            read: false,
-        },
-    ]
-
-    const posts: Post[] = [
-        {
-            id: "1",
-            title: "How to Build a Blog with Next.js",
-            content: "<p>This is the content of the post related to the first email.</p>",
-            user: { name: "John Doe", profile_photo_path: "" },
-            categories: [{ id: 1, name: "Next.js" }],
-            created_at: "Oct 22, 2023",
-            upvotes_count: 10,
-            has_upvoted: false,
-            comments: [],
-        },
-        {
-            id: "2",
-            title: "Update on the Project",
-            content: "<p>This is the content of the post related to the second email.</p>",
-            user: { name: "Jane Doe", profile_photo_path: "" },
-            categories: [{ id: 2, name: "React" }],
-            created_at: "Oct 20, 2023",
-            upvotes_count: 5,
-            has_upvoted: true,
-            comments: [],
-        },
-    ]
-
-    const [selectedEmail, setSelectedEmail] = useState<Email | null>(null)
+export default function DepartmentShow({ department, notifications: initialNotifications = [], posts, auth }: Props) {
+    const [localNotifications, setLocalNotifications] = useState<Notification[]>(initialNotifications);
+    const page = useTypedPage()
+    const userId = page.props.auth?.user?.id
+    const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null)
     const [isMobile, setIsMobile] = useState(false)
     const [showPostView, setShowPostView] = useState(false)
+    const currentUser = auth?.user || null;
+
+    useEffect(() => {
+        if (!userId) return;
+
+        const postChannel = window.Echo.channel("notifications");
+        postChannel.listen(".new-question-created", (e: Notification) => {
+            const newNotification = { ...e, type: "post" };
+
+        });
+        return () => {
+            postChannel.stopListening(".new-question-created");
+            window.Echo.leave("notifications");
+        };
+    }, [userId]);
 
     // Check if screen is mobile size
     useEffect(() => {
@@ -109,9 +51,8 @@ export default function DepartmentShow({ department }: Props) {
             const mobile = window.innerWidth < 768
             setIsMobile(mobile)
 
-            // Reset view when switching between mobile and desktop
             if (!mobile && !showPostView) {
-                setSelectedEmail(emails[0])
+                setSelectedNotification(localNotifications[0])
             }
         }
 
@@ -121,17 +62,17 @@ export default function DepartmentShow({ department }: Props) {
         return () => {
             window.removeEventListener('resize', checkIfMobile)
         }
-    }, [showPostView])
+    }, [showPostView, localNotifications])
 
     // Set default selected email for desktop view
     useEffect(() => {
-        if (!isMobile && selectedEmail === null) {
-            setSelectedEmail(emails[0])
+        if (!isMobile && selectedNotification === null && localNotifications.length > 0) {
+            setSelectedNotification(localNotifications[0])
         }
-    }, [isMobile, selectedEmail])
+    }, [isMobile, selectedNotification, localNotifications])
 
-    const handleEmailSelect = (email: Email) => {
-        setSelectedEmail(email)
+    const handleNotificationSelect = (notification: Notification) => {
+        setSelectedNotification(notification)
         if (isMobile) {
             setShowPostView(true)
         }
@@ -141,11 +82,33 @@ export default function DepartmentShow({ department }: Props) {
         setShowPostView(false)
     }
 
-    const selectedPost = selectedEmail ? posts.find((post) => post.id === selectedEmail.id) : null
+    const selectedPost = selectedNotification && selectedNotification.data.post_id
+        ? posts.find((post) => post.id === selectedNotification.data.post_id)
+        : null
+
+    const handleCommentSubmit = (content: string, parentId?: number) => {
+        if (!selectedPost) return;
+
+        // Use Inertia router or whatever method your app uses to submit comments
+        router.post(
+            route('comments.store'),
+            {
+                comment: content,
+                post_id: selectedPost.id,
+                parent_id: parentId || null
+            },
+            {
+                preserveScroll: true,
+                onError: errors => {
+                    console.error('Error submitting comment:', errors);
+                },
+            },
+        );
+    };
 
     return (
         <TooltipProvider>
-            <AppLayout>
+            <AppLayout title={department.name}>
                 <div className="shadow-xs w-full dark:bg-[#0F1014] z-10">
                     <Tabs defaultValue="all" className="w-full">
                         <div className="border-b px-4 py-2 bg-muted/20 h-16">
@@ -177,36 +140,36 @@ export default function DepartmentShow({ department }: Props) {
                                 <Button variant="ghost" size="icon"><Filter className="h-4 w-4" /></Button>
                             </div>
                         </div>
-                        <ScrollArea className="h-full">
-                            {emails.map((email) => {
-                                const isSelected = selectedEmail?.id === email.id;
+                        <ScrollArea className="h-[calc(100vh-10rem)] w-full">
+                            {localNotifications.map((notification) => {
+                                const isSelected = selectedNotification?.id === notification.id;
 
                                 return (
                                     <div
-                                        key={email.id}
-                                        onClick={() => handleEmailSelect(email)}
+                                        key={notification.id}
+                                        onClick={() => handleNotificationSelect(notification)}
                                         className={`w-full text-left p-3 cursor-pointer border-b hover:bg-accent/50 ${
                                             isSelected ? "border-l-4 border-l-blue-500" : "border-gray-300 dark:border-gray-600"
                                         }`}
                                     >
                                         <div className="flex items-start gap-1">
                                             <Avatar className="h-10 w-10 mt-0.5 rounded-lg">
-                                                <AvatarImage src={"http://localhost:8000/storage/profile-photos/8ZbgjCeJUhVQObkDLNmfC5biooFrONnmuOfNgQxC.jpg"} />
+                                                <AvatarImage src={notification.data.profile_photo_url || ''} />
                                                 <AvatarFallback className="bg-primary/10 text-primary">
-                                                    {email.initials}
+                                                    {notification.data.name?.[0] ?? "?"}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex justify-between items-start">
-                                                    <h3 className="font-medium text-sm truncate">{email.sender}</h3>
-                                                    <span className="text-xs text-muted-foreground ml-2">{email.shortDate}</span>
+                                                    <h3 className="font-medium text-sm truncate">{notification.data.name}</h3>
+                                                    <span className="text-xs text-muted-foreground ml-2">{new Date(notification.created_at).toLocaleDateString()}</span>
                                                 </div>
-                                                <h4 className="text-sm truncate mt-0.5">{email.subject}</h4>
-                                                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{email.preview}</p>
+                                                <h4 className="text-sm truncate mt-0.5">{notification.data.title}</h4>
+                                                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{notification.data.message}</p>
                                             </div>
                                         </div>
                                     </div>
-                                );
+                                )
                             })}
                         </ScrollArea>
                     </div>
@@ -216,6 +179,7 @@ export default function DepartmentShow({ department }: Props) {
                         flex-1
                         h-full
                         ${(isMobile && !showPostView) ? 'hidden' : 'block'}
+                        overflow-y-auto
                     `}>
                         {/* Mobile Back Button */}
                         {isMobile && showPostView && (
@@ -233,38 +197,19 @@ export default function DepartmentShow({ department }: Props) {
                         )}
 
                         {/* Post Content */}
-                        <div className="px-3 sm:px-4 md:px-6 py-4">
-                            {selectedPost ? (
-                                <div className="max-w-3xl mx-auto space-y-6">
-                                    <div className="p-4 sm:p-6">
-                                        <h2 className="text-xl sm:text-2xl font-bold">{selectedPost.title}</h2>
-                                        <div
-                                            className="prose dark:prose-invert max-w-none mt-4"
-                                            dangerouslySetInnerHTML={{ __html: selectedPost.content }}
-                                        />
-                                        <div className="flex items-center justify-between mt-6">
-                                            <div className="flex items-center gap-2">
-                                                <Avatar className="h-8 w-8">
-                                                    <AvatarImage />
-                                                    <AvatarFallback>{selectedPost.user.name[0]}</AvatarFallback>
-                                                </Avatar>
-                                                <span className="text-sm text-muted-foreground">{selectedPost.user.name}</span>
-                                            </div>
-                                            <UpvoteButton
-                                                postId={selectedPost.id}
-                                                initialUpvotes={selectedPost.upvotes_count}
-                                                initialHasUpvoted={selectedPost.has_upvoted}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="text-center text-muted-foreground py-10">
-                                    <Mail className="h-10 w-10 mx-auto mb-3" />
-                                    <p>Select an email to view the post</p>
-                                </div>
-                            )}
-                        </div>
+                        {selectedPost ? (
+                            <PostContent
+                                post={selectedPost}
+                                comments={selectedPost.comments}
+                                currentUser={currentUser}
+                                onCommentSubmit={handleCommentSubmit}
+                            />
+                        ) : (
+                            <div className="text-center text-muted-foreground py-10">
+                                <Mail className="h-10 w-10 mx-auto mb-3" />
+                                <p>Select a notification to view the post</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </AppLayout>

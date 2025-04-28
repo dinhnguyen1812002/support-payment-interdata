@@ -163,7 +163,22 @@ export interface BlogPost {
     has_upvoted: boolean;
     upvotes_count: number;
 }
-
+// interface Post {
+//     id: string;
+//     title: string;
+//     content: string;
+//     created_at: string;
+//     user: {
+//         name: string;
+//         profile_photo_path: string;
+//     };
+//     categories: Category[];
+//     tags: Tag[];
+//     upvotes_count: number;
+//     has_upvoted: boolean;
+//     next_page_url: string | null;
+//     comments: Comment[];
+// }
 // export interface Notification {
 //
 //     id: string;
@@ -191,7 +206,7 @@ export interface BlogPost {
 export interface Notification {
     id: string;
     data: {
-        post_id?: number;
+        post_id?: string;
         title?: string;
         message: string;
         slug?: string;
@@ -232,6 +247,8 @@ export interface NotificationContextType {
     unreadCount: number;
     markAllAsRead: () => void;
 }
+
+
 export interface Post {
     id: number;
     title: string;
@@ -240,4 +257,11 @@ export interface Post {
     comments_count: number;
     slug: string;
     upvotes_count: number;
+}
+
+export interface Department {
+    id: number
+    name: string
+    description: string | null
+    created_at: string
 }

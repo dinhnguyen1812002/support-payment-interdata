@@ -179,7 +179,7 @@ const EditPost = ({ post, categories, notifications, keyword, tags }: EditPostPr
                                                         modules={{
                                                             toolbar: [
                                                                 ['bold', 'italic', 'underline'],
-                                                                [{ list: 'ordered' }, { list: 'bullet' }],
+                                                                [{ list: 'ordered' }, { list: 'bullet' }, 'code-block'],
                                                                 ['link', 'image'],
                                                                 ['clean'],
                                                             ],

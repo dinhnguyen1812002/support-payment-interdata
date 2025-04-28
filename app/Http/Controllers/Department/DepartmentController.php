@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Department;
 
 use App\Http\Controllers\Controller;
 use App\Models\Departments;
+use App\Models\Post;
+use App\Services\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -11,6 +13,13 @@ use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class DepartmentController extends Controller
 {
+    protected $postService;
+
+    public function __construct(PostService $postService)
+    {
+        $this->postService = $postService;
+    }
+
     public function index(Request $request)
     {
         // Kiểm tra vai trò admin
@@ -81,8 +90,40 @@ class DepartmentController extends Controller
             throw UnauthorizedException::forRoles(['admin']);
         }
 
+        // Get notifications for the current user
+        $notifications = auth()->user()->unreadNotifications;
+
+        // Get posts related to notifications
+        $postIds = collect($notifications)->pluck('data.post_id')->filter()->unique()->values()->toArray();
+        $posts = Post::whereIn('id', $postIds)
+            ->with(['user', 'categories', 'tags'])
+            ->withCount('upvotes')
+            ->withCount('comments')
+            ->get()
+            ->map(function ($post) {
+                $comments = $post->getFormattedComments();
+                $hasUpvoted = auth()->check() ? $post->isUpvotedBy(auth()->id()) : false;
+
+                return [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'content' => $post->content,
+                    'created_at' => $post->created_at->diffForHumans(),
+                    'updated_at' => $post->updated_at,
+                    'published_at' => $post->published_at,
+                    'user' => $post->user,
+                    'categories' => $post->categories,
+                    'tags' => $post->tags,
+                    'comments' => $comments,
+                    'upvotes_count' => $post->upvotes_count,
+                    'has_upvoted' => $hasUpvoted,
+                ];
+            });
+
         return Inertia::render('Departments/Show', [
             'department' => $department,
+            'notifications' => $notifications,
+            'posts' => $posts,
         ]);
     }
 
@@ -127,5 +168,13 @@ class DepartmentController extends Controller
         $department->delete();
 
         return redirect()->route('departments.index')->with('success', 'Department deleted successfully.');
+    }
+
+    public function getPostBySlug(string $slug)
+    {
+        $post = Post::getPostBySlug($slug);
+        $data = $this->postService->preparePostData($post);
+
+        return Inertia::render('Departments/Show', $data);
     }
 }

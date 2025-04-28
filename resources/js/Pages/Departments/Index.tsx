@@ -19,7 +19,6 @@ interface Department {
     name: string
     description: string | null
     created_at: string
-
     slug: string
 }
 

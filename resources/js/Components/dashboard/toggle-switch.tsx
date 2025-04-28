@@ -17,7 +17,7 @@ export default function ThemeSwitch() {
 
     return (
         <ToggleGroup
-            className="rounded-full border p-1"
+            className="rounded-full border p-1 dark:bg-[#0F1014]"
             size="sm"
             type="single"
             value={theme}

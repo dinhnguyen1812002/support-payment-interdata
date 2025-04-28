@@ -8,20 +8,35 @@ import {
     Bell,
     HelpCircle,
     PanelLeftOpen,
-    PanelLeftClose
+    PanelLeftClose,
+    ChevronsUpDown
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/Components/ui/scroll-area";
 import { Button } from "@/Components/ui/button";
 import { Separator } from "@/Components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/Components/ui/tooltip";
+import { ThemeToggle } from "@/Components/Ticket/theme-toggle";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/Components/ui/dropdown-menu"
+import ThemeSwitch from "@/Components/dashboard/toggle-switch";
 
-// Define navigation items
+
 interface NavItem {
     title: string;
     href: string;
     icon: React.ReactNode;
     variant?: 'default' | 'ghost';
+}
+
+interface SidebarNavProps {
+    title: string;
 }
 
 interface NavSection {
@@ -32,91 +47,99 @@ interface NavSection {
 const navigationItems: NavSection[] = [
     {
         items: [
-            {
-                title: 'Dashboard',
-                href: '/dashboard',
-                icon: <LayoutDashboard className="h-5 w-5" />,
-                variant: 'default',
-            },
+            { title: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard className="h-5 w-5" />, variant: 'default' },
         ],
     },
     {
         title: 'Management',
         items: [
-            {
-                title: 'Employee',
-                href: '/nhan-su',
-                icon: <Users className="h-5 w-5" />,
-            },
-            {
-                title: 'Reports',
-                href: '/reports',
-                icon: <FileText className="h-5 w-5" />,
-            },
-            {
-                title: 'Analytics',
-                href: '/analytics',
-                icon: <BarChart3 className="h-5 w-5" />,
-            },
+            { title: 'Employee', href: '/nhan-su', icon: <Users className="h-5 w-5" /> },
+            { title: 'Reports', href: '/reports', icon: <FileText className="h-5 w-5" /> },
+            { title: 'Analytics', href: '/analytics', icon: <BarChart3 className="h-5 w-5" /> },
         ],
     },
     {
         title: 'Settings',
         items: [
-            {
-                title: 'Preferences',
-                href: '/preferences',
-                icon: <Settings className="h-5 w-5" />,
-            },
-            {
-                title: 'Notifications',
-                href: '/notifications',
-                icon: <Bell className="h-5 w-5" />,
-            },
-            {
-                title: 'Help',
-                href: '/help',
-                icon: <HelpCircle className="h-5 w-5" />,
-            },
+            { title: 'Preferences', href: '/preferences', icon: <Settings className="h-5 w-5" /> },
+            { title: 'Notifications', href: '/notifications', icon: <Bell className="h-5 w-5" /> },
+            { title: 'Help', href: '/help', icon: <HelpCircle className="h-5 w-5" /> },
         ],
     },
 ];
 
-export default function CollapsibleSidebar() {
+const SidebarNav: React.FC<SidebarNavProps> = ({ title }) => {
     const [collapsed, setCollapsed] = useState(false);
-    // Simulate active path (would typically come from a router)
     const activePath = '/dashboard';
 
     return (
         <div className="flex h-screen dark:bg-[#0F1014]">
             <div
                 className={cn(
-                    "group relative flex flex-col  transition-all duration-300 ease-in-out border-r",
+                    "group relative flex flex-col border-r transition-[width] duration-300 ease-in-out",
                     collapsed ? "w-16" : "w-64"
                 )}
             >
                 <div className="flex h-16 items-center justify-between border-b px-4">
-                    <div className={cn("transition-opacity duration-300",
-                        collapsed ? "opacity-0 invisible hidden" : "opacity-100 visible")}
+                    {/* Logo + Title */}
+                    <div
+                        className={cn(
+                            "flex items-center gap-4 transition-all duration-300",
+                            collapsed ? "opacity-0 scale-95 pointer-events-none w-0" : "opacity-100 scale-100 w-auto"
+                        )}
                     >
-                        <h2 className="text-lg font-semibold">Support</h2>
+
+                        <DropdownMenu >
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    className="flex items-center gap-2 px-4 py-2  rounded-none"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <img src="/icon/laravel.svg" alt="Logo" className="h-8 w-8 border-r py-2" />
+                                        <span className="text-xl font-semibold whitespace-nowrap">{title}</span>
+                                    </div>
+                                    <ChevronsUpDown className="h-4 w-4 ml-2 opacity-50" />
+                                </Button>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent className="w-56 dark:bg-[#0F1014] ">
+                                <DropdownMenuLabel  >
+                                    <ThemeSwitch />
+                                </DropdownMenuLabel>
+
+                                <DropdownMenuSeparator />
+
+                                {/*<DropdownMenuItem>Profile</DropdownMenuItem>*/}
+                                {/*<DropdownMenuItem>Billing</DropdownMenuItem>*/}
+                                {/*<DropdownMenuItem>Team</DropdownMenuItem>*/}
+                                {/*<DropdownMenuItem>Subscription</DropdownMenuItem>*/}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+
                     </div>
 
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-md"
-                        onClick={() => setCollapsed(!collapsed)}
-                        aria-label={collapsed ? "Expand sidebar hidden" : "Collapse sidebar"}
-                    >
-                        {collapsed ? (
-                            <PanelLeftClose className="h-4 w-4" />
-                        ) : (
-                            <PanelLeftOpen className="h-4 w-4" />
-                        )}
-                    </Button>
+                    {/* Toggle + Theme Button */}
+                    <div className="flex items-center gap-2">
+                        {!collapsed }
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-md"
+                            onClick={() => setCollapsed(!collapsed)}
+                            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                        >
+                            {collapsed ? (
+                                <PanelLeftOpen className="h-4 w-4" />
+                            ) : (
+                                <PanelLeftClose className="h-4 w-4" />
+                            )}
+                        </Button>
+                    </div>
                 </div>
 
+                {/* Navigation */}
                 <ScrollArea className="flex-1">
                     <nav className="flex flex-col gap-2 p-2">
                         {navigationItems.map((section, sectionIndex) => (
@@ -126,9 +149,7 @@ export default function CollapsibleSidebar() {
                                         <p className="text-xs font-medium text-muted-foreground">{section.title}</p>
                                     </div>
                                 )}
-                                {section.title && collapsed && (
-                                    <Separator className="mx-2 my-2" />
-                                )}
+                                {section.title && collapsed && <Separator className="mx-2 my-2" />}
                                 <div className="grid gap-1">
                                     {section.items.map((item, itemIndex) => (
                                         <NavItem
@@ -145,11 +166,12 @@ export default function CollapsibleSidebar() {
                 </ScrollArea>
             </div>
 
-            {/* Main content area */}
-
+            {/* Main Content */}
         </div>
     );
-}
+};
+
+export default SidebarNav;
 
 interface NavItemProps {
     item: NavItem;
@@ -165,7 +187,7 @@ function NavItem({ item, collapsed, active }: NavItemProps) {
                     <a
                         href={item.href}
                         className={cn(
-                            'flex h-10 w-10 mx-auto items-center justify-center rounded-md',
+                            'flex h-10 w-10 mx-auto items-center justify-center rounded-md transition-colors',
                             'hover:bg-accent hover:text-accent-foreground',
                             active ? 'bg-accent text-accent-foreground font-medium' : 'text-muted-foreground'
                         )}
@@ -184,7 +206,7 @@ function NavItem({ item, collapsed, active }: NavItemProps) {
         <a
             href={item.href}
             className={cn(
-                'flex h-10 items-center rounded-md px-3 text-sm font-medium',
+                'flex h-10 items-center rounded-md px-3 text-sm font-medium transition-colors',
                 'hover:bg-accent hover:text-accent-foreground',
                 active ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'
             )}
