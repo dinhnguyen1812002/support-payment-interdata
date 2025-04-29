@@ -19,7 +19,8 @@ class UserController extends UserProfileController
             ->when($request->search, function ($query, $search) {
                 $query->where('title', 'like', "%{$search}%");
             })
-            ->orderByDesc('upvotes_count') // Sắp xếp theo lượng upvote giảm dần
+//            ->orderByDesc('upvotes_count')
+            ->latest()
             ->paginate(10);
 
         return Inertia::render('Profile/Show', [

@@ -8,6 +8,7 @@ import CategoriesSidebar from "@/Pages/Categories/CategoriesSidebar";
 import { SearchCommandDialog } from "@/Components/command-dialog";
 import { Menu } from "lucide-react";
 import TagBar from "@/Pages/Tags/TagBar";
+import { Separator } from "@/Components/ui/separator"
 
 interface Category {
     id: number;
@@ -65,7 +66,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title, categories, s
     const keyCmd = navigator.userAgent.indexOf('Mac OS X') ? "ctrl + k" : "⌘ + K";
 
     return (
-        <div className="mt-5 ">
+        <div className="mt-5  ">
             <div className="px-4 sm:px-5">
                 <p className="w-full text-xs font-semibold text-gray-400 mb-2 ">{uppercaseText(title)}</p>
             </div>
@@ -80,11 +81,14 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title, categories, s
                         >
                             {title === "Search" ? (
                                 <div className="w-full flex items-center justify-between dark:text-[#9a9cae] " onClick={() => handleCategoryClick(title, link)}>
-                                    <span className={`text-sm font-medium transition-colors  dark:text-[#9a9cae]${isActive ?
-                                        "dark:text-blue-400 dark:hover:text-blue-600 " : "hover:text-blue-500 "}`}>
-                                        {title}
 
-                                    </span >
+                                    <span
+                                        className={`font-bold text-sm ${
+                                            isActive ? "text-blue-600 dark:text-blue-400 dark:hover:text-blue-600" : ""
+                                        }`}
+                                    >
+                                               {title}
+                                            </span>
                                     <span className="text-sm text-gray-400">{keyCmd}</span>
                                 </div>
                             ) : (
@@ -145,11 +149,13 @@ const Sidebar: React.FC<Props> = () => {
     }, []);
 
     return (
-        <div className="w-56 p-2">
-            <CategoryList title="PUBLIC" categories={publicCategories} setOpen={setOpen} />
-            <TagBar />
-            <CategoriesSidebar />
-            <SearchCommandDialog open={open} setOpen={setOpen} />
+        <div className="w-56 p-2  ">
+            <div className=" ml-2 ">
+                <CategoryList title="PUBLIC" categories={publicCategories} setOpen={setOpen} />
+                <TagBar />
+                <CategoriesSidebar />
+                <SearchCommandDialog open={open} setOpen={setOpen} />
+            </div>
         </div>
     );
 };

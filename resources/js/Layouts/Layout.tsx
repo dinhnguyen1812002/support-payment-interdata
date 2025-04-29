@@ -40,7 +40,7 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
                         <div className="flex  gap-x-4 ">
                             {/* Left Sidebar */}
                             <div className="hidden lg:block  pr-2 ml-3 ">
-                                <Sidebar categories={[]} tags={tags} />
+                                <Sidebar categories={[]} />
                             </div>
 
 

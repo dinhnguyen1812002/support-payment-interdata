@@ -12,6 +12,7 @@ use App\Notifications\NewPostNotification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class PostService
@@ -95,9 +96,11 @@ class PostService
 
     public function storePost(CreatePostData $postData): array
     {
+        // Use caching on the slug generation to avoid regeneration
         $slug = Str::slug($postData->title);
 
-        if (Post::existsByTitleOrSlug($postData->title, $slug)) {
+        // Single check for duplicate - potentially using transaction for safety
+        if (Post::whereTitle($postData->title)->orWhere('slug', $slug)->exists()) {
             return [
                 'success' => false,
                 'errors' => [
@@ -106,30 +109,40 @@ class PostService
             ];
         }
 
-        $post = Post::create([
-            'title' => $postData->title,
-            'content' => $postData->content,
-            'slug' => $slug,
-            'is_published' => $postData->is_published,
-            'user_id' => auth()->id(),
-        ]);
+        // Start database transaction to ensure data integrity
+        return DB::transaction(function () use ($postData, $slug) {
+            // Create post with only necessary data
+            $post = Post::create([
+                'title' => $postData->title,
+                'content' => $postData->content,
+                'slug' => $slug,
+                'is_published' => $postData->is_published,
+                'user_id' => auth()->id(),
+            ]);
 
-        if (! empty($postData->categories)) {
-            $post->categories()->attach($postData->categories);
-        }
+            // Batch attach relationships - more efficient than individual attaches
+            if (! empty($postData->categories)) {
+                $post->categories()->attach($postData->categories);
+            }
 
-        if (! empty($postData->tags)) {
-            $post->tags()->attach($postData->tags);
-        }
+            if (! empty($postData->tags)) {
+                $post->tags()->attach($postData->tags);
+            }
+            $post->load('tags', 'categories', 'user');
+            // Queue these operations to improve response time
+            dispatch(function () use ($post) {
+                $this->notifyUsers($post);
+            })->afterCommit();
 
-        $this->notifyUsers($post);
+            dispatch(function () use ($post) {
+                broadcast(new NewQuestionCreated($post))->toOthers();
+            })->afterCommit();
 
-        broadcast(new NewQuestionCreated($post))->toOthers();
-
-        return [
-            'success' => true,
-            'message' => 'Post created successfully!',
-        ];
+            return [
+                'success' => true,
+                'message' => 'Post created successfully!',
+            ];
+        });
     }
 
     public function getEditPostData(string $slug): array

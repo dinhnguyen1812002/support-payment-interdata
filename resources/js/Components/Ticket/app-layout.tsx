@@ -13,8 +13,8 @@ interface AppLayoutProps {
 export function AppLayout({ children, title }: AppLayoutProps) {
 
     return (
-        <div className="flex  flex-col dark:bg-[#0F1014]">
-            <div className="flex flex-1 mt-3">
+        <div className="flex flex-col dark:bg-[#0F1014]">
+            <div className="flex flex-1 ">
                 {/* Sidebar cố định chiều rộng */}
                 <aside className="hidden md:block ">
                     <SidebarNav title={title} />

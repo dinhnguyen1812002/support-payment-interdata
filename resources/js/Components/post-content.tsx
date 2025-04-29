@@ -24,20 +24,26 @@ interface PostContentProps {
     comments: Comment[];
     currentUser: { id: number; name: string; profile_photo_path: string } | null;
     onCommentSubmit: (content: string, parentId?: number) => void;
+    showBorder?: boolean; // <-- NEW
 }
 
 const PostContent: React.FC<PostContentProps> = ({
                                                      post,
                                                      comments,
                                                      currentUser,
-                                                     onCommentSubmit
+                                                     onCommentSubmit,
+                                                        showBorder = true
                                                  }) => {
     const authorAvatar = post.user.profile_photo_path
         ? `/storage/${post.user.profile_photo_path}`
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name)}&color=7F9CF5&background=EBF4FF`;
 
     return (
-        <div className="flex-1 w-full max-w-5xl mx-auto mt-4 sm:mt-5 md:mt-7 px-4 sm:px-6 md:px-4 dark:bg-[#0F1014] lg:border-l lg:pl-8 xl:pl-12">
+        <div
+            className={`flex-1 w-full max-w-5xl mx-auto mt-4 sm:mt-5 md:mt-7 px-4 sm:px-6 md:px-4 dark:bg-[#0F1014] ${
+                showBorder ? 'lg:border-l' : ''
+            } lg:pl-8 xl:pl-12`}
+        >
             <div className="mt-5 space-y-4">
                 <div className="mb-1">
                           <span className="text-2xl font-bold  mb-0 me-1 dark:text-[#F5F5F5]">

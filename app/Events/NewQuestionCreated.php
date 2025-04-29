@@ -52,7 +52,7 @@ class NewQuestionCreated implements ShouldBroadcast
                 'categories' => $this->post->categories->pluck('name')->toArray(),
             ],
             'read_at' => null,
-            'created_at' => now()->toISOString(),
+            'created_at' => now()->diffForHumans(),
             'type_notification' => 'post',
         ];
     }

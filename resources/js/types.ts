@@ -1,3 +1,6 @@
+import Tags from "@/Pages/Posts/Tags";
+
+
 type DateTime = string;
 
 export type Nullable<T> = T | null;
@@ -204,6 +207,8 @@ export interface BlogPost {
 //     created_at: string;
 // }\
 export interface Notification {
+    categories: Category[];
+    tags: Tag[];
     id: string;
     data: {
         post_id?: string;
@@ -213,6 +218,7 @@ export interface Notification {
         name?: string;
         profile_photo_url?: string;
         categories?: string[];
+        tags?: string[];
     };
     read_at: string | null;
     created_at: string;

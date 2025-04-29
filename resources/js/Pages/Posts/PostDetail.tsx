@@ -97,12 +97,14 @@ const PostDetail: React.FC<PostDetailProps> = ({
                             <div className="hidden lg:block w-52 pr-2 ml-[-10px]">
                                 <Sidebar categories={[]} />
                             </div>
+
                             <PostContent
                                 post={post}
                                 comments={comments}
                                 currentUser={currentUser}
                                 onCommentSubmit={handleCommentSubmit}
                             />
+
                             <div className="hidden lg:block mt-5 w-72">
                                 <div className="top-4">
                                     <div className="mb-6">
