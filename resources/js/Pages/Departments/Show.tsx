@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { AppLayout } from "@/Components/Ticket/app-layout";
 import { TooltipProvider } from "@/Components/ui/tooltip";
 import { Toaster } from "sonner";
@@ -6,7 +6,7 @@ import { ScrollArea } from "@/Components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";
 import { Search, Filter, Mail, ArrowLeft } from "lucide-react";
-import {Notification, Department, Tag} from "@/types";
+import { Department, Notification } from "@/types";
 import useTypedPage from "@/Hooks/useTypedPage";
 import PostContent from "@/Components/post-content";
 import { router } from "@inertiajs/core";
@@ -20,8 +20,9 @@ interface Props {
     auth: { user: { id: number; name: string; profile_photo_path: string } };
 }
 
-export default function DepartmentShow({ department, notifications: initialNotifications = [], posts, auth }: Props) {
+export default function DepartmentShow({ department, notifications: initialNotifications = [], posts: initialPosts = [], auth }: Props) {
     const [localNotifications, setLocalNotifications] = useState<Notification[]>(initialNotifications);
+    const [localPosts, setLocalPosts] = useState<Post[]>(initialPosts);
     const page = useTypedPage();
     const userId = page.props.auth?.user?.id;
     const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
@@ -29,36 +30,35 @@ export default function DepartmentShow({ department, notifications: initialNotif
     const [showPostView, setShowPostView] = useState(false);
     const currentUser = auth?.user || null;
 
+    // Memoize selectedPost to avoid unnecessary re-renders
+    const selectedPost = useMemo(() => {
+        return selectedNotification && selectedNotification.data.post_id
+            ? localPosts.find((post) => post.id === selectedNotification.data.post_id) || null
+            : null;
+    }, [selectedNotification, localPosts]);
+
+    // Handle new notifications via Echo
     useEffect(() => {
         if (!userId) return;
 
         const postChannel = window.Echo.channel("notifications");
         postChannel.listen(".new-question-created", (e: Notification) => {
             const newNotification = {
-                ...e,
+                id: e.id,
                 type: "post",
-                data: {
-                    ...e.data,
-                    post_id: e.data.post_id,
-                    message: e.data.message,
-                    title: e.data.title,
-                    name: e.data.name,
-                    profile_photo_url: e.data.profile_photo_url,
-                    tags: e.data.tags || [],
-                    categories: e.data.categories || [],
-                },
+                data: e.data,
                 read_at: null,
-                created_at: new Date().toISOString(),
+                created_at: e.created_at,
             };
 
             setLocalNotifications((prev) => {
-                // Check if notification already exists
-                const exists = prev.some(notification => notification.id === newNotification.id);
-                if (exists) return prev;
+                if (prev.some((notification) => notification.id === newNotification.id)) {
+                    return prev;
+                }
 
-                // Add new notification at the beginning of the array
-                return [newNotification, ...prev];
+                return [newNotification as Notification, ...prev];
             });
+
         });
 
         return () => {
@@ -67,12 +67,13 @@ export default function DepartmentShow({ department, notifications: initialNotif
         };
     }, [userId]);
 
+    // Handle mobile/desktop view
     useEffect(() => {
         const checkIfMobile = () => {
             const mobile = window.innerWidth < 768;
             setIsMobile(mobile);
 
-            if (!mobile && !showPostView) {
+            if (!mobile && !showPostView && localNotifications.length > 0) {
                 setSelectedNotification(localNotifications[0]);
             }
         };
@@ -85,45 +86,72 @@ export default function DepartmentShow({ department, notifications: initialNotif
         };
     }, [showPostView, localNotifications]);
 
+    // Set default notification for desktop
     useEffect(() => {
         if (!isMobile && selectedNotification === null && localNotifications.length > 0) {
             setSelectedNotification(localNotifications[0]);
         }
-    }, [isMobile, selectedNotification, localNotifications]);
+    }, [isMobile, localNotifications]);
 
-    const handleNotificationSelect = (notification: Notification) => {
-        setSelectedNotification(notification);
-        if (isMobile) {
-            setShowPostView(true);
-        }
-    };
-
-    const handleBackToList = () => {
-        setShowPostView(false);
-    };
-
-    const selectedPost = selectedNotification && selectedNotification.data.post_id
-        ? posts.find((post) => post.id === selectedNotification.data.post_id)
-        : null;
-
-    const handleCommentSubmit = (content: string, parentId?: number) => {
-        if (!selectedPost) return;
-
-        router.post(
-            route("comments.store"),
-            {
-                comment: content,
-                post_id: selectedPost.id,
-                parent_id: parentId || null,
-            },
-            {
-                preserveScroll: true,
-                onError: (errors) => {
-                    console.error("Error submitting comment:", errors);
-                },
+    // Handle notification click with lazy post fetching
+    const handleNotificationSelect = useCallback(
+        async (notification: Notification) => {
+            setSelectedNotification(notification);
+            if (isMobile) {
+                setShowPostView(true);
             }
-        );
-    };
+
+            // Check if post exists in localPosts
+            const postExists = localPosts.find((post) => post.id === notification.data.post_id);
+            if (!postExists && notification.data.post_id) {
+                try {
+                    const response = await fetch(route("posts.showById", { id: notification.data.post_id }));
+                    console.log("Fetching post:", notification.data.post_id);
+
+                    if (!response.ok) throw new Error("Failed to fetch post");
+                    const newPost = await response.json();
+
+                    setLocalPosts((prev) => {
+                        if (prev.some((post) => post.id === newPost.id)) return prev;
+                        return [newPost, ...prev];
+                    });
+                    console.log("Fetched post:", newPost);
+                } catch (error) {
+                    console.error("Error fetching post:", error);
+                }
+            }
+
+            // Mark notification as read
+
+        },
+        [localPosts, isMobile]
+    );
+
+    const handleBackToList = useCallback(() => {
+        setShowPostView(false);
+    }, []);
+
+    const handleCommentSubmit = useCallback(
+        (content: string, parentId?: number) => {
+            if (!selectedPost) return;
+
+            router.post(
+                route("comments.store"),
+                {
+                    comment: content,
+                    post_id: selectedPost.id,
+                    parent_id: parentId || null,
+                },
+                {
+                    preserveScroll: true,
+                    onError: (errors) => {
+                        console.error("Error submitting comment:", errors);
+                    },
+                }
+            );
+        },
+        [selectedPost]
+    );
 
     return (
         <TooltipProvider>
@@ -138,7 +166,7 @@ export default function DepartmentShow({ department, notifications: initialNotif
                             border-r
                         `}
                     >
-                        <div className="p-3 border-b bg-muted/30 flex items-center justify-between">
+                        <div className="p-3 border-b bg-muted/30 flex items-center justify-between h-16">
                             <h3 className="font-medium">Inbox</h3>
                             <div className="flex items-center gap-2">
                                 <Button variant="ghost" size="icon">
@@ -149,10 +177,10 @@ export default function DepartmentShow({ department, notifications: initialNotif
                                 </Button>
                             </div>
                         </div>
-                        <ScrollArea className="h-[calc(110vh-8rem)] w-full">
+                        <ScrollArea className="h-[calc(100vh-8rem)] w-full">
                             {localNotifications.map((notification) => {
                                 const isSelected = selectedNotification?.id === notification.id;
-                                const isUnread = !notification.read_at; // Kiểm tra thông báo chưa đọc
+                                const isUnread = !notification.read_at;
 
                                 return (
                                     <div
@@ -185,29 +213,36 @@ export default function DepartmentShow({ department, notifications: initialNotif
                                                         {new Date(notification.created_at).toLocaleDateString()}
                                                     </span>
                                                 </div>
-                                                <h4 className="text-sm truncate mt-0.5">{notification.data.title}</h4>
+                                                <h4 className="text-sm truncate mt-0.5">
+                                                    {notification.data.title}
+                                                    {/*{notification.data.product_name && (*/}
+                                                    {/*    <span className="text-xs text-muted-foreground">*/}
+                                                    {/*        {" "}*/}
+                                                    {/*        (from {notification.data.product_name})*/}
+                                                    {/*    </span>*/}
+                                                    {/*)}*/}
+                                                </h4>
                                                 <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                                                     {notification.data.message}
                                                 </p>
-                                                {/*<div className="mt-1 flex flex-wrap gap-1">*/}
-                                                {/*    {notification.data.categories?.map((category: string) => (*/}
-                                                {/*        <span*/}
-                                                {/*            key={category}*/}
-                                                {/*            className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"*/}
-                                                {/*        >*/}
-                                                {/*            {category}*/}
-                                                {/*        </span>*/}
-                                                {/*    ))}*/}
-                                                {/*    {notification.data.tags?.map((tag: string) => (*/}
-                                                {/*        <span*/}
-                                                {/*            key={tag}*/}
-                                                {/*            className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded"*/}
-                                                {/*        >*/}
-                                                {/*            {tag}*/}
-                                                {/*        </span>*/}
-                                                {/*    ))}*/}
-
-                                                {/*</div>*/}
+                                                <div className="mt-1 flex flex-wrap gap-1">
+                                                    {notification.data.categories?.map((category: string) => (
+                                                        <span
+                                                            key={category}
+                                                            className="text-xs border border-dashed border-gray-300 hover:border-blue-600 text-black px-2 py-1 rounded dark:text-gray-300 dark:border-gray-600 dark:hover:border-blue-400"
+                                                        >
+                                                            {category}
+                                                        </span>
+                                                    ))}
+                                                    {notification.data.tags?.map((tag: string) => (
+                                                        <span
+                                                            key={tag}
+                                                            className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded dark:bg-gray-700 dark:text-gray-300"
+                                                        >
+                                                            {tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -218,11 +253,11 @@ export default function DepartmentShow({ department, notifications: initialNotif
 
                     <div
                         className={`
-                        flex-1
-                        h-full
-                        ${(isMobile && !showPostView) ? "hidden" : "block"}
-                        overflow-y-auto
-                    `}
+                            flex-1
+                            h-full
+                            ${(isMobile && !showPostView) ? "hidden" : "block"}
+                            overflow-y-auto
+                        `}
                     >
                         {isMobile && showPostView && (
                             <div className="p-3 border-b flex items-center">
@@ -234,7 +269,7 @@ export default function DepartmentShow({ department, notifications: initialNotif
                         )}
 
                         {selectedPost ? (
-                            <ScrollArea className="h-[calc(100vh-8rem)] w-full">
+                            <ScrollArea className="h-screen w-full">
                                 <PostContent
                                     post={selectedPost}
                                     comments={selectedPost.comments}

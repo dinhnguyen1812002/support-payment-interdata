@@ -10,6 +10,7 @@ import { Menu } from "lucide-react";
 import TagBar from "@/Pages/Tags/TagBar";
 import { Separator } from "@/Components/ui/separator"
 
+
 interface Category {
     id: number;
     title: string;
@@ -68,7 +69,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title, categories, s
     return (
         <div className="mt-5  ">
             <div className="px-4 sm:px-5">
-                <p className="w-full text-xs font-semibold text-gray-400 mb-2 ">{uppercaseText(title)}</p>
+                <p className="w-full text-[0.8rem] font-bold text-mutedText dark:text-[#636674]">{uppercaseText(title)}</p>
             </div>
             <div className="p-1">
                 <ScrollArea className="max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-250px)]">
@@ -80,21 +81,25 @@ export const CategoryList: React.FC<CategoryListProps> = ({ title, categories, s
                             }`}
                         >
                             {title === "Search" ? (
-                                <div className="w-full flex items-center justify-between dark:text-[#9a9cae] " onClick={() => handleCategoryClick(title, link)}>
+                                <div className="w-full flex items-center justify-between dark:text-[#9a9cae] "
+                                     onClick={() => handleCategoryClick(title, link)}>
 
                                     <span
-                                        className={`font-bold text-sm ${
+                                        className={`font-bold text-sm text-gray-600
+                                         dark:text-[#9a9cae] hover:text-gray-900 dark:hover:text-blue-600 ${
                                             isActive ? "text-blue-600 dark:text-blue-400 dark:hover:text-blue-600" : ""
                                         }`}
                                     >
                                                {title}
                                             </span>
-                                    <span className="text-sm text-gray-400">{keyCmd}</span>
+                                    <span className="text-gray-600
+                                         dark:text-[#9a9cae] hover:text-gray-900 dark:hover:text-blue-600">{keyCmd}</span>
                                 </div>
                             ) : (
-                                <Link href={link} className="w-full flex h-5 items-center justify-between  dark:text-[#9a9cae]" onClick={() => handleCategoryClick(title, link)}>
+                                <Link href={link} className="w-full flex h-5 items-center justify-between text-gray-600
+                                         dark:text-[#9a9cae] hover:text-gray-900 dark:hover:text-blue-600" onClick={() => handleCategoryClick(title, link)}>
                                           <span className={`text-sm font-medium transition-colors   ${isActive ?
-                                              " dark:text-blue-400 dark:hover:text-blue-600" : "hover:text-blue-500"}`}>
+                                              " dark:text-blue-400 dark:hover:text-blue-600" : ""}`}>
                                         {title}
 
                                     </span >

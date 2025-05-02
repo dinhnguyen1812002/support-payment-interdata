@@ -123,4 +123,11 @@ class PostController extends Controller
 
         return response()->json(['data' => $posts]);
     }
+    public function showById($id)
+    {
+        $post = Post::with(['user', 'categories', 'tags'])->findOrFail($id);
+        $data = $this->postService->preparePostData($post);
+
+        return response()->json($data['post']);
+    }
 }

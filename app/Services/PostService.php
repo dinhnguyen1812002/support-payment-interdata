@@ -213,8 +213,11 @@ class PostService
 
     public function deletePost(Post $post): array
     {
-        $post->delete();
+        DB::table('notifications')
+            ->whereJsonContains('data->post_id', $post->id)
+            ->delete();
 
+        $post->delete();
         return [
             'success' => true,
             'message' => 'Bài viết đã được xóa thành công!',

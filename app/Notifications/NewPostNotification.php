@@ -3,7 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Post;
-use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -23,7 +23,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
 
     public function via($notifiable): array
     {
-        return ['database', 'broadcast'];
+        return ['database', 'broadcast' ];
     }
 
     public function toMail($notifiable): MailMessage
@@ -32,7 +32,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
             ->subject("Câu hỏi mới: {$this->post->title}")
             ->line("Có một câu hỏi mới từ {$this->post->user->name}:")
             ->line($this->post->title)
-            ->action('Xem bài viết', url('/posts/'.$this->post->slug))
+            ->action('Xem bài viết', url('/departments/'.$this->post->department_id.'?post='.$this->post->id))
             ->line('Cảm ơn bạn đã theo dõi!');
     }
 
@@ -56,13 +56,13 @@ class NewPostNotification extends Notification implements ShouldBroadcast
         return new BroadcastMessage([
             'id' => $this->post->id,
             'data' => $this->toArray($notifiable),
-            'created_at' => $this->post->created_at->diffForHumans(),
+            'created_at' => now()->toISOString(),
             'read_at' => null,
         ]);
     }
 
-    public function broadcastOn(): PrivateChannel
+    public function broadcastOn()
     {
-        return new PrivateChannel('user.'.$this->post->user_id);
+        return new Channel('notifications');
     }
 }

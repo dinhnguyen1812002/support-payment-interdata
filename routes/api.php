@@ -68,3 +68,4 @@ Route::post('/webhook/support-ticket', [TicketController::class, 'handleWebhook'
     ->middleware(\App\Http\Middleware\VerifyWebhook::class)->name('webhook');
 
 Route::post('/ticket', [TicketController::class, 'store']);
+Route::get('/posts/{id}', [App\Http\Controllers\PostController::class, 'showById'])->name('posts.showById');
