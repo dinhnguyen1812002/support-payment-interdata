@@ -143,7 +143,6 @@ const NotificationsDropdown = ({
             <AnimatePresence initial={false} mode="popLayout" >
                 {activeAlert && (
                     <motion.li
-
                         layout
                         initial={{ opacity: 0, y: 50, scale: 0.3 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}

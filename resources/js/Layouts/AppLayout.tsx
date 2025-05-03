@@ -126,9 +126,7 @@ export default function AppLayout({
                   {/*<NotificationsDropdown notifications={notifications}  />*/}
                   {/* Notifications - Only show for authenticated users */}
                 {page.props.auth.user && (
-
                     <NotificationsDropdown notifications={notifications}  />
-
                 )}
 
                 {/* User Menu or Login/Register buttons */}
@@ -158,6 +156,7 @@ export default function AppLayout({
                             {page.props.auth.user?.name.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
+                        
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent

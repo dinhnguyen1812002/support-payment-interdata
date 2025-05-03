@@ -178,3 +178,4 @@ class DepartmentController extends Controller
         return Inertia::render('Departments/Show', $data);
     }
 }
+

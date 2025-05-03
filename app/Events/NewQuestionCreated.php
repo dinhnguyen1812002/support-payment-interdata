@@ -50,6 +50,7 @@ class NewQuestionCreated implements ShouldBroadcast
                     ? asset('storage/'.$this->post->user->profile_photo_path)
                     : 'https://ui-avatars.com/api/?name='.urlencode($this->post->user->name).'&color=7F9CF5&background=EBF4FF',
                 'categories' => $this->post->categories->pluck('name')->toArray(),
+
             ],
             'read_at' => null,
             'created_at' => now()->diffForHumans(),

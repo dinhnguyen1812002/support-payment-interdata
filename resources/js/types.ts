@@ -207,8 +207,7 @@ export interface BlogPost {
 //     created_at: string;
 // }\
 export interface Notification {
-    categories: Category[];
-    tags: Tag[];
+
     id: string;
     data: {
         post_id?: string;
@@ -217,12 +216,14 @@ export interface Notification {
         slug?: string;
         name?: string;
         profile_photo_url?: string;
-        categories?: string[];
-        tags?: string[];
+        categories?: Category[];
+        tags?: Tag[];
     };
     read_at: string | null;
     created_at: string;
     type: string;
+    categories: Category[];
+    tags: Tag[];
 }
 export interface IndexProps {
 

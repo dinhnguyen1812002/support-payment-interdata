@@ -105,3 +105,4 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('departments', DepartmentController::class)->names('departments');
 });
+//Route::get('/posts/{id}/showById', [PostController::class, 'showById'])->name('posts.showById');

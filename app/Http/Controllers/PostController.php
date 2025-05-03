@@ -125,7 +125,7 @@ class PostController extends Controller
     }
     public function showById($id)
     {
-        $post = Post::with(['user', 'categories', 'tags'])->findOrFail($id);
+        $post = Post::with(['user', 'categories', 'tags',  'comments', 'upvotes'])->findOrFail($id);
         $data = $this->postService->preparePostData($post);
 
         return response()->json($data['post']);

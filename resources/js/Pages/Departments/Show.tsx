@@ -6,7 +6,7 @@ import { ScrollArea } from "@/Components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Button } from "@/Components/ui/button";
 import { Search, Filter, Mail, ArrowLeft } from "lucide-react";
-import { Department, Notification } from "@/types";
+import {Category, Department, Notification, Tag} from "@/types";
 import useTypedPage from "@/Hooks/useTypedPage";
 import PostContent from "@/Components/post-content";
 import { router } from "@inertiajs/core";
@@ -55,10 +55,8 @@ export default function DepartmentShow({ department, notifications: initialNotif
                 if (prev.some((notification) => notification.id === newNotification.id)) {
                     return prev;
                 }
-
                 return [newNotification as Notification, ...prev];
             });
-
         });
 
         return () => {
@@ -85,7 +83,7 @@ export default function DepartmentShow({ department, notifications: initialNotif
             window.removeEventListener("resize", checkIfMobile);
         };
     }, [showPostView, localNotifications]);
-
+        console.log(localNotifications)
     // Set default notification for desktop
     useEffect(() => {
         if (!isMobile && selectedNotification === null && localNotifications.length > 0) {
@@ -96,36 +94,54 @@ export default function DepartmentShow({ department, notifications: initialNotif
     // Handle notification click with lazy post fetching
     const handleNotificationSelect = useCallback(
         async (notification: Notification) => {
-            setSelectedNotification(notification);
             if (isMobile) {
                 setShowPostView(true);
             }
 
-            // Check if post exists in localPosts
-            const postExists = localPosts.find((post) => post.id === notification.data.post_id);
-            if (!postExists && notification.data.post_id) {
+            const postId = notification.data.post_id;
+            let post = localPosts.find((p) => p.id === postId);
+
+            if (!post) {
                 try {
-                    const response = await fetch(route("posts.showById", { id: notification.data.post_id }));
-                    console.log("Fetching post:", notification.data.post_id);
-
+                    const response = await fetch(route("posts.showById", { id: postId }));
                     if (!response.ok) throw new Error("Failed to fetch post");
-                    const newPost = await response.json();
+                    post = await response.json();
 
-                    setLocalPosts((prev) => {
-                        if (prev.some((post) => post.id === newPost.id)) return prev;
-                        return [newPost, ...prev];
-                    });
-                    console.log("Fetched post:", newPost);
+                    if (post) {
+                        setLocalPosts((prev) => {
+                            if (prev.some((p) => p.id === post!.id)) return prev;
+                            return [post!, ...prev];
+                        });
+                    }
                 } catch (error) {
                     console.error("Error fetching post:", error);
+                    return;
                 }
             }
 
-            // Mark notification as read
+            // 🔑 Sau khi chắc chắn post đã có, mới set notification
+            setSelectedNotification(notification);
 
+            // if (!notification.read_at) {
+            //     router.post(
+            //         route("notifications.read_all", { id: notification.id }),
+            //         {},
+            //         {
+            //             preserveScroll: true,
+            //             onSuccess: () => {
+            //                 setLocalNotifications((prev) =>
+            //                     prev.map((n) =>
+            //                         n.id === notification.id ? { ...n, read_at: new Date().toISOString() } : n
+            //                     )
+            //                 );
+            //             },
+            //         }
+            //     );
+            // }
         },
         [localPosts, isMobile]
     );
+
 
     const handleBackToList = useCallback(() => {
         setShowPostView(false);
@@ -213,36 +229,29 @@ export default function DepartmentShow({ department, notifications: initialNotif
                                                         {new Date(notification.created_at).toLocaleDateString()}
                                                     </span>
                                                 </div>
-                                                <h4 className="text-sm truncate mt-0.5">
-                                                    {notification.data.title}
-                                                    {/*{notification.data.product_name && (*/}
-                                                    {/*    <span className="text-xs text-muted-foreground">*/}
-                                                    {/*        {" "}*/}
-                                                    {/*        (from {notification.data.product_name})*/}
-                                                    {/*    </span>*/}
-                                                    {/*)}*/}
-                                                </h4>
+                                                <h4 className="text-sm truncate mt-0.5">{notification.data.title}</h4>
                                                 <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                                                     {notification.data.message}
                                                 </p>
-                                                <div className="mt-1 flex flex-wrap gap-1">
-                                                    {notification.data.categories?.map((category: string) => (
-                                                        <span
-                                                            key={category}
-                                                            className="text-xs border border-dashed border-gray-300 hover:border-blue-600 text-black px-2 py-1 rounded dark:text-gray-300 dark:border-gray-600 dark:hover:border-blue-400"
-                                                        >
-                                                            {category}
-                                                        </span>
-                                                    ))}
-                                                    {notification.data.tags?.map((tag: string) => (
-                                                        <span
-                                                            key={tag}
-                                                            className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded dark:bg-gray-700 dark:text-gray-300"
-                                                        >
-                                                            {tag}
-                                                        </span>
-                                                    ))}
-                                                </div>
+                                                {/*<div className="mt-1 flex flex-wrap gap-1">*/}
+                                                {/*    {notification.data.categories?.map((category: Category) => (*/}
+                                                {/*        <span*/}
+                                                {/*            key={category.id}*/}
+                                                {/*            className="text-xs border border-dashed border-gray-300 hover:border-blue-600 text-black px-2 py-1 rounded dark:text-gray-300 dark:border-gray-600 dark:hover:border-blue-400"*/}
+                                                {/*        >*/}
+                                                {/*            {category.title}*/}
+                                                {/*        </span>*/}
+
+                                                {/*    ))}*/}
+                                                {/*    {notification.data.tags?.map((tag: Tag) => (*/}
+                                                {/*        <span*/}
+                                                {/*            key={tag.id}*/}
+                                                {/*            className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded dark:bg-gray-700 dark:text-gray-300"*/}
+                                                {/*        >*/}
+                                                {/*            {tag.name}*/}
+                                                {/*        </span>*/}
+                                                {/*     ))}*/}
+                                                {/*</div>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -271,6 +280,7 @@ export default function DepartmentShow({ department, notifications: initialNotif
                         {selectedPost ? (
                             <ScrollArea className="h-screen w-full">
                                 <PostContent
+                                    key={selectedPost.id}
                                     post={selectedPost}
                                     comments={selectedPost.comments}
                                     currentUser={currentUser}
