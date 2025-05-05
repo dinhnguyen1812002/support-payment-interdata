@@ -218,6 +218,8 @@ export interface Notification {
         profile_photo_url?: string;
         categories?: Category[];
         tags?: Tag[];
+        product_id?: number;
+        product_name?: string;
     };
     read_at: string | null;
     created_at: string;

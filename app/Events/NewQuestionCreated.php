@@ -22,7 +22,7 @@ class NewQuestionCreated implements ShouldBroadcast
 
     public function via($notifiable)
     {
-        return ['database']; // Lưu vào cơ sở dữ liệu
+        return ['database', 'mail']; // Lưu vào cơ sở dữ liệu
     }
 
     public function broadcastOn()
@@ -39,22 +39,23 @@ class NewQuestionCreated implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'id' => (string) $this->post->id, // Match Notification interface
+            'id' => $this->post->id,
             'data' => [
                 'post_id' => $this->post->id,
                 'title' => $this->post->title,
-                'message' => "New Question: {$this->post->title}",
                 'slug' => $this->post->slug,
+                'message' => "New post from {$this->post->product_name }: {$this->post->title}",
                 'name' => $this->post->user->name,
                 'profile_photo_url' => $this->post->user->profile_photo_path
                     ? asset('storage/'.$this->post->user->profile_photo_path)
                     : 'https://ui-avatars.com/api/?name='.urlencode($this->post->user->name).'&color=7F9CF5&background=EBF4FF',
-                'categories' => $this->post->categories->pluck('name')->toArray(),
-
+                'tags' => $this->post->tags->pluck('name')->toArray(),
+                'categories' => $this->post->categories->pluck('title')->toArray(),
+                'product_id' => $this->post->product_id,
+                'product_name' => $this->post->product_name,
             ],
+            'created_at' => now()->toDateTimeString(),
             'read_at' => null,
-            'created_at' => now()->diffForHumans(),
-            'type_notification' => 'post',
         ];
     }
 }

@@ -16,7 +16,17 @@ class Post extends Model
 {
     use HasFactory, HasUlids, Notifiable, Searchable, SoftDeletes;
 
-    protected $fillable = ['title', 'content', 'user_id', 'is_published', 'slug', 'image'];
+    protected $fillable = ['title', 'content', 'user_id', 'is_published', 'slug', 'image', 'product_id', 'product_name'];
+
+    //    protected $fillable = [
+    //        'title',
+    //        'content',
+    //        'slug',
+    //        'is_published',
+    //        'user_id',
+    //        'product_id',
+    //        'product_name',
+    //    ];
 
     // Quan hệ với user
     public function user()

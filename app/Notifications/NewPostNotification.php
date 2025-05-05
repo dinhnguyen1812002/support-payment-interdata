@@ -23,7 +23,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
 
     public function via($notifiable): array
     {
-        return ['database', 'broadcast' ];
+        return ['database', 'broadcast', 'mail'];
     }
 
     public function toMail($notifiable): MailMessage
@@ -32,7 +32,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
             ->subject("Câu hỏi mới: {$this->post->title}")
             ->line("Có một câu hỏi mới từ {$this->post->user->name}:")
             ->line($this->post->title)
-            ->action('Xem bài viết', url('/departments/'.$this->post->department_id.'?post='.$this->post->id))
+            ->action('Xem bài viết', url('/posts/'.$this->post->slug))
             ->line('Cảm ơn bạn đã theo dõi!');
     }
 
@@ -41,6 +41,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
         return [
             'post_id' => $this->post->id,
             'title' => $this->post->title,
+            'slug' => $this->post->slug,
             'message' => "New post created: {$this->post->title}",
             'name' => $this->post->user->name,
             'profile_photo_url' => $this->post->user->profile_photo_path
@@ -48,6 +49,8 @@ class NewPostNotification extends Notification implements ShouldBroadcast
                 : 'https://ui-avatars.com/api/?name='.urlencode($this->post->user->name).'&color=7F9CF5&background=EBF4FF',
             'tags' => $this->post->tags->pluck('name')->toArray(),
             'categories' => $this->post->categories->pluck('title')->toArray(),
+            'product_id' => $this->post->product_id,
+            'product_name' => $this->post->product_name,
         ];
     }
 

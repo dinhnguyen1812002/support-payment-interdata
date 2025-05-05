@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Data\Post\CreatePostData;
-use App\Events\NewQuestionCreated;
+
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Events\NewQuestionCreated;
 
 class PostService
 {
@@ -218,6 +219,7 @@ class PostService
             ->delete();
 
         $post->delete();
+
         return [
             'success' => true,
             'message' => 'Bài viết đã được xóa thành công!',
@@ -386,5 +388,49 @@ class PostService
                 $user->notify(new NewPostNotification($post));
             }
         }
+    }
+
+    public function storeTransferredPost(array $data): array
+    {
+        $slug = Str::slug($data['title']);
+
+        if (Post::existsByTitleOrSlug($data['title'], $slug)) {
+            return [
+                'success' => false,
+                'errors' => [
+                    'title' => 'Tiêu đề hoặc đường dẫn (slug) đã tồn tại. Vui lòng chọn tiêu đề khác.',
+                ],
+            ];
+        }
+
+        $post = Post::create([
+            'title' => $data['title'],
+            'content' => $data['content'],
+            'slug' => $slug,
+            'is_published' => false,
+            'user_id' => $data['user_id'],
+            'product_id' => $data['product_id'],
+            'product_name' => $data['product_name'],
+        ]);
+
+        if (! empty($data['categories'])) {
+            $post->categories()->attach($data['categories']);
+        }
+
+        if (! empty($data['tags'])) {
+            $post->tags()->attach($data['tags']);
+        }
+
+        $post->load('tags', 'categories', 'user');
+
+        $this->notifyUsers($post);
+
+        broadcast(new NewQuestionCreated($post))->toOthers();
+
+        return [
+            'success' => true,
+            'message' => 'Ticket created successfully!',
+            'post' => $post,
+        ];
     }
 }

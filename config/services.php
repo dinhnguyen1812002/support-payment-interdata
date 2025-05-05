@@ -44,5 +44,7 @@ return [
         'client_secret' => env('GITHUB_CLIENT_SECRET'),
         'redirect' => env('GITHUB_REDIRECT_URI'),
     ],
-
+    'external_api' => [
+        'key' => env('EXTERNAL_API_KEY'),
+    ],
 ];

@@ -69,3 +69,4 @@ Route::post('/webhook/support-ticket', [TicketController::class, 'handleWebhook'
 
 Route::post('/ticket', [TicketController::class, 'store']);
 Route::get('/posts/{id}', [App\Http\Controllers\PostController::class, 'showById'])->name('posts.showById');
+Route::post('/posts/transfer', [App\Http\Controllers\PostController::class, 'transfer'])->name('posts.transfer');

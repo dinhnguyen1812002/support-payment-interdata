@@ -123,11 +123,39 @@ class PostController extends Controller
 
         return response()->json(['data' => $posts]);
     }
+
     public function showById($id)
     {
         $post = Post::with(['user', 'categories', 'tags',  'comments', 'upvotes'])->findOrFail($id);
         $data = $this->postService->preparePostData($post);
 
         return response()->json($data['post']);
+    }
+
+    public function transfer(Request $request)
+    {
+        $apikey = $request->header('X-API-KEY');
+        // Kiểm tra API key
+        if ($apikey !== config('services.external_api.key')) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        // Xác thực nguồn
+        $request->validate([
+            'title' => 'required|string',
+            'content' => 'required|string',
+            'user_id' => 'required|exists:users,id',
+            'product_id' => 'required|integer',
+            'product_name' => 'required|string',
+            'tags' => 'nullable|array',
+            'categories' => 'nullable|array',
+        ]);
+        // Tạo bài viết (ticket)
+        $result = $this->postService->storeTransferredPost($request->all());
+
+        if (! $result['success']) {
+            return response()->json(['error' => $result['errors']], 422);
+        }
+
+        return response()->json(['success' => true, 'post' => $result['post']]);
     }
 }

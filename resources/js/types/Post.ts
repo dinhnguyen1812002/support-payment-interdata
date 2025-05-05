@@ -15,6 +15,8 @@ export interface Post {
     has_upvoted: boolean;
     next_page_url: string | null;
     comments: Comment[];
+    product_id?: number;
+    product_name?: string;
 }
 export interface BlogPost {
     next_page_url: string | null;
