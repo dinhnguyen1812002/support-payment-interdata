@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Department;
 use App\Http\Controllers\Controller;
 use App\Models\Departments;
 use App\Models\Post;
+use App\Models\User;
 use App\Services\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -177,4 +178,53 @@ class DepartmentController extends Controller
 
         return Inertia::render('Departments/Show', $data);
     }
+
+    public function addUser(Request $request, Departments $department)
+    {
+        // Kiểm tra quyền
+        $this->authorize('add users to department', $department);
+
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+
+        // Kiểm tra xem user đã thuộc phòng ban khác chưa
+        if ($user->department_id && $user->department_id !== $department->id) {
+
+            return response()->json(['error' => 'User already belongs to another department'], 422);
+
+        }
+
+        $user->department_id = $department->id;
+
+        $user->save();
+
+        // Gán vai trò Employee nếu chưa có vai trò
+        if (! $user->hasAnyRole(['Admin', 'Department Manager', 'Employee'])) {
+            $user->assignRole('Employee');
+        }
+
+        return response()->json(['success' => true, 'message' => 'User added to department']);
+    }
+
+    public function getEmployee()
+    {
+        $user =  User::take(6)->get();
+        return Inertia::render('Departments/Employee', [
+            'user'=> $user
+        ]);
+    }
+//    public function showuser(Departments $department)
+//    {
+//
+//        return inertia('Departments/Employee', [
+//            'department' => $department,
+//            'departments' => Departments::select('id', 'name')->get(),
+//            'auth' => [
+//                'user' => auth()->user(),
+//            ],
+//        ]);
+//    }
 }

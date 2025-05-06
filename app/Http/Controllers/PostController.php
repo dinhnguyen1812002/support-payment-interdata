@@ -127,6 +127,9 @@ class PostController extends Controller
     public function showById($id)
     {
         $post = Post::with(['user', 'categories', 'tags',  'comments', 'upvotes'])->findOrFail($id);
+
+        $this->authorize('viewDepartmentPosts', $post->department);
+
         $data = $this->postService->preparePostData($post);
 
         return response()->json($data['post']);

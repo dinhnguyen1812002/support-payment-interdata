@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Data\Post\CreatePostData;
-
+use App\Events\NewQuestionCreated;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use App\Events\NewQuestionCreated;
 
 class PostService
 {

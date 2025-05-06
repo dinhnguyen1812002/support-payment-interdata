@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Comments;
+use App\Models\Departments;
 use App\Models\Post;
 use App\Models\User;
+use App\Policies\DepartmentPolicy;
 use App\Policies\PostPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -13,6 +15,7 @@ class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
         Post::class => PostPolicy::class,
+        Departments::class => DepartmentPolicy::class,
     ];
 
     /**

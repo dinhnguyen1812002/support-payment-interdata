@@ -43,6 +43,7 @@ class NewQuestionCreated implements ShouldBroadcast
             'data' => [
                 'post_id' => $this->post->id,
                 'title' => $this->post->title,
+                'content' => $this->post->getExcerpt(),
                 'slug' => $this->post->slug,
                 'message' => "New post from {$this->post->product_name }: {$this->post->title}",
                 'name' => $this->post->user->name,
@@ -54,7 +55,7 @@ class NewQuestionCreated implements ShouldBroadcast
                 'product_id' => $this->post->product_id,
                 'product_name' => $this->post->product_name,
             ],
-            'created_at' => now()->toDateTimeString(),
+            'created_at' => now()->diffForHumans(),
             'read_at' => null,
         ];
     }

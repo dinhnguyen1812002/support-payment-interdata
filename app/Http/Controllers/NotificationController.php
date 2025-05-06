@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\UserNotificationMail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
@@ -21,6 +22,14 @@ class NotificationController extends Controller
         return response()->json([
             'message' => 'All notifications marked as read.',
         ]);
+    }
+
+    public function markAsRead(Request $request, $id)
+    {
+        $notification = Auth::user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+
+        return response()->json(['success' => true]);
     }
 
     public function sendEmailNotification(Request $request)

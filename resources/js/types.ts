@@ -1,5 +1,4 @@
-import Tags from "@/Pages/Posts/Tags";
-
+import Tags from '@/Pages/Posts/Tags';
 
 type DateTime = string;
 
@@ -98,16 +97,14 @@ export interface TeamInvitation {
   created_at: DateTime;
   updated_at: DateTime;
 }
-export interface Paginate{
-    total: number;
-    per_page: number;
-    current_page: number;
-    last_page: number;
-    next_page_url: string | null;
-    prev_page_url: string | null;
+export interface Paginate {
+  total: number;
+  per_page: number;
+  current_page: number;
+  last_page: number;
+  next_page_url: string | null;
+  prev_page_url: string | null;
 }
-
-
 
 // export interface Category {
 //     id: number;
@@ -119,52 +116,52 @@ export interface Paginate{
 //     posts_count: number;
 // }
 export interface Category {
-    id: number;
-    title: string;
-    slug: string;
-    description:string;
-    posts_count?: number;
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  posts_count?: number;
 }
-export interface Tag{
-    id: number;
-    name: string;
-    posts_count?: number;
+export interface Tag {
+  id: number;
+  name: string;
+  posts_count?: number;
 }
 export interface Comment {
-    id: string;
-    comment: string;
-    user: User;
-    created_at: string;
-    replies?: Comment[];
-    parent_id?: number | null;
+  id: string;
+  comment: string;
+  user: User;
+  created_at: string;
+  replies?: Comment[];
+  parent_id?: number | null;
 }
 export interface NewCommentEvent {
-    id: number;
-    content: string;
-    question_id: number;
-    created_at: string;
-    user: User;
+  id: number;
+  content: string;
+  question_id: number;
+  created_at: string;
+  user: User;
 }
 export interface BlogPost {
-    id: string;
-    title: string;
-    content: string;
-    slug: string;
-    categories: Category[];
-    tags: Tag[];
-    user: {
-        id: number;
-        name: string;
-        profile_photo_path: string;
-    };
+  id: string;
+  title: string;
+  content: string;
+  slug: string;
+  categories: Category[];
+  tags: Tag[];
+  user: {
+    id: number;
+    name: string;
+    profile_photo_path: string;
+  };
 
-    created_at: string;
-    published_at: string;
-    upvote_count: number;
-    isUpvote: boolean;
-    totalComment:number;
-    has_upvoted: boolean;
-    upvotes_count: number;
+  created_at: string;
+  published_at: string;
+  upvote_count: number;
+  isUpvote: boolean;
+  totalComment: number;
+  has_upvoted: boolean;
+  upvotes_count: number;
 }
 // interface Post {
 //     id: string;
@@ -207,70 +204,68 @@ export interface BlogPost {
 //     created_at: string;
 // }\
 export interface Notification {
-
-    id: string;
-    data: {
-        post_id?: string;
-        title?: string;
-        message: string;
-        slug?: string;
-        name?: string;
-        profile_photo_url?: string;
-        categories?: Category[];
-        tags?: Tag[];
-        product_id?: number;
-        product_name?: string;
-    };
-    read_at: string | null;
-    created_at: string;
-    type: string;
-    categories: Category[];
-    tags: Tag[];
+  id: string;
+  data: {
+    post_id?: string;
+    title?: string;
+    content: string;
+    message: string;
+    slug?: string;
+    name?: string;
+    profile_photo_url?: string;
+    categories?: Category[];
+    tags?: Tag[];
+    product_id?: number;
+    product_name?: string;
+  };
+  read_at: string | null;
+  created_at: string;
+  type: string;
+  categories: Category[];
+  tags: Tag[];
 }
 export interface IndexProps {
-
-    posts: BlogPost[];
-    categories: Category[];
-    tags: Tag[];
-    pagination: Paginate;
-    postCount: number;
-    keyword: string;
-    selectedCategory?: string | null | undefined | unknown;
-    notifications: Notification[];
-    children: React.ReactNode;
+  posts: BlogPost[];
+  categories: Category[];
+  tags: Tag[];
+  pagination: Paginate;
+  postCount: number;
+  keyword: string;
+  selectedCategory?: string | null | undefined | unknown;
+  notifications: Notification[];
+  children: React.ReactNode;
 }
 export interface EditPostProps {
-    post: {
-        id: number;
-        title: string;
-        content: string;
-        slug: string;
-        is_published: boolean;
-        categories?: number[];
-    };
-    categories:Category[];
-
-}
-export interface NotificationContextType {
-    notifications: Notification[];
-    unreadCount: number;
-    markAllAsRead: () => void;
-}
-
-
-export interface Post {
+  post: {
     id: number;
     title: string;
-    created_at: string;
-    is_published: boolean;
-    comments_count: number;
+    content: string;
     slug: string;
-    upvotes_count: number;
+    is_published: boolean;
+    categories?: number[];
+  };
+  categories: Category[];
+}
+export interface NotificationContextType {
+  notifications: Notification[];
+  unreadCount: number;
+  markAllAsRead: () => void;
+}
+
+export interface Post {
+  id: number;
+  title: string;
+  created_at: string;
+  is_published: boolean;
+  comments_count: number;
+  slug: string;
+  upvotes_count: number;
 }
 
 export interface Department {
-    id: number
-    name: string
-    description: string | null
-    created_at: string
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  created_at: string;
 }

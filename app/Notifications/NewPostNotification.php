@@ -41,6 +41,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
         return [
             'post_id' => $this->post->id,
             'title' => $this->post->title,
+            'content' => $this->post->getExcerpt(),
             'slug' => $this->post->slug,
             'message' => "New post created: {$this->post->title}",
             'name' => $this->post->user->name,
@@ -59,7 +60,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
         return new BroadcastMessage([
             'id' => $this->post->id,
             'data' => $this->toArray($notifiable),
-            'created_at' => now()->toISOString(),
+            'created_at' => now()->diffForHumans(),
             'read_at' => null,
         ]);
     }

@@ -23,17 +23,9 @@ Route::post('/notifications/read-all', [NotificationController::class, 'markAllA
 
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/notifications/read-all', function () {
-        auth()->user()->unreadNotifications()->update(['read_at' => now()]);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 
-        return response()->json(['message' => 'Đã đánh dấu tất cả là đã đọc']);
-    });
-
-    Route::post('/notifications/{id}/read', function ($id) {
-        auth()->user()->notifications()->findOrFail($id)->markAsRead();
-
-        return response()->json(['message' => 'Đã đánh dấu là đã đọc']);
-    });
+    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead']);
 });
 Route::get('categories', [CategoryController::class, 'index']);
 
@@ -42,7 +34,9 @@ Route::get('/tags', [TagController::class, 'index']);
 Route::get('/global-search', [SearchController::class, 'globleSearch'])->name('search.posts');
 
 Route::get('/count', [PostController::class, 'getCountPost']);
+
 Route::get('/top-voted-posts', [PostController::class, 'topVotedPosts']);
+
 // Route::get('/test-notification', function () {
 //    $user = User::find(1); // User ID cần tồn tại
 //    $post = Post::find('01jnz291ec0j11gj752pgk2mc4'); // Post ID cần tồn tại
