@@ -209,22 +209,32 @@ class DepartmentController extends Controller
         return response()->json(['success' => true, 'message' => 'User added to department']);
     }
 
-    public function getEmployee()
+    public function getEmployee(string $slug)
     {
-        $user =  User::take(6)->get();
+        // Lấy thông tin phòng ban
+
+        $department = Departments::where('slug', $slug)->firstOrFail();
+        // Lấy nhân sự trong phòng ban với phân trang
+        $users = User::whereHas('departments', function($query) use ($department) {
+            $query->where('departments.id', $department->id);
+        })
+            ->with('roles')
+            ->paginate(10)
+            ->through(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'profile_photo_path' => $user->profile_photo_path
+                        ? asset('storage/'.$user->profile_photo_path)
+                        : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF',
+                    'roles' => $user->roles->pluck('name')->implode(', '), // trả về chuỗi role
+                ];
+            });
+
         return Inertia::render('Departments/Employee', [
-            'user'=> $user
+            'users' => $users,
+            'department' => $department,
         ]);
     }
-//    public function showuser(Departments $department)
-//    {
-//
-//        return inertia('Departments/Employee', [
-//            'department' => $department,
-//            'departments' => Departments::select('id', 'name')->get(),
-//            'auth' => [
-//                'user' => auth()->user(),
-//            ],
-//        ]);
-//    }
 }

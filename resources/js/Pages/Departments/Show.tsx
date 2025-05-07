@@ -1,14 +1,10 @@
-import React from 'react';
-
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AppLayout } from '@/Components/Ticket/app-layout';
 import { TooltipProvider } from '@/Components/ui/tooltip';
 import { Toaster } from 'sonner';
 import { ScrollArea } from '@/Components/ui/scroll-area';
-
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
-
 import { Search, Mail, Clock, MessageSquare, ChevronLeft } from 'lucide-react';
 import type { Department, Notification } from '@/types';
 import useTypedPage from '@/Hooks/useTypedPage';
@@ -17,7 +13,7 @@ import { router } from '@inertiajs/core';
 import { route } from 'ziggy-js';
 import type { Post } from '@/types/Post';
 import { Input } from '@/Components/ui/input';
-import { cn } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 
 interface Props {
   notifications: Notification[];
@@ -45,7 +41,6 @@ export default function DepartmentShow({
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'unread'>('all');
 
-  // Memoize selectedPost to avoid unnecessary re-renders
   const selectedPost = useMemo(() => {
     return selectedNotification && selectedNotification.data.post_id
       ? localPosts.find(
@@ -54,7 +49,6 @@ export default function DepartmentShow({
       : null;
   }, [selectedNotification, localPosts]);
 
-  // Filter notifications based on search query and active filter
   const filteredNotifications = useMemo(() => {
     return localNotifications.filter(notification => {
       const matchesSearch =
@@ -80,7 +74,6 @@ export default function DepartmentShow({
     });
   }, [localNotifications, searchQuery, activeFilter]);
 
-  // Handle new notifications via Echo
   useEffect(() => {
     if (!userId) return;
 
@@ -108,7 +101,6 @@ export default function DepartmentShow({
     };
   }, [userId]);
 
-  // Handle mobile/desktop view
   useEffect(() => {
     const checkIfMobile = () => {
       const mobile = window.innerWidth < 768;
@@ -127,7 +119,6 @@ export default function DepartmentShow({
     };
   }, [showPostView, localNotifications]);
 
-  // Set default notification for desktop
   useEffect(() => {
     if (
       !isMobile &&
@@ -138,7 +129,6 @@ export default function DepartmentShow({
     }
   }, [isMobile, localNotifications]);
 
-  // Handle notification click with lazy post fetching
   const handleNotificationSelect = useCallback(
     async (notification: Notification) => {
       if (isMobile) {
@@ -166,7 +156,6 @@ export default function DepartmentShow({
         }
       }
 
-      // Set notification after ensuring post exists
       setSelectedNotification(notification);
     },
     [localPosts, isMobile],
@@ -174,10 +163,9 @@ export default function DepartmentShow({
 
   const handleMarkAsRead = useCallback(
     (notification: Notification, e: React.MouseEvent) => {
-      e.stopPropagation(); // Prevent notification selection when clicking checkbox
+      e.stopPropagation();
 
       if (notification.read_at) {
-        // If already read, do nothing
         return;
       }
 
@@ -226,38 +214,21 @@ export default function DepartmentShow({
     },
     [selectedPost],
   );
+
   return (
     <TooltipProvider>
-      <AppLayout title={department.name}>
-        {/* Main Header */}
-
+      <AppLayout title={department.name} department={department}>
         <div className="flex overflow-hidden h-[calc(100vh-4rem)] dark:bg-[#0F1014] relative">
-          {/* Sidebar / Notification List */}
           <div
             className={cn(
-              'flex-col border-r  dark:border-gray-800 bg-background',
+              'flex-col border-r dark:border-gray-800 bg-background',
               'w-full md:w-96 lg:w-[400px] h-full',
               isMobile && showPostView ? 'hidden' : 'flex',
             )}
           >
-            {/* Sidebar Header */}
-            <div className="p-4 border-b dark:border-gray-800  bg-background flex flex-col gap-3 dark:bg-[#0F1014]">
-              {/*<div className="flex items-center justify-between">*/}
-              {/*    <div className="flex items-center gap-2">*/}
-              {/*        <h2 className="text-xl font-semibold">Inbox</h2>*/}
-              {/*        <Badge variant="outline" className="ml-2">*/}
-              {/*            {filteredNotifications.filter((n) => !n.read_at).length} unread*/}
-              {/*        </Badge>*/}
-              {/*    </div>*/}
-              {/*</div>*/}
-              {/*<Tabs defaultValue="all" className="w-full" onValueChange={(v) => setActiveFilter(v as "all" | "unread")}>*/}
-              {/*    <TabsList className="grid w-full grid-cols-2">*/}
-              {/*        <TabsTrigger value="all">All</TabsTrigger>*/}
-              {/*        <TabsTrigger value="unread">Unread</TabsTrigger>*/}
-              {/*    </TabsList>*/}
-              {/*</Tabs>*/}
+            <div className="p-4 border-b dark:border-gray-800 bg-background flex flex-col gap-3 dark:bg-[#0F1014]">
               <div className="relative dark:bg-[#0F1014]">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground  " />
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search notifications..."
                   className="pl-9 w-full bg-muted/40"
@@ -267,10 +238,9 @@ export default function DepartmentShow({
               </div>
             </div>
 
-            {/* Notification List */}
             <ScrollArea className="h-min-screen w-full">
               {filteredNotifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-40 text-muted-foreground ">
+                <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
                   <Mail className="h-8 w-8 mb-2" />
                   <p>No notifications found</p>
                 </div>
@@ -292,43 +262,21 @@ export default function DepartmentShow({
                       )}
                     >
                       <div className="flex items-start gap-3">
-                        {/* Checkbox for read status */}
-                        {/*<div className="pt-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>*/}
-                        {/*    <Checkbox*/}
-                        {/*        checked={!isUnread}*/}
-                        {/*        onCheckedChange={(checked) => {*/}
-                        {/*            if (checked && isUnread) {*/}
-                        {/*                handleMarkAsRead(notification, {} as React.MouseEvent)*/}
-                        {/*            }*/}
-                        {/*        }}*/}
-                        {/*        className="mt-0.5"*/}
-                        {/*    />*/}
-                        {/*</div>*/}
-
-                        {/*<Avatar className="h-20 w-0 rounded-lg flex-shrink-0">*/}
-                        {/*    <AvatarImage src={notification.data.profile_photo_url || ""} />*/}
-                        {/*    <AvatarFallback className="bg-primary/10 text-primary">*/}
-                        {/*        {notification.data.name?.[0] ?? "?"}*/}
-                        {/*    </AvatarFallback>*/}
-                        {/*</Avatar>*/}
-
-                        <div className="flex-1 ">
+                        <div className="flex-1">
                           <div className="flex justify-between items-start">
                             <h3 className="font-medium text-base truncate">
                               {notification.data.name}
                             </h3>
                             <div className="flex items-center gap-1 ml-2 text-xs text-muted-foreground">
                               <Clock className="h-3 w-3" />
-                              {/*<span>{formatDate(notification.created_at)}</span>*/}
-                              <span>{notification.created_at}</span>
+                              <span>{formatDate(notification.created_at)}</span>
                             </div>
                           </div>
 
-                          <h1 className="text-base font-bold mt-1 ">
+                          <h1 className="text-base font-bold mt-1">
                             {notification.data.title}
                           </h1>
 
-                          {/*<h4 className="text-gray-500 text-sm font-medium mt-1">{notification.data.message}</h4>*/}
                           <h4 className="text-gray-500 text-sm font-medium mt-1">
                             {notification.data.content}
                           </h4>
@@ -338,10 +286,6 @@ export default function DepartmentShow({
                                 {notification.data.product_name}
                               </Badge>
                             )}
-                            <Badge variant="outline" className="text-xs">
-                              <MessageSquare className="h-3 w-3 mr-1" />
-                              {selectedPost?.comments?.length || 0}
-                            </Badge>
                           </div>
                         </div>
                       </div>
@@ -352,7 +296,6 @@ export default function DepartmentShow({
             </ScrollArea>
           </div>
 
-          {/* Post Content */}
           <div
             className={cn(
               'flex-1 h-full overflow-hidden',

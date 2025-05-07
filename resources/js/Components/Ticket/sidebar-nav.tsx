@@ -20,15 +20,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/Components/ui/tooltip';
-// import { ThemeToggle } from "@/Components/Ticket/theme-toggle";
-// import {
-//     DropdownMenu,
-//     DropdownMenuContent,
-//     DropdownMenuItem,
-//     DropdownMenuLabel,
-//     DropdownMenuSeparator,
-//     DropdownMenuTrigger,
-// } from "@/Components/ui/dropdown-menu"
 import ThemeSwitch from '@/Components/dashboard/toggle-switch';
 import { Link, usePage } from '@inertiajs/react';
 import { Department } from '@/types';
@@ -36,13 +27,13 @@ import { Department } from '@/types';
 interface NavItem {
   title: string;
   href: string;
-
   icon: React.ReactNode;
   variant?: 'default' | 'ghost';
 }
 
 interface SidebarNavProps {
   title: string;
+  department?: Department;
 }
 
 interface NavSection {
@@ -50,63 +41,66 @@ interface NavSection {
   items: NavItem[];
 }
 
-const navigationItems: NavSection[] = [
-  {
-    items: [
-      {
-        title: 'Dashboard',
-        href: `/department/`,
-        icon: <LayoutDashboard className="h-5 w-5" />,
-        variant: 'default',
-      },
-    ],
-  },
-  {
-    title: 'Management',
-    items: [
-      {
-        title: 'Employee',
-        href: '/department/employee',
-        icon: <Users className="h-5 w-5" />,
-      },
-      {
-        title: 'Reports',
-        href: '/reports',
-        icon: <FileText className="h-5 w-5" />,
-      },
-      {
-        title: 'Analytics',
-        href: '/analytics',
-        icon: <BarChart3 className="h-5 w-5" />,
-      },
-    ],
-  },
-  {
-    title: 'Settings',
-    items: [
-      {
-        title: 'Preferences',
-        href: '/preferences',
-        icon: <Settings className="h-5 w-5" />,
-      },
-      {
-        title: 'Notifications',
-        href: '/notifications',
-        icon: <Bell className="h-5 w-5" />,
-      },
-      {
-        title: 'Help',
-        href: '/help',
-        icon: <HelpCircle className="h-5 w-5" />,
-      },
-    ],
-  },
-];
-
-const SidebarNav: React.FC<SidebarNavProps> = ({ title }) => {
+const SidebarNav: React.FC<SidebarNavProps> = ({ title, department }) => {
   const [collapsed, setCollapsed] = useState(false);
   const { url } = usePage();
   const activePath = url;
+
+  // Define navigation items with dynamic hrefs using department slug
+  const navigationItems: NavSection[] = [
+    {
+      items: [
+        {
+          title: 'Dashboard',
+          href: department ? `/departments/${department.slug}` : '/department',
+          icon: <LayoutDashboard className="h-5 w-5" />,
+          variant: 'default',
+        },
+      ],
+    },
+    {
+      title: 'Management',
+      items: [
+        {
+          title: 'Employee',
+          href: department
+            ? `/department/${department.slug}/employee`
+            : '/department/employee',
+          icon: <Users className="h-5 w-5" />,
+        },
+        {
+          title: 'Reports',
+          href: '/reports',
+          icon: <FileText className="h-5 w-5" />,
+        },
+        {
+          title: 'Analytics',
+          href: '/analytics',
+          icon: <BarChart3 className="h-5 w-5" />,
+        },
+      ],
+    },
+    {
+      title: 'Settings',
+      items: [
+        {
+          title: 'Preferences',
+          href: '/preferences',
+          icon: <Settings className="h-5 w-5" />,
+        },
+        {
+          title: 'Notifications',
+          href: '/notifications',
+          icon: <Bell className="h-5 w-5" />,
+        },
+        {
+          title: 'Help',
+          href: '/help',
+          icon: <HelpCircle className="h-5 w-5" />,
+        },
+      ],
+    },
+  ];
 
   return (
     <div className="flex min-h-screen">
@@ -203,7 +197,7 @@ function NavItem({ item, collapsed, active }: NavItemProps) {
     return (
       <Tooltip delayDuration={0}>
         <TooltipTrigger asChild>
-          <a
+          <Link
             href={item.href}
             className={cn(
               baseClasses,
@@ -212,7 +206,7 @@ function NavItem({ item, collapsed, active }: NavItemProps) {
             )}
           >
             {item.icon}
-          </a>
+          </Link>
         </TooltipTrigger>
         <TooltipContent side="right">{item.title}</TooltipContent>
       </Tooltip>
@@ -220,7 +214,7 @@ function NavItem({ item, collapsed, active }: NavItemProps) {
   }
 
   return (
-    <a
+    <Link
       href={item.href}
       className={cn(
         baseClasses,
@@ -230,6 +224,6 @@ function NavItem({ item, collapsed, active }: NavItemProps) {
     >
       {item.icon}
       <span>{item.title}</span>
-    </a>
+    </Link>
   );
 }

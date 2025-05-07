@@ -7,6 +7,7 @@ use App\Http\Controllers\Search\SearchController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\Ticket\TicketController;
 use App\Http\Controllers\UserController;
+use App\Models\Departments;
 use App\Models\Post;
 use App\Models\User;
 use App\Notifications\NewPostNotification;
@@ -62,5 +63,7 @@ Route::post('/webhook/support-ticket', [TicketController::class, 'handleWebhook'
     ->middleware(\App\Http\Middleware\VerifyWebhook::class)->name('webhook');
 
 Route::post('/ticket', [TicketController::class, 'store']);
-Route::get('/posts/{id}', [App\Http\Controllers\PostController::class, 'showById'])->name('posts.showById');
-Route::post('/posts/transfer', [App\Http\Controllers\PostController::class, 'transfer'])->name('posts.transfer');
+Route::get('/posts/{id}', [PostController::class, 'showById'])->name('posts.showById');
+Route::post('/posts/transfer', [PostController::class, 'transfer'])->name('posts.transfer');
+
+Route::get('/users/search', [Departments::class, 'search'])->name('search.departments');

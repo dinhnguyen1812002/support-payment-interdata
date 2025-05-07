@@ -102,8 +102,8 @@ Route::get('/users', [UserController::class, 'index'])->name('users.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/departments/{slug}', [DepartmentController::class, 'show']);
-
+    Route::get('/department/{slug}/employee', [DepartmentController::class, 'getEmployee']);
     Route::resource('departments', DepartmentController::class)->names('departments');
 });
 // Route::get('/posts/{id}/showById', [PostController::class, 'showById'])->name('posts.showById');
-Route::get('/department/employee', [DepartmentController::class, 'getEmployee']);
+
