@@ -102,10 +102,10 @@ export default function AppLayout({
         )}
       >
         {/* Primary Navigation Menu */}
-        <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="max-w-[1450px] mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex justify-between h-14 sm:h-16 md:h-18 lg:h-20">
             {/* Left section: Logo and menu toggle */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1">
               {/* Mobile sidebar toggle button */}
               <div className="lg:hidden">
                 <MobileSidebarToggle
@@ -115,7 +115,7 @@ export default function AppLayout({
               </div>
 
               {/* Logo */}
-              <Link href={route('/')} className="flex items-center shrink-0">
+              <Link href={route('/')} className="flex items-center ml-12">
                 <p
                   className="text-xl sm:text-2xl md:text-3xl font-extrabold bg-gradient-to-r
                     from-blue-600 to-indigo-500 text-transparent bg-clip-text
@@ -128,7 +128,7 @@ export default function AppLayout({
             </div>
 
             {/* Middle section: Navigation Links */}
-            <div className="hidden max-w-2xl flex-1 items-center justify-start ml-6 sm:flex">
+            <div className="hidden max-w-3xl flex-1 items-center justify-start ml-10 sm:flex  ">
               <div className="flex space-x-3 md:space-x-6">
                 <NavLink href={route('/')} active={route().current('/')}>
                   Dashboard
@@ -143,10 +143,9 @@ export default function AppLayout({
             </div>
 
             {/* Right section: User controls */}
-            <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
+            <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4 ">
               {/* Theme toggle */}
               <ModeToggle />
-
               {/* Notifications - Only show for authenticated users */}
               {page.props.auth.user && (
                 <NotificationsDropdown notifications={[]} />

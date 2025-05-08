@@ -101,9 +101,11 @@ Route::get('/form', [\App\Http\Controllers\Ticket\TicketController::class, 'show
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/departments/{slug}', [DepartmentController::class, 'show']);
-    Route::get('/department/{slug}/employee', [DepartmentController::class, 'getEmployee']);
+    Route::get('/departments/{slug}', [DepartmentController::class, 'show'])->name('departments.show');
+    Route::get('/department/{slug}/employee', [DepartmentController::class, 'getEmployee'])->name('departments.employees');
+    Route::get('/departments/{department}/available-users', [DepartmentController::class, 'getAvailableUsers'])->name('users.available');
+
+    Route::post('/departments/{department}/add-user', [DepartmentController::class, 'addUser'])->name('departments.addUser');
     Route::resource('departments', DepartmentController::class)->names('departments');
 });
 // Route::get('/posts/{id}/showById', [PostController::class, 'showById'])->name('posts.showById');
-

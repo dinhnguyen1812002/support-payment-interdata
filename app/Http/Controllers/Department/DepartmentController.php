@@ -7,6 +7,8 @@ use App\Models\Departments;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\PostService;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -14,6 +16,8 @@ use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class DepartmentController extends Controller
 {
+    use AuthorizesRequests;
+
     protected $postService;
 
     public function __construct(PostService $postService)
@@ -86,8 +90,12 @@ class DepartmentController extends Controller
     public function show(string $slug)
     {
         $department = Departments::where('slug', $slug)->firstOrFail();
+        $user = auth()->user();
 
-        if (! auth()->user()->hasRole('admin')) {
+        // Kiểm tra quyền truy cập:
+        // 1. Admin có thể xem tất cả phòng ban
+        // 2. Người dùng chỉ có thể xem phòng ban mà họ thuộc về
+        if (! $user->hasRole('admin') && ! $user->departments()->where('departments.id', $department->id)->exists()) {
             throw UnauthorizedException::forRoles(['admin']);
         }
 
@@ -179,43 +187,40 @@ class DepartmentController extends Controller
         return Inertia::render('Departments/Show', $data);
     }
 
-    public function addUser(Request $request, Departments $department)
+    /**
+     * @throws AuthorizationException
+     */
+    public function getAvailableUsers(Departments $department)
     {
-        // Kiểm tra quyền
-        $this->authorize('add users to department', $department);
+        //        $this->authorize('add users to department', $department);
+        //        $this->authorize('addUsersToDepartment', $department);
 
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-        ]);
+        // Lấy danh sách người dùng chưa thuộc phòng ban nào
+        $users = User::whereDoesntHave('departments')
+            ->orWhereHas('departments', function ($query) use ($department) {
+                $query->where('departments.id', '!=', $department->id);
+            })
+            ->select(['id', 'name', 'email'])
+            ->get();
 
-        $user = User::findOrFail($request->user_id);
-
-        // Kiểm tra xem user đã thuộc phòng ban khác chưa
-        if ($user->department_id && $user->department_id !== $department->id) {
-
-            return response()->json(['error' => 'User already belongs to another department'], 422);
-
-        }
-
-        $user->department_id = $department->id;
-
-        $user->save();
-
-        // Gán vai trò Employee nếu chưa có vai trò
-        if (! $user->hasAnyRole(['Admin', 'Department Manager', 'Employee'])) {
-            $user->assignRole('Employee');
-        }
-
-        return response()->json(['success' => true, 'message' => 'User added to department']);
+        return response()->json($users);
     }
 
     public function getEmployee(string $slug)
     {
         // Lấy thông tin phòng ban
-
         $department = Departments::where('slug', $slug)->firstOrFail();
+        $user = auth()->user();
+
+        // Kiểm tra quyền xem danh sách nhân viên:
+        // 1. Admin có thể xem tất cả phòng ban
+        // 2. Người dùng chỉ có thể xem phòng ban mà họ thuộc về
+        if (! $user->hasRole('admin') && ! $user->departments()->where('departments.id', $department->id)->exists()) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
         // Lấy nhân sự trong phòng ban với phân trang
-        $users = User::whereHas('departments', function($query) use ($department) {
+        $users = User::whereHas('departments', function ($query) use ($department) {
             $query->where('departments.id', $department->id);
         })
             ->with('roles')
@@ -236,5 +241,36 @@ class DepartmentController extends Controller
             'users' => $users,
             'department' => $department,
         ]);
+    }
+
+    public function addUser(Request $request, Departments $department)
+    {
+        // Kiểm tra quyền
+        //        $this->authorize('add users to department', $department);
+        //        $this->hasRole('admin');
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+
+        // Kiểm tra xem user đã thuộc phòng ban khác chưa
+        if ($user->departments()->exists()) {
+            return response()->json(['error' => 'User already belongs to another department'], 422);
+        }
+
+        // Thêm user vào phòng ban
+        $department->users()->attach($user->id);
+
+        // Gán vai trò Employee nếu chưa có vai trò
+        if (! $user->hasAnyRole(['admin', 'department_manager', 'employee'])) {
+            $user->assignRole('employee');
+        }
+
+        return redirect()->route('departments.employees', ['slug' => $department->slug])->with('success', 'User added to department');
     }
 }

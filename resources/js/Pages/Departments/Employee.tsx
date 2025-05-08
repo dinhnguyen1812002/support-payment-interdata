@@ -55,12 +55,15 @@ export default function Employee({ users, department }: Props) {
               />
             </div>
 
-            <AddUserToDepartment departmentId={department.id} users={[]} />
+            <AddUserToDepartment
+              departmentId={department.id}
+              departmentSlug={department.slug}
+            />
           </div>
         </div>
 
         <div className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredEmployees.length > 0 ? (
               filteredEmployees.map(employee => (
                 <UserCard
