@@ -148,7 +148,7 @@ export default function AppLayout({
               <ModeToggle />
               {/* Notifications - Only show for authenticated users */}
               {page.props.auth.user && (
-                <NotificationsDropdown notifications={[]} />
+                <NotificationsDropdown notifications={notifications} />
               )}
 
               {/* User Menu or Login/Register buttons */}

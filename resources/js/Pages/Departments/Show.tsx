@@ -217,7 +217,11 @@ export default function DepartmentShow({
 
   return (
     <TooltipProvider>
-      <AppLayout title={department.name} department={department}>
+      <AppLayout
+        title={department.name}
+        department={department}
+        notifications={localNotifications}
+      >
         <div className="flex overflow-hidden h-[calc(100vh-4rem)] dark:bg-[#0F1014] relative">
           <div
             className={cn(

@@ -1,229 +1,133 @@
-import React, { useState } from 'react';
 import {
-  LayoutDashboard,
+  ChevronDown,
+  Home,
+  Settings,
   Users,
   FileText,
-  BarChart3,
-  Settings,
-  Bell,
-  HelpCircle,
-  PanelLeftOpen,
-  PanelLeftClose,
-  ChevronsUpDown,
+  Mail,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/Components/ui/scroll-area';
-import { Button } from '@/Components/ui/button';
-import { Separator } from '@/Components/ui/separator';
+
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/Components/ui/tooltip';
-import ThemeSwitch from '@/Components/dashboard/toggle-switch';
-import { Link, usePage } from '@inertiajs/react';
-import { Department } from '@/types';
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarRail,
+} from '@/Components/ui/sidebar';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/Components/ui/collapsible';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import React from 'react';
 
-interface NavItem {
-  title: string;
-  href: string;
-  icon: React.ReactNode;
-  variant?: 'default' | 'ghost';
-}
+// Navigation items with nested sections
+const navItems = [
+  {
+    title: 'Dashboard',
+    icon: Home,
+    href: '/',
+  },
+  {
+    title: 'Users',
+    icon: Users,
+    href: '/users',
+  },
+  {
+    title: 'Content',
+    icon: FileText,
+    children: [
+      { title: 'Pages', href: '/content/pages' },
+      { title: 'Blog Posts', href: '/content/blog' },
+      { title: 'Media Library', href: '/content/media' },
+    ],
+  },
+  {
+    title: 'Communications',
+    icon: Mail,
+    children: [
+      { title: 'Email', href: '/communications/email' },
+      { title: 'Notifications', href: '/communications/notifications' },
+      { title: 'Calendar', href: '/communications/calendar' },
+    ],
+  },
+  {
+    title: 'Settings',
+    icon: Settings,
+    href: '/settings',
+  },
+];
 
-interface SidebarNavProps {
-  title: string;
-  department?: Department;
-}
-
-interface NavSection {
-  title?: string;
-  items: NavItem[];
-}
-
-const SidebarNav: React.FC<SidebarNavProps> = ({ title, department }) => {
-  const [collapsed, setCollapsed] = useState(false);
-  const { url } = usePage();
-  const activePath = url;
-
-  // Define navigation items with dynamic hrefs using department slug
-  const navigationItems: NavSection[] = [
-    {
-      items: [
-        {
-          title: 'Dashboard',
-          href: department ? `/departments/${department.slug}` : '/department',
-          icon: <LayoutDashboard className="h-5 w-5" />,
-          variant: 'default',
-        },
-      ],
-    },
-    {
-      title: 'Management',
-      items: [
-        {
-          title: 'Employee',
-          href: department
-            ? `/department/${department.slug}/employee`
-            : '/department/employee',
-          icon: <Users className="h-5 w-5" />,
-        },
-        {
-          title: 'Reports',
-          href: '/reports',
-          icon: <FileText className="h-5 w-5" />,
-        },
-        {
-          title: 'Analytics',
-          href: '/analytics',
-          icon: <BarChart3 className="h-5 w-5" />,
-        },
-      ],
-    },
-    {
-      title: 'Settings',
-      items: [
-        {
-          title: 'Preferences',
-          href: '/preferences',
-          icon: <Settings className="h-5 w-5" />,
-        },
-        {
-          title: 'Notifications',
-          href: '/notifications',
-          icon: <Bell className="h-5 w-5" />,
-        },
-        {
-          title: 'Help',
-          href: '/help',
-          icon: <HelpCircle className="h-5 w-5" />,
-        },
-      ],
-    },
-  ];
-
+export default function AdvancedSidebar() {
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <div
-        className={cn(
-          'flex flex-col border-r bg-sidebar dark:bg-[#0F1014] transition-all duration-300 ease-in-out',
-          collapsed ? 'w-16' : 'w-64',
-        )}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between h-16 px-4 border-b">
-          <Link
-            className={cn(
-              'flex items-center gap-2 px-2 py-2 rounded-none transition-all',
-              collapsed && 'opacity-0 scale-90 w-0 overflow-hidden',
-            )}
-            href={'/'}
-          >
-            <img src="/icon/laravel.svg" alt="Logo" className="h-8 w-8" />
-            <span className="text-xl font-semibold whitespace-nowrap">
-              {title}
-            </span>
-            <ChevronsUpDown className="h-4 w-4 ml-2 opacity-50" />
-          </Link>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-md"
-            onClick={() => setCollapsed(!collapsed)}
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {collapsed ? (
-              <PanelLeftOpen className="h-4 w-4" />
-            ) : (
-              <PanelLeftClose className="h-4 w-4" />
-            )}
-          </Button>
+    <Sidebar>
+      <SidebarHeader className="h-16 flex items-center px-4 border-b">
+        <div className="flex items-center gap-3">
+          <div className="bg-primary h-8 w-8 rounded-md flex items-center justify-center text-primary-foreground font-bold">
+            A
+          </div>
+          <div className="font-semibold text-lg">Admin Panel</div>
         </div>
-
-        {/* Navigation */}
-        <ScrollArea className="flex-1 px-2 py-4">
-          <nav className="flex flex-col gap-2">
-            {navigationItems.map((section, sectionIndex) => (
-              <div key={sectionIndex}>
-                {section.title && !collapsed && (
-                  <div className="px-2 py-1.5">
-                    <p className="text-xs font-medium text-muted-foreground">
-                      {section.title}
-                    </p>
-                  </div>
-                )}
-                {section.title && collapsed && (
-                  <Separator className="mx-2 my-2" />
-                )}
-                <div className="grid gap-1">
-                  {section.items.map((item, itemIndex) => (
-                    <NavItem
-                      key={itemIndex}
-                      item={item}
-                      collapsed={collapsed}
-                      active={activePath.startsWith(item.href)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </nav>
-        </ScrollArea>
-
-        {/* Footer (optional) */}
-        <div className="border-t p-4">{!collapsed && <ThemeSwitch />}</div>
-      </div>
-    </div>
-  );
-};
-
-export default SidebarNav;
-
-interface NavItemProps {
-  item: NavItem;
-  collapsed: boolean;
-  active: boolean;
-}
-
-function NavItem({ item, collapsed, active }: NavItemProps) {
-  const baseClasses = 'flex items-center rounded-md transition-colors';
-  const activeClasses = 'bg-accent text-accent-foreground';
-  const normalClasses =
-    'text-muted-foreground hover:bg-accent hover:text-accent-foreground';
-
-  if (collapsed) {
-    return (
-      <Tooltip delayDuration={0}>
-        <TooltipTrigger asChild>
-          <Link
-            href={item.href}
-            className={cn(
-              baseClasses,
-              'h-10 w-10 mx-auto justify-center',
-              active ? activeClasses : normalClasses,
-            )}
-          >
-            {item.icon}
-          </Link>
-        </TooltipTrigger>
-        <TooltipContent side="right">{item.title}</TooltipContent>
-      </Tooltip>
-    );
-  }
-
-  return (
-    <Link
-      href={item.href}
-      className={cn(
-        baseClasses,
-        'h-10 px-3 text-sm font-medium gap-2',
-        active ? activeClasses : normalClasses,
-      )}
-    >
-      {item.icon}
-      <span>{item.title}</span>
-    </Link>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarMenu>
+          {navItems.map(item => (
+            <SidebarMenuItem key={item.title}>
+              {item.children ? (
+                <Collapsible className="w-full">
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      <span>{item.title}</span>
+                      <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {item.children.map(subItem => (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton asChild>
+                            <a href={subItem.href}>{subItem.title}</a>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </Collapsible>
+              ) : (
+                <SidebarMenuButton asChild>
+                  <a href={item.href} className="flex items-center">
+                    <item.icon className="mr-2 h-4 w-4" />
+                    <span>{item.title}</span>
+                  </a>
+                </SidebarMenuButton>
+              )}
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarFooter className="p-4 border-t">
+        <div className="flex items-center gap-3">
+          <Avatar>
+            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User" />
+            <AvatarFallback>U</AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="font-medium">User Name</div>
+            <div className="text-xs text-muted-foreground">
+              user@example.com
+            </div>
+          </div>
+        </div>
+      </SidebarFooter>
+      <SidebarRail />
+    </Sidebar>
   );
 }

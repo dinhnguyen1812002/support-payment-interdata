@@ -10,7 +10,7 @@ import AddUserToDepartment from '@/Pages/Departments/AddUser';
 import { Pagination } from '@/Components/ui/pagination';
 import { Button } from '@/Components/ui/button';
 import { Link } from '@inertiajs/react';
-import type { Department } from '@/types';
+import type { Department, Notification } from '@/types';
 import type { PaginatedData } from '@/types';
 
 interface UserType {
@@ -24,9 +24,10 @@ interface UserType {
 interface Props {
   users: PaginatedData<UserType>;
   department: Department;
+  notifications: Notification[];
 }
 
-export default function Employee({ users, department }: Props) {
+export default function Employee({ users, department, notifications }: Props) {
   const page = useTypedPage();
   const currentUser = page.props.auth?.user || null;
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,7 +42,11 @@ export default function Employee({ users, department }: Props) {
 
   return (
     <TooltipProvider>
-      <AppLayout title={department.name} department={department}>
+      <AppLayout
+        title={department.name}
+        department={department}
+        notifications={notifications}
+      >
         <div className="p-4 border-b">
           <div className="flex items-center gap-4">
             <div className="relative flex-1">

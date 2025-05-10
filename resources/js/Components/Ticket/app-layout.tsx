@@ -15,15 +15,21 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import useTypedPage from '@/Hooks/useTypedPage';
-import { Department } from '@/types';
+import { Department, Notification } from '@/types';
 
 interface AppLayoutProps {
   children: React.ReactNode;
   title: string;
-  department?: Department; // Add department prop
+  department?: Department;
+  notifications: Notification[];
 }
 
-export function AppLayout({ children, title, department }: AppLayoutProps) {
+export function AppLayout({
+  children,
+  title,
+  department,
+  notifications,
+}: AppLayoutProps) {
   const page = useTypedPage();
   const currentUser = page.props.auth?.user;
   const username = currentUser?.name || undefined;
@@ -43,15 +49,16 @@ export function AppLayout({ children, title, department }: AppLayoutProps) {
               <h1 className="font-semibold text-lg">Dashboard</h1>
             </div>
 
-            <div className="flex items-center gap-2 ">
-              <NotificationsDropdown notifications={[]} />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground"
-              >
-                <HelpCircle className="h-5 w-5" />
-              </Button>
+            <div className="flex items-center gap-2 space-x-8 ">
+              <NotificationsDropdown notifications={notifications} />
+
+              {/*<Button*/}
+              {/*  variant="ghost"*/}
+              {/*  size="icon"*/}
+              {/*  className="text-muted-foreground"*/}
+              {/*>*/}
+              {/*  <HelpCircle className="h-5 w-5" />*/}
+              {/*</Button>*/}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
