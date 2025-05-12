@@ -102,7 +102,7 @@ Route::get('/users', [UserController::class, 'index'])->name('users.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/departments/{slug}', [DepartmentController::class, 'show'])->name('departments.show');
-    Route::get('/department/{slug}/employee', [DepartmentController::class, 'getEmployee'])->name('departments.employees');
+    Route::get('/departments/{slug}/employee', [DepartmentController::class, 'getEmployee'])->name('departments.employees');
     Route::get('/departments/{department}/available-users', [DepartmentController::class, 'getAvailableUsers'])->name('users.available');
 
     Route::post('/departments/{department}/add-user', [DepartmentController::class, 'addUser'])->name('departments.addUser');

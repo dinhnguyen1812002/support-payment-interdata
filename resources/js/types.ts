@@ -263,7 +263,7 @@ export interface Post {
 }
 
 export interface Department {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   description: string | null;

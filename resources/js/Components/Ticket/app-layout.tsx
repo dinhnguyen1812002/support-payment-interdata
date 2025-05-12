@@ -1,26 +1,29 @@
 import React from 'react';
-import { Button } from '@/Components/ui/button';
-import { HelpCircle, LogOut, User } from 'lucide-react';
-import SidebarNav from './sidebar-nav';
-import NotificationsDropdown from '@/Components/NotificationsDropdown';
+
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/Components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/Components/ui/breadcrumb';
+import { Separator } from '@/Components/ui/separator';
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/Components/ui/sidebar';
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import useTypedPage from '@/Hooks/useTypedPage';
 import { Department, Notification } from '@/types';
+import AppSidebar from '@/Components/Ticket/sidebar-nav';
 
 interface AppLayoutProps {
   children: React.ReactNode;
   title: string;
-  department?: Department;
+  department: Department;
   notifications: Notification[];
 }
 
@@ -35,81 +38,47 @@ export function AppLayout({
   const username = currentUser?.name || undefined;
 
   return (
-    <div className="flex flex-col dark:bg-[#0F1014]">
-      <div className="flex flex-1 ">
-        {/* Sidebar cố định chiều rộng */}
-        <aside className="hidden md:block ">
-          <SidebarNav title={title} department={department} />
-        </aside>
-
-        {/* Main content chiếm phần còn lại */}
-        <main className="flex-1 w-full ">
-          <header className="h-16 border-b dark:border-gray-800 bg-background flex items-center justify-between px-4 top-0 z-50 dark:bg-[#0F1014]">
-            <div className="flex items-center gap-3">
-              <h1 className="font-semibold text-lg">Dashboard</h1>
-            </div>
-
-            <div className="flex items-center gap-2 space-x-8 ">
-              <NotificationsDropdown notifications={notifications} />
-
-              {/*<Button*/}
-              {/*  variant="ghost"*/}
-              {/*  size="icon"*/}
-              {/*  className="text-muted-foreground"*/}
-              {/*>*/}
-              {/*  <HelpCircle className="h-5 w-5" />*/}
-              {/*</Button>*/}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 rounded-full"
-                  >
-                    <Avatar className="h-10 w-10 rounded-lg">
-                      <AvatarImage
-                        src={
-                          currentUser?.profile_photo_path
-                            ? `/storage/${currentUser.profile_photo_path}`
-                            : `https://ui-avatars.com/api/?name=${encodeURI(username as string)}&color=7F9CF5&background=EBF4FF`
-                        }
-                        alt={currentUser?.name}
-                      />
-                      <AvatarFallback>
-                        {currentUser?.name?.[0] ?? 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {currentUser?.name || 'User'}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {currentUser?.email || 'user@example.com'}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Link href={route('profile.show')} className="inline-flex">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </header>
-          {children}
-        </main>
-      </div>
-    </div>
+    <SidebarProvider>
+      <AppSidebar
+        id={department?.id}
+        name={department.name}
+        slug={department.slug}
+        description={null}
+        created_at={''}
+      />
+      <SidebarInset>
+        <header
+          className="flex h-16 shrink-0 items-center gap-2 transition-[width,height]
+        ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b"
+        >
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="#">
+                    Building Your Application
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </header>
+        {/*<div className="flex flex-1 flex-col gap-4 p-4 pt-0">*/}
+        {/*  <div className="grid auto-rows-min gap-4 md:grid-cols-3">*/}
+        {/*    <div className="aspect-video rounded-xl bg-muted/50" />*/}
+        {/*    <div className="aspect-video rounded-xl bg-muted/50" />*/}
+        {/*    <div className="aspect-video rounded-xl bg-muted/50" />*/}
+        {/*  </div>*/}
+        {/*  <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />*/}
+        {/*</div>*/}
+        {children}
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

@@ -1,10 +1,19 @@
 import {
-  ChevronDown,
+  AudioWaveform,
+  BookOpen,
+  Bot,
+  Command,
+  Frame,
+  GalleryVerticalEnd,
+  Map,
+  PieChart,
+  Settings2,
+  SquareTerminal,
   Home,
-  Settings,
   Users,
   FileText,
   Mail,
+  Settings,
 } from 'lucide-react';
 
 import {
@@ -12,120 +21,183 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarRail,
 } from '@/Components/ui/sidebar';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/Components/ui/collapsible';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+// import {
+//   Collapsible,
+//   CollapsibleContent,
+//   CollapsibleTrigger,
+// } from '@/Components/ui/collapsible';
+// import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import React from 'react';
+import { NavMain } from '../dashboard/nav-main';
+
+import NavUser from './nav-user';
+import NavProjects from '@/Components/Ticket/nav-projects';
+import { TeamSwitcher } from '@/Components/Ticket/team-switcher';
+import { Department } from '@/types';
 
 // Navigation items with nested sections
-const navItems = [
-  {
-    title: 'Dashboard',
-    icon: Home,
-    href: '/',
-  },
-  {
-    title: 'Users',
-    icon: Users,
-    href: '/users',
-  },
-  {
-    title: 'Content',
-    icon: FileText,
-    children: [
-      { title: 'Pages', href: '/content/pages' },
-      { title: 'Blog Posts', href: '/content/blog' },
-      { title: 'Media Library', href: '/content/media' },
-    ],
-  },
-  {
-    title: 'Communications',
-    icon: Mail,
-    children: [
-      { title: 'Email', href: '/communications/email' },
-      { title: 'Notifications', href: '/communications/notifications' },
-      { title: 'Calendar', href: '/communications/calendar' },
-    ],
-  },
-  {
-    title: 'Settings',
-    icon: Settings,
-    href: '/settings',
-  },
-];
+// const navItems = [
+//   {
+//     title: 'Dashboard',
+//     icon: Home,
+//     href: '/',
+//   },
+//   {
+//     title: 'Users',
+//     icon: Users,
+//     href: '/users',
+//   },
+//   {
+//     title: 'Content',
+//     icon: FileText,
+//     children: [
+//       { title: 'Pages', href: '/content/pages' },
+//       { title: 'Blog Posts', href: '/content/blog' },
+//       { title: 'Media Library', href: '/content/media' },
+//     ],
+//   },
+//   {
+//     title: 'Communications',
+//     icon: Mail,
+//     children: [
+//       { title: 'Email', href: '/communications/email' },
+//       { title: 'Notifications', href: '/communications/notifications' },
+//       { title: 'Calendar', href: '/communications/calendar' },
+//     ],
+//   },
+//   {
+//     title: 'Settings',
+//     icon: Settings,
+//     href: '/settings',
+//   },
+// ];
 
-export default function AdvancedSidebar() {
+export default function AppSidebar(department: Department) {
+  const data = {
+    navMain: [
+      {
+        title: 'Dashboard ',
+        url: `/departments/${department.slug}`,
+        icon: SquareTerminal,
+        isActive: true,
+        items: [
+          {
+            title: 'History',
+            url: '#',
+          },
+          {
+            title: 'Starred',
+            url: '#',
+          },
+          {
+            title: 'Settings',
+            url: '#',
+          },
+        ],
+      },
+      {
+        title: 'Employee',
+        url: `/departments/${department.slug}/employee`,
+        icon: Bot,
+        items: [
+          {
+            title: 'Genesis',
+            url: '#',
+          },
+          {
+            title: 'Explorer',
+            url: '#',
+          },
+          {
+            title: 'Quantum',
+            url: '#',
+          },
+        ],
+      },
+      {
+        title: 'Documentation',
+        url: '#',
+        icon: BookOpen,
+        items: [
+          {
+            title: 'Introduction',
+            url: '#',
+          },
+          {
+            title: 'Get Started',
+            url: '#',
+          },
+          {
+            title: 'Tutorials',
+            url: '#',
+          },
+          {
+            title: 'Changelog',
+            url: '#',
+          },
+        ],
+      },
+      {
+        title: 'Settings',
+        url: '#',
+        icon: Settings2,
+        items: [
+          {
+            title: 'General',
+            url: '#',
+          },
+          {
+            title: 'Team',
+            url: '#',
+          },
+          {
+            title: 'Billing',
+            url: '#',
+          },
+          {
+            title: 'Limits',
+            url: '#',
+          },
+        ],
+      },
+    ],
+    projects: [
+      {
+        name: 'Design Engineering',
+        url: '#',
+        icon: Frame,
+      },
+      {
+        name: 'Sales & Marketing',
+        url: '#',
+        icon: PieChart,
+      },
+      {
+        name: 'Travel',
+        url: '#',
+        icon: Map,
+      },
+    ],
+  };
   return (
-    <Sidebar>
-      <SidebarHeader className="h-16 flex items-center px-4 border-b">
-        <div className="flex items-center gap-3">
-          <div className="bg-primary h-8 w-8 rounded-md flex items-center justify-center text-primary-foreground font-bold">
-            A
-          </div>
-          <div className="font-semibold text-lg">Admin Panel</div>
-        </div>
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <TeamSwitcher
+          name={department.name}
+          id={department.id}
+          slug={department.slug}
+          description={null}
+          created_at={''}
+        />
       </SidebarHeader>
       <SidebarContent>
-        <SidebarMenu>
-          {navItems.map(item => (
-            <SidebarMenuItem key={item.title}>
-              {item.children ? (
-                <Collapsible className="w-full">
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                      <item.icon className="mr-2 h-4 w-4" />
-                      <span>{item.title}</span>
-                      <ChevronDown className="ml-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.children.map(subItem => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <a href={subItem.href}>{subItem.title}</a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </Collapsible>
-              ) : (
-                <SidebarMenuButton asChild>
-                  <a href={item.href} className="flex items-center">
-                    <item.icon className="mr-2 h-4 w-4" />
-                    <span>{item.title}</span>
-                  </a>
-                </SidebarMenuButton>
-              )}
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+        <NavMain items={data.navMain} />
+        <NavProjects projects={data.projects} />
       </SidebarContent>
-      <SidebarFooter className="p-4 border-t">
-        <div className="flex items-center gap-3">
-          <Avatar>
-            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="User" />
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="font-medium">User Name</div>
-            <div className="text-xs text-muted-foreground">
-              user@example.com
-            </div>
-          </div>
-        </div>
+      <SidebarFooter>
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
