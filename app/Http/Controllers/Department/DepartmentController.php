@@ -192,14 +192,13 @@ class DepartmentController extends Controller
      */
     public function getAvailableUsers(Departments $department)
     {
-        //        $this->authorize('add users to department', $department);
-        //        $this->authorize('addUsersToDepartment', $department);
+        // Kiểm tra quyền
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
 
-        // Lấy danh sách người dùng chưa thuộc phòng ban nào
+        // Chỉ lấy danh sách người dùng chưa thuộc phòng ban nào
         $users = User::whereDoesntHave('departments')
-            ->orWhereHas('departments', function ($query) use ($department) {
-                $query->where('departments.id', '!=', $department->id);
-            })
             ->select(['id', 'name', 'email'])
             ->get();
 
@@ -260,7 +259,7 @@ class DepartmentController extends Controller
 
         // Kiểm tra xem user đã thuộc phòng ban khác chưa
         if ($user->departments()->exists()) {
-            return response()->json(['error' => 'User already belongs to another department'], 422);
+            return response()->json(['error' => 'User already belongs to a department'], 422);
         }
 
         // Thêm user vào phòng ban
@@ -272,5 +271,31 @@ class DepartmentController extends Controller
         }
 
         return redirect()->route('departments.employees', ['slug' => $department->slug])->with('success', 'User added to department');
+    }
+
+    public function removeUser(Request $request, Departments $department, User $user)
+    {
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+        // Kiểm tra xem user có thuộc phòng ban này không
+        if (! $user->departments()->where('departments.id', $department->id)->exists()) {
+            return response()->json(['error' => 'User does not belong to this department'], 422);
+        }
+
+        // Không cho phép xóa chính mình khỏi phòng ban
+        if ($user->id === auth()->id()) {
+            return response()->json(['error' => 'You cannot remove yourself from the department'], 422);
+        }
+
+        // Không cho phép xóa Admin khỏi phòng ban
+        if ($user->hasRole('admin')) {
+            return response()->json(['error' => 'Cannot remove Admin users from department'], 422);
+        }
+
+        // Xóa user khỏi phòng ban
+        $department->users()->detach($user->id);
+
+        return redirect()->back()->with('success', 'User removed from department');
     }
 }

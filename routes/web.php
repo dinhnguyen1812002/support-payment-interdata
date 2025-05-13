@@ -104,7 +104,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/departments/{slug}', [DepartmentController::class, 'show'])->name('departments.show');
     Route::get('/departments/{slug}/employee', [DepartmentController::class, 'getEmployee'])->name('departments.employees');
     Route::get('/departments/{department}/available-users', [DepartmentController::class, 'getAvailableUsers'])->name('users.available');
-
+    Route::delete('/departments/{department}/users/{user}', [DepartmentController::class, 'removeUser'])->name('departments.removeUser');
     Route::post('/departments/{department}/add-user', [DepartmentController::class, 'addUser'])->name('departments.addUser');
     Route::resource('departments', DepartmentController::class)->names('departments');
 });

@@ -68,7 +68,10 @@ export default function Employee({ users, department, notifications }: Props) {
         </div>
 
         <div className="p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <div
+            className="*:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4 grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t
+         *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card lg:px-6 md:grid-cols-3"
+          >
             {filteredEmployees.length > 0 ? (
               filteredEmployees.map(employee => (
                 <UserCard
@@ -78,6 +81,7 @@ export default function Employee({ users, department, notifications }: Props) {
                   email={employee.email}
                   roles={employee.roles}
                   profile_photo_path={employee.profile_photo_path}
+                  departmentId={department.id}
                 />
               ))
             ) : (

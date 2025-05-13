@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\Department\DepartmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\Search\SearchController;
@@ -67,3 +68,5 @@ Route::get('/posts/{id}', [PostController::class, 'showById'])->name('posts.show
 Route::post('/posts/transfer', [PostController::class, 'transfer'])->name('posts.transfer');
 
 Route::get('/users/search', [Departments::class, 'search'])->name('search.departments');
+
+Route::delete('/departments/{department}/users/{user}', [DepartmentController::class, 'removeUser'])->name('departments.remove.user');

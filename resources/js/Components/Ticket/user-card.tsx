@@ -19,6 +19,8 @@ import {
   UserRoundMinus,
   Pencil,
 } from 'lucide-react';
+import { router } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 interface UserCardProps {
   id: number;
@@ -26,6 +28,7 @@ interface UserCardProps {
   email: string;
   roles: string;
   profile_photo_path?: string;
+  departmentId: string;
 }
 
 export default function UserCard({
@@ -34,6 +37,7 @@ export default function UserCard({
   email,
   roles,
   profile_photo_path,
+  departmentId,
 }: UserCardProps) {
   const nameParts = name?.split(' ') || ['U'];
   const initials =
@@ -41,8 +45,23 @@ export default function UserCard({
       ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
       : nameParts[0][0] || 'U';
 
+  const handleRemoveUser = () => {
+    if (
+      confirm(`Are you sure you want to remove ${name} from this department?`)
+    ) {
+      router.delete(
+        route('departments.removeUser', { department: departmentId, user: id }),
+        {
+          onSuccess: () => {
+            // Success notification is handled by the redirect in the controller
+          },
+        },
+      );
+    }
+  };
+
   return (
-    <Card className="w-full max-w-md">
+    <Card className="@container/card">
       <CardHeader className="pb-2" />
 
       <CardContent>
@@ -69,7 +88,6 @@ export default function UserCard({
               <Mail className="h-4 w-4 text-muted-foreground" />
               <Label className="flex w-full gap-x-1">
                 <span className="text-muted-foreground">Email: </span>
-
                 <span className="font-medium">{email}</span>
               </Label>
             </div>
@@ -96,7 +114,7 @@ export default function UserCard({
         <Button variant="outline">
           <Pencil />
         </Button>
-        <Button variant="secondary">
+        <Button variant="secondary" onClick={handleRemoveUser}>
           <UserRoundMinus />
         </Button>
       </CardFooter>
