@@ -19,6 +19,7 @@ import { route } from 'ziggy-js';
 import useTypedPage from '@/Hooks/useTypedPage';
 import { Department, Notification } from '@/types';
 import AppSidebar from '@/Components/Ticket/sidebar-nav';
+import NotificationsDropdown from '@/Components/NotificationsDropdown';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -49,9 +50,9 @@ export function AppLayout({
       <SidebarInset>
         <header
           className="flex h-16 shrink-0 items-center gap-2 transition-[width,height]
-        ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b"
+        ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b dark:bg-[#0F1014]"
         >
-          <div className="flex items-center gap-2 px-4">
+          <div className="flex items-center gap-2 px-4 ">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
@@ -67,6 +68,9 @@ export function AppLayout({
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
+          </div>
+          <div className="justify-end flex-1 flex items-center gap-2 pr-10">
+            <NotificationsDropdown notifications={notifications} />
           </div>
         </header>
         {/*<div className="flex flex-1 flex-col gap-4 p-4 pt-0">*/}

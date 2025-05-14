@@ -27,6 +27,17 @@ import {
 } from '@/Components/ui/sidebar';
 
 import useTypedPage from '@/Hooks/useTypedPage';
+import { router } from '@inertiajs/core';
+import { route } from 'ziggy-js';
+import { Button } from '@/Components/ui/button';
+import { Label } from '@/Components/ui/label';
+import ThemeSwitch from '@/Components/dashboard/toggle-switch';
+import ModeToggle from '@/Components/mode-toggle';
+
+function logout(e: React.FormEvent) {
+  e.preventDefault();
+  router.post(route('logout'));
+}
 
 export default function NavUser() {
   const { isMobile } = useSidebar();
@@ -82,29 +93,33 @@ export default function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
+                <ThemeSwitch />
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+            {/*<DropdownMenuSeparator />*/}
+            {/*<DropdownMenuGroup>*/}
+            {/*  <DropdownMenuItem>*/}
+            {/*    <BadgeCheck />*/}
+            {/*    Account*/}
+            {/*  </DropdownMenuItem>*/}
+            {/*  <DropdownMenuItem>*/}
+            {/*    <CreditCard />*/}
+            {/*    Billing*/}
+            {/*  </DropdownMenuItem>*/}
+            {/*  <DropdownMenuItem>*/}
+            {/*    <Bell />*/}
+            {/*    Notifications*/}
+            {/*  </DropdownMenuItem>*/}
+            {/*</DropdownMenuGroup>*/}
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <LogOut />
-              Log out
+              <Label
+                onClick={logout}
+                className="text-red-500 border-none flex items-center gap-2"
+              >
+                <LogOut />
+                Logout
+              </Label>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

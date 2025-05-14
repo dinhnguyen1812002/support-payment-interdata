@@ -61,7 +61,7 @@ export default function UserCard({
   };
 
   return (
-    <Card className="@container/card">
+    <Card className="@container/card dark:bg-[#0F1014]">
       <CardHeader className="pb-2" />
 
       <CardContent>

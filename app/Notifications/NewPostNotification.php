@@ -23,7 +23,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
 
     public function via($notifiable): array
     {
-        return ['database', 'broadcast', 'mail'];
+        return ['database', 'broadcast'];
     }
 
     public function toMail($notifiable): MailMessage
@@ -52,6 +52,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
             'categories' => $this->post->categories->pluck('title')->toArray(),
             'product_id' => $this->post->product_id,
             'product_name' => $this->post->product_name,
+            'created_at' => $this->post->created_at->diffForHumans(),
         ];
     }
 

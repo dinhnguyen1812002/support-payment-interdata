@@ -13,7 +13,7 @@ import { router } from '@inertiajs/core';
 import { route } from 'ziggy-js';
 import type { Post } from '@/types/Post';
 import { Input } from '@/Components/ui/input';
-import { cn, formatDate } from '@/lib/utils';
+import { cn, formatTimeAgo } from '@/lib/utils';
 
 interface Props {
   notifications: Notification[];
@@ -273,7 +273,10 @@ export default function DepartmentShow({
                             </h3>
                             <div className="flex items-center gap-1 ml-2 text-xs text-muted-foreground">
                               <Clock className="h-3 w-3" />
-                              <span>{formatDate(notification.created_at)}</span>
+                              <span>
+                                {/*{formatTimeAgo(notification.created_at)}*/}
+                                {notification.created_at}
+                              </span>
                             </div>
                           </div>
 

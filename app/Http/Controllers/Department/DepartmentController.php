@@ -89,6 +89,7 @@ class DepartmentController extends Controller
 
     public function show(string $slug)
     {
+
         $department = Departments::where('slug', $slug)->firstOrFail();
         $user = auth()->user();
 
@@ -275,9 +276,11 @@ class DepartmentController extends Controller
 
     public function removeUser(Request $request, Departments $department, User $user)
     {
-        if (! auth()->user()->hasRole('admin')) {
-            throw UnauthorizedException::forRoles(['admin']);
-        }
+//        if (! auth()->user()->hasRole('admin')) {
+//            throw UnauthorizedException::forRoles(['admin']);
+//        }
+        $this->authorize('remove-users-from-department', $department);
+
         // Kiểm tra xem user có thuộc phòng ban này không
         if (! $user->departments()->where('departments.id', $department->id)->exists()) {
             return response()->json(['error' => 'User does not belong to this department'], 422);

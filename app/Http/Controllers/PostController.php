@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Data\Post\CreatePostData;
 use App\Models\Post;
 use App\Services\PostService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PostController extends Controller
 {
+    use AuthorizesRequests;
+
     protected $postService;
 
     public function __construct(PostService $postService)
@@ -128,7 +131,7 @@ class PostController extends Controller
     {
         $post = Post::with(['user', 'categories', 'tags',  'comments', 'upvotes'])->findOrFail($id);
 
-        $this->authorize('viewDepartmentPosts', $post->department);
+//        $this->authorize('viewDepartmentPosts', $post->department);
 
         $data = $this->postService->preparePostData($post);
 
