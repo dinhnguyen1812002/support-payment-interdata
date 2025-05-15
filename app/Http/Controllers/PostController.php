@@ -131,7 +131,7 @@ class PostController extends Controller
     {
         $post = Post::with(['user', 'categories', 'tags',  'comments', 'upvotes'])->findOrFail($id);
 
-//        $this->authorize('viewDepartmentPosts', $post->department);
+        //        $this->authorize('viewDepartmentPosts', $post->department);
 
         $data = $this->postService->preparePostData($post);
 

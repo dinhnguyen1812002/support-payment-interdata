@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Data\Post\CreatePostData;
 use App\Events\NewQuestionCreated;
 use App\Models\Category;
+use App\Models\Departments;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
@@ -132,6 +133,7 @@ class PostService
             // Queue these operations to improve response time
             dispatch(function () use ($post) {
                 $this->notifyUsers($post);
+                $this->notifyDepartment($post);
             })->afterCommit();
 
             dispatch(function () use ($post) {
@@ -389,6 +391,38 @@ class PostService
         }
     }
 
+    private function notifyDepartment(Post $post): void
+    {
+        // Nếu bài viết thuộc về một phòng ban cụ thể
+        if ($post->department_id) {
+            $department = Departments::find($post->department_id);
+            if ($department) {
+                // Gửi thông báo cho tất cả người dùng trong phòng ban
+                $department->users->each(function ($user) use ($post) {
+                    // Không gửi thông báo cho người tạo bài viết
+                    if ($user->id !== $post->user_id) {
+                        $user->notify(new NewPostNotification($post));
+                    }
+                });
+            }
+        } else {
+            // Nếu bài viết không thuộc phòng ban nào, kiểm tra xem người tạo có thuộc phòng ban nào không
+            $userDepartments = $post->user->departments;
+
+            if ($userDepartments->isNotEmpty()) {
+                // Gửi thông báo cho tất cả người dùng trong các phòng ban của người tạo
+                foreach ($userDepartments as $department) {
+                    $department->users->each(function ($user) use ($post) {
+                        // Không gửi thông báo cho người tạo bài viết
+                        if ($user->id !== $post->user_id) {
+                            $user->notify(new NewPostNotification($post));
+                        }
+                    });
+                }
+            }
+        }
+    }
+
     public function storeTransferredPost(array $data): array
     {
         $slug = Str::slug($data['title']);
@@ -423,6 +457,8 @@ class PostService
         $post->load('tags', 'categories', 'user');
 
         $this->notifyUsers($post);
+
+        $this->notifyDepartment($post);
 
         broadcast(new NewQuestionCreated($post))->toOthers();
 

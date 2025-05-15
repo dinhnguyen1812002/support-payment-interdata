@@ -6,7 +6,7 @@ import useRoute from '@/Hooks/useRoute';
 import useTypedPage from '@/Hooks/useTypedPage';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Notification, Team } from '@/types';
+import { Department, Notification, Team } from '@/types';
 
 import {
   DropdownMenu,
@@ -28,6 +28,7 @@ import { Toaster } from '@/Components/ui/sonner';
 import { motion } from 'framer-motion';
 import MobileSidebarToggle from '@/Components/toggle-side-bar';
 import MobileSidebar from '@/Components/MobileSidebar';
+import { Label } from '@/Components/ui/label';
 
 interface Props {
   title: string;
@@ -76,7 +77,7 @@ export default function AppLayout({
       },
     );
   }
-
+  console.log(page.props.auth.user);
   function logout(e: React.FormEvent) {
     e.preventDefault();
     router.post(route('logout'));
@@ -150,7 +151,18 @@ export default function AppLayout({
               {page.props.auth.user && (
                 <NotificationsDropdown notifications={notifications} />
               )}
-
+              {page.props.auth.user && page.props.department && (
+                <div className="flex items-center gap-4 border p-4 rounded-md">
+                  <Link
+                    href={route('departments.show', {
+                      department: page.props.department.slug,
+                    })}
+                    className="hidden md:block"
+                  >
+                    <Label className="flex cursor-pointer">Dashboard</Label>
+                  </Link>
+                </div>
+              )}
               {/* User Menu or Login/Register buttons */}
               {page.props.auth.user ? (
                 <DropdownMenu>

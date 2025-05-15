@@ -23,6 +23,8 @@ class UserController extends UserProfileController
             ->latest()
             ->paginate(10);
 
+        $department = auth()->user()->departments->first();
+
         return Inertia::render('Profile/Show', [
             'sessions' => $this->sessions($request)->all(),
             'confirmsTwoFactorAuthentication' => $request->session()->get('confirmsTwoFactorAuthentication'),
@@ -46,6 +48,7 @@ class UserController extends UserProfileController
                 'prev_page_url' => $posts->previousPageUrl(),
             ],
             'keyword' => $request->search ?? '',
+            'department' => $department,
             'notifications' => auth()->user()->unreadNotifications,
         ]);
     }

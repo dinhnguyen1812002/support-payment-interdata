@@ -24,6 +24,7 @@ export interface User {
   created_at: DateTime;
   updated_at: DateTime;
   notifications: Notification[];
+  departments: Department[];
 }
 
 export interface Auth {
@@ -52,6 +53,7 @@ export type InertiaSharedProps<T = {}> = T & {
   auth: Auth;
   errorBags: any;
   errors: any;
+  department: Department;
 };
 
 export interface Session {

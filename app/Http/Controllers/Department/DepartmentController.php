@@ -276,9 +276,9 @@ class DepartmentController extends Controller
 
     public function removeUser(Request $request, Departments $department, User $user)
     {
-//        if (! auth()->user()->hasRole('admin')) {
-//            throw UnauthorizedException::forRoles(['admin']);
-//        }
+        //        if (! auth()->user()->hasRole('admin')) {
+        //            throw UnauthorizedException::forRoles(['admin']);
+        //        }
         $this->authorize('remove-users-from-department', $department);
 
         // Kiểm tra xem user có thuộc phòng ban này không

@@ -3,18 +3,20 @@
 namespace App\Notifications;
 
 use App\Models\Post;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewQuestionNotification extends Notification
+class NewTicket extends Notification
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
+
     public Post $post;
 
     public function __construct(Post $post)
@@ -43,11 +45,6 @@ class NewQuestionNotification extends Notification
             ->line('Thank you for using our application!');
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray($notifiable)
     {
         return [
@@ -76,5 +73,10 @@ class NewQuestionNotification extends Notification
             'created_at' => now()->diffForHumans(),
             'read_at' => null,
         ]);
+    }
+
+    public function broadcastOn()
+    {
+        return new Channel('tickets');
     }
 }
