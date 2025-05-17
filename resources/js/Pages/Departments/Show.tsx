@@ -14,7 +14,7 @@ import { route } from 'ziggy-js';
 import type { Post } from '@/types/Post';
 import { Input } from '@/Components/ui/input';
 import { cn, formatTimeAgo } from '@/lib/utils';
-
+import { formatDistanceToNow } from 'date-fns';
 interface Props {
   notifications: Notification[];
   department: Department;
@@ -214,7 +214,14 @@ export default function DepartmentShow({
     },
     [selectedPost],
   );
-
+  const formatTimeAgo = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return formatDistanceToNow(date, { addSuffix: true });
+    } catch (error) {
+      return dateString;
+    }
+  };
   return (
     <TooltipProvider>
       <AppLayout
@@ -222,7 +229,7 @@ export default function DepartmentShow({
         department={department}
         notifications={localNotifications}
       >
-        <div className="flex overflow-hidden h-[calc(100vh-4rem)] dark:bg-[#0F1014] relative">
+        <div className="flex overflow-hidden h-[calc(100vh-4rem)] relative">
           <div
             className={cn(
               'flex-col border-r dark:border-gray-800 bg-background',
@@ -230,8 +237,8 @@ export default function DepartmentShow({
               isMobile && showPostView ? 'hidden' : 'flex',
             )}
           >
-            <div className="p-4 border-b dark:border-gray-800 bg-background flex flex-col gap-3 dark:bg-[#0F1014]">
-              <div className="relative dark:bg-[#0F1014]">
+            <div className="p-4 border-b dark:border-gray-800 bg-background flex flex-col gap-3 ">
+              <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search notifications..."
@@ -242,63 +249,87 @@ export default function DepartmentShow({
               </div>
             </div>
 
-            <ScrollArea className="h-min-screen w-full">
+            <ScrollArea className="h-[calc(100vh-200px)] pr-3">
               {filteredNotifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
-                  <Mail className="h-8 w-8 mb-2" />
-                  <p>No notifications found</p>
+                <div className="flex flex-col items-center justify-center h-60 text-muted-foreground bg-muted/30 rounded-lg p-6">
+                  <Mail className="h-12 w-12 mb-3 opacity-40" />
+                  <p className="text-base font-medium">
+                    No notifications found
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    New notifications will appear here
+                  </p>
                 </div>
               ) : (
-                filteredNotifications.map(notification => {
-                  const isSelected =
-                    selectedNotification?.id === notification.id;
-                  const isUnread = !notification.read_at;
+                <div className="space-y-2">
+                  {filteredNotifications.map(notification => {
+                    const isSelected =
+                      selectedNotification?.id === notification.id;
+                    const isUnread = !notification.read_at;
 
-                  return (
-                    <div
-                      key={notification.id}
-                      onClick={() => handleNotificationSelect(notification)}
-                      className={cn(
-                        'w-full text-left p-4 cursor-pointer border-b-2 hover:bg-accent/50 transition-colors dark:bg-[#0F1014]',
-                        isSelected
-                          ? 'border-l-4 border-l-blue-500 dark:border-l-blue-500'
-                          : '',
-                      )}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start">
-                            <h3 className="font-medium text-base truncate">
-                              {notification.data.name}
-                            </h3>
-                            <div className="flex items-center gap-1 ml-2 text-xs text-muted-foreground">
-                              <Clock className="h-3 w-3" />
-                              <span>
-                                {/*{formatTimeAgo(notification.created_at)}*/}
-                                {notification.created_at}
-                              </span>
-                            </div>
-                          </div>
+                    return (
+                      <div
+                        key={notification.id}
+                        onClick={() => handleNotificationSelect(notification)}
+                        className={cn(
+                          'relative p-4 cursor-pointer rounded-lg transition-all',
+                          'hover:bg-accent/50 dark:hover:bg-accent/30',
+                          isSelected
+                            ? 'bg-accent/40 dark:bg-accent/20 ring-1 ring-primary/10  border-l-1 border-primary'
+                            : 'bg-card dark:bg-card/80',
+                        )}
+                      >
+                        <div className="flex items-start gap-4">
+                          {/*{isUnread && (*/}
+                          {/*  <div className="absolute top-4 left-1.5 w-1.5 h-1.5 rounded-full bg-primary" />*/}
+                          {/*)}*/}
 
-                          <h1 className="text-base font-bold mt-1">
-                            {notification.data.title}
-                          </h1>
-
-                          <h4 className="text-gray-500 text-sm font-medium mt-1">
-                            {notification.data.content}
-                          </h4>
-                          <div className="mt-2 flex flex-wrap gap-1">
-                            {notification.data.product_name && (
-                              <Badge variant="default" className="text-xs">
-                                {notification.data.product_name}
-                              </Badge>
+                          <div
+                            className={cn(
+                              'flex-1 space-y-2',
+                              isUnread && 'pl-1.5',
                             )}
+                          >
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-muted-foreground">
+                                  From {notification.data.name}
+                                </span>
+                                {notification.data.product_name && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs font-normal px-2 py-0.5"
+                                  >
+                                    {notification.data.product_name}
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap">
+                                <Clock className="h-3 w-3" />
+                                <span>
+                                  {formatTimeAgo(notification.created_at)}
+                                </span>
+                              </div>
+                            </div>
+
+                            <h2
+                              className={cn(
+                                'text-base leading-tight',
+                                isUnread ? 'font-semibold' : 'font-medium',
+                              )}
+                            >
+                              {notification.data.title}
+                            </h2>
+
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {notification.data.message}
+                            </p>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })
+                    );
+                  })}
+                </div>
               )}
             </ScrollArea>
           </div>
@@ -325,7 +356,7 @@ export default function DepartmentShow({
 
             {selectedPost ? (
               <ScrollArea className="h-full w-full">
-                <div className="p-4 md:p-6">
+                <div className="p-4 md:p-6 dark:bg-background ">
                   <PostContent
                     key={selectedPost.id}
                     post={selectedPost}

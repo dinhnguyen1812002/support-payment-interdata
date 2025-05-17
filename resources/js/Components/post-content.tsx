@@ -40,20 +40,24 @@ const PostContent: React.FC<PostContentProps> = ({
 
   return (
     <div
-      className={`flex-1 w-full max-w-5xl mx-auto mt-4 sm:mt-5 md:mt-7 px-4 sm:px-6 md:px-4 dark:bg-[#0F1014] ${
+      className={`flex-1 w-full max-w-5xl mx-auto mt-4 sm:mt-5 md:mt-7 px-4 sm:px-6 md:px-4 ${
         showBorder ? 'lg:border-l' : ''
       } lg:pl-8 xl:pl-12`}
     >
-      <div className="mt-5 space-y-4">
+      <div className="mt-5 space-y-4 dark:text-[#F5F5F5] ">
         <div className="mb-1">
           <span className="text-2xl font-bold  mb-0 me-1 dark:text-[#F5F5F5]">
             {post.title}
           </span>
           <div className="mb-6 max-w-none prose prose-lg">
-            <p
+            {/*<p*/}
+            {/*  className="text-lg font-normal dark:text-[#F5F5F5] mb-10 mr-1 "*/}
+            {/* */}
+            {/*/>*/}
+            <article
               className="text-lg font-normal dark:text-[#F5F5F5] mb-10 mr-1 "
               dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+            ></article>
           </div>
         </div>
         <div className="flex items-center mb-4 justify-between">

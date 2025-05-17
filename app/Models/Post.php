@@ -88,6 +88,9 @@ class Post extends Model
             'user' => $this->user ? [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
+                'profile_photo_url' => $this->user->profile_photo_path
+                    ? asset('storage/'.$this->user->profile_photo_path)
+                    : 'https://ui-avatars.com/api/?name='.urlencode($this->user->name).'&color=7F9CF5&background=EBF4FF',
             ] : null,
             'tags' => $this->tags->map(function ($tag) {
                 return [

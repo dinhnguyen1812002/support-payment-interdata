@@ -41,7 +41,9 @@ export function TeamSwitcher({ name, id, slug }: Department) {
                 className="grid flex-1 text-left text-sm leading-tight"
                 key={id}
               >
-                <span className="truncate font-semibold text-3xl">{name}</span>
+                <h1 className="truncate font-semibold text-3xl uppercase">
+                  {name}
+                </h1>
                 {/*<span className="truncate text-xs">{activeTeam.plan}</span>*/}
               </div>
               <ChevronsUpDown className="ml-auto" />

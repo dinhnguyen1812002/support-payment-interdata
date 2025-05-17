@@ -77,11 +77,11 @@ export default function AppLayout({
       },
     );
   }
-  console.log(page.props.auth.user);
   function logout(e: React.FormEvent) {
     e.preventDefault();
     router.post(route('logout'));
   }
+  const role = page.props.auth.user?.roles.map(role => role.name).toString();
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -151,18 +151,23 @@ export default function AppLayout({
               {page.props.auth.user && (
                 <NotificationsDropdown notifications={notifications} />
               )}
-              {page.props.auth.user && page.props.department && (
-                <div className="flex items-center gap-4 border p-4 rounded-md">
-                  <Link
-                    href={route('departments.show', {
-                      department: page.props.department.slug,
-                    })}
-                    className="hidden md:block"
-                  >
-                    <Label className="flex cursor-pointer">Dashboard</Label>
-                  </Link>
-                </div>
+
+              {role === 'admin' && (
+                <NavLink
+                  href={route('admin.dashboard')}
+                  active={route().current('admin.dashboard')}
+                >
+                  Admin
+                </NavLink>
               )}
+              {/*<div className="flex items-center gap-4 rounded-md">*/}
+              {/*  <Link*/}
+              {/*    href={route('admin.dashboard')}*/}
+              {/*    className="hidden md:block"*/}
+              {/*  >*/}
+              {/*    <Label className="flex cursor-pointer">Admin</Label>*/}
+              {/*  </Link>*/}
+              {/*</div>*/}
               {/* User Menu or Login/Register buttons */}
               {page.props.auth.user ? (
                 <DropdownMenu>
@@ -194,19 +199,32 @@ export default function AppLayout({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
+                      <div className="flex flex-col space-y-1 ">
                         <p className="text-sm font-medium leading-none line-clamp-1">
                           {page.props.auth.user?.name}
                         </p>
-                        <p className="text-xs leading-none text-muted-foreground line-clamp-1">
+                        <p className="text-xs leading-none text-muted-foreground ">
                           {page.props.auth.user?.email}
                         </p>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    {page.props.department && (
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href={route('departments.show', {
+                            department: page.props.department.slug,
+                          })}
+                        >
+                          {/*{page.props.department.name}*/}
+                          Department
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
                       <Link href={route('profile.show')}>Profile</Link>
                     </DropdownMenuItem>
+
                     <DropdownMenuItem
                       className="cursor-pointer"
                       onSelect={e => {

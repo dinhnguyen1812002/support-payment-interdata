@@ -48,7 +48,7 @@ export default function Employee({ users, department, notifications }: Props) {
         notifications={notifications}
       >
         <div className="p-4 dark:bg-[#0F1014] pl-9">
-          <div className="flex  gap-4">
+          <div className="flex gap-4">
             <div className="relative w-64">
               {' '}
               {/* Giới hạn chiều rộng thanh tìm kiếm */}
@@ -72,7 +72,7 @@ export default function Employee({ users, department, notifications }: Props) {
         <div className="p-4 dark:bg-[#0F1014]">
           <div
             className="*:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4 grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t
-         *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card lg:px-6 md:grid-cols-3 dark:bg-[#0F1014]"
+         *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card lg:px-6 md:grid-cols-3 dark:bg-[#0F1014] "
           >
             {filteredEmployees.length > 0 ? (
               filteredEmployees.map(employee => (

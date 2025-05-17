@@ -25,6 +25,7 @@ export interface User {
   updated_at: DateTime;
   notifications: Notification[];
   departments: Department[];
+  roles: Role[];
 }
 
 export interface Auth {
@@ -54,6 +55,7 @@ export type InertiaSharedProps<T = {}> = T & {
   errorBags: any;
   errors: any;
   department: Department;
+  roles: Role;
 };
 
 export interface Session {
@@ -85,7 +87,7 @@ export interface JetstreamTeamPermissions {
 }
 
 export interface Role {
-  key: string;
+  id: number;
   name: string;
   permissions: string[];
   description: string;
@@ -154,7 +156,7 @@ export interface BlogPost {
   user: {
     id: number;
     name: string;
-    profile_photo_path: string;
+    profile_photo_url: string;
   };
 
   created_at: string;

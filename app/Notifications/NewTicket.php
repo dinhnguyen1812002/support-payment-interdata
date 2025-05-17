@@ -16,7 +16,6 @@ class NewTicket extends Notification
     /**
      * Create a new notification instance.
      */
-
     public Post $post;
 
     public function __construct(Post $post)

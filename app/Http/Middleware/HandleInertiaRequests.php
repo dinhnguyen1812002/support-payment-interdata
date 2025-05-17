@@ -37,9 +37,11 @@ class HandleInertiaRequests extends Middleware
     {
         $department = null;
 
+        $role = null;
+
         if (auth()->check()) {
             $userDepartment = auth()->user()->departments->first();
-
+            $role = auth()->user()->getRoleNames();
             if ($userDepartment) {
                 $department = [
                     'name' => $userDepartment->name,
@@ -50,6 +52,7 @@ class HandleInertiaRequests extends Middleware
 
         return array_merge(parent::share($request), [
             'department' => $department,
+            'roles' => $role,
         ]);
     }
 }
