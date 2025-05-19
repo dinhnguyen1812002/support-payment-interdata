@@ -7,7 +7,9 @@ use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\Department\DepartmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Oauth\SocialAuthController;
+use App\Http\Controllers\Permission\PermissionController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\UpvoteController;
 use App\Http\Controllers\UserController;
 use App\Models\Post;
@@ -62,6 +64,15 @@ Route::middleware([
     })->name('dashboard');
 });
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::get('/permissions', [PermissionController::class, 'index'])
+        ->name('permissions.index')
+        ->middleware(['auth:sanctum', 'verified']);
+    Route::post('/users/assign-permissions', [PermissionController::class, 'assignPermissions'])
+        ->name('users.assignPermissions');
+    Route::get('/roles', [RoleController::class, 'index'])
+        ->name('roles.index');
+    Route::post('/users/assign-role', [RoleController::class, 'assignRole'])
+        ->name('users.assign-role');
     Route::get('/admin/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/posts', [AdminController::class, 'getAllPost'])->name('admin.posts');
     Route::get('/admin/categories', [AdminController::class, 'getAllCategory'])->name('admin.categories');
@@ -109,3 +120,5 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('departments', DepartmentController::class)->names('departments');
 });
 // Route::get('/posts/{id}/showById', [PostController::class, 'showById'])->name('posts.showById');
+
+// Role routes

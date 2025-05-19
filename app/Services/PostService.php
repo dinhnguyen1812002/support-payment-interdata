@@ -382,7 +382,8 @@ class PostService
 
     private function notifyUsers(Post $post): void
     {
-        $users = User::all();
+        // Lấy danh sách user có vai trò 'admin' hoặc 'employee'
+        $users = User::role(['admin', 'employee'])->get();
 
         foreach ($users as $user) {
             if ($user->can('receiveNotification', $post)) {

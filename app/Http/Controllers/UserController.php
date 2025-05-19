@@ -53,25 +53,6 @@ class UserController extends UserProfileController
         ]);
     }
 
-    public function assignRole(Request $request)
-    {
-        // Validate dữ liệu đầu vào
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'role' => 'required|string|exists:roles,name',
-        ]);
-
-        // Tìm user theo ID
-        $user = User::findOrFail($request->user_id);
-
-        // Gán vai trò cho user
-        $user->assignRole($request->role);
-
-        return response()->json([
-            'message' => "Role '{$request->role}' has been assigned to user '{$user->name}' successfully.",
-        ], 200);
-    }
-
     public function index(Request $request): \Inertia\Response
     {
         $search = $request->input('search', '');

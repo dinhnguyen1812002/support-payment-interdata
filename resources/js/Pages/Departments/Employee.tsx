@@ -47,7 +47,7 @@ export default function Employee({ users, department, notifications }: Props) {
         department={department}
         notifications={notifications}
       >
-        <div className="p-4 dark:bg-[#0F1014] pl-9">
+        <div className="p-4  pl-9">
           <div className="flex gap-4">
             <div className="relative w-64">
               {' '}
@@ -69,10 +69,10 @@ export default function Employee({ users, department, notifications }: Props) {
           </div>
         </div>
 
-        <div className="p-4 dark:bg-[#0F1014]">
+        <div className="p-4">
           <div
             className="*:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4 grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t
-         *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card lg:px-6 md:grid-cols-3 dark:bg-[#0F1014] "
+         *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card lg:px-6 md:grid-cols-3  "
           >
             {filteredEmployees.length > 0 ? (
               filteredEmployees.map(employee => (
