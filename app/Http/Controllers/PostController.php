@@ -150,8 +150,6 @@ class PostController extends Controller
             'title' => 'required|string',
             'content' => 'required|string',
             'user_id' => 'required|exists:users,id',
-            'product_id' => 'required|integer',
-            'product_name' => 'required|string',
             'tags' => 'nullable|array',
             'categories' => 'nullable|array',
         ]);

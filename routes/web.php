@@ -122,3 +122,4 @@ Route::middleware(['auth'])->group(function () {
 // Route::get('/posts/{id}/showById', [PostController::class, 'showById'])->name('posts.showById');
 
 // Role routes
+

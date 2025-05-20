@@ -1,74 +1,79 @@
-
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    image: support_payment
-    container_name: support_payment
+    container_name: support-payment-app
     restart: unless-stopped
-    working_dir: /var/www
+    working_dir: /var/www/html
     volumes:
-      - .:/var/www
+      - .:/var/www/html
+    environment:
+      - APP_ENV=${APP_ENV}
+      - APP_DEBUG=${APP_DEBUG}
+      - DB_HOST=db
+      - DB_DATABASE=support_payment
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - DB_PORT=3306
+      - MEMCACHED_HOST=memcached
+      - CACHE_DRIVER=memcached
+      - SESSION_DRIVER=memcached
+      - QUEUE_DRIVER=database
+      - Pusher_APP_KEY=${PUSHER_APP_KEY}
+      - PUSHER_APP_SECRET=${PUSHER_APP_SECRET}
+      - PUSHER_APP_ID=${PUSHER_APP_ID}
+      - PUSHER_APP_CLUSTER=${PUSHER_APP_CLUSTER}
+      - PUSHER_HOST=${PUSHER_HOST}
+      - PUSHER_SCHEME=${PUSHER_SCHEME}
+      - PUSHER_PORT=${PUSHER_PORT}
+      - REVERB_APP_KEY=${REVERB_APP_KEY}
+      - REVERB_APP_SECRET=${REVERB_APP_SECRET}
+      - REVERB_APP_ID=${REVERB_APP_ID}
+      - REVERB_HOST=${REVERB_HOST}
+      - REVERB_SCHEME=${REVERB_SCHEME}
+      - REVERB_PORT=${REVERB_PORT}
     networks:
-      - app-network
-    depends_on:
-      - mysql
-      - redis
+      - support-payment-network
+
+  db:
+    image: mysql:8.0
+    container_name: support-payment-db
+    restart: unless-stopped
+    volumes:
+      - support-payment-db:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=support_payment
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - support-payment-network
 
   nginx:
     image: nginx:alpine
-    container_name: laravel_nginx
+    container_name: support-payment-nginx
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8000:80"
     volumes:
-      - .:/var/www
-      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      - app-network
+      - .:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
-
-  mysql:
-    image: mysql:8.0
-    container_name: laravel_mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_USER: ${DB_USERNAME}
-    volumes:
-      - mysql-data:/var/lib/mysql
     networks:
-      - app-network
+      - support-payment-network
 
-  redis:
-    image: redis:alpine
-    container_name: laravel_redis
+  memcached:
+    image: memcached:latest
+    container_name: support-payment-memcached
     restart: unless-stopped
     networks:
-      - app-network
-
-  reverb:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: laravel_reverb
-    restart: unless-stopped
-    working_dir: /var/www
-    command: php artisan reverb:start
-    networks:
-      - app-network
-    depends_on:
-      - app
-      - redis
+      - support-payment-network
 
 networks:
-  app-network:
+  support-payment-network:
     driver: bridge
 
 volumes:
-  mysql-data:
-    driver: local
+  support-payment-db:

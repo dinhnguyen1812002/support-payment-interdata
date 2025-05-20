@@ -1,137 +1,73 @@
-import * as React from "react"
+import * as React from 'react';
 import {
-    ArrowUpCircleIcon,
-    BarChartIcon,
-    CameraIcon,
-    ClipboardListIcon,
-    DatabaseIcon,
-    FileCodeIcon,
-    FileIcon,
-    FileTextIcon,
-    FolderIcon,
-    HelpCircleIcon,
-    LayoutDashboardIcon,
-    ListIcon,
-    SearchIcon,
-    SettingsIcon,
-    ContactRound,
-    ChartColumnStacked, Boxes
-} from "lucide-react"
+  ArrowUpCircleIcon,
+  BarChartIcon,
+  CameraIcon,
+  ClipboardListIcon,
+  DatabaseIcon,
+  FileCodeIcon,
+  FileIcon,
+  FileTextIcon,
+  FolderIcon,
+  HelpCircleIcon,
+  LayoutDashboardIcon,
+  ListIcon,
+  SearchIcon,
+  SettingsIcon,
+  ContactRound,
+  ChartColumnStacked,
+  Boxes,
+} from 'lucide-react';
 
-import { NavDocuments } from "@/Components/dashboard/nav-documents"
-import { NavMain } from "@/Components/dashboard/nav-main"
-import { NavSecondary } from "@/Components/dashboard/nav-secondary"
-import { NavUser } from "@/Components/dashboard/nav-user"
+import { NavDocuments } from '@/Components/dashboard/nav-documents';
+import { NavMain } from '@/Components/dashboard/nav-main';
+import { NavSecondary } from '@/Components/dashboard/nav-secondary';
+import { NavUser } from '@/Components/dashboard/nav-user';
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem
-} from '@/Components/ui/sidebar'
-
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@/Components/ui/sidebar';
 
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: 'shadcn',
+    email: 'm@example.com',
+    avatar: '/avatars/shadcn.jpg',
   },
   navMain: [
     {
-      title: "Dashboard",
-      url: "/admin/",
+      title: 'Dashboard',
+      url: '/admin/',
       icon: LayoutDashboardIcon,
     },
     {
-      title: "Post",
-      url: "/admin/posts",
+      title: 'Post',
+      url: '/admin/posts',
       icon: ListIcon,
     },
     {
-      title: "Categories",
-      url: "/admin/categories",
+      title: 'Categories',
+      url: '/admin/categories',
       icon: ChartColumnStacked,
     },
 
     {
-      title: "User",
-      url: "/users",
+      title: 'User',
+      url: '/users',
       icon: ContactRound,
     },
-      {
-          title: "Department",
-          url: "/departments",
-          icon: Boxes,
-      },
-  ],
-  navClouds: [
     {
-      title: "Capture",
-      icon: CameraIcon,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: FileTextIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: FileCodeIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      title: 'Department',
+      url: '/departments',
+      icon: Boxes,
     },
   ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: SettingsIcon,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: HelpCircleIcon,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: SearchIcon,
-    },
-  ],
+
   // documents: [
   //   {
   //     name: "Data Library",
@@ -149,7 +85,7 @@ const data = {
   //     icon: FileIcon,
   //   },
   // ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -178,5 +114,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

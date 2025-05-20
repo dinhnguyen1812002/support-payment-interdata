@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronsUpDown, Plus } from 'lucide-react';
-
+import { Link } from '@inertiajs/react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,7 +42,7 @@ export function TeamSwitcher({ name, id, slug }: Department) {
                 key={id}
               >
                 <h1 className="truncate font-semibold text-3xl uppercase">
-                  {name}
+                  <Link href={`/`}>{name}</Link>
                 </h1>
                 {/*<span className="truncate text-xs">{activeTeam.plan}</span>*/}
               </div>
