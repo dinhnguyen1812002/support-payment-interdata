@@ -1,38 +1,34 @@
-FROM php:8.2-fpm
+FROM php:8.3-fpm
+ARG user
+ARG uid
 
-# Install system dependencies
+# Cài đặt các extension Laravel cần
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
+    build-essential \
     libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
+    locales \
     zip \
-    unzip \
-    && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-configure gd \
-    && docker-php-ext-install gd \
-    && docker-php-ext-install bcmath \
-    && docker-php-ext-install opcache
+    jpegoptim optipng pngquant gifsicle \
+    vim unzip git curl libzip-dev \
+    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Cài composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
-WORKDIR /var/www/html
+# Set thư mục làm việc
+WORKDIR /var/www
 
-# Copy application
-COPY . .
+# Copy source code vào container
+# After copying source
+COPY . /var/www
 
-# Install dependencies
-RUN composer install --optimize-autoloader --no-dev
+# Fix permissions
 
-# Clear cache
-RUN php artisan optimize:clear
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html
-
-# Expose port 9000 and start php-fpm server
+# Expose cổng PHP-FPM
 EXPOSE 9000
 CMD ["php-fpm"]

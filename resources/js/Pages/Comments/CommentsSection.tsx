@@ -1,84 +1,257 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-
-
-
 import { Loader2 } from 'lucide-react';
-import {CommentsProvider, useComments} from '@/Context/CommentsContext';
-
-import {CommentsResponse, Comment, User} from "@/types/CommentTypes";
-import CommentList from "@/Pages/Comments/CommentList";
-import CommentForm from "@/Pages/Comments/CommentForm";
+import { CommentsProvider, useComments } from '@/Context/CommentsContext';
+import { CommentsResponse, Comment, User } from '@/types/CommentTypes';
+import CommentList from '@/Pages/Comments/CommentList';
+import CommentForm from '@/Pages/Comments/CommentForm';
 
 interface CommentsSectionProps {
-    initialComments: CommentsResponse;
-    onCommentSubmit: (content: string, parentId?: number) => void;
-    postId: string;
-    currentUser: User | null;
+  initialComments: CommentsResponse;
+  onCommentSubmit: (content: string, parentId?: string) => Promise<void> | void;
+  postId: string;
+  currentUser: User | null;
 }
 
-const CommentsContent: React.FC<Omit<CommentsSectionProps, 'initialComments'>> = ({
-                                                                                      onCommentSubmit,
-                                                                                      postId,
-                                                                                      currentUser
-                                                                                  }) => {
-    const { comments, nextPage, setComments, setNextPage, isLoading, addComment } = useComments();
+const CommentsContent: React.FC<
+  Omit<CommentsSectionProps, 'initialComments'>
+> = ({ onCommentSubmit, postId, currentUser }) => {
+  const {
+    comments,
+    nextPage,
+    setComments,
+    setNextPage,
+    isLoading,
+    addComment,
+    addReply,
+    removeComment,
+    loadMoreComments,
+    hasMore,
+  } = useComments();
 
+  const channelRef = useRef<any>(null);
+  const isUnmountedRef = useRef(false);
 
+  // Handle comment submission with proper type conversion
+  const handleCommentSubmit = useCallback(
+    async (content: string, parentId?: string) => {
+      try {
+        await onCommentSubmit(content, parentId);
+      } catch (error) {
+        console.error('Error submitting comment:', error);
+      }
+    },
+    [onCommentSubmit],
+  );
 
-    // Listen for real-time comments via Laravel Echo
-    useEffect(() => {
-        const channel = window.Echo.channel(`post.${postId}`);
-        channel.listen('CommentPosted', (e: { comment: Comment }) => {
+  // Setup Echo channel for real-time updates
+  useEffect(() => {
+    if (!window.Echo || !postId) return;
 
+    const channelName = `post.${postId}`;
+
+    try {
+      const channel = window.Echo.channel(channelName);
+      channelRef.current = channel;
+
+      const handleCommentPosted = (e: { comment: Comment }) => {
+        if (!isUnmountedRef.current && e.comment) {
+          console.log('New comment received:', e.comment);
+
+          // Don't add comments from the current user (they're already added locally)
+          if (e.comment.user?.id === currentUser?.id) {
+            return;
+          }
+
+          if (e.comment.parent_id) {
+            // If it's a reply, use addReply
+            addReply(e.comment.parent_id, e.comment);
+          } else {
+            // If it's a top-level comment, use addComment
             addComment(e.comment);
-        });
+          }
+        }
+      };
 
-        return () => {
-            channel.stopListening('CommentPosted');
-            window.Echo.leaveChannel(`post.${postId}`);
-        };
-    }, [postId]);
+      const handleCommentDeleted = (e: { commentId: string | number }) => {
+        if (!isUnmountedRef.current && e.commentId) {
+          console.log('Comment deleted:', e.commentId);
+          removeComment(String(e.commentId));
+        }
+      };
 
-    const commentCount = comments.length;
+      // Listen for events
+      channel.listen('CommentPosted', handleCommentPosted);
+      channel.listen('CommentDeleted', handleCommentDeleted);
 
-    return (
-        <div className="w-full space-y-6">
-            {currentUser ? (
-                <CommentForm onSubmit={content => onCommentSubmit(content)} />
-            ) : (
-                <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-center">
-                    <p className="text-gray-700 dark:text-gray-300">Sign in to leave a comment</p>
-                </div>
-            )}
+      console.log(`Subscribed to channel: ${channelName}`);
 
-            <div className="flex items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    Comments
-                </h2>
-                <span className="ml-2 text-base font-semibold text-gray-500 dark:text-gray-400">
-          ({commentCount})
-        </span>
-            </div>
+      return () => {
+        isUnmountedRef.current = true;
 
-            {commentCount === 0 ? (
-                <div className="py-8 text-center">
-                    <p className="text-gray-500 dark:text-gray-400">Be the first to comment!</p>
-                </div>
-            ) : (
+        if (channelRef.current) {
+          try {
+            channelRef.current.stopListening('CommentPosted');
+            channelRef.current.stopListening('CommentDeleted');
+            window.Echo.leaveChannel(channelName);
+            console.log(`Left channel: ${channelName}`);
+          } catch (error) {
+            console.warn('Error cleaning up Echo channel:', error);
+          }
+        }
 
-                <CommentList comments={comments} onReply={onCommentSubmit} currentUser={currentUser} />
-            )}
+        channelRef.current = null;
+      };
+    } catch (error) {
+      console.error('Error setting up Echo channel:', error);
+    }
+  }, [postId, addComment, addReply, removeComment, currentUser?.id]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isUnmountedRef.current = true;
+    };
+  }, []);
+
+  const commentCount = comments?.length || 0;
+  const hasComments = commentCount > 0;
+
+  return (
+    <div className="w-full space-y-6">
+      {/* Comment Form */}
+      {currentUser ? (
+        <div className="bg-white dark:bg-[#0F1014]  p-4">
+          <CommentForm
+            onSubmit={content => handleCommentSubmit(content)}
+            placeholder="Share your thoughts..."
+            buttonText="Send"
+            // currentUser={currentUser}
+          />
         </div>
-    );
+      ) : (
+        <div
+          className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900
+        rounded-lg text-center border border-gray-200 dark:border-gray-700"
+        >
+          <div className="flex flex-col items-center space-y-3">
+            <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+              <svg
+                className="w-6 h-6 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </div>
+            <div>
+              <p className="text-gray-700 dark:text-gray-300 mb-1 font-medium">
+                Join the conversation
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Sign in to leave a comment and engage with the community
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Comments Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-3">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Comments
+          </h2>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+            {commentCount}
+          </span>
+        </div>
+
+        {isLoading && (
+          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            Loading...
+          </div>
+        )}
+      </div>
+
+      {/* Comments List */}
+      {!hasComments ? (
+        <div className="py-16 text-center">
+          <div className="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6">
+            <svg
+              className="w-10 h-10 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+            No comments yet
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+            Be the first to share your thoughts and start the conversation!
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <InfiniteScroll
+            dataLength={commentCount}
+            next={loadMoreComments}
+            hasMore={hasMore}
+            loader={
+              <div className="flex justify-center py-4">
+                <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Loading more comments...
+                </div>
+              </div>
+            }
+            endMessage={
+              commentCount > 5 ? (
+                <div className="text-center py-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    You've reached the end of the comments
+                  </p>
+                </div>
+              ) : null
+            }
+          >
+            <CommentList
+              comments={comments}
+              onReply={handleCommentSubmit}
+              currentUser={currentUser}
+            />
+          </InfiniteScroll>
+        </div>
+      )}
+    </div>
+  );
 };
 
-const CommentsSection: React.FC<CommentsSectionProps> = ({ initialComments, ...props }) => {
-    return (
-        <CommentsProvider initialComments={initialComments}>
-            <CommentsContent {...props} />
-        </CommentsProvider>
-    );
+const CommentsSection: React.FC<CommentsSectionProps> = ({
+  initialComments,
+  postId,
+  ...props
+}) => {
+  return (
+    <CommentsProvider initialComments={initialComments} postId={postId}>
+      <CommentsContent postId={postId} {...props} />
+    </CommentsProvider>
+  );
 };
 
 export default CommentsSection;

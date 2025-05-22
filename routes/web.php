@@ -3,7 +3,7 @@
 use App\Events\NewQuestionCreated;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\Comment\CommentsController;
 use App\Http\Controllers\Department\DepartmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Oauth\SocialAuthController;
@@ -12,7 +12,6 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\UpvoteController;
 use App\Http\Controllers\UserController;
-use App\Models\Post;
 use Illuminate\Support\Facades\Route;
 
 // Homepage

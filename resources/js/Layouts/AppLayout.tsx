@@ -134,12 +134,20 @@ export default function AppLayout({
                 <NavLink href={route('/')} active={route().current('/')}>
                   Dashboard
                 </NavLink>
-                <NavLink
-                  href={route('posts.create')}
-                  active={route().current('posts.create')}
-                >
-                  Create Post
-                </NavLink>
+                {/*<NavLink*/}
+                {/*  href={route('posts.create')}*/}
+                {/*  active={route().current('posts.create')}*/}
+                {/*>*/}
+                {/*  Create Post*/}
+                {/*</NavLink>*/}
+                {role === 'admin' && (
+                  <NavLink
+                    href={route('admin.dashboard')}
+                    active={route().current('admin.dashboard')}
+                  >
+                    Management
+                  </NavLink>
+                )}
               </div>
             </div>
 
@@ -152,14 +160,6 @@ export default function AppLayout({
                 <NotificationsDropdown notifications={notifications} />
               )}
 
-              {role === 'admin' && (
-                <NavLink
-                  href={route('admin.dashboard')}
-                  active={route().current('admin.dashboard')}
-                >
-                  Admin
-                </NavLink>
-              )}
               {/*<div className="flex items-center gap-4 rounded-md">*/}
               {/*  <Link*/}
               {/*    href={route('admin.dashboard')}*/}
@@ -317,12 +317,29 @@ export default function AppLayout({
             <ResponsiveNavLink href={route('/')} active={route().current('/')}>
               Dashboard
             </ResponsiveNavLink>
-            <ResponsiveNavLink
-              href={route('posts.create')}
-              active={route().current('posts.create')}
-            >
-              Create Post
-            </ResponsiveNavLink>
+            {/*<ResponsiveNavLink*/}
+            {/*  href={route('posts.create')}*/}
+            {/*  active={route().current('posts.create')}*/}
+            {/*>*/}
+            {/*  Create Post*/}
+            {/*</ResponsiveNavLink>*/}
+            {role === 'admin' && (
+              <ResponsiveNavLink
+                href={route('admin.dashboard')}
+                active={route().current('admin.dashboard')}
+              >
+                Management
+              </ResponsiveNavLink>
+            )}
+
+            {/*{role === 'admin' && (*/}
+            {/*    <NavLink*/}
+            {/*        href={route('admin.dashboard')}*/}
+            {/*        active={route().current('admin.dashboard')}*/}
+            {/*    >*/}
+            {/*        Management*/}
+            {/*    </NavLink>*/}
+            {/*)}*/}
           </div>
 
           {/* Mobile User Menu */}

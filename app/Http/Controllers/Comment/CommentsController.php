@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Comment;
 
 use App\Events\CommentPosted;
 use App\Events\NewCommentCreated;
+use App\Http\Controllers\Controller;
 use App\Models\Comments;
 use App\Models\Post;
 use App\Notifications\NewCommentNotification;
