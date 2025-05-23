@@ -9,6 +9,7 @@ services:
         container_name: laravel-app
         volumes:
             - ./:/var/www
+            - ./docker/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
         networks:
             - laravel
         depends_on:

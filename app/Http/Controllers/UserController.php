@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Laravel\Jetstream\Http\Controllers\Inertia\UserProfileController;
 
 class UserController extends UserProfileController
 {
+    use AuthorizesRequests;
+
     public function show(Request $request)
     {
         $posts = Post::query()
@@ -55,6 +58,8 @@ class UserController extends UserProfileController
 
     public function index(Request $request): \Inertia\Response
     {
+        $this->authorize('view admin dashboard');
+
         $search = $request->input('search', '');
 
         $users = User::query()

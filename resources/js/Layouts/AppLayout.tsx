@@ -96,8 +96,7 @@ export default function AppLayout({
         className={classNames(
           'sticky top-0 z-30 w-full transition-all duration-300 border-b',
           {
-            'shadow-md bg-white/95 backdrop-blur-sm dark:bg-[#0D0E12]/95':
-              scrolled,
+            ' bg-white/95  dark:bg-[#0D0E12]/95': scrolled,
             'bg-white dark:bg-[#0D0E12]': !scrolled,
           },
         )}

@@ -274,63 +274,45 @@ export default function Categories() {
                         Manage your content categories and organization
                       </CardDescription>
                     </div>
-                    <Button
-                      onClick={handleAddNew}
-                      className="flex items-center gap-2"
-                    >
-                      <Plus className="h-4 w-4" /> Add Category
-                    </Button>
+
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                      <form
+                        onSubmit={handleSearch}
+                        className="flex w-full max-w-sm items-center space-x-2"
+                      >
+                        <div className="relative w-full">
+                          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            type="search"
+                            placeholder="Search categories..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            className="pl-9 pr-10"
+                          />
+                          {searchTerm && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-0 top-0 h-full aspect-square rounded-l-none"
+                              onClick={handleClearSearch}
+                            >
+                              <X className="h-4 w-4" />
+                              <span className="sr-only">Clear search</span>
+                            </Button>
+                          )}
+                        </div>
+                      </form>
+                      <Button
+                        onClick={handleAddNew}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" /> Add Category
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <form
-                      onSubmit={handleSearch}
-                      className="flex w-full max-w-sm items-center space-x-2"
-                    >
-                      <div className="relative w-full">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          type="search"
-                          placeholder="Search categories..."
-                          value={searchTerm}
-                          onChange={e => setSearchTerm(e.target.value)}
-                          className="pl-9 pr-10"
-                        />
-                        {searchTerm && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-0 top-0 h-full aspect-square rounded-l-none"
-                            onClick={handleClearSearch}
-                          >
-                            <X className="h-4 w-4" />
-                            <span className="sr-only">Clear search</span>
-                          </Button>
-                        )}
-                      </div>
-                    </form>
-                    {/*<DropdownMenu>*/}
-                    {/*  <DropdownMenuTrigger asChild>*/}
-                    {/*    <Button*/}
-                    {/*      variant="outline"*/}
-                    {/*      size="sm"*/}
-                    {/*      className="flex items-center gap-2"*/}
-                    {/*    >*/}
-                    {/*      <Filter className="h-4 w-4" />*/}
-                    {/*      Filter*/}
-                    {/*    </Button>*/}
-                    {/*  </DropdownMenuTrigger>*/}
-                    {/*  <DropdownMenuContent align="end">*/}
-                    {/*    <DropdownMenuItem>All Categories</DropdownMenuItem>*/}
-                    {/*    <DropdownMenuItem>With Posts</DropdownMenuItem>*/}
-                    {/*    <DropdownMenuItem>Without Posts</DropdownMenuItem>*/}
-                    {/*    <DropdownMenuItem>Recently Added</DropdownMenuItem>*/}
-                    {/*  </DropdownMenuContent>*/}
-                    {/*</DropdownMenu>*/}
-                  </div>
-
                   <CategoryTable
                     data={data}
                     pagination={pagination}

@@ -34,7 +34,7 @@ class SearchController extends Controller
                     'title' => $post->title,
                     'excerpt' => \Str::limit($post->content, 100),
                     'url' => route('posts.show', $post->slug),
-                    'create_at' => $post->created_at->toIso8601String(), // Chuyển đổi format date
+                    'create_at' => $post->created_at->toDateTimeString(), // Chuyển đổi format date
                 ];
             });
 
