@@ -1,0 +1,6 @@
+$permission = Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view admin dashboard']);
+$user = App\Models\User::find(1);
+
+$user->givePermissionTo('view admin dashboard');
+$user->hasPermissionTo('view admin dashboard');
+exit
