@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
-Route::get('/latest-posts', [PostController::class, 'getLatestPosts']);
+Route::get('/top-voted-posts', [PostController::class, 'getTopVotePosts']);
 
 // Route::get('/posts', [PostController::class, 'getPostByUser']);
 Route::middleware(['auth'])->group(function () {
@@ -121,4 +121,3 @@ Route::middleware(['auth'])->group(function () {
 // Route::get('/posts/{id}/showById', [PostController::class, 'showById'])->name('posts.showById');
 
 // Role routes
-

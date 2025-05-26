@@ -25,13 +25,13 @@ const BlogCard: React.FC<BlogCardProps> = ({
 
   const handleUpvoteChange = (
     postId: string,
-    newUpvotes: number,
-    newHasUpvoted: boolean,
+    newUpvote: number,
+    newHasUpvote: boolean,
   ) => {
     setPosts(prevPosts =>
       prevPosts.map(post =>
         post.id === postId
-          ? { ...post, upvote_count: newUpvotes, has_upvoted: newHasUpvoted }
+          ? { ...post, upvote_count: newUpvote, has_upvote: newHasUpvote }
           : post,
       ),
     );
@@ -174,10 +174,10 @@ const BlogCard: React.FC<BlogCardProps> = ({
                     {/*</div>*/}
                     <UpvoteButton
                       postId={post.id}
-                      initialUpvotes={post.upvote_count}
-                      initialHasUpvoted={post.has_upvoted}
-                      onUpvoteChange={(newUpvotes, newHasUpvoted) =>
-                        handleUpvoteChange(post.id, newUpvotes, newHasUpvoted)
+                      initialUpvote={post.upvote_count}
+                      initialHasUpvote={post.has_upvoted}
+                      onUpvoteChange={(newUpvote, newHasUpvote) =>
+                        handleUpvoteChange(post.id, newUpvote, newHasUpvote)
                       }
                     />
                   </div>

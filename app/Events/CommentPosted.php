@@ -20,34 +20,36 @@ class CommentPosted implements ShouldBroadcast
         $this->comment = $comment;
     }
 
-    public function broadcastOn()
+    /**
+     * Get the channels the event should broadcast on.
+     */
+    public function broadcastOn(): Channel
     {
         return new Channel('post.'.$this->comment->post_id);
     }
 
-    public function broadcastWith()
+    /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'CommentPosted';
+    }
+
+    /**
+     * Get the data to broadcast.
+     */
+    public function broadcastWith(): array
     {
         return [
             'comment' => [
                 'id' => $this->comment->id,
                 'comment' => $this->comment->comment,
-                'post_id' => $this->comment->post_id,
+                'created_at' => $this->comment->created_at->toISOString(),
+                'user' => $this->comment->user->only(['id', 'name', 'profile_photo_path']),
                 'parent_id' => $this->comment->parent_id,
-                'created_at' => $this->comment->created_at,
-                'updated_at' => $this->comment->updated_at,
-                'user' => [
-                    'id' => $this->comment->user->id,
-                    'name' => $this->comment->user->name,
-                    'email' => $this->comment->user->email,
-                    'avatar' => $this->comment->user->avatar ?? null,
-                ],
-                'replies' => [], // New comments start with empty replies
-            ]
+                'replies' => [],
+            ],
         ];
-    }
-
-    public function broadcastAs()
-    {
-        return 'CommentPosted';
     }
 }

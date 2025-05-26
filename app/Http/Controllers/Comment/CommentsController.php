@@ -14,25 +14,6 @@ use Inertia\Inertia;
 
 class CommentsController extends Controller
 {
-    //    public function store(CommentData $data)
-    //    {
-    //        $comment = Comments::create([
-    //            'comment' => $data->comment,
-    //            'post_id' => $data->post_id,
-    //            'user_id' => auth()->id(),
-    //            'parent_id' => $data->parent_id,
-    //        ]);
-    //        $post = Post::find($data->post_id);
-    //        if ($post && $post->user_id !== auth()->id()) {
-    //            $post->user->notify(new NewQuestionOrAnswerNotification('answer', [
-    //                'title' => $post->title,
-    //                'url' => "/posts/{$post->slug}",
-    //            ]));
-    //        }
-    //
-    //        return back()->with('success', 'Comment added successfully!');
-    //    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -47,11 +28,17 @@ class CommentsController extends Controller
             'user_id' => auth()->id(),
             'parent_id' => $validated['parent_id'],
         ]);
+
         $comment->load('user');
-        // Broadcast the event
-        broadcast(new CommentPosted($comment))->toOthers();
+
+        // Broadcast comment đến tất cả users trên channel
+        broadcast(new CommentPosted($comment));
+
+        // Notification for post owner (excluding the comment author)
         broadcast(new NewCommentCreated($comment))->toOthers();
+
         $postOwner = $comment->post->user;
+
         if ($postOwner->id !== auth()->id()) {
             $postOwner->notify(new NewCommentNotification($comment));
         }
@@ -65,7 +52,7 @@ class CommentsController extends Controller
             ->whereNull('parent_id')
             ->with(['user', 'replies.user'])
             ->latest()
-            ->paginate(5); // Sử dụng paginate()
+            ->paginate(5);
 
         return Inertia::render('Posts/PostDetail', [
             'post' => $post,

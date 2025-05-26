@@ -53,11 +53,26 @@ services:
             PMA_USER: root
             PMA_PASSWORD: 123456789
         ports:
-            - "8080:80"
+            - "8888:80"
         depends_on:
             - mysql
         networks:
             - laravel
+
+    reverb:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: laravel-reverb
+        command: php artisan reverb:start
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./:/var/www
+        networks:
+            - laravel
+        depends_on:
+            - app
 
 volumes:
     dbdata:

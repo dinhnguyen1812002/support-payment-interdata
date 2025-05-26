@@ -5,6 +5,7 @@ import { CommentsProvider, useComments } from '@/Context/CommentsContext';
 import { CommentsResponse, Comment, User } from '@/types/CommentTypes';
 import CommentList from '@/Pages/Comments/CommentList';
 import CommentForm from '@/Pages/Comments/CommentForm';
+// import { v4 as uuidv4 } from 'uuid';
 
 interface CommentsSectionProps {
   initialComments: CommentsResponse;
@@ -32,24 +33,58 @@ const CommentsContent: React.FC<
   const channelRef = useRef<any>(null);
   const isUnmountedRef = useRef(false);
 
-  // Handle comment submission with proper type conversion
+  // Thêm useEffect để debug comments state
+  useEffect(() => {
+    console.log('Current comments state:', comments);
+  }, [comments]);
+
   const handleCommentSubmit = useCallback(
     async (content: string, parentId?: string) => {
+      if (!currentUser) return;
+
+      console.log('Submitting comment:', content, 'parentId:', parentId);
+
+      // Tạo comment tạm thời (optimistic)
+      const optimisticComment: Comment = {
+        id: 'temp-' + new Date().getTime(), // Sử dụng ID tạm thời dễ nhận biết hơn
+        comment: content,
+        created_at: new Date().toISOString(),
+        user: {
+          id: currentUser.id,
+          name: currentUser.name,
+          profile_photo_path: currentUser.profile_photo_path,
+        },
+        parent_id: parentId || undefined,
+        replies: [],
+        isOptimistic: true,
+      };
+
+      console.log('Created optimistic comment:', optimisticComment);
+
+      // Thêm comment tạm thời vào UI ngay lập tức
+      if (parentId) {
+        addReply(parentId, optimisticComment);
+      } else {
+        addComment(optimisticComment);
+      }
+
       try {
+        console.log('Calling onCommentSubmit...');
         await onCommentSubmit(content, parentId);
+        console.log('onCommentSubmit completed successfully');
       } catch (error) {
         console.error('Error submitting comment:', error);
+        // Xóa comment tạm thời nếu có lỗi
+        removeComment(optimisticComment.id);
       }
     },
-    [onCommentSubmit],
+    [onCommentSubmit, currentUser, addComment, addReply, removeComment],
   );
 
-  // Setup Echo channel for real-time updates
   useEffect(() => {
     if (!window.Echo || !postId) return;
 
     const channelName = `post.${postId}`;
-
     try {
       const channel = window.Echo.channel(channelName);
       channelRef.current = channel;
@@ -58,17 +93,30 @@ const CommentsContent: React.FC<
         if (!isUnmountedRef.current && e.comment) {
           console.log('New comment received:', e.comment);
 
-          // Don't add comments from the current user (they're already added locally)
-          if (e.comment.user?.id === currentUser?.id) {
-            return;
+          // Kiểm tra và xóa comment tạm thời nếu tồn tại
+          const optimisticComment = comments.find(
+            c =>
+              c.isOptimistic &&
+              c.comment === e.comment.comment &&
+              c.user.id === e.comment.user.id &&
+              c.parent_id === e.comment.parent_id,
+          );
+
+          if (optimisticComment) {
+            removeComment(optimisticComment.id);
           }
 
-          if (e.comment.parent_id) {
-            // If it's a reply, use addReply
-            addReply(e.comment.parent_id, e.comment);
-          } else {
-            // If it's a top-level comment, use addComment
-            addComment(e.comment);
+          // Kiểm tra xem comment thực sự đã tồn tại chưa
+          const realCommentExists = comments.some(
+            c => !c.isOptimistic && c.id === e.comment.id,
+          );
+
+          if (!realCommentExists) {
+            if (e.comment.parent_id) {
+              addReply(e.comment.parent_id, e.comment);
+            } else {
+              addComment(e.comment);
+            }
           }
         }
       };
@@ -80,18 +128,21 @@ const CommentsContent: React.FC<
         }
       };
 
-      // Listen for events
+      // Sửa lại cách lắng nghe sự kiện - thử cả hai cách
+      channel.listen('.CommentPosted', handleCommentPosted);
       channel.listen('CommentPosted', handleCommentPosted);
+      channel.listen('.CommentDeleted', handleCommentDeleted);
       channel.listen('CommentDeleted', handleCommentDeleted);
 
       console.log(`Subscribed to channel: ${channelName}`);
 
       return () => {
         isUnmountedRef.current = true;
-
         if (channelRef.current) {
           try {
+            channelRef.current.stopListening('.CommentPosted');
             channelRef.current.stopListening('CommentPosted');
+            channelRef.current.stopListening('.CommentDeleted');
             channelRef.current.stopListening('CommentDeleted');
             window.Echo.leaveChannel(channelName);
             console.log(`Left channel: ${channelName}`);
@@ -99,15 +150,13 @@ const CommentsContent: React.FC<
             console.warn('Error cleaning up Echo channel:', error);
           }
         }
-
         channelRef.current = null;
       };
     } catch (error) {
       console.error('Error setting up Echo channel:', error);
     }
-  }, [postId, addComment, addReply, removeComment, currentUser?.id]);
+  }, [postId, addComment, addReply, removeComment, comments]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       isUnmountedRef.current = true;
@@ -119,20 +168,18 @@ const CommentsContent: React.FC<
 
   return (
     <div className="w-full space-y-6">
-      {/* Comment Form */}
       {currentUser ? (
-        <div className="bg-white dark:bg-[#0F1014]  p-4">
+        <div className="bg-white dark:bg-[#0F1014] p-4">
           <CommentForm
             onSubmit={content => handleCommentSubmit(content)}
             placeholder="Share your thoughts..."
             buttonText="Send"
-            // currentUser={currentUser}
           />
         </div>
       ) : (
         <div
           className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900
-        rounded-lg text-center border border-gray-200 dark:border-gray-700"
+            rounded-lg text-center border border-gray-200 dark:border-gray-700"
         >
           <div className="flex flex-col items-center space-y-3">
             <div>
@@ -147,7 +194,6 @@ const CommentsContent: React.FC<
         </div>
       )}
 
-      {/* Comments Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -166,7 +212,6 @@ const CommentsContent: React.FC<
         )}
       </div>
 
-      {/* Comments List */}
       {!hasComments ? (
         <div className="py-16 text-center">
           <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">

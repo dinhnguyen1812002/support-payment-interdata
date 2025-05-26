@@ -104,10 +104,10 @@ class PostController extends Controller
         return Inertia::render('Posts/Search', $data);
     }
 
-    public function getLatestPosts(Request $request): \Illuminate\Http\JsonResponse
+    public function getTopVotePosts(Request $request): \Illuminate\Http\JsonResponse
     {
         $limit = $request->query('limit', 5);
-        $posts = $this->postService->getLatestPosts($limit);
+        $posts = $this->postService->getTopVotePosts($limit);
 
         return response()->json($posts);
     }

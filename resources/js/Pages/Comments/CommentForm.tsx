@@ -26,7 +26,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
 }) => {
   const [comment, setComment] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const { isLoading, setIsLoading } = useComments();
+  const [isLoading, setIsLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Handle Emoji Selection

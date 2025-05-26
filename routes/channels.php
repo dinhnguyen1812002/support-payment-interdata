@@ -7,7 +7,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('post.{postId}', function ($user, $postId) {
-    return $user && Post::find($postId) !== null; // Ensure user is authenticated and post exists
+    return true; // Allow all users to listen to this channel
 });
 
 Broadcast::channel('user.{id}', function ($user, $id) {

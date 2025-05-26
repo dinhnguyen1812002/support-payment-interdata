@@ -31,7 +31,7 @@ class PostService
             ->get();
 
         $comments = $post->getFormattedComments();
-        $hasUpvoted = auth()->check() ? $post->isUpvotedBy(auth()->id()) : false;
+        $hasUpvote = auth()->check() ? $post->isUpvotedBy(auth()->id()) : false;
 
         return [
             'post' => [
@@ -45,8 +45,8 @@ class PostService
                 'categories' => $post->categories,
                 'tags' => $post->tags,
                 'comments' => $comments,
-                'upvotes_count' => $post->upvotes_count,
-                'has_upvoted' => $hasUpvoted,
+                'upvote_count' => $post->upvotes_count,
+                'has_upvote' => $hasUpvote,
             ],
             'categories' => $categories,
             'tag' => $tag,
@@ -77,7 +77,7 @@ class PostService
             'categories' => $categories,
             'tags' => $tags,
             'postCount' => $postCount,
-            'upvotes_count' => $posts->sum('upvotes_count'),
+            'upvote_count' => $posts->sum('upvote_count'),
             'pagination' => $this->getPaginationData($posts),
             'keyword' => $search,
             'notifications' => $notifications,
@@ -233,8 +233,8 @@ class PostService
 
         $posts = Post::byCategorySlug($categorySlug)
             ->with(['user', 'categories'])
-            ->withCount('upvotes')
-            ->orderBy('upvotes_count', 'desc')
+            ->withCount('upvote')
+            ->orderBy('upvote_count', 'desc')
             ->latest()
             ->paginate(6);
 
@@ -260,8 +260,8 @@ class PostService
 
         $posts = Post::byTagsSlug($tagsSlug)
             ->with(['user', 'categories'])
-            ->withCount('upvotes')
-            ->orderBy('upvotes_count', 'desc')
+            ->withCount('upvote')
+            ->orderBy('upvote_count', 'desc')
             ->latest()
             ->paginate(6);
 
@@ -291,9 +291,9 @@ class PostService
         // Truy vấn thực tế từ database với điều kiện ID
         $posts = Post::whereIn('id', $postIds)
             ->with(['user', 'categories'])
-            ->withCount('upvotes')
+            ->withCount('upvote')
             ->when($sort === 'latest', fn ($q) => $q->latest())
-            ->when($sort === 'upvotes', fn ($q) => $q->orderBy('upvotes_count', 'desc'))
+            ->when($sort === 'upvote', fn ($q) => $q->orderBy('upvote_count', 'desc'))
             ->paginate(10)
             ->withQueryString();
 
@@ -311,7 +311,7 @@ class PostService
         ];
     }
 
-    public function getLatestPosts(int $limit = 5): Collection
+    public function getTopVotePosts(int $limit = 5): Collection
     {
         return Post::select(['id', 'title', 'slug'])
             ->withCount('upvotes')
@@ -330,7 +330,7 @@ class PostService
     {
         $posts = Post::with(['user:id,name,profile_photo_path'])
             ->withCount('upvotes')
-            ->orderBy('upvotes_count', 'desc')
+            ->orderBy('upvote_count', 'desc')
             ->take($limit)
             ->get();
 
