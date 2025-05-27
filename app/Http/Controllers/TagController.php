@@ -17,7 +17,7 @@ class TagController extends Controller
 
         $tags = Tag::select(['id', 'name', 'slug'])
             ->withCount('posts')
-            ->orderBy('posts_count', 'desc')
+            ->orderBy('name', 'asc')
             ->paginate($perPage);
 
         return response()->json($tags);

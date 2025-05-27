@@ -93,31 +93,69 @@ const CommentsContent: React.FC<
         if (!isUnmountedRef.current && e.comment) {
           console.log('New comment received:', e.comment);
 
-          // Kiểm tra và xóa comment tạm thời nếu tồn tại
-          const optimisticComment = comments.find(
-            c =>
-              c.isOptimistic &&
-              c.comment === e.comment.comment &&
-              c.user.id === e.comment.user.id &&
-              c.parent_id === e.comment.parent_id,
-          );
+          // Use callback form of state updates to avoid stale closures
+          setComments(prevComments => {
+            // Kiểm tra và xóa comment tạm thời nếu tồn tại
+            const optimisticComment = prevComments.find(
+              c =>
+                c.isOptimistic &&
+                c.comment === e.comment.comment &&
+                c.user.id === e.comment.user.id &&
+                c.parent_id === e.comment.parent_id,
+            );
 
-          if (optimisticComment) {
-            removeComment(optimisticComment.id);
-          }
+            if (optimisticComment) {
+              // Remove optimistic comment first
+              const withoutOptimistic = prevComments.filter(
+                c => c.id !== optimisticComment.id,
+              );
 
-          // Kiểm tra xem comment thực sự đã tồn tại chưa
-          const realCommentExists = comments.some(
-            c => !c.isOptimistic && c.id === e.comment.id,
-          );
+              // Check if real comment already exists
+              const realCommentExists = withoutOptimistic.some(
+                c => !c.isOptimistic && c.id === e.comment.id,
+              );
 
-          if (!realCommentExists) {
-            if (e.comment.parent_id) {
-              addReply(e.comment.parent_id, e.comment);
-            } else {
-              addComment(e.comment);
+              if (!realCommentExists) {
+                if (e.comment.parent_id) {
+                  // Handle reply case inside state update
+                  return withoutOptimistic.map(comment =>
+                    comment.id === e.comment.parent_id
+                      ? {
+                          ...comment,
+                          replies: [...(comment.replies || []), e.comment],
+                        }
+                      : comment,
+                  );
+                } else {
+                  // Add new top-level comment
+                  return [e.comment, ...withoutOptimistic];
+                }
+              }
+              return withoutOptimistic;
             }
-          }
+
+            // If no optimistic comment found, just check if we need to add the real one
+            const realCommentExists = prevComments.some(
+              c => !c.isOptimistic && c.id === e.comment.id,
+            );
+
+            if (!realCommentExists) {
+              if (e.comment.parent_id) {
+                return prevComments.map(comment =>
+                  comment.id === e.comment.parent_id
+                    ? {
+                        ...comment,
+                        replies: [...(comment.replies || []), e.comment],
+                      }
+                    : comment,
+                );
+              } else {
+                return [e.comment, ...prevComments];
+              }
+            }
+
+            return prevComments;
+          });
         }
       };
 
@@ -155,7 +193,7 @@ const CommentsContent: React.FC<
     } catch (error) {
       console.error('Error setting up Echo channel:', error);
     }
-  }, [postId, addComment, addReply, removeComment, comments]);
+  }, [postId, addComment, addReply, removeComment]);
 
   useEffect(() => {
     return () => {

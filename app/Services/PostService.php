@@ -291,9 +291,9 @@ class PostService
         // Truy vấn thực tế từ database với điều kiện ID
         $posts = Post::whereIn('id', $postIds)
             ->with(['user', 'categories'])
-            ->withCount('upvote')
+            ->withCount('upvotes')
             ->when($sort === 'latest', fn ($q) => $q->latest())
-            ->when($sort === 'upvote', fn ($q) => $q->orderBy('upvote_count', 'desc'))
+            ->when($sort === 'upvote', fn ($q) => $q->orderBy('upvotes_count', 'desc'))
             ->paginate(10)
             ->withQueryString();
 
