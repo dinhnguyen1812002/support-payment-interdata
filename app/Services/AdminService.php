@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -136,6 +137,15 @@ class AdminService
             'last_page' => $paginator->lastPage(),
             'next_page_url' => $paginator->nextPageUrl(),
             'prev_page_url' => $paginator->previousPageUrl(),
+        ];
+    }
+
+    public function getAllTags(Request $request, mixed $perPage)
+    {
+        $tags = Tag::all();
+
+        return [
+            'tags' => $tags,
         ];
     }
 }

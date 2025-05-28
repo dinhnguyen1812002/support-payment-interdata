@@ -194,7 +194,7 @@ export default function DepartmentShow({
   }, []);
 
   const handleCommentSubmit = useCallback(
-    (content: string, parentId?: number) => {
+    (content: string, parentId?: string) => {
       if (!selectedPost) return;
 
       router.post(

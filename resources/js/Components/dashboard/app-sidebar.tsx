@@ -51,16 +51,21 @@ const data = {
       icon: ListIcon,
     },
     {
-      title: 'Categories',
-      url: '/admin/categories',
-      icon: ChartColumnStacked,
-    },
-
-    {
       title: 'User',
       url: '/users',
       icon: ContactRound,
     },
+    {
+      title: 'Categories',
+      url: '/admin/categories',
+      icon: ChartColumnStacked,
+    },
+    {
+      title: 'tag',
+      url: '/admin/tags',
+      icon: FileTextIcon,
+    },
+
     {
       title: 'Department',
       url: '/departments',

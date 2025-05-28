@@ -10,6 +10,7 @@ use App\Http\Controllers\Oauth\SocialAuthController;
 use App\Http\Controllers\Permission\PermissionController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\Role\RoleController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\UpvoteController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -78,6 +79,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/admin/create-category', [CategoryController::class, 'store'])->name('admin.categories.store');
     Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
     Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+    Route::get('/admin/tags', [AdminController::class, 'getAllTags'])->name('admin.tags');
 });
 
 // Route::get('/test-event', function () {
@@ -86,7 +88,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 //
 //    return 'Event dispatched!';
 // });
-
+Route::resource('tags', TagController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::get('/user/profile', [\App\Http\Controllers\UserController::class, 'show'])
     ->name('profile.show')
     ->middleware(['auth', 'verified']);

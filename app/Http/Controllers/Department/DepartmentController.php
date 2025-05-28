@@ -125,8 +125,8 @@ class DepartmentController extends Controller
                     'categories' => $post->categories,
                     'tags' => $post->tags,
                     'comments' => $comments,
-                    'upvotes_count' => $post->upvotes_count,
-                    'has_upvoted' => $hasUpvoted,
+                    'upvote_count' => $post->upvotes_count,
+                    'has_upvote' => $hasUpvoted,
                 ];
             });
 

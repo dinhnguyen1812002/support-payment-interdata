@@ -18,7 +18,7 @@ class AssignRole extends Seeder
 
         if (! $user) {
             $user = User::create([
-                'name' => 'Admin User',
+                'name' => 'Admin',
                 'email' => 'dinhnguyen1812002@gmail.com',
                 'password' => bcrypt('4H.Jydh4k&3JJCA'),
             ]);
@@ -27,7 +27,8 @@ class AssignRole extends Seeder
         $role = Role::firstOrCreate(['name' => 'admin']);
 
         $user->assignRole('admin');
-
+        $user->givePermissionTo('view admin dashboard');
+        $user->hasPermissionTo('view admin dashboard');
         echo "Role 'admin' has been assigned to user with ID: {$user->id}\n";
     }
 }

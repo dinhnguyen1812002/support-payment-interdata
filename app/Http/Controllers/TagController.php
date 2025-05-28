@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 
 class TagController extends Controller
 {
@@ -24,50 +26,52 @@ class TagController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
-    }
+        Gate::authorize('create', Tag::class);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(tag $tag)
-    {
-        //
-    }
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:tags,name',
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(tag $tag)
-    {
-        //
+        $tag = Tag::create([
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']),
+        ]);
+
+        return redirect()->back()->with('success', 'Tag created successfully.');
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, tag $tag)
+    public function update(Request $request, Tag $tag)
     {
-        //
+        Gate::authorize('update', $tag);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:tags,name,'.$tag->id,
+        ]);
+
+        $tag->update([
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']),
+        ]);
+
+        return redirect()->back()->with('success', 'Tag updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(tag $tag)
+    public function destroy(Tag $tag)
     {
-        //
+        Gate::authorize('delete', $tag);
+
+        $tag->delete();
+
+        return redirect()->back()->with('success', 'Tag deleted successfully.');
     }
 }
