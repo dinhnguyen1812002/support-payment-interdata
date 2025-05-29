@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import { usePage, useForm } from '@inertiajs/react';
-import { SidebarProvider, SidebarInset } from '@/Components/ui/sidebar';
 import { AppSidebar } from '@/Components/dashboard/app-sidebar';
+import { SidebarInset, SidebarProvider } from '@/Components/ui/sidebar';
 import { SiteHeader } from '@/Components/dashboard/site-header';
 import {
   Table,
@@ -11,310 +9,128 @@ import {
   TableHeader,
   TableRow,
 } from '@/Components/ui/table';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/Components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/Components/ui/alert-dialog';
+import { Link } from '@inertiajs/react';
+import { Pencil, Trash2, Plus, Search } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-
-import { Page, router } from '@inertiajs/core';
-import { useToast } from '@/Hooks/use-toast';
+import { formatDate } from 'date-fns';
+import React, { useState } from 'react';
+import { TagDialog } from '../Tags/TagDialog';
+import { Inertia } from '@inertiajs/inertia';
 
 interface Tag {
   id: number;
   name: string;
   slug: string;
   created_at: string;
-  posts_count?: number;
 }
 
-interface Props {
-  props: {
-    tags: {
-      data: Tag[];
-      current_page: number;
-      last_page: number;
-      per_page: number;
-      total: number;
-    };
-    flash: {
-      success?: string;
-      error?: string;
-    };
-  };
+interface TagsPageProps {
+  tags: Tag[];
 }
 
-export default function TagsPage(tags: Props) {
-  const { toast } = useToast();
-  const [openCreateDialog, setOpenCreateDialog] = useState(false);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [editingTag, setEditingTag] = useState<Tag | null>(null);
+export default function TagsPage({ tags = [] }: TagsPageProps) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<Tag | undefined>(undefined);
 
-  // Form for creating a new tag
-  const createForm = useForm({
-    name: '',
-  });
-
-  // Form for updating an existing tag
-  const updateForm = useForm({
-    name: '',
-  });
-
-  // Handle flash messages
-  React.useEffect(() => {
-    if (tags.props.flash.success) {
-      toast({
-        title: 'Success',
-        description: tags.props.flash.success,
-      });
-    }
-    if (tags.props.flash.error) {
-      toast({
-        title: 'Error',
-        description: tags.props.flash.error,
-        variant: 'destructive',
-      });
-    }
-  }, [tags.props.flash]);
-
-  // Handle create tag submission
-  const handleCreateTag = () => {
-    createForm.post('/tags', {
-      onSuccess: () => {
-        setOpenCreateDialog(false);
-        createForm.reset();
-      },
-      onError: errors => {
-        toast({
-          title: 'Error',
-          description: errors.name || 'Failed to create tag',
-          variant: 'destructive',
-        });
-      },
-    });
+  const handleOpenDialog = (tag?: Tag) => {
+    setSelectedTag(tag);
+    setDialogOpen(true);
   };
 
-  // Handle update tag submission
-  const handleUpdateTag = () => {
-    if (!editingTag) return;
-    updateForm.put(`/tags/${editingTag.id}`, {
-      onSuccess: () => {
-        setOpenEditDialog(false);
-        updateForm.reset();
-        setEditingTag(null);
-      },
-      onError: errors => {
-        toast({
-          title: 'Error',
-          description: errors.name || 'Failed to update tag',
-          variant: 'destructive',
-        });
-      },
-    });
+  const handleCloseDialog = () => {
+    setSelectedTag(undefined);
+    setDialogOpen(false);
   };
-
-  // Handle delete tag
-  const handleDeleteTag = (tag: Tag) => {
-    useForm().delete(`/tags/${tag.id}`, {
-      onSuccess: () => {
-        toast({
-          title: 'Success',
-          description: 'Tag deleted successfully',
-        });
-      },
-      onError: () => {
-        toast({
-          title: 'Error',
-          description: 'Failed to delete tag',
-          variant: 'destructive',
-        });
-      },
-    });
+  const handleDelete = (tag: Tag) => {
+    if (confirm(`Are you sure you want to delete ${tag.name}?`)) {
+      Inertia.delete(`/admin/tags/${tag.id}`);
+    }
   };
 
   return (
     <SidebarProvider>
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader title="All Tags" />
+        <SiteHeader title={'All Tags'} />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 ml-4">
-              {/* Create Tag Dialog */}
-              <Dialog
-                open={openCreateDialog}
-                onOpenChange={setOpenCreateDialog}
-              >
-                <DialogTrigger asChild>
-                  <Button>Add New Tag</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Create New Tag</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 ml-4 mr-4">
+              {/* Header section with title, search and add button */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight">
+                    Tags Management
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Manage your tags and categories
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Tag name"
-                      value={createForm.data.name}
-                      onChange={e => createForm.setData('name', e.target.value)}
+                      placeholder="Search tags..."
+                      className="pl-8 w-[250px]"
                     />
-                    {createForm.errors.name && (
-                      <p className="text-sm text-red-500">
-                        {createForm.errors.name}
-                      </p>
-                    )}
-                    <Button
-                      onClick={handleCreateTag}
-                      disabled={createForm.processing}
-                    >
-                      Create
-                    </Button>
                   </div>
-                </DialogContent>
-              </Dialog>
+                  <Button onClick={() => handleOpenDialog()}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Tag
+                  </Button>
+                </div>
+              </div>
 
-              {/* Edit Tag Dialog */}
-              <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Edit Tag</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <Input
-                      placeholder="Tag name"
-                      value={updateForm.data.name}
-                      onChange={e => updateForm.setData('name', e.target.value)}
-                    />
-                    {updateForm.errors.name && (
-                      <p className="text-sm text-red-500">
-                        {updateForm.errors.name}
-                      </p>
-                    )}
-                    <Button
-                      onClick={handleUpdateTag}
-                      disabled={updateForm.processing}
-                    >
-                      Save
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              {/* Tags Table */}
-              <Table>
+              {/* Table */}
+              <Table className="border border-gray-200 rounded-md">
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Slug</TableHead>
-                    <TableHead>Posts Count</TableHead>
-                    <TableHead>Created At</TableHead>
-                    <TableHead>Action</TableHead>
+                    <TableHead>Created at</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tags.props.tags.data.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5}>No tags found.</TableCell>
-                    </TableRow>
-                  ) : (
-                    tags.props.tags.data.map(tag => (
-                      <TableRow key={tag.id}>
-                        <TableCell>{tag.name}</TableCell>
-                        <TableCell>{tag.slug}</TableCell>
-                        <TableCell>{tag.posts_count ?? 0}</TableCell>
-                        <TableCell>{tag.created_at}</TableCell>
-                        <TableCell className="space-x-2">
+                  {tags.map((tag: Tag) => (
+                    <TableRow key={tag.id}>
+                      <TableCell className="font-medium">{tag.name}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {tag.slug}
+                      </TableCell>
+                      <TableCell>
+                        {formatDate(tag.created_at, 'dd/MM/yyyy')}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            onClick={() => {
-                              setEditingTag(tag);
-                              updateForm.setData('name', tag.name);
-                              setOpenEditDialog(true);
-                            }}
+                            onClick={() => handleOpenDialog(tag)}
                           >
-                            Edit
+                            <Pencil className="w-4 h-4" />
                           </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm">
-                                Delete
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Are you sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This will permanently delete the tag "
-                                  {tag.name}".
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDeleteTag(tag)}
-                                >
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(tag)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
-
-              {/* Pagination Controls */}
-              <div className="flex justify-between mt-4">
-                <Button
-                  disabled={tags.props.tags.current_page === 1}
-                  onClick={() =>
-                    router.get(
-                      `/tags?page=${tags.props.tags.current_page - 1}&per_page=${tags.props.tags.per_page}`,
-                    )
-                  }
-                >
-                  Previous
-                </Button>
-                <span>
-                  Page {tags.props.tags.current_page} of{' '}
-                  {tags.props.tags.last_page}
-                </span>
-                <Button
-                  disabled={
-                    tags.props.tags.current_page === tags.props.tags.last_page
-                  }
-                  onClick={() =>
-                    router.get(
-                      `/tags?post_page=${tags.props.tags.current_page + 1}&per_page=${tags.props.tags.per_page}`,
-                    )
-                  }
-                >
-                  Next
-                </Button>
-              </div>
             </div>
           </div>
         </div>
+        <TagDialog
+          isOpen={dialogOpen}
+          onClose={handleCloseDialog}
+          tag={selectedTag}
+        />
       </SidebarInset>
     </SidebarProvider>
   );

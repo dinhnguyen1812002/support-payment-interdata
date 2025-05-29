@@ -80,6 +80,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
     Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
     Route::get('/admin/tags', [AdminController::class, 'getAllTags'])->name('admin.tags');
+
 });
 
 // Route::get('/test-event', function () {
@@ -88,7 +89,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 //
 //    return 'Event dispatched!';
 // });
-Route::resource('tags', TagController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::resource('/admin/tags', TagController::class)->only(['store', 'update', 'destroy']);
+
 Route::get('/user/profile', [\App\Http\Controllers\UserController::class, 'show'])
     ->name('profile.show')
     ->middleware(['auth', 'verified']);

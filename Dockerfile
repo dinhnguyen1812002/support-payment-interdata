@@ -1,61 +1,42 @@
+# Sử dụng image PHP chính thức với phiên bản 8.2
+FROM php:8.2-fpm
 
-FROM php:8.3-fpm
-ARG user=www-data
-ARG uid=1000
-
-# Install Laravel required extensions
+# Cài đặt các extension PHP cần thiết
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    supervisor \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    libonig-dev \
-    libxml2-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim unzip git curl libzip-dev \
-    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd
+    libpq-dev \
+    libzip-dev \
+    unzip \
+    git \
+    && docker-php-ext-install pdo_mysql zip
 
-# Install composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Cài đặt Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Create system user
-RUN useradd -G www-data,root -u $uid -d /home/$user $user || true
-RUN mkdir -p /home/$user/.composer && \
-    chown -R $user:$user /home/$user
+# Cài đặt Bun
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:$PATH"
 
-# Set working directory
-WORKDIR /var/www
+# Thiết lập thư mục làm việc
+WORKDIR /var/www/html
 
-# Create storage directory structure
-RUN mkdir -p /var/www/storage/app/public \
-    /var/www/storage/framework/cache \
-    /var/www/storage/framework/sessions \
-    /var/www/storage/framework/testing \
-    /var/www/storage/framework/views \
-    /var/www/storage/logs \
-    /var/www/bootstrap/cache
+# Sao chép mã nguồn ứng dụng
+COPY . .
 
-# Copy only necessary files (not the storage)
-COPY --chown=$user:$user . /var/www
+# Cài đặt các dependency PHP
+RUN composer install --optimize-autoloader --no-dev
 
-# Create public/storage symbolic link at runtime
-RUN rm -rf /var/www/public/storage && \
-    ln -s /var/www/storage/app/public /var/www/public/storage
+# Cài đặt các dependency JavaScript/TypeScript với Bun
+RUN bun install
 
-# Fix permissions
-RUN chown -R $user:$user /var/www/storage \
-    /var/www/bootstrap/cache \
-    /var/www/public \
-    && chmod -R 775 /var/www/storage \
-    /var/www/bootstrap/cache \
-    /var/www/public
+# Build frontend assets
+RUN bun run build
 
-# Switch to non-root user
-USER $user
+# Quyền cho thư mục storage và cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Expose PHP-FPM port
-EXPOSE 9000
+# Expose cổng cho Laravel Reverb (WebSocket)
+EXPOSE 8080
+
+# Lệnh chạy PHP-FPM
 CMD ["php-fpm"]
