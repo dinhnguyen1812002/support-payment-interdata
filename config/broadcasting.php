@@ -46,20 +46,6 @@ return [
             ],
         ],
 
-        'pusher' => [
-            'driver' => 'pusher',
-            'key' => env('PUSHER_APP_KEY'),
-            'secret' => env('PUSHER_APP_SECRET'),
-            'app_id' => env('PUSHER_APP_ID'),
-            'options' => [
-                'cluster' => env('PUSHER_APP_CLUSTER'),
-                'useTLS' => true, // Bật TLS để tránh lỗi ws://
-                'encrypted' => true,
-                'host' => 'ws-mt1.pusher.com',
-                'port' => 443,
-                'scheme' => 'https',
-            ],
-        ],
 
         'ably' => [
             'driver' => 'ably',

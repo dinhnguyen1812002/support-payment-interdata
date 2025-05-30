@@ -30,6 +30,7 @@ interface TagsPageProps {
 }
 
 export default function TagsPage({ tags = [] }: TagsPageProps) {
+  
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | undefined>(undefined);
 
