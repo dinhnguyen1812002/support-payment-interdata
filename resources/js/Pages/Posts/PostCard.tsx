@@ -106,7 +106,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
                 <div className="pt-0">
                   <div className="space-y-3 flex items-center mb-4">
                     <Link href={`/posts/${post.slug}`} className="block group">
-                      <span className="text-xl font-bold text-customBlue hover:text-blue-700 dark:text-white dark:hover:text-blue-300 mr-1">
+                      <span className="text-2xl font-extrabold text-customBlue hover:text-blue-700 dark:text-white dark:hover:text-blue-300 mr-1">
                         {post.title}
                       </span>
                       <p className="text-sm font-normal text-gray-600 dark:text-gray-300 line-clamp-2 mt-3">
