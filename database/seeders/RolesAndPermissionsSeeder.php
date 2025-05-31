@@ -20,6 +20,7 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::create(['name' => 'manage-department']);
         Permission::create(['name' => 'view-department-posts']);
         // Tạo quyền
+        Permission::create(['name' => 'view posts']);
         Permission::create(['name' => 'view admin dashboard']);
 
         // Tạo vai trò

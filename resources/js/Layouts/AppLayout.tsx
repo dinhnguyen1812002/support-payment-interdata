@@ -147,6 +147,15 @@ export default function AppLayout({
                     Management
                   </NavLink>
                 )}
+                {page.props.department && (
+                  <NavLink
+                    href={route('departments.show', {
+                      department: page.props.department.slug,
+                    })}
+                  >
+                    {page.props.department.name}
+                  </NavLink>
+                )}
               </div>
             </div>
 
