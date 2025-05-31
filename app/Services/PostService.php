@@ -234,7 +234,7 @@ class PostService
         $posts = Post::byCategorySlug($categorySlug)
             ->with(['user', 'categories'])
             ->withCount('upvotes')
-            ->orderBy('upvoted_count', 'desc')
+            ->orderBy('upvotes_count', 'desc')
             ->latest()
             ->paginate(6);
 
@@ -261,7 +261,7 @@ class PostService
         $posts = Post::byTagsSlug($tagsSlug)
             ->with(['user', 'categories'])
             ->withCount('upvotes')
-            ->orderBy('upvoted_count', 'desc')
+            ->orderBy('upvotes_count', 'desc')
             ->latest()
             ->paginate(6);
 
