@@ -15,6 +15,7 @@ import type { Post } from '@/types/Post';
 import { Input } from '@/Components/ui/input';
 import { cn, formatTimeAgo } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
+
 interface Props {
   notifications: Notification[];
   department: Department;
@@ -28,8 +29,15 @@ export default function DepartmentShow({
   posts: initialPosts = [],
   auth,
 }: Props) {
-  const [localNotifications, setLocalNotifications] =
-    useState<Notification[]>(initialNotifications);
+  // Filter only new post notifications from initial data
+  const [localNotifications, setLocalNotifications] = useState<Notification[]>(
+    initialNotifications.filter(
+      notification =>
+        notification.type === 'App\\Notifications\\NewPostCreated' ||
+        notification.data.post_id,
+    ),
+  );
+
   const [localPosts, setLocalPosts] = useState<Post[]>(initialPosts);
   const page = useTypedPage();
   const userId = page.props.auth?.user?.id;
@@ -51,6 +59,14 @@ export default function DepartmentShow({
 
   const filteredNotifications = useMemo(() => {
     return localNotifications.filter(notification => {
+      // Double check: only include new post notifications
+      const isNewPostNotification =
+        notification.type === 'App\\Notifications\\NewPostCreated' ||
+        notification.type === 'new-post' ||
+        notification.data.post_id;
+
+      if (!isNewPostNotification) return false;
+
       const matchesSearch =
         searchQuery === '' ||
         notification.data.title
@@ -79,6 +95,14 @@ export default function DepartmentShow({
 
     const postChannel = window.Echo.channel('notifications');
     postChannel.listen('.new-question-created', (e: Notification) => {
+      // Only process if this is a new post notification
+      const isNewPostNotification =
+        e.type === 'App\\Notifications\\NewPostCreated' ||
+        e.type === 'new-post' ||
+        e.data.post_id;
+
+      if (!isNewPostNotification) return;
+
       const newNotification = {
         id: e.id,
         type: 'post',
@@ -214,6 +238,7 @@ export default function DepartmentShow({
     },
     [selectedPost],
   );
+
   const formatTimeAgo = (dateString: string) => {
     try {
       const date = new Date(dateString);
@@ -222,6 +247,7 @@ export default function DepartmentShow({
       return dateString;
     }
   };
+
   return (
     <TooltipProvider>
       <AppLayout
@@ -238,10 +264,16 @@ export default function DepartmentShow({
             )}
           >
             <div className="p-4 border-b dark:border-gray-800 bg-background flex flex-col gap-3 ">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">New Posts</h2>
+                <Badge variant="secondary" className="text-xs">
+                  {filteredNotifications.length}
+                </Badge>
+              </div>
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search notifications..."
+                  placeholder="Search new posts..."
                   className="pl-9 w-full bg-muted/40"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
@@ -252,12 +284,10 @@ export default function DepartmentShow({
             <ScrollArea className="h-[calc(100vh-200px)] pr-3">
               {filteredNotifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-60 text-muted-foreground bg-muted/30 rounded-lg p-6">
-                  <Mail className="h-12 w-12 mb-3 opacity-40" />
-                  <p className="text-base font-medium">
-                    No notifications found
-                  </p>
+                  <MessageSquare className="h-12 w-12 mb-3 opacity-40" />
+                  <p className="text-base font-medium">No new posts found</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    New notifications will appear here
+                    New post notifications will appear here
                   </p>
                 </div>
               ) : (
@@ -275,25 +305,26 @@ export default function DepartmentShow({
                           'relative p-4 cursor-pointer rounded-lg transition-all',
                           'hover:bg-accent/50 dark:hover:bg-accent/30',
                           isSelected
-                            ? 'bg-accent/40 dark:bg-accent/20 ring-1 ring-primary/10  border-l-1 border-primary'
+                            ? 'bg-accent/40 dark:bg-accent/20 ring-1 ring-primary/10  border-l-2 border-primary'
                             : 'bg-card dark:bg-card/80',
                         )}
                       >
                         <div className="flex items-start gap-4">
-                          {/*{isUnread && (*/}
-                          {/*  <div className="absolute top-4 left-1.5 w-1.5 h-1.5 rounded-full bg-primary" />*/}
-                          {/*)}*/}
+                          {isUnread && (
+                            <div className="absolute top-4 left-2 w-2 h-2 rounded-full bg-blue-500" />
+                          )}
 
                           <div
                             className={cn(
                               'flex-1 space-y-2',
-                              isUnread && 'pl-1.5',
+                              isUnread && 'pl-3',
                             )}
                           >
                             <div className="flex justify-between items-center">
                               <div className="flex items-center gap-2">
+                                <MessageSquare className="h-4 w-4 text-primary" />
                                 <span className="text-sm font-medium text-muted-foreground">
-                                  From {notification.data.name}
+                                  New Post by {notification.data.name}
                                 </span>
                                 {notification.data.product_name && (
                                   <Badge
@@ -322,7 +353,8 @@ export default function DepartmentShow({
                             </h2>
 
                             <p className="text-sm text-muted-foreground line-clamp-2">
-                              {notification.data.message}
+                              {notification.data.message ||
+                                'New post has been created'}
                             </p>
                           </div>
                         </div>
@@ -350,7 +382,7 @@ export default function DepartmentShow({
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </Button>
-                <span className="font-medium">Back to Inbox</span>
+                <span className="font-medium">Back to New Posts</span>
               </div>
             )}
 
@@ -369,10 +401,10 @@ export default function DepartmentShow({
               </ScrollArea>
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                <Mail className="h-16 w-16 mb-4 text-muted-foreground/50" />
+                <MessageSquare className="h-16 w-16 mb-4 text-muted-foreground/50" />
                 <h3 className="text-xl font-medium mb-2">No post selected</h3>
                 <p className="text-center max-w-md">
-                  Select a notification from the inbox to view its content
+                  Select a new post notification to view its content
                 </p>
               </div>
             )}

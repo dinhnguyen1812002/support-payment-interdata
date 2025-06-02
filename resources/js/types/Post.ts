@@ -5,7 +5,9 @@ export interface Post {
   title: string;
   content: string;
   created_at: string;
+  is_published: boolean;
   user: {
+    id: number;
     name: string;
     profile_photo_path: string;
   };

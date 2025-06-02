@@ -20,7 +20,8 @@ interface BlogPost {
   id: string;
   title: string;
   content: string;
-  user: { name: string; profile_photo_path: string };
+  is_published: boolean;
+  user: { id: number; name: string; profile_photo_path: string };
   categories: Category[];
   created_at: string;
   comments: Comment[];

@@ -1,11 +1,23 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { Badge } from '@/Components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import UpvoteButton from '@/Components/VoteButton';
 import CommentsSection from '@/Pages/Comments/CommentsSection';
 import { Comment, CommentsResponse } from '@/types/CommentTypes';
 import { Category, Tag } from '@/types';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
+import { Button } from '@/Components/ui/button';
+import { toast } from '@/Hooks/use-toast';
+import { ChevronDown, Globe, Lock, Loader2 } from 'lucide-react';
+import { route } from 'ziggy-js';
 
 interface PostContentProps {
   post: {
@@ -13,9 +25,10 @@ interface PostContentProps {
     title: string;
     content: string;
     created_at: string;
-    user: { name: string; profile_photo_path: string };
+    user: { id: number; name: string; profile_photo_path: string };
     categories: Category[];
     tags: Tag[];
+    is_published: boolean;
     upvote_count: number;
     has_upvote: boolean;
     next_page_url: string | null;
@@ -38,12 +51,48 @@ const PostContent: React.FC<PostContentProps> = ({
   showBorder = true,
 }) => {
   const [comments, setComments] = useState<Comment[]>(initialComments || []);
+  const [isPublished, setIsPublished] = useState(post.is_published);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const channelRef = useRef<any>(null);
   const isUnmountedRef = useRef(false);
 
   const authorAvatar = post.user.profile_photo_path
     ? `/storage/${post.user.profile_photo_path}`
     : `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name)}&color=7F9CF5&background=EBF4FF`;
+
+  // Check if the current user is authorized to update the post status
+  const canUpdateStatus = currentUser && currentUser.id === post.user.id;
+
+  // Handle status update
+  const handleStatusUpdate = async (newStatus: boolean) => {
+    if (isUpdatingStatus) return; // Prevent double clicks
+
+    setIsUpdatingStatus(true);
+
+    try {
+      router.patch(
+        route('posts.update-status', post.id),
+        {
+          is_published: newStatus,
+        },
+        {
+          preserveScroll: true,
+          onSuccess: page => {
+            setIsPublished(newStatus);
+          },
+          onError: errors => {
+            console.error('Status update errors:', errors);
+          },
+          onFinish: () => {
+            setIsUpdatingStatus(false);
+          },
+        },
+      );
+    } catch (error) {
+      console.error('Status update error:', error);
+      setIsUpdatingStatus(false);
+    }
+  };
 
   // Setup Echo channel for real-time comment updates
   useEffect(() => {
@@ -150,6 +199,52 @@ const PostContent: React.FC<PostContentProps> = ({
             </div>
           </div>
           <div className="flex items-center space-x-4">
+            {canUpdateStatus && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={isUpdatingStatus}
+                    className={`flex items-center `}
+                  >
+                    {/*{isUpdatingStatus ? (*/}
+                    {/*  <Loader2 className="w-4 h-4 animate-spin" />*/}
+                    {/*) : isPublished ? (*/}
+                    {/*  <Globe className="w-4 h-4" />*/}
+                    {/*) : (*/}
+                    {/*  <Lock className="w-4 h-4" />*/}
+                    {/*)}*/}
+                    <span>{isPublished ? 'Public' : 'Private'}</span>
+                    {!isUpdatingStatus && <ChevronDown className="w-4 h-4" />}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Post Status</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => handleStatusUpdate(true)}
+                    disabled={isUpdatingStatus || isPublished}
+                    className="flex items-center space-x-2"
+                  >
+                    <span>Set to Public</span>
+                    {isPublished && (
+                      <span className="text-xs text-gray-500">(Current)</span>
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleStatusUpdate(false)}
+                    disabled={isUpdatingStatus || !isPublished}
+                    className="flex items-center space-x-2"
+                  >
+                    <span>Set to Private</span>
+                    {!isPublished && (
+                      <span className="text-xs text-gray-500">(Current)</span>
+                    )}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             {post.categories.map(category => (
               <Link
                 key={category.id}
@@ -158,7 +253,8 @@ const PostContent: React.FC<PostContentProps> = ({
               >
                 <Badge
                   variant="outline"
-                  className="px-3 py-1 text-sm font-medium rounded border border-dashed dark:text-white hover:border-blue-600 dark:bg-[#0F1014]"
+                  className="px-3 py-1 text-sm font-medium rounded border dark:border-gray-600
+                  border-dashed dark:text-white hover:border-blue-600 dark:bg-[#0F1014]"
                 >
                   {category.title}
                 </Badge>

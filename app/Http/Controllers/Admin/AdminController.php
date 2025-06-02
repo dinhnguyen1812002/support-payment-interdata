@@ -31,6 +31,7 @@ class AdminController extends Controller
         $data = $this->adminService->getDashboardData(auth()->user());
 
         return Inertia::render('Admin/Dashboard', $data);
+
     }
 
     public function getAllPost(Request $request)

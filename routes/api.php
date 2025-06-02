@@ -51,10 +51,8 @@ Route::get('/top-voted-posts', [PostController::class, 'topVotedPosts']);
 //
 //    return response()->json(['message' => 'Thông báo đã được gửi!']);
 // });
+//
 
-Route::post('/users/assign-role', [UserController::class, 'assignRole'])
-    ->middleware(['auth:sanctum', 'verified'])
-    ->name('users.assign-role');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/support-ticket/submit', [TicketController::class, 'submitTicket'])->name('ticket.submit');

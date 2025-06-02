@@ -104,17 +104,18 @@ const BlogCard: React.FC<BlogCardProps> = ({
             <div className="flex">
               <div className="flex-1 mb-2">
                 <div className="pt-0">
-                  <div className="space-y-3 flex items-center mb-4">
+                  <div className="space-y-3 mb-4">
                     <Link href={`/posts/${post.slug}`} className="block group">
-                      <span className="text-2xl font-extrabold text-customBlue hover:text-blue-700 dark:text-white dark:hover:text-blue-300 mr-1">
+                      <h1 className="block text-[25px] font-semibold text-customBlue hover:text-blue-700 dark:text-white dark:hover:text-blue-300 mr-1 break-words">
                         {post.title}
-                      </span>
-                      <p className="text-sm font-normal text-gray-600 dark:text-gray-300 line-clamp-2 mt-3">
+                      </h1>
+                      <p className="mt-3 text-sm font-semibold text-gray-600 dark:text-gray-300 break-words overflow-hidden">
                         {post.content}
                       </p>
                     </Link>
                   </div>
                 </div>
+
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center py-1">
@@ -164,7 +165,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
                         <Badge
                           key={tags.id}
                           variant="secondary"
-                          className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 rounded-md   dark:bg-[#0F1014]"
+                          className="px-3 py-2  text-sm font-medium text-gray-700 dark:text-gray-200 rounded-md   dark:bg-[#0F1014]"
                         >
                           {tags.name}
                         </Badge>

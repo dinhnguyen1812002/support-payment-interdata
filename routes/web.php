@@ -44,6 +44,8 @@ Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show')
 
 Route::post('/posts/{post}/upvote', [UpvoteController::class, 'upvote'])
     ->name('posts.upvote');
+Route::patch('/posts/{post}/update-status', [PostController::class, 'updateStatus'])
+    ->name('posts.update-status');
 Route::delete('/comments/{comment}', [CommentsController::class, 'destroy'])
     ->middleware(['auth:sanctum'])
     ->name('comments.destroy');

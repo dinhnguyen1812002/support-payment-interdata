@@ -40,7 +40,7 @@ class PostService
                 'content' => $post->content,
                 'created_at' => $post->created_at->diffForHumans(),
                 'updated_at' => $post->updated_at,
-                'published_at' => $post->published_at,
+                'is_published' => $post->is_published,
                 'user' => $post->user,
                 'categories' => $post->categories,
                 'tags' => $post->tags,
@@ -232,6 +232,7 @@ class PostService
         $category = Category::where('slug', $categorySlug)->firstOrFail();
 
         $posts = Post::byCategorySlug($categorySlug)
+            ->where('is_published', true)
             ->with(['user', 'categories'])
             ->withCount('upvotes')
             ->orderBy('upvotes_count', 'desc')
@@ -259,6 +260,7 @@ class PostService
         $tag = Tag::where('slug', $tagsSlug)->firstOrFail();
 
         $posts = Post::byTagsSlug($tagsSlug)
+            ->where('is_published', true)
             ->with(['user', 'categories'])
             ->withCount('upvotes')
             ->orderBy('upvotes_count', 'desc')
@@ -469,4 +471,6 @@ class PostService
             'post' => $post,
         ];
     }
+
+
 }

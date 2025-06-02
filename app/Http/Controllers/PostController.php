@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Data\Post\CreatePostData;
 use App\Models\Post;
 use App\Services\PostService;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Access\Gate;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -161,5 +163,20 @@ class PostController extends Controller
         }
 
         return response()->json(['success' => true, 'post' => $result['post']]);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function updateStatus(Request $request, Post $post): \Illuminate\Http\RedirectResponse
+    {
+        $this->authorize('update', $post);
+        $request->validate([
+            'is_published' => 'required|boolean',
+        ]);
+        $post->update([
+            'is_published' => $request->boolean('is_published')
+        ]);
+        return redirect()->back()->with('success', 'change status successfully.');
     }
 }
