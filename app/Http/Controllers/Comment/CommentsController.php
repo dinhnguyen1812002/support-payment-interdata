@@ -26,19 +26,15 @@ class CommentsController extends Controller
             'comment' => $validated['comment'],
             'post_id' => $validated['post_id'],
             'user_id' => auth()->id(),
-            'parent_id' => $validated['parent_id'],
+            'parent_id' => $validated['parent_id'] ?? null,
         ]);
 
         $comment->load('user');
 
-        // Broadcast comment đến tất cả users trên channel
         broadcast(new CommentPosted($comment));
-
-        // Notification for post owner (excluding the comment author)
         broadcast(new NewCommentCreated($comment))->toOthers();
 
         $postOwner = $comment->post->user;
-
         if ($postOwner->id !== auth()->id()) {
             $postOwner->notify(new NewCommentNotification($comment));
         }
@@ -65,7 +61,7 @@ class CommentsController extends Controller
 
     public function destroy(Comments $comment)
     {
-        if (! Gate::allows('delete-comment', $comment)) {
+        if (Gate::denies('delete-comment', $comment)) {
             abort(403, 'Unauthorized action.');
         }
 
