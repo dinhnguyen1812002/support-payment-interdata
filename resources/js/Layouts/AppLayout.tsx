@@ -147,15 +147,6 @@ export default function AppLayout({
                     Management
                   </NavLink>
                 )}
-                {page.props.department && (
-                  <NavLink
-                    href={route('departments.show', {
-                      department: page.props.department.slug,
-                    })}
-                  >
-                    {page.props.department.name}
-                  </NavLink>
-                )}
               </div>
             </div>
 
@@ -217,18 +208,18 @@ export default function AppLayout({
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {page.props.department && (
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href={route('departments.show', {
-                            department: page.props.department.slug,
-                          })}
-                        >
-                          {/*{page.props.department.name}*/}
-                          Department
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
+                    {/*{page.props.department && (*/}
+                    {/*  <DropdownMenuItem asChild>*/}
+                    {/*    <Link*/}
+                    {/*      href={route('departments.show', {*/}
+                    {/*        department: page.props.department.slug,*/}
+                    {/*      })}*/}
+                    {/*    >*/}
+                    {/*      /!*{page.props.department.name}*!/*/}
+                    {/*      Department*/}
+                    {/*    </Link>*/}
+                    {/*  </DropdownMenuItem>*/}
+                    {/*)}*/}
                     <DropdownMenuItem asChild>
                       <Link href={route('profile.show')}>Profile</Link>
                     </DropdownMenuItem>
@@ -323,7 +314,7 @@ export default function AppLayout({
         >
           <div className="pt-2 pb-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
             <ResponsiveNavLink href={route('/')} active={route().current('/')}>
-              Dashboard
+              Home
             </ResponsiveNavLink>
             {/*<ResponsiveNavLink*/}
             {/*  href={route('posts.create')}*/}
@@ -336,7 +327,7 @@ export default function AppLayout({
                 href={route('admin.dashboard')}
                 active={route().current('admin.dashboard')}
               >
-                Management
+                Dashboard
               </ResponsiveNavLink>
             )}
 

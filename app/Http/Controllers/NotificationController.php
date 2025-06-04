@@ -6,6 +6,7 @@ use App\Mail\UserNotificationMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class NotificationController extends Controller
 {
@@ -14,22 +15,45 @@ class NotificationController extends Controller
         $user = auth()->user();
 
         if ($user instanceof User) {
+            // Mark all unread notifications as read
             $user->unreadNotifications->markAsRead();
 
-            return response()->json(['message' => 'All notifications marked as read.']);
+            // Return updated notifications list to maintain state
+            $allNotifications = $user->notifications()
+                ->orderBy('created_at', 'desc')
+                ->limit(50) // Limit to recent 50 notifications
+                ->get();
+
+            return response()->json([
+                'message' => 'All notifications marked as read.',
+                'notifications' => $allNotifications
+            ]);
         }
 
         return response()->json([
             'message' => 'All notifications marked as read.',
+            'notifications' => []
         ]);
     }
 
     public function markAsRead(Request $request, $id)
     {
-        $notification = Auth::user()->notifications()->findOrFail($id);
-        $notification->markAsRead();
+        try {
+            $user = Auth::user();
+            $notification = $user->notifications()->findOrFail($id);
 
-        return response()->json(['success' => true]);
+            $notification->markAsRead();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification marked as read successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to mark notification as read.'
+            ], 500);
+        }
     }
 
     public function sendEmailNotification(Request $request)
@@ -43,7 +67,7 @@ class NotificationController extends Controller
             'actionUrl' => url('/notifications'),
         ];
 
-        Mail:to($user->email)->send(new UserNotificationMail($details));
+        Mail::to($user->email)->send(new UserNotificationMail($details));
 
         return back()->with('success', 'Email sent successfully!');
     }

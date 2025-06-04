@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bell, Loader2 } from 'lucide-react';
+import { Bell, Loader2, Check } from 'lucide-react';
 import { cn, formatTimeAgo } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -55,6 +55,7 @@ const NotificationsDropdown = ({
     useState<Notification[]>(initialNotifications);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [markingAsRead, setMarkingAsRead] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const { props } = useTypedPage<{
@@ -85,7 +86,11 @@ const NotificationsDropdown = ({
       ...notification,
       type: determineNotificationType(notification),
     }));
-    setLocalNotifications(processedNotifications);
+
+    // Only update if we have notifications or if current state is empty
+    if (processedNotifications.length > 0 || localNotifications.length === 0) {
+      setLocalNotifications(processedNotifications);
+    }
   }, [initialNotifications]);
 
   useEffect(() => {
@@ -117,18 +122,57 @@ const NotificationsDropdown = ({
     };
   }, [currentUserId]);
 
+  const markAsRead = async (notificationId: string) => {
+    try {
+      setMarkingAsRead(prev => [...prev, notificationId]);
+      await axios.post(`/notifications/${notificationId}/read`);
+
+      setLocalNotifications(prev =>
+        prev.map(notification =>
+          notification.id === notificationId
+            ? { ...notification, read_at: new Date().toISOString() }
+            : notification,
+        ),
+      );
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    } finally {
+      setMarkingAsRead(prev => prev.filter(id => id !== notificationId));
+    }
+  };
+
   const markAllAsRead = async () => {
     try {
       setIsLoading(true);
-      await axios.post('/notifications/read-all');
+
+      // Store current state for potential rollback
+      const previousState = localNotifications;
+
+      // Immediately update local state to set unread count to 0
+      const currentTime = new Date().toISOString();
       setLocalNotifications(prev =>
         prev.map(notification => ({
           ...notification,
-          read_at: new Date().toISOString(),
+          read_at: notification.read_at || currentTime,
         })),
       );
+
+      // Make API call
+      const response = await axios.post('/notifications/read-all');
+
+      // If server returns updated notifications, use them
+      if (response.data.notifications) {
+        const processedNotifications = response.data.notifications.map(
+          (notification: Notification) => ({
+            ...notification,
+            type: determineNotificationType(notification),
+          }),
+        );
+        setLocalNotifications(processedNotifications);
+      }
     } catch (error) {
       console.error('Error marking notifications as read:', error);
+      // Revert to previous state if API call fails
     } finally {
       setIsLoading(false);
     }
@@ -188,7 +232,7 @@ const NotificationsDropdown = ({
                     {isLoading && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    Mark as read
+                    Mark all as read
                   </Button>
                 )}
               </div>
@@ -223,7 +267,7 @@ const NotificationsDropdown = ({
                     <div
                       key={notification.id}
                       className={cn(
-                        'flex items-start gap-3 p-4 transition-colors cursor-pointer border-b last:border-0',
+                        'flex items-start gap-3 p-4 transition-colors border-b last:border-0 relative',
                         !notification.read_at,
                       )}
                     >
@@ -237,31 +281,51 @@ const NotificationsDropdown = ({
                             {notification.data.name?.[0] || 'U'}
                           </AvatarFallback>
                         </Avatar>
-                        {/*<p className="text-xs text-gray-600 mt-1 text-center break-words max-w-[80px]">*/}
-                        {/*    {notification.data.name}*/}
-                        {/*</p>*/}
                       </div>
+
                       <Link
                         href={`/posts/${notification.data.slug}`}
                         className="block group flex-1"
                       >
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium">
-                            {' '}
                             {notification.data.name}
                           </p>
                           <p className="text-sm">{notification.data.message}</p>
                           <p className="text-xs text-gray-500 mt-1">
                             {formatTimeAgo(notification.created_at)}
-                            {/*<ba className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">*/}
-                            {/*    {notification.type === "comment" ? "Comment" : "Question"}*/}
-                            {/*</ba>*/}
-                            {/*<Badge variant="outline" className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ">*/}
-                            {/*    {notification.type === "comment" ? "Comment" : "Question"}*/}
-                            {/*</Badge>*/}
                           </p>
                         </div>
                       </Link>
+
+                      {/* Check button for unread notifications */}
+                      {!notification.read_at && (
+                        <div className="flex items-center">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={e => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              markAsRead(notification.id);
+                            }}
+                            disabled={markingAsRead.includes(notification.id)}
+                            className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 dark:hover:bg-green-900/20"
+                            title="Mark as read"
+                          >
+                            {markingAsRead.includes(notification.id) ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Check className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      )}
+
+                      {/* Unread indicator dot */}
+                      {!notification.read_at && (
+                        <div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full"></div>
+                      )}
                     </div>
                   ))
                 )}

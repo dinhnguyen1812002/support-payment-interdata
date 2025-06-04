@@ -22,12 +22,12 @@ Route::get('/user', function (Request $request) {
 Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
     ->middleware('auth')
     ->name('notifications.read_all');
+// Trong routes/web.php hoặc routes/api.php
 
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
-
-    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
 });
 Route::get('categories', [CategoryController::class, 'index']);
 
