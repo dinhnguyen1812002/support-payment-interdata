@@ -148,10 +148,10 @@ const CommentItem: React.FC<CommentItemProps> = ({
                         {isDeleting ? 'Deleting...' : 'Delete'}
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem className="text-gray-500">
-                      <Flag className="w-4 h-4 mr-2" />
-                      Report
-                    </DropdownMenuItem>
+                    {/*<DropdownMenuItem className="text-gray-500">*/}
+                    {/*  <Flag className="w-4 h-4 mr-2" />*/}
+                    {/*  Report*/}
+                    {/*</DropdownMenuItem>*/}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

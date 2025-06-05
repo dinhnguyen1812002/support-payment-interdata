@@ -13,9 +13,6 @@ class NewCommentCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
     public Comments $comment;
 
     public function __construct(Comments $comment)
@@ -23,30 +20,24 @@ class NewCommentCreated implements ShouldBroadcast
         $this->comment = $comment;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return Channel
-     */
-    public function broadcastOn()
+    public function broadcastOn(): Channel
     {
-        // Gửi đến kênh riêng của chủ bài viết
         return new Channel('notifications-comment.'.$this->comment->post->user_id);
     }
 
-    public function broadcastAs()
+    public function broadcastAs(): string
     {
         return 'new-comment-created';
     }
 
-    public function broadcastWith()
+    public function broadcastWith(): array
     {
         return [
             'id' => (string) $this->comment->id,
             'data' => [
-                'post_id' => $this->comment->post_id,
+                'post_id' => (string) $this->comment->post_id,
                 'title' => $this->comment->post->title,
-                'message' => "New Comment on your post: {$this->comment->comment}",
+                'message' => "New comment on your post: {$this->comment->comment}",
                 'slug' => $this->comment->post->slug,
                 'name' => $this->comment->user->name,
                 'profile_photo_url' => $this->comment->user->profile_photo_path
@@ -57,7 +48,7 @@ class NewCommentCreated implements ShouldBroadcast
             ],
             'read_at' => null,
             'created_at' => $this->comment->created_at->toISOString(),
-            'type_notification' => 'comment',
+            'type' => 'comment',
         ];
     }
 }

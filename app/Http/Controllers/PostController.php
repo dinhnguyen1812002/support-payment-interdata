@@ -6,7 +6,6 @@ use App\Data\Post\CreatePostData;
 use App\Models\Post;
 use App\Services\PostService;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Auth\Access\Gate;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -175,8 +174,9 @@ class PostController extends Controller
             'is_published' => 'required|boolean',
         ]);
         $post->update([
-            'is_published' => $request->boolean('is_published')
+            'is_published' => $request->boolean('is_published'),
         ]);
+
         return redirect()->back()->with('success', 'change status successfully.');
     }
 }

@@ -168,9 +168,8 @@ const CommentsContent: React.FC<
 
       // Sửa lại cách lắng nghe sự kiện - thử cả hai cách
       channel.listen('.CommentPosted', handleCommentPosted);
-      channel.listen('CommentPosted', handleCommentPosted);
+      // channel.listen('CommentPosted', handleCommentPosted);
       channel.listen('.CommentDeleted', handleCommentDeleted);
-      channel.listen('CommentDeleted', handleCommentDeleted);
 
       console.log(`Subscribed to channel: ${channelName}`);
 
@@ -179,9 +178,7 @@ const CommentsContent: React.FC<
         if (channelRef.current) {
           try {
             channelRef.current.stopListening('.CommentPosted');
-            channelRef.current.stopListening('CommentPosted');
             channelRef.current.stopListening('.CommentDeleted');
-            channelRef.current.stopListening('CommentDeleted');
             window.Echo.leaveChannel(channelName);
             console.log(`Left channel: ${channelName}`);
           } catch (error) {

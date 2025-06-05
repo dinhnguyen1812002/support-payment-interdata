@@ -471,6 +471,4 @@ class PostService
             'post' => $post,
         ];
     }
-
-
 }

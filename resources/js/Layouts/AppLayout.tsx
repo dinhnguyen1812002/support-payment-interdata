@@ -144,7 +144,7 @@ export default function AppLayout({
                     href={route('admin.dashboard')}
                     active={route().current('admin.dashboard')}
                   >
-                    Management
+                    Dashboard
                   </NavLink>
                 )}
               </div>
@@ -327,7 +327,7 @@ export default function AppLayout({
                 href={route('admin.dashboard')}
                 active={route().current('admin.dashboard')}
               >
-                Dashboard
+                Home
               </ResponsiveNavLink>
             )}
 

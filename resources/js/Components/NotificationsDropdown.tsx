@@ -7,37 +7,35 @@ import {
   DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 import { Badge } from '@/Components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { ScrollArea } from '@/Components/ui/scroll-area';
-import { format } from 'date-fns';
-import { vi } from 'date-fns/locale';
-import axios from 'axios';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Tabs, TabsList, TabsTrigger } from '@/Components/ui/tabs';
-import useTypedPage from '@/Hooks/useTypedPage';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Link } from '@inertiajs/react';
-import React from 'react';
-import { Category } from '@/types';
-import AlertInfoDemo from '@/Components/InfoAlert';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import AlertInfoDemo from '@/Components/InfoAlert';
+import useTypedPage from '@/Hooks/useTypedPage';
+import { Category } from '@/types';
+import React from 'react';
+interface NotificationData {
+  post_id: string;
+  title?: string;
+  message: string;
+  slug?: string;
+  name?: string;
+  profile_photo_url?: string;
+  categories?: Category[];
+  type_notification?: string;
+}
 
 interface Notification {
   id: string;
-  data: {
-    post_id?: string;
-    title?: string;
-    message: string;
-    slug?: string;
-    name?: string;
-    profile_photo_url?: string;
-    categories?: Category[];
-    type_notification?: string;
-  };
+  data: NotificationData;
   read_at: string | null;
   created_at: string;
-  type: string;
-  type_notification?: string;
+  type: 'post' | 'comment';
 }
 
 interface NotificationsDropdownProps {
@@ -51,46 +49,26 @@ const NotificationsDropdown = ({
   className,
   maxHeight = 500,
 }: NotificationsDropdownProps) => {
-  const [localNotifications, setLocalNotifications] =
+  const [notifications, setNotifications] =
     useState<Notification[]>(initialNotifications);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [markingAsRead, setMarkingAsRead] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+
   const [activeTab, setActiveTab] = useState('all');
+  const [error, setError] = useState<string | null>(null);
   const { props } = useTypedPage<{
     auth: { user: { id: number; role: string } };
   }>();
   const currentUserId = props.auth?.user?.id;
 
-  const unreadCount = localNotifications.filter(n => !n.read_at).length;
-  const postCount = localNotifications.filter(n => n.type === 'post').length;
-  const commentCount = localNotifications.filter(
-    n => n.type === 'comment',
-  ).length;
-
-  const determineNotificationType = (
-    notification: Notification,
-  ): 'post' | 'comment' => {
-    if (
-      notification.type_notification === 'comment' ||
-      notification.data?.type_notification === 'comment'
-    ) {
-      return 'comment';
-    }
-    return 'post';
-  };
+  const unreadCount = notifications.filter(n => !n.read_at).length;
+  const postCount = notifications.filter(n => n.type === 'post').length;
+  const commentCount = notifications.filter(n => n.type === 'comment').length;
 
   useEffect(() => {
-    const processedNotifications = initialNotifications.map(notification => ({
-      ...notification,
-      type: determineNotificationType(notification),
-    }));
-
-    // Only update if we have notifications or if current state is empty
-    if (processedNotifications.length > 0 || localNotifications.length === 0) {
-      setLocalNotifications(processedNotifications);
-    }
+    setNotifications(initialNotifications);
   }, [initialNotifications]);
 
   useEffect(() => {
@@ -98,9 +76,8 @@ const NotificationsDropdown = ({
 
     const postChannel = window.Echo.channel('notifications');
     postChannel.listen('.new-question-created', (e: Notification) => {
-      const newNotification = { ...e, type: 'post' };
-      setLocalNotifications(prev => [{ ...e, type: 'comment' }, ...prev]);
-      setActiveAlert(newNotification.data.message);
+      setNotifications(prev => [e, ...prev]);
+      setActiveAlert(e.data.message);
       setTimeout(() => setActiveAlert(null), 5000);
     });
 
@@ -108,9 +85,8 @@ const NotificationsDropdown = ({
       `notifications-comment.${currentUserId}`,
     );
     commentChannel.listen('.new-comment-created', (e: Notification) => {
-      const newNotification = { ...e, type: 'comment' };
-      setLocalNotifications(prev => [{ ...e, type: 'comment' }, ...prev]);
-      setActiveAlert(newNotification.data.message);
+      setNotifications(prev => [e, ...prev]);
+      setActiveAlert(e.data.message);
       setTimeout(() => setActiveAlert(null), 5000);
     });
 
@@ -125,9 +101,8 @@ const NotificationsDropdown = ({
   const markAsRead = async (notificationId: string) => {
     try {
       setMarkingAsRead(prev => [...prev, notificationId]);
-      await axios.post(`/notifications/${notificationId}/read`);
-
-      setLocalNotifications(prev =>
+      await axios.post(`/api/notifications/${notificationId}/read`);
+      setNotifications(prev =>
         prev.map(notification =>
           notification.id === notificationId
             ? { ...notification, read_at: new Date().toISOString() }
@@ -136,6 +111,8 @@ const NotificationsDropdown = ({
       );
     } catch (error) {
       console.error('Error marking notification as read:', error);
+      setError('Failed to mark notification as read. Please try again.');
+      setTimeout(() => setError(null), 3000);
     } finally {
       setMarkingAsRead(prev => prev.filter(id => id !== notificationId));
     }
@@ -144,41 +121,23 @@ const NotificationsDropdown = ({
   const markAllAsRead = async () => {
     try {
       setIsLoading(true);
-
-      // Store current state for potential rollback
-      const previousState = localNotifications;
-
-      // Immediately update local state to set unread count to 0
-      const currentTime = new Date().toISOString();
-      setLocalNotifications(prev =>
+      await axios.post('/api/notifications/read-all');
+      setNotifications(prev =>
         prev.map(notification => ({
           ...notification,
-          read_at: notification.read_at || currentTime,
+          read_at: new Date().toISOString(),
         })),
       );
-
-      // Make API call
-      const response = await axios.post('/notifications/read-all');
-
-      // If server returns updated notifications, use them
-      if (response.data.notifications) {
-        const processedNotifications = response.data.notifications.map(
-          (notification: Notification) => ({
-            ...notification,
-            type: determineNotificationType(notification),
-          }),
-        );
-        setLocalNotifications(processedNotifications);
-      }
     } catch (error) {
-      console.error('Error marking notifications as read:', error);
-      // Revert to previous state if API call fails
+      console.error('Error marking all notifications as read:', error);
+      setError('Failed to mark all notifications as read. Please try again.');
+      setTimeout(() => setError(null), 3000);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const filteredNotifications = localNotifications.filter(notification => {
+  const filteredNotifications = notifications.filter(notification => {
     if (activeTab === 'all') return true;
     return notification.type === activeTab;
   });
@@ -187,18 +146,24 @@ const NotificationsDropdown = ({
     <>
       <AnimatePresence initial={false} mode="popLayout">
         {activeAlert && (
-          <motion.li
-            layout
+          <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.3 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
             className="fixed bottom-4 right-4 z-50 w-[300px] sm:w-[350px]"
           >
-            <AlertInfoDemo
-              title="You have new notification"
-              content={activeAlert}
-            />
-          </motion.li>
+            <AlertInfoDemo title="New Notification" content={activeAlert} />
+          </motion.div>
+        )}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-4 right-4 z-50 w-[300px] sm:w-[350px]"
+          >
+            <AlertInfoDemo title="Error" content={error} />
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -220,7 +185,7 @@ const NotificationsDropdown = ({
           <Card className={cn('w-full border-0 shadow-none', className)}>
             <CardHeader className="border-b py-3 flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <CardTitle className="text-lg">Notification</CardTitle>
+                <CardTitle className="text-lg">Notifications</CardTitle>
                 {unreadCount > 0 && (
                   <Button
                     variant="ghost"
@@ -244,7 +209,7 @@ const NotificationsDropdown = ({
               >
                 <TabsList className="grid grid-cols-3 w-full">
                   <TabsTrigger value="all" className="text-sm">
-                    All ({localNotifications.length})
+                    All ({notifications.length})
                   </TabsTrigger>
                   <TabsTrigger value="post" className="text-sm">
                     New Question ({postCount})
@@ -255,12 +220,12 @@ const NotificationsDropdown = ({
                 </TabsList>
               </Tabs>
             </CardHeader>
-            <ScrollArea className="h-[300px] w-full ">
+            <ScrollArea className={`h-[${maxHeight}px] w-full`}>
               <CardContent className="p-0">
                 {filteredNotifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-8 text-gray-500">
                     <Bell className="h-12 w-12 mb-2 text-gray-400" />
-                    <p>Không có thông báo</p>
+                    <p>No notifications</p>
                   </div>
                 ) : (
                   filteredNotifications.map(notification => (
@@ -271,21 +236,18 @@ const NotificationsDropdown = ({
                         !notification.read_at,
                       )}
                     >
-                      <div className="flex flex-col items-center">
-                        <Avatar className="h-12 w-12 border rounded-lg">
-                          <AvatarImage
-                            src={notification.data.profile_photo_url}
-                            alt={notification.data.name || 'User'}
-                          />
-                          <AvatarFallback className="bg-primary/10 text-primary">
-                            {notification.data.name?.[0] || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
-
+                      <Avatar className="h-12 w-12 border rounded-lg">
+                        <AvatarImage
+                          src={notification.data.profile_photo_url}
+                          alt={notification.data.name || 'User'}
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {notification.data.name?.[0] || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
                       <Link
                         href={`/posts/${notification.data.slug}`}
-                        className="block group flex-1"
+                        className="block flex-1"
                       >
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium">
@@ -297,34 +259,28 @@ const NotificationsDropdown = ({
                           </p>
                         </div>
                       </Link>
-
-                      {/* Check button for unread notifications */}
                       {!notification.read_at && (
-                        <div className="flex items-center">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={e => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              markAsRead(notification.id);
-                            }}
-                            disabled={markingAsRead.includes(notification.id)}
-                            className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 dark:hover:bg-green-900/20"
-                            title="Mark as read"
-                          >
-                            {markingAsRead.includes(notification.id) ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Check className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            markAsRead(notification.id);
+                          }}
+                          disabled={markingAsRead.includes(notification.id)}
+                          className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 dark:hover:bg-green-900/20"
+                          title="Mark as read"
+                        >
+                          {markingAsRead.includes(notification.id) ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Check className="h-4 w-4" />
+                          )}
+                        </Button>
                       )}
-
-                      {/* Unread indicator dot */}
                       {!notification.read_at && (
-                        <div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full" />
                       )}
                     </div>
                   ))
