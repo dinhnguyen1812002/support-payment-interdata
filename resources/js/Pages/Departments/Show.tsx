@@ -1,417 +1,297 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { AppLayout } from '@/Components/Ticket/app-layout';
-import { TooltipProvider } from '@/Components/ui/tooltip';
-import { Toaster } from 'sonner';
-import { ScrollArea } from '@/Components/ui/scroll-area';
-import { Button } from '@/Components/ui/button';
-import { Badge } from '@/Components/ui/badge';
-import { Search, Mail, Clock, MessageSquare, ChevronLeft } from 'lucide-react';
-import type { Department, Notification } from '@/types';
-import useTypedPage from '@/Hooks/useTypedPage';
-import PostContent from '@/Components/post-content';
-import { router } from '@inertiajs/core';
-import { route } from 'ziggy-js';
-import type { Post } from '@/types/Post';
-import { Input } from '@/Components/ui/input';
+import { useEffect, useState } from 'react';
+import { Bell, Loader2, Check } from 'lucide-react';
 import { cn, formatTimeAgo } from '@/lib/utils';
-import { formatDistanceToNow } from 'date-fns';
-
-interface Props {
-  notifications: Notification[];
-  department: Department;
-  posts: Post[];
-  auth: { user: { id: number; name: string; profile_photo_path: string } };
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu';
+import { Badge } from '@/Components/ui/badge';
+import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import { ScrollArea } from '@/Components/ui/scroll-area';
+import { Tabs, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { Link } from '@inertiajs/react';
+import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
+import AlertInfoDemo from '@/Components/InfoAlert';
+import useTypedPage from '@/Hooks/useTypedPage';
+import { Category } from '@/types';
+import React from 'react';
+interface NotificationData {
+  post_id: string;
+  title?: string;
+  message: string;
+  slug?: string;
+  name?: string;
+  profile_photo_url?: string;
+  categories?: Category[];
+  type_notification?: string;
 }
 
-export default function DepartmentShow({
-  department,
+interface Notification {
+  id: string;
+  data: NotificationData;
+  read_at: string | null;
+  created_at: string;
+  type: 'post' | 'comment';
+}
+
+interface NotificationsDropdownProps {
+  notifications: Notification[];
+  className?: string;
+  maxHeight?: number;
+}
+
+const NotificationsDropdown = ({
   notifications: initialNotifications = [],
-  posts: initialPosts = [],
-  auth,
-}: Props) {
-  // Filter only new post notifications from initial data
-  const [localNotifications, setLocalNotifications] = useState<Notification[]>(
-    initialNotifications.filter(
-      notification =>
-        notification.type === 'App\\Notifications\\NewPostCreated' ||
-        notification.data.post_id,
-    ),
-  );
+  className,
+  maxHeight = 500,
+}: NotificationsDropdownProps) => {
+  const [notifications, setNotifications] =
+    useState<Notification[]>(initialNotifications);
+  const [activeAlert, setActiveAlert] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [markingAsRead, setMarkingAsRead] = useState<string[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const [localPosts, setLocalPosts] = useState<Post[]>(initialPosts);
-  const page = useTypedPage();
-  const userId = page.props.auth?.user?.id;
-  const [selectedNotification, setSelectedNotification] =
-    useState<Notification | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-  const [showPostView, setShowPostView] = useState(false);
-  const user = auth?.user || null;
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState<'all' | 'unread'>('all');
+  const [activeTab, setActiveTab] = useState('all');
+  const [error, setError] = useState<string | null>(null);
+  const { props } = useTypedPage<{
+    auth: { user: { id: number; role: string } };
+  }>();
+  const currentUserId = props.auth?.user?.id;
 
-  const selectedPost = useMemo(() => {
-    return selectedNotification && selectedNotification.data.post_id
-      ? localPosts.find(
-          post => post.id === selectedNotification.data.post_id,
-        ) || null
-      : null;
-  }, [selectedNotification, localPosts]);
-
-  const filteredNotifications = useMemo(() => {
-    return localNotifications.filter(notification => {
-      // Double check: only include new post notifications
-      const isNewPostNotification =
-        notification.type === 'App\\Notifications\\NewPostCreated' ||
-        notification.type === 'new-post' ||
-        notification.data.post_id;
-
-      if (!isNewPostNotification) return false;
-
-      const matchesSearch =
-        searchQuery === '' ||
-        notification.data.title
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        notification.data.name
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        notification.data.message
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        notification.data.product_name
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase());
-
-      const matchesFilter =
-        activeFilter === 'all' ||
-        (activeFilter === 'unread' && !notification.read_at);
-
-      return matchesSearch && matchesFilter;
-    });
-  }, [localNotifications, searchQuery, activeFilter]);
+  const unreadCount = notifications.filter(n => !n.read_at).length;
+  const postCount = notifications.filter(n => n.type === 'post').length;
+  const commentCount = notifications.filter(n => n.type === 'comment').length;
 
   useEffect(() => {
-    if (!userId) return;
+    setNotifications(initialNotifications);
+  }, [initialNotifications]);
+
+  useEffect(() => {
+    if (!currentUserId) return;
 
     const postChannel = window.Echo.channel('notifications');
     postChannel.listen('.new-question-created', (e: Notification) => {
-      // Only process if this is a new post notification
-      const isNewPostNotification =
-        e.type === 'App\\Notifications\\NewPostCreated' ||
-        e.type === 'new-post' ||
-        e.data.post_id;
+      setNotifications(prev => [e, ...prev]);
+      setActiveAlert(e.data.message);
+      setTimeout(() => setActiveAlert(null), 5000);
+    });
 
-      if (!isNewPostNotification) return;
-
-      const newNotification = {
-        id: e.id,
-        type: 'post',
-        data: e.data,
-        read_at: null,
-        created_at: e.created_at,
-      };
-
-      setLocalNotifications(prev => {
-        if (prev.some(notification => notification.id === newNotification.id)) {
-          return prev;
-        }
-        return [newNotification as Notification, ...prev];
-      });
+    const commentChannel = window.Echo.channel(
+      `notifications-comment.${currentUserId}`,
+    );
+    commentChannel.listen('.new-comment-created', (e: Notification) => {
+      setNotifications(prev => [e, ...prev]);
+      setActiveAlert(e.data.message);
+      setTimeout(() => setActiveAlert(null), 5000);
     });
 
     return () => {
       postChannel.stopListening('.new-question-created');
+      commentChannel.stopListening('.new-comment-created');
       window.Echo.leave('notifications');
+      window.Echo.leave(`notifications-comment.${currentUserId}`);
     };
-  }, [userId]);
+  }, [currentUserId]);
 
-  useEffect(() => {
-    const checkIfMobile = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-
-      if (!mobile && !showPostView && localNotifications.length > 0) {
-        setSelectedNotification(localNotifications[0]);
-      }
-    };
-
-    checkIfMobile();
-    window.addEventListener('resize', checkIfMobile);
-
-    return () => {
-      window.removeEventListener('resize', checkIfMobile);
-    };
-  }, [showPostView, localNotifications]);
-
-  useEffect(() => {
-    if (
-      !isMobile &&
-      selectedNotification === null &&
-      localNotifications.length > 0
-    ) {
-      setSelectedNotification(localNotifications[0]);
-    }
-  }, [isMobile, localNotifications]);
-
-  const handleNotificationSelect = useCallback(
-    async (notification: Notification) => {
-      if (isMobile) {
-        setShowPostView(true);
-      }
-
-      const postId = notification.data.post_id;
-      let post = localPosts.find(p => p.id === postId);
-
-      if (!post) {
-        try {
-          const response = await fetch(route('posts.showById', { id: postId }));
-          if (!response.ok) throw new Error('Failed to fetch post');
-          post = await response.json();
-
-          if (post) {
-            setLocalPosts(prev => {
-              if (prev.some(p => p.id === post!.id)) return prev;
-              return [post!, ...prev];
-            });
-          }
-        } catch (error) {
-          console.error('Error fetching post:', error);
-          return;
-        }
-      }
-
-      setSelectedNotification(notification);
-    },
-    [localPosts, isMobile],
-  );
-
-  const handleMarkAsRead = useCallback(
-    (notification: Notification, e: React.MouseEvent) => {
-      e.stopPropagation();
-
-      if (notification.read_at) {
-        return;
-      }
-
-      router.post(
-        route('notifications.read_all', { id: notification.id }),
-        {},
-        {
-          preserveScroll: true,
-          onSuccess: () => {
-            setLocalNotifications(prev =>
-              prev.map(n =>
-                n.id === notification.id
-                  ? { ...n, read_at: new Date().toISOString() }
-                  : n,
-              ),
-            );
-          },
-        },
-      );
-    },
-    [],
-  );
-
-  const handleBackToList = useCallback(() => {
-    setShowPostView(false);
-  }, []);
-
-  const handleCommentSubmit = useCallback(
-    (content: string, parentId?: string) => {
-      if (!selectedPost) return;
-
-      router.post(
-        route('comments.store'),
-        {
-          comment: content,
-          post_id: selectedPost.id,
-          parent_id: parentId || null,
-        },
-        {
-          preserveScroll: true,
-          onError: errors => {
-            console.error('Error submitting comment:', errors);
-          },
-        },
-      );
-    },
-    [selectedPost],
-  );
-
-  const formatTimeAgo = (dateString: string) => {
+  const markAsRead = async (notificationId: string) => {
     try {
-      const date = new Date(dateString);
-      return formatDistanceToNow(date, { addSuffix: true });
+      setMarkingAsRead(prev => [...prev, notificationId]);
+      await axios.post(`/api/notifications/${notificationId}/read`);
+      setNotifications(prev =>
+        prev.map(notification =>
+          notification.id === notificationId
+            ? { ...notification, read_at: new Date().toISOString() }
+            : notification,
+        ),
+      );
     } catch (error) {
-      return dateString;
+      console.error('Error marking notification as read:', error);
+      setError('Failed to mark notification as read. Please try again.');
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setMarkingAsRead(prev => prev.filter(id => id !== notificationId));
     }
   };
 
+  const markAllAsRead = async () => {
+    try {
+      setIsLoading(true);
+      await axios.post('/api/notifications/read-all');
+      setNotifications(prev =>
+        prev.map(notification => ({
+          ...notification,
+          read_at: new Date().toISOString(),
+        })),
+      );
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      setError('Failed to mark all notifications as read. Please try again.');
+      setTimeout(() => setError(null), 3000);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filteredNotifications = notifications.filter(notification => {
+    if (activeTab === 'all') return true;
+    return notification.type === activeTab;
+  });
+
   return (
-    <TooltipProvider>
-      <AppLayout
-        title={department.name}
-        department={department}
-        notifications={localNotifications}
-      >
-        <div className="flex overflow-hidden h-[calc(100vh-4rem)] relative">
-          <div
-            className={cn(
-              'flex-col border-r dark:border-gray-800 bg-background',
-              'w-full md:w-96 lg:w-[400px] h-full',
-              isMobile && showPostView ? 'hidden' : 'flex',
-            )}
+    <>
+      <AnimatePresence initial={false} mode="popLayout">
+        {activeAlert && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.3 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
+            className="fixed bottom-4 right-4 z-50 w-[300px] sm:w-[350px]"
           >
-            <div className="p-4 border-b dark:border-gray-800 bg-background flex flex-col gap-3 ">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">New Posts</h2>
-                <Badge variant="secondary" className="text-xs">
-                  {filteredNotifications.length}
-                </Badge>
-              </div>
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search new posts..."
-                  className="pl-9 w-full bg-muted/40"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
+            <AlertInfoDemo title="New Notification" content={activeAlert} />
+          </motion.div>
+        )}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-4 right-4 z-50 w-[300px] sm:w-[350px]"
+          >
+            <AlertInfoDemo title="Error" content={error} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            <ScrollArea className="h-[calc(100vh-200px)] pr-3">
-              {filteredNotifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-60 text-muted-foreground bg-muted/30 rounded-lg p-6">
-                  <MessageSquare className="h-12 w-12 mb-3 opacity-40" />
-                  <p className="text-base font-medium">No new posts found</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    New post notifications will appear here
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {filteredNotifications.map(notification => {
-                    const isSelected =
-                      selectedNotification?.id === notification.id;
-                    const isUnread = !notification.read_at;
-
-                    return (
-                      <div
-                        key={notification.id}
-                        onClick={() => handleNotificationSelect(notification)}
-                        className={cn(
-                          'relative p-4 cursor-pointer rounded-lg transition-all',
-                          'hover:bg-accent/50 dark:hover:bg-accent/30',
-                          isSelected
-                            ? 'bg-accent/40 dark:bg-accent/20 ring-1 ring-primary/10  border-l-2 border-primary'
-                            : 'bg-card dark:bg-card/80',
-                        )}
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-10 w-10 text-gray-600 dark:text-white" />
+            {unreadCount > 0 && (
+              <Badge
+                variant="destructive"
+                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs animate-pulse"
+              >
+                {unreadCount}
+              </Badge>
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-[450px] p-0">
+          <Card className={cn('w-full border-0 shadow-none', className)}>
+            <CardHeader className="border-b py-3 flex flex-col gap-2">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-lg">Notifications</CardTitle>
+                {unreadCount > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={markAllAsRead}
+                    disabled={isLoading}
+                    className="text-sm hover:text-blue-700"
+                  >
+                    {isLoading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Mark all as read
+                  </Button>
+                )}
+              </div>
+              <Tabs
+                defaultValue="all"
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="w-full"
+              >
+                <TabsList className="grid grid-cols-3 w-full">
+                  <TabsTrigger value="all" className="text-sm">
+                    All ({notifications.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="post" className="text-sm">
+                    New Question ({postCount})
+                  </TabsTrigger>
+                  <TabsTrigger value="comment" className="text-sm">
+                    Comment ({commentCount})
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </CardHeader>
+            <ScrollArea className={`h-[${maxHeight}px] w-full`}>
+              <CardContent className="p-0">
+                {filteredNotifications.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+                    <Bell className="h-12 w-12 mb-2 text-gray-400" />
+                    <p>No notifications</p>
+                  </div>
+                ) : (
+                  filteredNotifications.map(notification => (
+                    <div
+                      key={notification.id}
+                      className={cn(
+                        'flex items-start gap-3 p-4 transition-colors border-b last:border-0 relative',
+                        !notification.read_at,
+                      )}
+                    >
+                      <Avatar className="h-12 w-12 border rounded-lg">
+                        <AvatarImage
+                          src={notification.data.profile_photo_url}
+                          alt={notification.data.name || 'User'}
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {notification.data.name?.[0] || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <Link
+                        href={`/posts/${notification.data.slug}`}
+                        className="block flex-1"
                       >
-                        <div className="flex items-start gap-4">
-                          {isUnread && (
-                            <div className="absolute top-4 left-2 w-2 h-2 rounded-full bg-blue-500" />
-                          )}
-
-                          <div
-                            className={cn(
-                              'flex-1 space-y-2',
-                              isUnread && 'pl-3',
-                            )}
-                          >
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-2">
-                                <MessageSquare className="h-4 w-4 text-primary" />
-                                <span className="text-sm font-medium text-muted-foreground">
-                                  New Post by {notification.data.name}
-                                </span>
-                                {notification.data.product_name && (
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-xs font-normal px-2 py-0.5"
-                                  >
-                                    {notification.data.product_name}
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap">
-                                <Clock className="h-3 w-3" />
-                                <span>
-                                  {formatTimeAgo(notification.created_at)}
-                                </span>
-                              </div>
-                            </div>
-
-                            <h2
-                              className={cn(
-                                'text-base leading-tight',
-                                isUnread ? 'font-semibold' : 'font-medium',
-                              )}
-                            >
-                              {notification.data.title}
-                            </h2>
-
-                            <p className="text-sm text-muted-foreground line-clamp-2">
-                              {notification.data.message ||
-                                'New post has been created'}
-                            </p>
-                          </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium">
+                            {notification.data.name}
+                          </p>
+                          <p className="text-sm">{notification.data.message}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {formatTimeAgo(notification.created_at)}
+                          </p>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                      </Link>
+                      {!notification.read_at && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            markAsRead(notification.id);
+                          }}
+                          disabled={markingAsRead.includes(notification.id)}
+                          className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 dark:hover:bg-green-900/20"
+                          title="Mark as read"
+                        >
+                          {markingAsRead.includes(notification.id) ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Check className="h-4 w-4" />
+                          )}
+                        </Button>
+                      )}
+                      {!notification.read_at && (
+                        <div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full" />
+                      )}
+                    </div>
+                  ))
+                )}
+              </CardContent>
             </ScrollArea>
-          </div>
-
-          <div
-            className={cn(
-              'flex-1 h-full overflow-hidden',
-              isMobile && !showPostView ? 'hidden' : 'block',
-            )}
-          >
-            {isMobile && showPostView && (
-              <div className="p-4 border-b dark:border-gray-800 flex items-center bg-background sticky top-0 z-10">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleBackToList}
-                  className="mr-2"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </Button>
-                <span className="font-medium">Back to New Posts</span>
-              </div>
-            )}
-
-            {selectedPost ? (
-              <ScrollArea className="h-full w-full">
-                <div className="p-4 md:p-6 dark:bg-background ">
-                  <PostContent
-                    key={selectedPost.id}
-                    post={selectedPost}
-                    comments={selectedPost.comments}
-                    onCommentSubmit={handleCommentSubmit}
-                    showBorder={false}
-                    currentUser={user}
-                  />
-                </div>
-              </ScrollArea>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                <MessageSquare className="h-16 w-16 mb-4 text-muted-foreground/50" />
-                <h3 className="text-xl font-medium mb-2">No post selected</h3>
-                <p className="text-center max-w-md">
-                  Select a new post notification to view its content
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      </AppLayout>
-      <Toaster />
-    </TooltipProvider>
+          </Card>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
-}
+};
+
+export default NotificationsDropdown;

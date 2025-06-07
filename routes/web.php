@@ -84,7 +84,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/admin/tags', [AdminController::class, 'getAllTags'])->name('admin.tags');
 
 });
-
+Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 // Route::get('/test-event', function () {
 //    $post = Post::find('01jp1xepa4cv3en4axatkh9vdk');
 //    event(new NewQuestionCreated($post));

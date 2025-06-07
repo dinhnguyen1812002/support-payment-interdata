@@ -3,7 +3,7 @@ import { router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
-import { MessageCircle, Trash2, MoreHorizontal, Flag } from 'lucide-react';
+import { MessageCircle, Trash2, MoreHorizontal, Flag, X } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,8 +38,11 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
   const handleReply = (content: string) => {
     // Convert comment.id to number if it's a string
-
     onReply(content, comment.id);
+    setIsReplying(false);
+  };
+
+  const handleCancelReply = () => {
     setIsReplying(false);
   };
 
@@ -167,6 +170,20 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
         {isReplying && currentUser && (
           <div className="ml-4 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                Replying to {comment.user.name}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCancelReply}
+                className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              >
+                <X className="w-4 h-4" />
+                <span className="ml-1 text-xs">Cancel</span>
+              </Button>
+            </div>
             <CommentForm
               onSubmit={handleReply}
               placeholder="Write a reply..."

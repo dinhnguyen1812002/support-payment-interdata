@@ -31,7 +31,7 @@ class CommentsController extends Controller
 
         $comment->load('user');
 
-        broadcast(new CommentPosted($comment));
+        broadcast(new CommentPosted($comment))->toOthers();
         broadcast(new NewCommentCreated($comment))->toOthers();
 
         $postOwner = $comment->post->user;

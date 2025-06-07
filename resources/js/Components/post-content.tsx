@@ -95,63 +95,6 @@ const PostContent: React.FC<PostContentProps> = ({
   };
 
   // Setup Echo channel for real-time comment updates
-  useEffect(() => {
-    if (!window.Echo || !post.id) return;
-
-    const channelName = `post.${post.id}`;
-    try {
-      const channel = window.Echo.channel(channelName);
-      channelRef.current = channel;
-
-      const handleCommentPosted = (e: NewCommentEvent) => {
-        if (!isUnmountedRef.current && e.comment) {
-          console.log('New comment received:', e.comment);
-
-          // Prevent duplicate comments
-          setComments(prevComments => {
-            const commentExists = prevComments.some(c => c.id === e.comment.id);
-            if (commentExists) return prevComments;
-
-            if (e.comment.parent_id) {
-              // Handle reply: find parent comment and append reply
-              return prevComments.map(comment => {
-                if (comment.id === e.comment.parent_id) {
-                  return {
-                    ...comment,
-                    replies: [...(comment.replies || []), e.comment],
-                  };
-                }
-                return comment;
-              });
-            } else {
-              // Add top-level comment
-              return [e.comment, ...prevComments];
-            }
-          });
-        }
-      };
-
-      channel.listen('CommentPosted', handleCommentPosted);
-
-      console.log(`Subscribed to channel: ${channelName}`);
-
-      return () => {
-        isUnmountedRef.current = true;
-        if (channelRef.current) {
-          try {
-            channelRef.current.stopListening('CommentPosted');
-            window.Echo.leaveChannel(channelName);
-            console.log(`Left channel: ${channelName}`);
-          } catch (error) {
-            console.warn('Error cleaning up Echo channel:', error);
-          }
-        }
-        channelRef.current = null;
-      };
-    } catch (error) {
-      console.error('Error setting up Echo channel:', error);
-    }
-  }, [post.id]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -173,7 +116,7 @@ const PostContent: React.FC<PostContentProps> = ({
     >
       <div className="mt-5 space-y-4 dark:text-[#F5F5F5] ">
         <div className="mb-1">
-          <span className="text-2xl font-bold mb-0 me-1 dark:text-[#F5F5F5]">
+          <span className="text-xl font-bold mb-0 me-1 dark:text-[#F5F5F5]">
             {post.title}
           </span>
           <div className="mb-6 max-w-none prose prose-lg">

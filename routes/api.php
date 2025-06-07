@@ -18,16 +18,16 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-//Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
+// Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
 //    ->middleware('auth')
 //    ->name('notifications.read_all');
 // Trong routes/web.php hoặc routes/api.php
 
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
-//Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
 //    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 //    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
-//});
+// });
 Route::get('categories', [CategoryController::class, 'index']);
 
 Route::get('/tags', [TagController::class, 'index']);
@@ -38,11 +38,8 @@ Route::get('/count', [PostController::class, 'getCountPost']);
 
 Route::get('/top-voted-posts', [PostController::class, 'topVotedPosts']);
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(function () {});
 
-});
-Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
-Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 // Route::get('/test-notification', function () {
 //    $user = User::find(1); // User ID cần tồn tại
 //    $post = Post::find('01jnz291ec0j11gj752pgk2mc4'); // Post ID cần tồn tại
