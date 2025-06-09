@@ -29,6 +29,10 @@ import { motion } from 'framer-motion';
 import MobileSidebarToggle from '@/Components/toggle-side-bar';
 import MobileSidebar from '@/Components/MobileSidebar';
 import { Label } from '@/Components/ui/label';
+import { SearchCommandDialog } from '@/Components/command-dialog';
+import { Input } from '@/Components/ui/input';
+import { LogOut, ScanSearch } from 'lucide-react';
+import ThemeSwitch from '@/Components/dashboard/toggle-switch';
 
 interface Props {
   title: string;
@@ -54,7 +58,7 @@ export default function AppLayout({
     useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
+  const [open, setOpen] = useState(false);
   // Handle scroll event for sticky header effects
   useEffect(() => {
     const handleScroll = () => {
@@ -65,6 +69,16 @@ export default function AppLayout({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen(open => !open);
+      }
+    };
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, []);
   function switchToTeam(e: React.FormEvent, team: Team) {
     e.preventDefault();
     router.put(
@@ -77,6 +91,9 @@ export default function AppLayout({
       },
     );
   }
+  const handleCategoryClick = () => {
+    setOpen(true);
+  };
   function logout(e: React.FormEvent) {
     e.preventDefault();
     router.post(route('logout'));
@@ -152,8 +169,20 @@ export default function AppLayout({
 
             {/* Right section: User controls */}
             <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4 ">
+              <div>
+                <SearchCommandDialog open={open} setOpen={setOpen} />
+                {/*<Input type="search" placeholder="Search..."></Input>*/}
+                <Button
+                  variant={'ghost'}
+                  className="rounded-full"
+                  onClick={() => handleCategoryClick()}
+                >
+                  <ScanSearch className="h-10 w-10" />
+                  Ctrl+K
+                </Button>
+              </div>
               {/* Theme toggle */}
-              <ModeToggle />
+              {/*<ModeToggle />*/}
               {/* Notifications - Only show for authenticated users */}
               {page.props.auth.user && (
                 <NotificationsDropdown notifications={notifications} />
@@ -196,42 +225,45 @@ export default function AppLayout({
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
+
+                  <DropdownMenuContent className="w-56" align="end">
                     <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1 ">
+                      <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none line-clamp-1">
                           {page.props.auth.user?.name}
                         </p>
-                        <p className="text-xs leading-none text-muted-foreground ">
+                        <p className="text-xs leading-none text-muted-foreground">
                           {page.props.auth.user?.email}
                         </p>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {/*{page.props.department && (*/}
-                    {/*  <DropdownMenuItem asChild>*/}
-                    {/*    <Link*/}
-                    {/*      href={route('departments.show', {*/}
-                    {/*        department: page.props.department.slug,*/}
-                    {/*      })}*/}
-                    {/*    >*/}
-                    {/*      /!*{page.props.department.name}*!/*/}
-                    {/*      Department*/}
-                    {/*    </Link>*/}
-                    {/*  </DropdownMenuItem>*/}
-                    {/*)}*/}
-                    <DropdownMenuItem asChild>
-                      <Link href={route('profile.show')}>Profile</Link>
-                    </DropdownMenuItem>
-
                     <DropdownMenuItem
-                      className="cursor-pointer"
-                      onSelect={e => {
+                      asChild
+                      className="h-10 border-b text-base"
+                    >
+                      <Link
+                        href={route('profile.show')}
+                        className="flex h-10 w-full cursor-pointer items-center"
+                      >
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      asChild
+                      className="flex h-10 w-full cursor-pointer items-center h-10 border-b text-base"
+                    >
+                      <ThemeSwitch />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer text-destructive focus:text-destructive h-10 border-b  text-base"
+                      onClick={e => {
                         e.preventDefault();
                         logout(e as unknown as React.FormEvent);
                       }}
                     >
-                      Log Out
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log Out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

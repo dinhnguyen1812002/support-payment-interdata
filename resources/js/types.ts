@@ -210,7 +210,7 @@ export interface BlogPost {
 export interface Notification {
   id: string;
   data: {
-    post_id?: string;
+    post_id: string;
     title?: string;
     content: string;
     message: string;
@@ -224,7 +224,7 @@ export interface Notification {
   };
   read_at: string | null;
   created_at: string;
-  type: string;
+  type: 'post' | 'comment';
   categories: Category[];
   tags: Tag[];
 }

@@ -34,9 +34,6 @@ const CommentsContent: React.FC<
   const isUnmountedRef = useRef(false);
 
   // Thêm useEffect để debug comments state
-  useEffect(() => {
-    console.log('Current comments state:', comments);
-  }, [comments]);
 
   const handleCommentSubmit = useCallback(
     async (content: string, parentId?: string) => {
@@ -171,8 +168,6 @@ const CommentsContent: React.FC<
       // channel.listen('CommentPosted', handleCommentPosted);
       channel.listen('.CommentDeleted', handleCommentDeleted);
 
-      console.log(`Subscribed to channel: ${channelName}`);
-
       return () => {
         isUnmountedRef.current = true;
         if (channelRef.current) {
@@ -180,7 +175,6 @@ const CommentsContent: React.FC<
             channelRef.current.stopListening('.CommentPosted');
             channelRef.current.stopListening('.CommentDeleted');
             window.Echo.leaveChannel(channelName);
-            console.log(`Left channel: ${channelName}`);
           } catch (error) {
             console.warn('Error cleaning up Echo channel:', error);
           }

@@ -1,5 +1,4 @@
-import { MailIcon, PlusCircleIcon, type LucideIcon } from "lucide-react"
-
+import { MailIcon, PlusCircleIcon, type LucideIcon } from 'lucide-react';
 
 import {
   SidebarGroup,
@@ -7,18 +6,18 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/Components/ui/sidebar"
-import React from "react"
-import {Link} from "@inertiajs/react";
+} from '@/Components/ui/sidebar';
+import React from 'react';
+import { Link } from '@inertiajs/react';
 
 export function NavMain({
   items,
 }: {
   items: {
-    title: string
-    url: string
-    icon?: LucideIcon
-  }[]
+    title: string;
+    url: string;
+    icon?: LucideIcon;
+  }[];
 }) {
   return (
     <SidebarGroup>
@@ -43,18 +42,18 @@ export function NavMain({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title}>
+          {items.map(item => (
+            <Link href={item.url}>
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton tooltip={item.title}>
                   {item.icon && <item.icon />}
-                  <Link href={item.url} >
-                      <span>{item.title}</span>
-                  </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+                  <span>{item.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </Link>
           ))}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }

@@ -147,10 +147,10 @@ const Sidebar: React.FC<Props> = () => {
   const [open, setOpen] = useState(false);
   const [totalPosts, setTotalPosts] = useState<number>(0);
   const [publicCategories, setPublicCategories] = useState<Category[]>([
-    { id: 1, title: 'All Questions', number: 6234 },
-    { id: 2, title: 'Search', number: null },
+    { id: 1, title: 'All Tickets', number: 6234 },
+    // { id: 2, title: 'Search', number: null },
     // { id: 3, title: "Tags", number: null },
-    { id: 4, title: 'Ask Question', number: null },
+    { id: 4, title: 'Create Ticket', number: null },
   ]);
 
   useEffect(() => {
@@ -194,7 +194,7 @@ const Sidebar: React.FC<Props> = () => {
         />
         <TagBar />
         <CategoriesSidebar />
-        <SearchCommandDialog open={open} setOpen={setOpen} />
+        {/*<SearchCommandDialog open={open} setOpen={setOpen} />*/}
       </div>
     </div>
   );

@@ -70,7 +70,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
       <div className="flex justify-between items-center flex-wrap mb-8 lg:mb-7">
         <div className="space-y-1">
           <span className="font-bold text-2xl text-customBlue dark:text-white">
-            All Questions
+            All Tickets
             <small className="text-gray-500 dark:text-gray-400 text-base font-semibold ml-1">
               ({postCount})
             </small>

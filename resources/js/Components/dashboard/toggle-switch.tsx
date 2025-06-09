@@ -1,36 +1,42 @@
-import React, { useEffect, useState } from "react";
-import { ToggleGroup, ToggleGroupItem } from "@/Components/ui/toggle-group";
-import { MoonStar, MonitorCog, Sun } from "lucide-react";
-import { useTheme } from "@/Components/theme-provider";
+import React, { useEffect, useState } from 'react';
+import { Switch } from '@/Components/ui/switch';
+import { MoonStar, Sun } from 'lucide-react';
+import { useTheme } from '@/Components/theme-provider';
 
 export default function ThemeSwitch() {
-    const [mounted, setMounted] = useState(false);
-    const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    if (!mounted || theme === undefined) {
-        return null;
-    }
+  if (!mounted || theme === undefined) {
+    return null;
+  }
 
-    return (
-        <ToggleGroup
-            className="rounded-full border p-1 dark:bg-[#0F1014]"
-            size="sm"
-            type="single"
-            value={theme}
-        >
-            <ToggleGroupItem className="rounded-full" value="dark" aria-label="Toggle dark" onClick={() => setTheme("dark")}>
-                <MoonStar size={16} />
-            </ToggleGroupItem>
-            <ToggleGroupItem className="rounded-full" value="system" aria-label="Toggle system" onClick={() => setTheme("system")}>
-                <MonitorCog size={16} />
-            </ToggleGroupItem>
-            <ToggleGroupItem className="rounded-full" value="light" aria-label="Toggle light" onClick={() => setTheme("light")}>
-                <Sun size={16} />
-            </ToggleGroupItem>
-        </ToggleGroup>
-    );
+  const isDark = theme === 'dark';
+
+  const handleThemeChange = (checked: boolean) => {
+    setTheme(checked ? 'dark' : 'light');
+  };
+
+  return (
+    <div className="flex items-center space-x-2  p-2 dark:bg-dark h-10 border-b">
+      <Sun
+        size={16}
+        className={`transition-colors ${!isDark ? 'text-primary' : 'text-muted-foreground'}`}
+      />
+      <Switch
+        checked={isDark}
+        onCheckedChange={handleThemeChange}
+        aria-label="Toggle theme"
+        className="data-[state=checked]:bg-slate-900 data-[state=unchecked]:text-primary"
+      />
+      <MoonStar
+        size={16}
+        className={`transition-colors ${isDark ? 'text-blue-400' : 'text-muted-foreground'}`}
+      />
+    </div>
+  );
 }

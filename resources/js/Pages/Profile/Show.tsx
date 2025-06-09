@@ -221,46 +221,46 @@ const ProfilePage = ({
       icon: <Activity className="w-5 h-5" />,
       component: <LogoutOtherBrowserSessions sessions={sessions} />,
     },
-    {
-      id: 'notifications',
-      title: 'Notifications',
-      icon: <BellIcon className="w-5 h-5" />,
-      component: (
-        <Card>
-          <CardHeader>
-            <CardTitle>Tùy chọn thông báo</CardTitle>
-            <CardDescription>Quản lý cách bạn nhận thông báo.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium">Thông báo qua email</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Nhận thông báo qua email khi có hoạt động mới
-                  </p>
-                </div>
-                <div>
-                  <Switch />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium">Thông báo trên trình duyệt</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Hiển thị thông báo trên trình duyệt
-                  </p>
-                </div>
-                <div>
-                  <Switch />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ),
-    },
+    // {
+    //   id: 'notifications',
+    //   title: 'Notifications',
+    //   icon: <BellIcon className="w-5 h-5" />,
+    //   component: (
+    //     <Card>
+    //       <CardHeader>
+    //         <CardTitle>Tùy chọn thông báo</CardTitle>
+    //         <CardDescription>Quản lý cách bạn nhận thông báo.</CardDescription>
+    //       </CardHeader>
+    //       <CardContent>
+    //         <div className="space-y-4">
+    //           <div className="flex items-center justify-between">
+    //             <div>
+    //               <h4 className="font-medium">Thông báo qua email</h4>
+    //               <p className="text-sm text-muted-foreground">
+    //                 Nhận thông báo qua email khi có hoạt động mới
+    //               </p>
+    //             </div>
+    //             <div>
+    //               <Switch />
+    //             </div>
+    //           </div>
+    //
+    //           <div className="flex items-center justify-between">
+    //             <div>
+    //               <h4 className="font-medium">Thông báo trên trình duyệt</h4>
+    //               <p className="text-sm text-muted-foreground">
+    //                 Hiển thị thông báo trên trình duyệt
+    //               </p>
+    //             </div>
+    //             <div>
+    //               <Switch />
+    //             </div>
+    //           </div>
+    //         </div>
+    //       </CardContent>
+    //     </Card>
+    //   ),
+    // },
     {
       id: 'posts',
       title: 'Your question',
@@ -337,7 +337,7 @@ const ProfilePage = ({
       canLogin={true}
       title={user.name}
     >
-      <div className="flex max-w-7xl mx-auto flex-col lg:flex-row min-h-screen dark:bg-[#0D0E12] ">
+      <div className="flex max-w-7xl mx-auto flex-col lg:flex-row min-h-screen dark:bg-[#0F1014] ">
         {/* Mobile/Tablet header */}
         {(screenSize.isMobile || screenSize.isTablet) && (
           <div className="sticky top-0 z-10 p-4 flex justify-between items-center border-b bg-background">
@@ -366,7 +366,7 @@ const ProfilePage = ({
         <div
           id="sidebar"
           className={cn(
-            'dark:bg-[#0D0E12] lg:min-h-screen mt-5',
+            'dark:bg-[#0F1014] lg:min-h-screen mt-5',
             screenSize.isMobile || screenSize.isTablet
               ? 'fixed inset-y-0 left-0 w-64 transform transition-transform duration-200 ease-in-out'
               : 'sticky top-16 h-screen w-60 overflow-y-auto border-r',
@@ -391,19 +391,12 @@ const ProfilePage = ({
               {page.props.jetstream.hasAccountDeletionFeatures && (
                 <SidebarItem
                   icon={<UserX className="w-5 h-5" />}
-                  title="Xóa tài khoản"
+                  title="Danger zone"
                   isActive={activeSection === 'delete-account'}
                   onClick={() => handleSectionChange('delete-account')}
                   variant="destructive"
                 />
               )}
-              <SidebarItem
-                icon={<LogOut className="w-5 h-5" />}
-                title="Đăng xuất"
-                isActive={false}
-                onClick={() => router.post(route('logout'))}
-                variant="destructive"
-              />
             </div>
           </ScrollArea>
         </div>
