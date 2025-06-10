@@ -38,6 +38,7 @@ import { router } from '@inertiajs/core';
 import { route } from 'ziggy-js';
 import { Switch } from '@/Components/ui/switch';
 import { uppercaseText } from '@/Utils/slugUtils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 
 interface Props {
   sessions: Session[];
@@ -366,17 +367,37 @@ const ProfilePage = ({
         <div
           id="sidebar"
           className={cn(
-            'dark:bg-[#0F1014] lg:min-h-screen mt-5',
+            'dark:bg-[#0F1014] lg:sticky lg:top-0 lg:h-screen',
             screenSize.isMobile || screenSize.isTablet
-              ? 'fixed inset-y-0 left-0 w-64 transform transition-transform duration-200 ease-in-out'
-              : 'sticky top-16 h-screen w-60 overflow-y-auto border-r',
+              ? 'fixed inset-y-0 left-0 w-64 transform transition-transform duration-200 ease-in-out z-30'
+              : 'w-60 shrink-0 border-r sticky',
           )}
+          style={{
+            transform:
+              (screenSize.isMobile || screenSize.isTablet) && !sidebarOpen
+                ? 'translateX(-100%)'
+                : 'translateX(0)',
+          }}
         >
-          <div className="px-4 sm:px-5 py-4">
-            <p className="w-full text-xs font-bold text-mutedText uppercase dark:text-gray-400">
-              Dashboard
-            </p>
-          </div>
+          {/*<div className="px-4 sm:px-5 py-4 flex gap-4">*/}
+          {/*  <Avatar className="h-12 w-12 rounded-lg">*/}
+          {/*    <AvatarImage*/}
+          {/*      src={page.props.auth.user?.profile_photo_url}*/}
+          {/*      alt={page.props.auth.user?.name}*/}
+          {/*      className="rounded-lg"*/}
+          {/*    />*/}
+          {/*    <AvatarFallback className="rounded-lg">CN</AvatarFallback>*/}
+          {/*  </Avatar>*/}
+          {/*  <div className="grid flex text-left text-sm leading-tight">*/}
+          {/*    <span className="truncate font-medium">*/}
+          {/*      {page.props.auth.user?.name}*/}
+          {/*    </span>*/}
+          {/*    <span className="truncate text-xs text-muted-foreground">*/}
+          {/*      {page.props.auth.user?.email}*/}
+          {/*    </span>*/}
+          {/*  </div>*/}
+          {/*</div>*/}
+
           <ScrollArea className="h-[calc(100vh-8rem)]">
             <div className="p-3 space-y-1">
               {sidebarItems.map(item => (

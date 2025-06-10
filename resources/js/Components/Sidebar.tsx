@@ -25,8 +25,8 @@ interface Props {
 
 const getCategoryLink = (title: string) => {
   const routes: Record<string, string> = {
-    'All Questions': '/',
-    'Ask Question': '/posts/create',
+    'All Tickets': '/',
+    'Request Ticket': '/posts/create',
     'My Questions': '',
     Search: '',
   };
@@ -56,9 +56,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({
     return categories.map(category => {
       const link = getCategoryLink(category.title);
       const isActive =
-        pathname === '/'
-          ? category.title === 'All Questions'
-          : pathname === link;
+        pathname === '/' ? category.title === 'All Tickets' : pathname === link;
       return { ...category, link, isActive };
     });
   }, [categories, activeLink]);
@@ -150,7 +148,7 @@ const Sidebar: React.FC<Props> = () => {
     { id: 1, title: 'All Tickets', number: 6234 },
     // { id: 2, title: 'Search', number: null },
     // { id: 3, title: "Tags", number: null },
-    { id: 4, title: 'Create Ticket', number: null },
+    { id: 4, title: 'Request Ticket', number: null },
   ]);
 
   useEffect(() => {

@@ -31,7 +31,7 @@ export default function ThemeSwitch() {
         checked={isDark}
         onCheckedChange={handleThemeChange}
         aria-label="Toggle theme"
-        className="data-[state=checked]:bg-slate-900 data-[state=unchecked]:text-primary"
+        className="data-[state=checked]:bg-slate-900 data-[state=unchecked]:text-primary  dark:bg-amber-50"
       />
       <MoonStar
         size={16}

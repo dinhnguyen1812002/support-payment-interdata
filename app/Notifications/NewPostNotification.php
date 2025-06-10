@@ -53,6 +53,7 @@ class NewPostNotification extends Notification implements ShouldBroadcast
             'product_id' => $this->post->product_id,
             'product_name' => $this->post->product_name,
             'created_at' => $this->post->created_at->diffForHumans(),
+            'type_notification' => 'post',
         ];
     }
 
@@ -61,8 +62,9 @@ class NewPostNotification extends Notification implements ShouldBroadcast
         return new BroadcastMessage([
             'id' => $this->post->id,
             'data' => $this->toArray($notifiable),
-            'created_at' => now()->diffForHumans(),
+            'created_at' => $this->post->created_at->diffForHumans(),
             'read_at' => null,
+            'type' => 'post',
         ]);
     }
 

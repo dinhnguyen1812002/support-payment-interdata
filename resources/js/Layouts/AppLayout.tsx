@@ -22,15 +22,12 @@ import Footer from '@/Components/Footer';
 import { Button } from '@/Components/ui/button';
 import NotificationsDropdown from '@/Components/NotificationsDropdown';
 
-import ModeToggle from '@/Components/mode-toggle';
 
 import { Toaster } from '@/Components/ui/sonner';
 import { motion } from 'framer-motion';
 import MobileSidebarToggle from '@/Components/toggle-side-bar';
 import MobileSidebar from '@/Components/MobileSidebar';
-import { Label } from '@/Components/ui/label';
 import { SearchCommandDialog } from '@/Components/command-dialog';
-import { Input } from '@/Components/ui/input';
 import { LogOut, ScanSearch } from 'lucide-react';
 import ThemeSwitch from '@/Components/dashboard/toggle-switch';
 
@@ -262,8 +259,10 @@ export default function AppLayout({
                         logout(e as unknown as React.FormEvent);
                       }}
                     >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log Out</span>
+                      <span className="dark:text-white flex items-center">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        log out
+                      </span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -407,7 +406,9 @@ export default function AppLayout({
 
                 {/* Authentication */}
                 <form method="POST" onSubmit={logout}>
-                  <ResponsiveNavLink as="button">Log Out</ResponsiveNavLink>
+                  <ResponsiveNavLink as="button">
+                    <span className="dark:text-white">log out</span>
+                  </ResponsiveNavLink>
                 </form>
 
                 {/* Team Management (if enabled) */}
