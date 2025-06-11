@@ -68,13 +68,13 @@ export default function TagsPage({ tags = [] }: TagsPageProps) {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="relative">
+                  {/* <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       placeholder="Search tags..."
                       className="pl-8 w-[250px]"
                     />
-                  </div>
+                  </div> */}
                   <Button onClick={() => handleOpenDialog()}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add Tag

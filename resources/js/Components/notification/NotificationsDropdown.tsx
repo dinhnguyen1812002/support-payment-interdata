@@ -88,10 +88,20 @@ const useNotificationStats = (
   return useMemo(
     () => ({
       unreadCount: notifications.filter(n => !n.read_at).length,
-      postCount: notifications.filter(n => n.data.type_notification === 'post')
-        .length,
+      // Sử dụng cùng logic filtering như ở trên
+      postCount: notifications.filter(
+        n =>
+          n.type === 'post' ||
+          n.data.type_notification === 'post' ||
+          n.type.includes('post') ||
+          (n.data.post_id && !n.data.comment_id),
+      ).length,
       commentCount: notifications.filter(
-        n => n.data.type_notification === 'comment',
+        n =>
+          n.type === 'comment' ||
+          n.data.type_notification === 'comment' ||
+          n.type.includes('comment') ||
+          n.data.comment_id,
       ).length,
       totalCount: notifications.length,
     }),
@@ -108,10 +118,22 @@ const useFilteredNotifications = (
       case TAB_KEYS.UNREAD:
         return notifications.filter(n => !n.read_at);
       case TAB_KEYS.POST:
-        return notifications.filter(n => n.data.type_notification === 'post');
-      case TAB_KEYS.COMMENT:
+        // Sửa logic filtering cho posts - có thể type là 'post' hoặc kiểm tra theo type khác
         return notifications.filter(
-          n => n.data.type_notification === 'comment',
+          n =>
+            n.type === 'post' ||
+            n.data.type_notification === 'post' ||
+            n.type.includes('post') ||
+            (n.data.post_id && !n.data.comment_id), // Post notification thường có post_id nhưng không có comment_id
+        );
+      case TAB_KEYS.COMMENT:
+        // Sửa logic filtering cho comments
+        return notifications.filter(
+          n =>
+            n.type === 'comment' ||
+            n.data.type_notification === 'comment' ||
+            n.type.includes('comment') ||
+            n.data.comment_id, // Comment notification có comment_id
         );
       default:
         return notifications;
@@ -296,11 +318,18 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
     async (notificationId: string) => {
       if (markingAsRead.has(notificationId)) return;
 
+      // Tìm notification trước khi mark as read
+      const notificationToUpdate = notifications.find(
+        n => n.id === notificationId,
+      );
+      if (!notificationToUpdate || notificationToUpdate.read_at) return;
+
       try {
         setMarkingAsRead(prev => new Set([...prev, notificationId]));
 
         await apiClient.post(`/notifications/${notificationId}/read`);
 
+        // Update state ngay lập tức
         setNotifications(prev =>
           prev.map(notification =>
             notification.id === notificationId
@@ -312,10 +341,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
         console.error('Error marking notification as read:', error);
         showError({
           type: 'mark-read',
-          message:
-            error instanceof Error
-              ? error.message
-              : 'Failed to mark notification as read.',
+          message: 'Failed to mark notification as read.',
         });
       } finally {
         setMarkingAsRead(prev => {
@@ -325,7 +351,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
         });
       }
     },
-    [apiClient, markingAsRead, showError],
+    [apiClient, notifications, markingAsRead, showError],
   );
 
   const markAllAsRead = useCallback(async () => {
@@ -356,12 +382,12 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
 
   // Effects
   useEffect(() => {
-    if (activeTab === TAB_KEYS.ALL) {
+    // Chỉ fetch lại khi tab ALL và chưa có data, hoặc khi cần refresh
+    if (activeTab === TAB_KEYS.ALL && notifications.length === 0) {
       fetchAllNotifications();
-    } else {
-      setNotifications(initialNotifications);
     }
-  }, [activeTab, initialNotifications, fetchAllNotifications]);
+    // Bỏ phần reset về initialNotifications vì nó sẽ làm mất những notification đã mark as read
+  }, [activeTab, fetchAllNotifications]);
 
   // Cleanup timeouts
   useEffect(() => {

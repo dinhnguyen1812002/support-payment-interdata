@@ -7,6 +7,7 @@ import { AppSidebar } from '@/Components/dashboard/app-sidebar';
 import { SiteHeader } from '@/Components/dashboard/site-header';
 import { SectionCards } from '@/Components/dashboard/section-cards';
 import { Inertia } from '@inertiajs/inertia';
+import { PageTransition } from '@/Components/ui/page-transition';
 
 export type Post = {
   id: string;
@@ -65,18 +66,20 @@ export default function PostsPage() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title={'All Post'} />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 ml-4">
-              <DataTable
-                columns={columns}
-                data={data}
-                pagination={pagination}
-                onPageChange={handlePageChange}
-              />
+        <PageTransition>
+          <div className="flex flex-1 flex-col">
+            <div className="@container/main flex flex-1 flex-col gap-2">
+              <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 ml-4">
+                <DataTable
+                  columns={columns}
+                  data={data}
+                  pagination={pagination}
+                  onPageChange={handlePageChange}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </PageTransition>
       </SidebarInset>
     </SidebarProvider>
   );

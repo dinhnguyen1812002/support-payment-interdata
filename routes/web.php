@@ -82,6 +82,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
     Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
     Route::get('/admin/tags', [AdminController::class, 'getAllTags'])->name('admin.tags');
+    Route::get('/admin/roles-permissions', [AdminController::class, 'getAllRolesAndPermissions'])->name('admin.roles-permissions');
 
 });
 Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
@@ -128,3 +129,11 @@ Route::middleware(['auth'])->group(function () {
 // Route::get('/posts/{id}/showById', [PostController::class, 'showById'])->name('posts.showById');
 
 // Role routes
+
+// API endpoints cho role và permission
+Route::post('/users/assign-role', [PermissionController::class, 'assignRole'])->name('users.assign-role');
+Route::post('/users/assign-permissions', [PermissionController::class, 'assignPermissions'])->name('users.assign-permissions');
+Route::post('/admin/roles', [RoleController::class, 'storeRole'])->name('admin.roles.store');
+Route::put('/admin/roles/{id}', [RoleController::class, 'updateRole'])->name('admin.roles.update');
+//Route::post('/admin/permissions', [RoleController::class, 'storePermission'])->name('admin.permissions.store');
+//Route::put('/admin/permissions/{id}', [RoleController::class, 'updatePermission'])->name('admin.permissions.update');

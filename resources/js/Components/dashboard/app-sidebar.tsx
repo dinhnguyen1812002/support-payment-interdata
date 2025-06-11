@@ -17,6 +17,7 @@ import {
   ContactRound,
   ChartColumnStacked,
   Boxes,
+  FolderKey,
 } from 'lucide-react';
 
 import { NavDocuments } from '@/Components/dashboard/nav-documents';
@@ -64,6 +65,11 @@ const data = {
       title: 'tag',
       url: '/admin/tags',
       icon: FileTextIcon,
+    },
+    {
+      title: 'roles and permission',
+      url: '/admin/roles-permissions',
+      icon: FolderKey,
     },
 
     {

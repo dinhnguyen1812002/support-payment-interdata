@@ -19,7 +19,7 @@ import { route } from 'ziggy-js';
 import useTypedPage from '@/Hooks/useTypedPage';
 import { Department, Notification } from '@/types';
 import AppSidebar from '@/Components/Ticket/sidebar-nav';
-import NotificationsDropdown from '@/Components/NotificationsDropdown';
+import NotificationsDropdown from '@/Components/notification/NotificationsDropdown';
 
 interface AppLayoutProps {
   children: React.ReactNode;

@@ -46,7 +46,7 @@ class NewQuestionCreated implements ShouldBroadcast
                 'categories' => $this->post->categories->pluck('title')->toArray(),
                 'type_notification' => 'post',
             ],
-            'created_at' => $this->post->created_at->toISOString(),
+            'created_at' => $this->post->created_at->diffForHumans(),
             'read_at' => null,
             'type' => 'post',
         ];

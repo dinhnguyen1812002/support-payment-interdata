@@ -74,4 +74,44 @@ class AdminController extends Controller
             'tags' => $tags,
         ]);
     }
+
+    public function getAllRolesAndPermissions(Request $request)
+    {
+        $this->authorize('view admin dashboard');
+
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search', '');
+        $page = $request->input('page', 1);
+        $roles = \Spatie\Permission\Models\Role::with('permissions')->get();
+        $permissions = \Spatie\Permission\Models\Permission::all();
+
+        // Phân trang cho users
+        $users = \App\Models\User::query()
+            ->with(['roles', 'permissions'])
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return Inertia::render('Admin/RolesPermissions', [
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'users' => [
+                'data' => $users->items(),
+                'total' => $users->total(),
+                'per_page' => $users->perPage(),
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'next_page_url' => $users->nextPageUrl(),
+                'prev_page_url' => $users->previousPageUrl(),
+            ],
+            'filters' => [
+                'search' => $search,
+                'per_page' => $perPage,
+            ],
+        ]);
+    }
 }

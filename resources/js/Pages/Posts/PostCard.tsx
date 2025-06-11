@@ -4,20 +4,23 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Badge } from '@/Components/ui/badge';
 import { Link } from '@inertiajs/react';
 import useTypedPage from '@/Hooks/useTypedPage';
-import { BlogPost } from '@/types';
+import { BlogPost, Paginate } from '@/types';
 import { generateSlug } from '@/Utils/slugUtils';
 import UpvoteButton from '@/Components/VoteButton';
 import { route } from 'ziggy-js';
 import { Button } from '@/Components/ui/button';
+import Pagination from '@/Components/Pagination';
 
 interface BlogCardProps {
   posts: BlogPost[];
   postCount: number;
+  pagination: Paginate;
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({
   posts: initialPosts = [],
   postCount,
+  pagination,
 }) => {
   const page = useTypedPage();
   const isAuthenticated = !!page.props.auth.user;
@@ -191,6 +194,16 @@ const BlogCard: React.FC<BlogCardProps> = ({
           </div>
         ))}
       </div>
+      {pagination && pagination.total > 0 && (
+        <div className=" flex justify-center">
+          <Pagination
+            current_page={pagination.current_page}
+            next_page_url={pagination.next_page_url}
+            prev_page_url={pagination.prev_page_url}
+            last_page={pagination.last_page}
+          />
+        </div>
+      )}
     </div>
   );
 };

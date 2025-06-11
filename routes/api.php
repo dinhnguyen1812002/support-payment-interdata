@@ -68,3 +68,4 @@ Route::post('/posts/transfer', [PostController::class, 'transfer'])->name('posts
 Route::get('/users/search', [Departments::class, 'search'])->name('search.departments');
 
 Route::delete('/departments/{department}/users/{user}', [DepartmentController::class, 'removeUser'])->name('departments.remove.user');
+Route::get('/notify', [NotificationController::class, 'getNotification']);

@@ -47,7 +47,7 @@ class NewCommentCreated implements ShouldBroadcast
                 'type_notification' => 'comment',
             ],
             'read_at' => null,
-            'created_at' => $this->comment->created_at->toISOString(),
+            'created_at' => $this->comment->created_at->diffForHumans(),
             'type' => 'comment',
         ];
     }

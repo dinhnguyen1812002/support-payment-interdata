@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class PermissionController extends Controller
 {
@@ -21,6 +22,28 @@ class PermissionController extends Controller
         $permissions = Permission::select('id', 'name')->orderBy('name')->get();
 
         return response()->json($permissions);
+    }
+
+    public function assignRole(Request $request)
+    {
+        // Validate input data
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'required|string|exists:roles,name',
+        ]);
+
+        // Only admin can assign roles
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        // Find user by ID
+        $user = User::findOrFail($request->user_id);
+
+        // Sync role for the user (remove all existing roles and assign the new one)
+        $user->syncRoles([$request->role]);
+
+        return Redirect::back()->with('success', 'Role assigned successfully.');
     }
 
     public function assignPermissions(Request $request)
@@ -45,4 +68,7 @@ class PermissionController extends Controller
 
         return Redirect::back()->with('success', 'Permissions assigned successfully.');
     }
+
+
+
 }

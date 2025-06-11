@@ -20,16 +20,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import Footer from '@/Components/Footer';
 import { Button } from '@/Components/ui/button';
-import NotificationsDropdown from '@/Components/NotificationsDropdown';
-
+import NotificationsDropdown from '@/Components/notification/NotificationsDropdown';
 
 import { Toaster } from '@/Components/ui/sonner';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import MobileSidebarToggle from '@/Components/toggle-side-bar';
 import MobileSidebar from '@/Components/MobileSidebar';
 import { SearchCommandDialog } from '@/Components/command-dialog';
 import { LogOut, ScanSearch } from 'lucide-react';
 import ThemeSwitch from '@/Components/dashboard/toggle-switch';
+import { PageTransition } from '@/Components/ui/page-transition';
 
 interface Props {
   title: string;
@@ -145,7 +145,7 @@ export default function AppLayout({
             <div className="hidden max-w-3xl flex-1 items-center justify-start ml-10 sm:flex  ">
               <div className="flex space-x-3 md:space-x-6">
                 <NavLink href={route('/')} active={route().current('/')}>
-                  Dashboard
+                  Home
                 </NavLink>
                 {/*<NavLink*/}
                 {/*  href={route('posts.create')}*/}
@@ -489,13 +489,11 @@ export default function AppLayout({
           </header>
         ) : null}
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          {children}
-        </motion.div>
+        <AnimatePresence mode="wait">
+          <PageTransition key={window.location.pathname}>
+            {children}
+          </PageTransition>
+        </AnimatePresence>
       </main>
 
       <Footer />

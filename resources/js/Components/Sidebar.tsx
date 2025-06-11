@@ -145,7 +145,7 @@ const Sidebar: React.FC<Props> = () => {
   const [open, setOpen] = useState(false);
   const [totalPosts, setTotalPosts] = useState<number>(0);
   const [publicCategories, setPublicCategories] = useState<Category[]>([
-    { id: 1, title: 'All Tickets', number: 6234 },
+    { id: 1, title: 'All Tickets', number: null },
     // { id: 2, title: 'Search', number: null },
     // { id: 3, title: "Tags", number: null },
     { id: 4, title: 'Request Ticket', number: null },
