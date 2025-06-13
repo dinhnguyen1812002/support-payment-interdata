@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Data\Post\CreatePostData;
 use App\Events\NewQuestionCreated;
 use App\Models\Category;
-use App\Models\Departments;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
@@ -137,7 +136,13 @@ class PostService
             })->afterCommit();
 
             dispatch(function () use ($post) {
+                // Broadcast đến kênh notifications chung
                 broadcast(new NewQuestionCreated($post))->toOthers();
+
+                // Broadcast đến kênh của phòng ban cụ thể
+                if ($post->department_id) {
+                    broadcast(new NewPostCreated($post))->toOthers();
+                }
             })->afterCommit();
 
             return [
@@ -394,7 +399,7 @@ class PostService
         }
     }
 
-    private function notifyDepartment(Post $post): void
+    public function notifyDepartment(Post $post): void
     {
         // Nếu bài viết thuộc về một phòng ban cụ thể
         if ($post->department_id) {
@@ -407,21 +412,6 @@ class PostService
                         $user->notify(new NewPostNotification($post));
                     }
                 });
-            }
-        } else {
-            // Nếu bài viết không thuộc phòng ban nào, kiểm tra xem người tạo có thuộc phòng ban nào không
-            $userDepartments = $post->user->departments;
-
-            if ($userDepartments->isNotEmpty()) {
-                // Gửi thông báo cho tất cả người dùng trong các phòng ban của người tạo
-                foreach ($userDepartments as $department) {
-                    $department->users->each(function ($user) use ($post) {
-                        // Không gửi thông báo cho người tạo bài viết
-                        if ($user->id !== $post->user_id) {
-                            $user->notify(new NewPostNotification($post));
-                        }
-                    });
-                }
             }
         }
     }

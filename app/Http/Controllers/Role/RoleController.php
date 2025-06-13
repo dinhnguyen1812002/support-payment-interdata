@@ -44,6 +44,7 @@ class RoleController extends Controller
 
         return Redirect::back()->with('success', 'Role assigned successfully.');
     }
+
     public function storeRole(Request $request)
     {
         // Validate input data
@@ -73,7 +74,7 @@ class RoleController extends Controller
     {
         // Validate input data
         $request->validate([
-            'name' => 'required|string|unique:roles,name,' . $id,
+            'name' => 'required|string|unique:roles,name,'.$id,
             'permissions' => 'nullable|array',
             'permissions.*' => 'string|exists:permissions,name',
         ]);

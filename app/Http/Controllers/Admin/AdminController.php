@@ -114,4 +114,85 @@ class AdminController extends Controller
             ],
         ]);
     }
+
+    public function notifications()
+    {
+        $this->authorize('view admin dashboard');
+
+        $user = auth()->user();
+        $notifications = $user->notifications()
+            ->orderByRaw('read_at IS NULL DESC') // Unread first
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($notification) {
+                return [
+                    'id' => $notification->id,
+                    'data' => $notification->data,
+                    'read_at' => $notification->read_at,
+                    'created_at' => $notification->created_at->diffForHumans(),
+                ];
+            });
+
+        // Get posts related to these notifications
+        $postIds = $notifications->pluck('data.post_id')->filter()->unique()->values()->toArray();
+        $posts = [];
+
+        if (! empty($postIds)) {
+            $posts = \App\Models\Post::whereIn('id', $postIds)
+                ->with(['user', 'categories', 'tags'])
+                ->withCount('upvotes')
+                ->get()
+                ->map(function ($post) {
+                    $comments = $post->getFormattedComments();
+                    $hasUpvote = auth()->check() ? $post->isUpvotedBy(auth()->id()) : false;
+
+                    return [
+                        'id' => $post->id,
+                        'title' => $post->title,
+                        'content' => $post->content,
+                        'created_at' => $post->created_at->diffForHumans(),
+                        'updated_at' => $post->updated_at,
+                        'user' => $post->user,
+                        'categories' => $post->categories,
+                        'tags' => $post->tags,
+                        'comments' => $comments,
+                        'upvote_count' => $post->upvotes_count,
+                        'has_upvote' => $hasUpvote,
+                    ];
+                });
+        }
+
+        return Inertia::render('Admin/Notifications', [
+            'notifications' => $notifications,
+            'posts' => $posts,
+        ]);
+    }
+
+    public function getPost($id)
+    {
+        $this->authorize('view admin dashboard');
+
+        $post = \App\Models\Post::with(['user', 'categories', 'tags'])
+            ->withCount('upvotes')
+            ->findOrFail($id);
+
+        $comments = $post->getFormattedComments();
+        $hasUpvote = auth()->check() ? $post->isUpvotedBy(auth()->id()) : false;
+
+        return response()->json([
+            'post' => [
+                'id' => $post->id,
+                'title' => $post->title,
+                'content' => $post->content,
+                'created_at' => $post->created_at->diffForHumans(),
+                'updated_at' => $post->updated_at,
+                'user' => $post->user,
+                'categories' => $post->categories,
+                'tags' => $post->tags,
+                'comments' => $comments,
+                'upvote_count' => $post->upvotes_count,
+                'has_upvote' => $hasUpvote,
+            ],
+        ]);
+    }
 }

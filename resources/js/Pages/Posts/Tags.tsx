@@ -41,18 +41,7 @@ const PostsIndex: React.FC<Props & { category?: Category }> = ({
         className="flex-1 w-full max-w-5xl mx-auto mt-4 sm:mt-5 md:mt-7 px-4 sm:px-6 md:px-4
              dark:bg-[#0F1014] lg:border-l lg:pl-8 xl:pl-9"
       >
-        <BlogCard posts={posts} postCount={postCount} />
-
-        {pagination && pagination.total > 0 && (
-          <div className="mt-5 sm:mt-6 md:mt-7 flex justify-center">
-            <Pagination
-              current_page={pagination.current_page}
-              next_page_url={pagination.next_page_url}
-              prev_page_url={pagination.prev_page_url}
-              last_page={pagination.last_page}
-            />
-          </div>
-        )}
+        <BlogCard posts={posts} postCount={postCount} pagination={pagination} />
       </div>
     </MainLayout>
     // <AppLayout title={title} canLogin={true} canRegister={true} notifications={notifications}>

@@ -1,297 +1,337 @@
-import { useEffect, useState } from 'react';
-import { Bell, Loader2, Check } from 'lucide-react';
-import { cn, formatTimeAgo } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/Components/ui/dropdown-menu';
-import { Badge } from '@/Components/ui/badge';
-import { Card, CardHeader, CardTitle, CardContent } from '@/Components/ui/card';
-import { Button } from '@/Components/ui/button';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { AppLayout } from '@/Components/Ticket/app-layout';
+import { TooltipProvider } from '@/Components/ui/tooltip';
+import { Toaster } from 'sonner';
 import { ScrollArea } from '@/Components/ui/scroll-area';
-import { Tabs, TabsList, TabsTrigger } from '@/Components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
-import { Link } from '@inertiajs/react';
-import axios from 'axios';
-import { motion, AnimatePresence } from 'framer-motion';
-import AlertInfoDemo from '@/Components/InfoAlert';
+import { Button } from '@/Components/ui/button';
+import { Badge } from '@/Components/ui/badge';
+import { Search, Mail, Clock, MessageSquare, ChevronLeft } from 'lucide-react';
+import type { Department, Notification } from '@/types';
 import useTypedPage from '@/Hooks/useTypedPage';
-import { Category } from '@/types';
-import React from 'react';
-interface NotificationData {
-  post_id: string;
-  title?: string;
-  message: string;
-  slug?: string;
-  name?: string;
-  profile_photo_url?: string;
-  categories?: Category[];
-  type_notification?: string;
-}
+import PostContent from '@/Components/post-content';
+import { router } from '@inertiajs/core';
+import { route } from 'ziggy-js';
+import type { Post } from '@/types/Post';
+import { Input } from '@/Components/ui/input';
+import { cn, formatTimeAgo } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
 
-interface Notification {
-  id: string;
-  data: NotificationData;
-  read_at: string | null;
-  created_at: string;
-  type: 'post' | 'comment';
-}
-
-interface NotificationsDropdownProps {
+interface Props {
   notifications: Notification[];
-  className?: string;
-  maxHeight?: number;
+  department: Department;
+  posts: Post[];
+  auth: { user: { id: number; name: string; profile_photo_path: string } };
 }
 
-const NotificationsDropdown = ({
+export default function DepartmentShow({
+  department,
   notifications: initialNotifications = [],
-  className,
-  maxHeight = 500,
-}: NotificationsDropdownProps) => {
-  const [notifications, setNotifications] =
-    useState<Notification[]>(initialNotifications);
-  const [activeAlert, setActiveAlert] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [markingAsRead, setMarkingAsRead] = useState<string[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  posts: initialPosts = [],
+  auth,
+}: Props) {
+  // Filter only new post notifications from initial data
+  const [localPosts, setLocalPosts] = useState<Post[]>(initialPosts);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const page = useTypedPage();
+  const userId = page.props.auth?.user?.id;
+  const [isMobile, setIsMobile] = useState(false);
+  const [showPostView, setShowPostView] = useState(false);
+  const user = auth?.user || null;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'unread'>('all');
 
-  const [activeTab, setActiveTab] = useState('all');
-  const [error, setError] = useState<string | null>(null);
-  const { props } = useTypedPage<{
-    auth: { user: { id: number; role: string } };
-  }>();
-  const currentUserId = props.auth?.user?.id;
+  const selectedPost = useMemo(() => {
+    return selectedPostId
+      ? localPosts.find(post => post.id === selectedPostId) || null
+      : null;
+  }, [selectedPostId, localPosts]);
 
-  const unreadCount = notifications.filter(n => !n.read_at).length;
-  const postCount = notifications.filter(n => n.type === 'post').length;
-  const commentCount = notifications.filter(n => n.type === 'comment').length;
+  const filteredPosts = useMemo(() => {
+    return localPosts.filter(post => {
+      const matchesSearch =
+        searchQuery === '' ||
+        post.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.product_name?.toLowerCase().includes(searchQuery.toLowerCase());
 
-  useEffect(() => {
-    setNotifications(initialNotifications);
-  }, [initialNotifications]);
-
-  useEffect(() => {
-    if (!currentUserId) return;
-
-    const postChannel = window.Echo.channel('notifications');
-    postChannel.listen('.new-question-created', (e: Notification) => {
-      setNotifications(prev => [e, ...prev]);
-      setActiveAlert(e.data.message);
-      setTimeout(() => setActiveAlert(null), 5000);
+      return matchesSearch;
     });
+  }, [localPosts, searchQuery]);
 
-    const commentChannel = window.Echo.channel(
-      `notifications-comment.${currentUserId}`,
+  useEffect(() => {
+    if (!userId || !department?.id) return;
+
+    // Kênh cho department posts
+    const departmentChannel = window.Echo.channel(
+      `department.${department.id}`,
     );
-    commentChannel.listen('.new-comment-created', (e: Notification) => {
-      setNotifications(prev => [e, ...prev]);
-      setActiveAlert(e.data.message);
-      setTimeout(() => setActiveAlert(null), 5000);
+    departmentChannel.listen('.new-post-created', (e: any) => {
+      const newPost = e.post;
+
+      if (!newPost) return;
+
+      // Thêm post mới vào danh sách
+      setLocalPosts(prev => {
+        if (prev.some(post => post.id === newPost.id)) {
+          return prev;
+        }
+        return [newPost, ...prev];
+      });
     });
 
     return () => {
-      postChannel.stopListening('.new-question-created');
-      commentChannel.stopListening('.new-comment-created');
-      window.Echo.leave('notifications');
-      window.Echo.leave(`notifications-comment.${currentUserId}`);
+      departmentChannel.stopListening('.new-post-created');
+      window.Echo.leave(`department.${department.id}`);
     };
-  }, [currentUserId]);
+  }, [userId, department?.id]);
 
-  const markAsRead = async (notificationId: string) => {
-    try {
-      setMarkingAsRead(prev => [...prev, notificationId]);
-      await axios.post(`/api/notifications/${notificationId}/read`);
-      setNotifications(prev =>
-        prev.map(notification =>
-          notification.id === notificationId
-            ? { ...notification, read_at: new Date().toISOString() }
-            : notification,
-        ),
+  useEffect(() => {
+    const checkIfMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+
+      if (!mobile && !showPostView && localPosts.length > 0) {
+        setSelectedPostId(localPosts[0].id);
+      }
+    };
+
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, [showPostView, localPosts]);
+
+  useEffect(() => {
+    if (!isMobile && selectedPostId === null && localPosts.length > 0) {
+      setSelectedPostId(localPosts[0].id);
+    }
+  }, [isMobile, localPosts]);
+
+  const handlePostSelect = useCallback(
+    async (post: Post) => {
+      if (isMobile) {
+        setShowPostView(true);
+      }
+      setSelectedPostId(post.id);
+    },
+    [isMobile],
+  );
+
+  const handleMarkAsRead = useCallback(
+    (notification: Notification, e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      if (notification.read_at) {
+        return;
+      }
+
+      router.post(
+        route('notifications.read_all', { id: notification.id }),
+        {},
+        {
+          preserveScroll: true,
+          onSuccess: () => {
+            setLocalPosts(prev =>
+              prev.map(p =>
+                p.id === notification.data.post_id
+                  ? { ...p, read_at: new Date().toISOString() }
+                  : p,
+              ),
+            );
+          },
+        },
       );
+    },
+    [],
+  );
+
+  const handleBackToList = useCallback(() => {
+    setShowPostView(false);
+  }, []);
+
+  const handleCommentSubmit = useCallback(
+    (content: string, parentId?: string) => {
+      if (!selectedPost) return;
+
+      router.post(
+        route('comments.store'),
+        {
+          comment: content,
+          post_id: selectedPost.id,
+          parent_id: parentId || null,
+        },
+        {
+          preserveScroll: true,
+          onError: errors => {
+            console.error('Error submitting comment:', errors);
+          },
+        },
+      );
+    },
+    [selectedPost],
+  );
+
+  const formatTimeAgo = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return formatDistanceToNow(date, { addSuffix: true });
     } catch (error) {
-      console.error('Error marking notification as read:', error);
-      setError('Failed to mark notification as read. Please try again.');
-      setTimeout(() => setError(null), 3000);
-    } finally {
-      setMarkingAsRead(prev => prev.filter(id => id !== notificationId));
+      return dateString;
     }
   };
-
-  const markAllAsRead = async () => {
-    try {
-      setIsLoading(true);
-      await axios.post('/api/notifications/read-all');
-      setNotifications(prev =>
-        prev.map(notification => ({
-          ...notification,
-          read_at: new Date().toISOString(),
-        })),
-      );
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
-      setError('Failed to mark all notifications as read. Please try again.');
-      setTimeout(() => setError(null), 3000);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const filteredNotifications = notifications.filter(notification => {
-    if (activeTab === 'all') return true;
-    return notification.type === activeTab;
-  });
 
   return (
-    <>
-      <AnimatePresence initial={false} mode="popLayout">
-        {activeAlert && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.3 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-            className="fixed bottom-4 right-4 z-50 w-[300px] sm:w-[350px]"
-          >
-            <AlertInfoDemo title="New Notification" content={activeAlert} />
-          </motion.div>
-        )}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-4 right-4 z-50 w-[300px] sm:w-[350px]"
-          >
-            <AlertInfoDemo title="Error" content={error} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-10 w-10 text-gray-600 dark:text-white" />
-            {unreadCount > 0 && (
-              <Badge
-                variant="destructive"
-                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs animate-pulse"
-              >
-                {unreadCount}
-              </Badge>
+    <TooltipProvider>
+      <AppLayout
+        title={department.name}
+        department={department}
+        // notifications={localPosts}
+        post={localPosts}
+        notifications={[]}
+      >
+        <div className="flex overflow-hidden h-[calc(100vh-4rem)] relative">
+          <div
+            className={cn(
+              'flex-col border-r dark:border-gray-800 bg-background',
+              'w-full md:w-96 lg:w-[400px] h-full',
+              isMobile && showPostView ? 'hidden' : 'flex',
             )}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[450px] p-0">
-          <Card className={cn('w-full border-0 shadow-none', className)}>
-            <CardHeader className="border-b py-3 flex flex-col gap-2">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-lg">Notifications</CardTitle>
-                {unreadCount > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={markAllAsRead}
-                    disabled={isLoading}
-                    className="text-sm hover:text-blue-700"
-                  >
-                    {isLoading && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    Mark all as read
-                  </Button>
-                )}
+          >
+            <div className="p-4 border-b dark:border-gray-800 bg-background flex flex-col gap-3 ">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">New Posts</h2>
+                <Badge variant="secondary" className="text-xs">
+                  {filteredPosts.length}
+                </Badge>
               </div>
-              <Tabs
-                defaultValue="all"
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full"
-              >
-                <TabsList className="grid grid-cols-3 w-full">
-                  <TabsTrigger value="all" className="text-sm">
-                    All ({notifications.length})
-                  </TabsTrigger>
-                  <TabsTrigger value="post" className="text-sm">
-                    New Question ({postCount})
-                  </TabsTrigger>
-                  <TabsTrigger value="comment" className="text-sm">
-                    Comment ({commentCount})
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </CardHeader>
-            <ScrollArea className={`h-[${maxHeight}px] w-full`}>
-              <CardContent className="p-0">
-                {filteredNotifications.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                    <Bell className="h-12 w-12 mb-2 text-gray-400" />
-                    <p>No notifications</p>
-                  </div>
-                ) : (
-                  filteredNotifications.map(notification => (
-                    <div
-                      key={notification.id}
-                      className={cn(
-                        'flex items-start gap-3 p-4 transition-colors border-b last:border-0 relative',
-                        !notification.read_at,
-                      )}
-                    >
-                      <Avatar className="h-12 w-12 border rounded-lg">
-                        <AvatarImage
-                          src={notification.data.profile_photo_url}
-                          alt={notification.data.name || 'User'}
-                        />
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          {notification.data.name?.[0] || 'U'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <Link
-                        href={`/posts/${notification.data.slug}`}
-                        className="block flex-1"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium">
-                            {notification.data.name}
-                          </p>
-                          <p className="text-sm">{notification.data.message}</p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {formatTimeAgo(notification.created_at)}
-                          </p>
-                        </div>
-                      </Link>
-                      {!notification.read_at && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={e => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            markAsRead(notification.id);
-                          }}
-                          disabled={markingAsRead.includes(notification.id)}
-                          className="h-8 w-8 p-0 hover:bg-green-100 hover:text-green-700 dark:hover:bg-green-900/20"
-                          title="Mark as read"
-                        >
-                          {markingAsRead.includes(notification.id) ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Check className="h-4 w-4" />
-                          )}
-                        </Button>
-                      )}
-                      {!notification.read_at && (
-                        <div className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full" />
-                      )}
-                    </div>
-                  ))
-                )}
-              </CardContent>
-            </ScrollArea>
-          </Card>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </>
-  );
-};
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search new posts..."
+                  className="pl-9 w-full bg-muted/40"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                />
+              </div>
+            </div>
 
-export default NotificationsDropdown;
+            <ScrollArea className="h-[calc(100vh-200px)] pr-3">
+              {filteredPosts.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-60 text-muted-foreground bg-muted/30 rounded-lg p-6">
+                  <MessageSquare className="h-12 w-12 mb-3 opacity-40" />
+                  <p className="text-base font-medium">No posts found</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    New posts will appear here in real-time
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {filteredPosts.map(post => {
+                    const isSelected = selectedPostId === post.id;
+
+                    return (
+                      <div
+                        key={post.id}
+                        onClick={() => handlePostSelect(post)}
+                        className={cn(
+                          'relative p-4 cursor-pointer rounded-lg transition-all',
+                          'hover:bg-accent/50 dark:hover:bg-accent/30',
+                          isSelected
+                            ? 'bg-accent/40 dark:bg-accent/20 ring-1 ring-primary/10 border-l-2 border-primary'
+                            : 'bg-card dark:bg-card/80',
+                        )}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="flex-1 space-y-2">
+                            <div className="flex justify-between items-center">
+                              <div className="flex items-center gap-2">
+                                <MessageSquare className="h-4 w-4 text-primary" />
+                                <span className="text-sm font-medium text-muted-foreground">
+                                  Post by {post.user?.name}
+                                </span>
+                                {post.product_name && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs font-normal px-2 py-0.5"
+                                  >
+                                    {post.product_name}
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1.5 text-xs text-muted-foreground whitespace-nowrap">
+                                <Clock className="h-3 w-3" />
+                                <span>{formatTimeAgo(post.created_at)}</span>
+                              </div>
+                            </div>
+
+                            <h2 className="text-base leading-tight font-medium">
+                              {post.title}
+                            </h2>
+
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {post.content
+                                ? post.content.replace(/<[^>]*>/g, '')
+                                : 'No content'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </ScrollArea>
+          </div>
+
+          <div
+            className={cn(
+              'flex-1 h-full overflow-hidden',
+              isMobile && !showPostView ? 'hidden' : 'block',
+            )}
+          >
+            {isMobile && showPostView && (
+              <div className="p-4 border-b dark:border-gray-800 flex items-center bg-background sticky top-0 z-10">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleBackToList}
+                  className="mr-2"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+                <span className="font-medium">Back to New Posts</span>
+              </div>
+            )}
+
+            {selectedPost ? (
+              <ScrollArea className="h-full w-full">
+                <div className="p-4 md:p-6 dark:bg-background ">
+                  <PostContent
+                    key={selectedPost.id}
+                    post={selectedPost}
+                    comments={selectedPost.comments}
+                    onCommentSubmit={handleCommentSubmit}
+                    showBorder={false}
+                    currentUser={user}
+                  />
+                </div>
+              </ScrollArea>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                <MessageSquare className="h-16 w-16 mb-4 text-muted-foreground/50" />
+                <h3 className="text-xl font-medium mb-2">No post selected</h3>
+                <p className="text-center max-w-md">
+                  Select a new post notification to view its content
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </AppLayout>
+      <Toaster />
+    </TooltipProvider>
+  );
+}

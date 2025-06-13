@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect, FormEvent } from 'react';
+import React, { useState } from 'react';
 import { SidebarInset, SidebarProvider } from '@/Components/ui/sidebar';
 import { AppSidebar } from '@/Components/dashboard/app-sidebar';
 import { SiteHeader } from '@/Components/dashboard/site-header';
@@ -50,9 +50,6 @@ import {
   Search,
 } from 'lucide-react';
 import { route } from 'ziggy-js';
-import { usePage } from '@inertiajs/react';
-
-import debounce from 'lodash/debounce';
 
 interface Permission {
   id: number;
@@ -103,34 +100,18 @@ interface RolesPermissionsProps {
 }
 
 export default function RolesPermissions({
-  roles: initialRoles,
-  permissions: initialPermissions,
-  users: initialUsers,
+  roles,
+  permissions,
+  users,
   filters,
 }: RolesPermissionsProps) {
-  const { url } = usePage();
-  const searchParams = new URLSearchParams(url.split('?')[1]);
-  const initialTab = searchParams.get('tab') || 'roles';
-  
-  const [activeTab, setActiveTab] = useState(initialTab);
-  
-  // Update URL when tab changes
-  const handleTabChange = useCallback((value: string) => {
-    setActiveTab(value);
-    const newUrl = new URL(window.location.href);
-    newUrl.searchParams.set('tab', value);
-    window.history.pushState({}, '', newUrl.toString());
-  }, []);
+  const [activeTab, setActiveTab] = useState('users');
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const [permissionDialogOpen, setPermissionDialogOpen] = useState(false);
   const [userRoleDialogOpen, setUserRoleDialogOpen] = useState(false);
   const [userPermissionDialogOpen, setUserPermissionDialogOpen] =
     useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const [roles, setRoles] = useState(initialRoles);
-  const [permissions, setPermissions] = useState(initialPermissions);
-  const [users, setUsers] = useState(initialUsers);
-  const [allUsers, setAllUsers] = useState<User[]>(initialUsers.data);
+
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedPermission, setSelectedPermission] =
     useState<Permission | null>(null);
@@ -148,254 +129,42 @@ export default function RolesPermissions({
   const [search, setSearch] = useState(filters.search);
   const [perPage, setPerPage] = useState(filters.per_page.toString());
   const [isLoading, setIsLoading] = useState(false);
-  const [debouncedSearch, setDebouncedSearch] = useState(search);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [search]);
-
-
-  const filteredUsers = useMemo(() => {
-    if (!debouncedSearch) return allUsers;
-    
-    const searchLower = debouncedSearch.toLowerCase();
-    return allUsers.filter(user => 
-      user.name.toLowerCase().includes(searchLower) ||
-      user.email.toLowerCase().includes(searchLower) ||
-      user.roles.some(role => role.name.toLowerCase().includes(searchLower)) ||
-      user.permissions.some(permission => permission.name.toLowerCase().includes(searchLower))
-    );
-  }, [allUsers, debouncedSearch]);
-  // Optimistic update helper
-  const updateUsersOptimistically = useCallback((updatedUser: User) => {
-    setUsers(prev => ({
-      ...prev,
-      data: prev.data.map(user =>
-        user.id === updatedUser.id ? updatedUser : user,
-      ),
-    }));
-  }, []);
-
-  // Role handlers with optimistic updates
-  const handleSaveRole = () => {
-    const url = selectedRole
-      ? `/admin/roles/${selectedRole.id}`
-      : '/admin/roles';
-    const method = (selectedRole ? 'put' : 'post') as Method;
-
-    // Optimistic update for roles
-    const newRole = {
-      id: selectedRole?.id || Date.now(),
-      name: newRoleName,
-      permissions: permissions.filter(p =>
-        selectedPermissions.includes(p.name),
-      ),
-    };
-
-    if (selectedRole) {
-      setRoles(prev =>
-        prev.map(role => (role.id === selectedRole.id ? newRole : role)),
-      );
-    } else {
-      setRoles(prev => [...prev, newRole]);
-    }
-
-    Inertia.visit(url, {
-      method,
-      data: {
-        name: newRoleName,
-        permissions: selectedPermissions,
-      },
-      onSuccess: () => {
-        setRoleDialogOpen(false);
-      },
-      onError: () => {
-        // Revert optimistic update on error
-        setRoles(initialRoles);
-      },
-    });
-  };
-
-  // Permission handlers with optimistic updates
-  const handleSavePermission = () => {
-    const url = selectedPermission
-      ? `/admin/permissions/${selectedPermission.id}`
-      : '/admin/permissions';
-    const method = (selectedPermission ? 'put' : 'post') as Method;
-
-    // Optimistic update for permissions
-    const newPermission = {
-      id: selectedPermission?.id || Date.now(),
-      name: newPermissionName,
-    };
-
-    if (selectedPermission) {
-      setPermissions(prev =>
-        prev.map(permission =>
-          permission.id === selectedPermission.id ? newPermission : permission,
-        ),
-      );
-    } else {
-      setPermissions(prev => [...prev, newPermission]);
-    }
-
-    Inertia.visit(url, {
-      method,
-      data: {
-        name: newPermissionName,
-      },
-      onSuccess: () => {
-        setPermissionDialogOpen(false);
-      },
-      onError: () => {
-        // Revert optimistic update on error
-        setPermissions(initialPermissions);
-      },
-    });
-  };
-
-  // User role handlers with optimistic updates
-  const handleSaveUserRole = () => {
-    if (!selectedUser?.id) return;
-
-    const selectedRoleObj = roles.find(r => r.name === selectedRoleForUser);
-    if (!selectedRoleObj) return;
-
-    // Optimistic update
-    const updatedUser = {
-      ...selectedUser,
-      roles: [selectedRoleObj],
-    };
-    updateUsersOptimistically(updatedUser);
-
-    Inertia.post(
-      '/users/assign-role',
-      {
-        user_id: selectedUser.id,
-        role: selectedRoleForUser,
-      },
-      {
-        onSuccess: () => {
-          setUserRoleDialogOpen(false);
-        },
-        onError: () => {
-          // Revert optimistic update on error
-          setUsers(initialUsers);
-        },
-      },
-    );
-  };
-
-  // User permission handlers with optimistic updates
-  const handleSaveUserPermissions = () => {
-    if (!selectedUser?.id) return;
-
-    const selectedPermissionsObj = permissions.filter(p =>
-      selectedPermissionsForUser.includes(p.name),
-    );
-
-    // Optimistic update
-    const updatedUser = {
-      ...selectedUser,
-      permissions: selectedPermissionsObj,
-    };
-    updateUsersOptimistically(updatedUser);
-
-    Inertia.post(
-      '/users/assign-permissions',
-      {
-        user_id: selectedUser.id,
-        permissions: selectedPermissionsForUser,
-      },
-      {
-        onSuccess: () => {
-          setUserPermissionDialogOpen(false);
-        },
-        onError: () => {
-          // Revert optimistic update on error
-          setUsers(initialUsers);
-        },
-      },
-    );
-  };
-  // Tạo hàm debounced search
-  const debouncedSearchFunction = useMemo(
-    () =>
-      debounce((searchValue: string, perPageValue: string) => {
-        setIsLoading(true);
-        Inertia.get(
-          route('admin.roles-permissions'),
-          {
-            search: searchValue,
-            per_page: perPageValue,
-            page: 1,
-          },
-          {
-            preserveState: true, // Giữ trạng thái hiện tại của trang
-            preserveScroll: true, // Giữ vị trí cuộn
-            only: ['users', 'filters'], // Chỉ cập nhật users và filters
-            onSuccess: () => setIsLoading(false),
-            onError: () => setIsLoading(false),
-          },
-        );
-      }, 300),
-    [],
-  );
-
-  // Search handlers
-  const performSearch = useCallback(() => {
+  // Hàm xử lý tìm kiếm
+  const handleSearch = () => {
     setIsLoading(true);
     Inertia.get(
       route('admin.roles-permissions'),
-      { search, per_page: perPage },
+      {
+        search,
+        per_page: perPage,
+        page: 1, // Reset về trang 1 khi tìm kiếm
+      },
       {
         preserveState: true,
-        preserveScroll: true,
-        only: ['users', 'filters'],
         onSuccess: () => setIsLoading(false),
         onError: () => setIsLoading(false),
       },
     );
-  }, [search, perPage]);
-
-  const handleSearch = useCallback(
-    (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      performSearch();
-    },
-    [performSearch],
-  );
-
-  useEffect(() => {
-    if (debouncedSearch !== filters.search) {
-      performSearch();
-    }
-  }, [debouncedSearch, filters.search, performSearch]);
-
-  const handleClearSearch = useCallback(() => {
-    setSearch('');
-    setIsLoading(true);
-    Inertia.get(
-      route('admin.roles-permissions'),
-      { per_page: perPage },
-      {
-        preserveState: true,
-        preserveScroll: true,
-        only: ['users', 'filters'],
-        onSuccess: () => setIsLoading(false),
-        onError: () => setIsLoading(false),
-      },
-    );
-  }, [perPage]);
+  };
 
   // Hàm xử lý thay đổi số lượng item mỗi trang
   const handlePerPageChange = (value: string) => {
     setPerPage(value);
-    performSearch();
+    setIsLoading(true);
+    Inertia.get(
+      route('admin.roles-permissions'),
+      {
+        search,
+        per_page: value,
+        page: 1, // Reset về trang 1 khi thay đổi số lượng item
+      },
+      {
+        preserveState: true,
+        onSuccess: () => setIsLoading(false),
+        onError: () => setIsLoading(false),
+      },
+    );
   };
 
   // Hàm xử lý chuyển trang
@@ -404,8 +173,6 @@ export default function RolesPermissions({
       setIsLoading(true);
       Inertia.visit(url, {
         preserveState: true,
-        preserveScroll: true,
-        only: ['users', 'filters'], // Chỉ cập nhật users và filters
         onSuccess: () => setIsLoading(false),
         onError: () => setIsLoading(false),
       });
@@ -427,6 +194,24 @@ export default function RolesPermissions({
     setRoleDialogOpen(true);
   };
 
+  const handleSaveRole = () => {
+    const url = selectedRole
+      ? `/admin/roles/${selectedRole.id}`
+      : '/admin/roles';
+    const method = (selectedRole ? 'put' : 'post') as Method;
+
+    Inertia.visit(url, {
+      method,
+      data: {
+        name: newRoleName,
+        permissions: selectedPermissions,
+      },
+      onSuccess: () => {
+        setRoleDialogOpen(false);
+      },
+    });
+  };
+
   // Permission handlers
   const handleAddPermission = () => {
     setSelectedPermission(null);
@@ -438,6 +223,37 @@ export default function RolesPermissions({
     setSelectedPermission(permission);
     setNewPermissionName(permission.name);
     setPermissionDialogOpen(true);
+  };
+
+  const handleSavePermission = () => {
+    const url = selectedPermission
+      ? `/admin/permissions/${selectedPermission.id}`
+      : '/admin/permissions';
+    const method = (selectedPermission ? 'put' : 'post') as Method;
+
+    Inertia.visit(url, {
+      method,
+      data: {
+        name: newPermissionName,
+      },
+      onSuccess: () => {
+        setPermissionDialogOpen(false);
+      },
+    });
+  };
+
+  const handleDeletePermission = (permission: Permission) => {
+    if (
+      confirm(
+        `Are you sure you want to delete the permission "${permission.name}"?`,
+      )
+    ) {
+      Inertia.delete(`/admin/permissions/${permission.id}`, {
+        onSuccess: () => {
+          // Permission deleted successfully
+        },
+      });
+    }
   };
 
   // User role/permission handlers
@@ -453,7 +269,66 @@ export default function RolesPermissions({
     setUserPermissionDialogOpen(true);
   };
 
+  const handleSaveUserRole = () => {
+    if (!selectedUser?.id) return;
 
+    const selectedRoleObj = roles.find(r => r.name === selectedRoleForUser);
+    if (!selectedRoleObj) return;
+
+    // Optimistic update
+    const updatedUser = {
+      ...selectedUser,
+      roles: [selectedRoleObj],
+    };
+
+    Inertia.post(
+      '/users/assign-role',
+      {
+        user_id: selectedUser.id,
+        role: selectedRoleForUser,
+      },
+      {
+        onSuccess: () => {
+          setUserRoleDialogOpen(false);
+        },
+        onError: () => {
+          // Revert optimistic update on error
+        },
+      },
+    );
+  };
+
+  const handleSaveUserPermissions = () => {
+    if (!selectedUser?.id) return;
+
+    const selectedPermissionsObj = permissions.filter(p =>
+      selectedPermissionsForUser.includes(p.name),
+    );
+
+    // Optimistic update
+    const updatedUser = {
+      ...selectedUser,
+      permissions: selectedPermissionsObj,
+    };
+    // updateUsersOptimistically(updatedUser);
+
+    Inertia.post(
+      '/users/assign-permissions',
+      {
+        user_id: selectedUser.id,
+        permissions: selectedPermissionsForUser,
+      },
+      {
+        onSuccess: () => {
+          setUserPermissionDialogOpen(false);
+        },
+        onError: () => {
+          // Revert optimistic update on error
+          // setUsers(initialUsers);
+        },
+      },
+    );
+  };
 
   return (
     <SidebarProvider>
@@ -463,11 +338,11 @@ export default function RolesPermissions({
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4">
-              <Tabs value={activeTab} onValueChange={handleTabChange}>
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="users">User Assignments</TabsTrigger>
                   <TabsTrigger value="roles">Roles</TabsTrigger>
                   <TabsTrigger value="permissions">Permissions</TabsTrigger>
-                  <TabsTrigger value="users">User Assignments</TabsTrigger>
                 </TabsList>
 
                 {/* Roles Tab */}
@@ -569,15 +444,27 @@ export default function RolesPermissions({
                                 {permission.name}
                               </TableCell>
                               <TableCell>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleEditPermission(permission)
-                                  }
-                                >
-                                  <Pencil className="h-4 w-4" />
-                                </Button>
+                                <div className="flex items-center space-x-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleEditPermission(permission)
+                                    }
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleDeletePermission(permission)
+                                    }
+                                    className="text-red-500 hover:text-red-700"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
                               </TableCell>
                             </TableRow>
                           ))}
@@ -602,33 +489,33 @@ export default function RolesPermissions({
                           </CardDescription>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                          <form
-                            onSubmit={handleSearch}
-                            className="flex w-full max-w-sm items-center space-x-2"
+                          <div className="relative w-full sm:w-64">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              type="search"
+                              placeholder="Search users..."
+                              value={search}
+                              onChange={e => setSearch(e.target.value)}
+                              onKeyDown={e =>
+                                e.key === 'Enter' && handleSearch()
+                              }
+                              className="pl-8 pr-4"
+                            />
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={handleSearch}
+                            disabled={isLoading}
+                            className="shrink-0"
                           >
-                            <div className="relative w-full">
-                              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                              <Input
-                                type="search"
-                                placeholder="Search users..."
-                                value={search}
-                                onChange={e => setSearch(e.target.value)}
-                                className="pl-9 pr-10"
-                              />
-                              {search && (
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  className="absolute right-0 top-0 h-full aspect-square rounded-l-none"
-                                  onClick={handleClearSearch}
-                                >
-                                  <X className="h-4 w-4" />
-                                  <span className="sr-only">Clear search</span>
-                                </Button>
-                              )}
-                            </div>
-                          </form>
+                            {isLoading ? (
+                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                            ) : (
+                              <Search className="h-4 w-4" />
+                            )}
+                            <span className="sr-only">Search</span>
+                          </Button>
                         </div>
                       </div>
                     </CardHeader>

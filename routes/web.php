@@ -135,5 +135,18 @@ Route::post('/users/assign-role', [PermissionController::class, 'assignRole'])->
 Route::post('/users/assign-permissions', [PermissionController::class, 'assignPermissions'])->name('users.assign-permissions');
 Route::post('/admin/roles', [RoleController::class, 'storeRole'])->name('admin.roles.store');
 Route::put('/admin/roles/{id}', [RoleController::class, 'updateRole'])->name('admin.roles.update');
-//Route::post('/admin/permissions', [RoleController::class, 'storePermission'])->name('admin.permissions.store');
-//Route::put('/admin/permissions/{id}', [RoleController::class, 'updatePermission'])->name('admin.permissions.update');
+// Route::post('/admin/permissions', [RoleController::class, 'storePermission'])->name('admin.permissions.store');
+// Route::put('/admin/permissions/{id}', [RoleController::class, 'updatePermission'])->name('admin.permissions.update');
+
+// API endpoints for permissions
+Route::post('/admin/permissions', [PermissionController::class, 'store'])->name('admin.permissions.store');
+Route::put('/admin/permissions/{id}', [PermissionController::class, 'update'])->name('admin.permissions.update');
+Route::delete('/admin/permissions/{id}', [PermissionController::class, 'destroy'])->name('admin.permissions.destroy');
+
+// Admin routes
+Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+
+    Route::get('/notifications', [AdminController::class, 'notifications'])->name('notifications');
+
+    Route::get('/posts/{id}', [AdminController::class, 'getPost'])->name('posts.get');
+});

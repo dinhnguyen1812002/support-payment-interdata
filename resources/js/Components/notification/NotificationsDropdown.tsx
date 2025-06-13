@@ -438,7 +438,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
       key={notification.id}
       className={cn(
         'flex items-start gap-3 p-4 transition-all duration-200 border-b last:border-0 relative hover:bg-gray-50 dark:hover:bg-gray-800/50',
-        !notification.read_at && 'bg-blue-50/50 dark:bg-blue-900/10',
+        !notification.read_at && '',
       )}
     >
       <Avatar className="h-10 w-10 border rounded-lg flex-shrink-0">

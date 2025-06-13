@@ -24,6 +24,61 @@ class PermissionController extends Controller
         return response()->json($permissions);
     }
 
+    public function store(Request $request)
+    {
+        // Validate input data
+        $request->validate([
+            'name' => 'required|string|unique:permissions,name',
+        ]);
+
+        // Only admin can create permissions
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        // Create new permission
+        $permission = Permission::create(['name' => $request->name]);
+
+        return redirect()->back()->with('success', 'Permission created successfully.');
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validate input data
+        $request->validate([
+            'name' => 'required|string|unique:permissions,name,'.$id,
+        ]);
+
+        // Only admin can update permissions
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        // Find permission by ID
+        $permission = Permission::findOrFail($id);
+
+        // Update permission name
+        $permission->update(['name' => $request->name]);
+
+        return redirect()->back()->with('success', 'Permission updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        // Only admin can delete permissions
+        if (! auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        // Find permission by ID
+        $permission = Permission::findOrFail($id);
+
+        // Delete permission
+        $permission->delete();
+
+        return redirect()->back()->with('success', 'Permission deleted successfully.');
+    }
+
     public function assignRole(Request $request)
     {
         // Validate input data
@@ -68,7 +123,4 @@ class PermissionController extends Controller
 
         return Redirect::back()->with('success', 'Permissions assigned successfully.');
     }
-
-
-
 }

@@ -18,6 +18,7 @@ import {
   ChartColumnStacked,
   Boxes,
   FolderKey,
+  Bell,
 } from 'lucide-react';
 
 import { NavDocuments } from '@/Components/dashboard/nav-documents';
@@ -33,6 +34,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/Components/ui/sidebar';
+import { route } from 'ziggy-js';
 
 const data = {
   user: {
@@ -76,6 +78,11 @@ const data = {
       title: 'Department',
       url: '/departments',
       icon: Boxes,
+    },
+    {
+      title: 'Notifications',
+      url: '/admin/notifications',
+      icon: Bell,
     },
   ],
 

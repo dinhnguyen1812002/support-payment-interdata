@@ -175,7 +175,7 @@ export default function AppLayout({
                   onClick={() => handleCategoryClick()}
                 >
                   <ScanSearch className="h-10 w-10" />
-                  Ctrl+K
+                  <small className="hidden sm:inline">(Ctrl+K)</small>
                 </Button>
               </div>
               {/* Theme toggle */}

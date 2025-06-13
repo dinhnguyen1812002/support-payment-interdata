@@ -18,6 +18,7 @@ import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import useTypedPage from '@/Hooks/useTypedPage';
 import { Department, Notification } from '@/types';
+import type { Post } from '@/types/Post';
 import AppSidebar from '@/Components/Ticket/sidebar-nav';
 import NotificationsDropdown from '@/Components/notification/NotificationsDropdown';
 
@@ -26,13 +27,14 @@ interface AppLayoutProps {
   title: string;
   department: Department;
   notifications: Notification[];
+  post: Post[];
 }
 
 export function AppLayout({
   children,
   title,
   department,
-  notifications,
+  post,
 }: AppLayoutProps) {
   const page = useTypedPage();
   const currentUser = page.props.auth?.user;
@@ -70,7 +72,7 @@ export function AppLayout({
             </Breadcrumb>
           </div>
           <div className="justify-end flex-1 flex items-center gap-2 pr-10">
-            <NotificationsDropdown notifications={notifications} />
+            {/*<NotificationsDropdown notifications={notifications} />*/}
           </div>
         </header>
         {/*<div className="flex flex-1 flex-col gap-4 p-4 pt-0">*/}

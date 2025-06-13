@@ -35,3 +35,8 @@ Broadcast::channel('post.{postId}', function ($user, $postId) {
 Broadcast::channel('reply.{postId}', function ($user, $postId) {
     return true; // Allow all users to listen; restrict as needed
 });
+
+Broadcast::channel('department.{departmentId}', function ($user, $departmentId) {
+    // Kiểm tra xem người dùng có thuộc phòng ban này không
+    return $user->departments()->where('departments.id', $departmentId)->exists();
+});

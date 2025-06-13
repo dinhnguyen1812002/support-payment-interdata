@@ -224,7 +224,7 @@ export interface Notification {
   };
   read_at: string | null;
   created_at: string;
-  type: 'post' | 'comment';
+  type: string;
   categories: Category[];
   tags: Tag[];
 }
