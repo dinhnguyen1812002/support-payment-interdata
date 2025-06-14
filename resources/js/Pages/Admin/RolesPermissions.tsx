@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SidebarInset, SidebarProvider } from '@/Components/ui/sidebar';
 import { AppSidebar } from '@/Components/dashboard/app-sidebar';
 import { SiteHeader } from '@/Components/dashboard/site-header';
@@ -50,6 +50,7 @@ import {
   Search,
 } from 'lucide-react';
 import { route } from 'ziggy-js';
+import { Head } from '@inertiajs/react';
 
 interface Permission {
   id: number;
@@ -130,23 +131,36 @@ export default function RolesPermissions({
   const [perPage, setPerPage] = useState(filters.per_page.toString());
   const [isLoading, setIsLoading] = useState(false);
 
-  // Hàm xử lý tìm kiếm
+  // Thêm state để lưu trữ toàn bộ dữ liệu users
+  const [allUsers, setAllUsers] = useState<User[]>(users.data);
+  // Thêm state để lưu trữ dữ liệu users đã được lọc
+  const [filteredUsers, setFilteredUsers] = useState<User[]>(users.data);
+
+  // Thay đổi hàm xử lý tìm kiếm để lọc dữ liệu client-side
   const handleSearch = () => {
-    setIsLoading(true);
-    Inertia.get(
-      route('admin.roles-permissions'),
-      {
-        search,
-        per_page: perPage,
-        page: 1, // Reset về trang 1 khi tìm kiếm
-      },
-      {
-        preserveState: true,
-        onSuccess: () => setIsLoading(false),
-        onError: () => setIsLoading(false),
-      },
-    );
+    if (search.trim() === '') {
+      setFilteredUsers(allUsers);
+    } else {
+      const searchLower = search.toLowerCase();
+      const filtered = allUsers.filter(
+        user =>
+          user.name.toLowerCase().includes(searchLower) ||
+          user.email.toLowerCase().includes(searchLower),
+      );
+      setFilteredUsers(filtered);
+    }
   };
+
+  // Thêm useEffect để cập nhật filteredUsers khi search thay đổi
+  useEffect(() => {
+    handleSearch();
+  }, [search]);
+
+  // Thêm useEffect để cập nhật allUsers khi users.data thay đổi
+  useEffect(() => {
+    setAllUsers(users.data);
+    setFilteredUsers(users.data);
+  }, [users.data]);
 
   // Hàm xử lý thay đổi số lượng item mỗi trang
   const handlePerPageChange = (value: string) => {
@@ -332,6 +346,7 @@ export default function RolesPermissions({
 
   return (
     <SidebarProvider>
+      <Head title={'Roles & Permissions'} />
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title="Roles & Permissions" />
@@ -532,8 +547,8 @@ export default function RolesPermissions({
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {users.data.length > 0 ? (
-                              users.data.map(user => (
+                            {filteredUsers.length > 0 ? (
+                              filteredUsers.map(user => (
                                 <TableRow key={user.id}>
                                   <TableCell className="font-medium">
                                     {user.name}

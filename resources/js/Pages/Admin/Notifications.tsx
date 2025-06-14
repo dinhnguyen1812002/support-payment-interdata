@@ -12,6 +12,7 @@ import PostContent from '@/Components/post-content';
 import useTypedPage from '@/Hooks/useTypedPage';
 import { PageTransition } from '@/Components/ui/page-transition';
 import { Page } from '@inertiajs/inertia';
+import { Head } from '@inertiajs/react';
 
 interface User {
   id: number;
@@ -78,10 +79,15 @@ interface PageProps {
   post?: Post;
 }
 
-export default function AdminNotifications({ notifications: initialNotifications, posts: initialPosts }: PageProps) {
+export default function AdminNotifications({
+  notifications: initialNotifications,
+  posts: initialPosts,
+}: PageProps) {
   const { auth } = useTypedPage().props;
   const userId = auth.user?.id;
-  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications || []);
+  const [notifications, setNotifications] = useState<Notification[]>(
+    initialNotifications || [],
+  );
   const [posts, setPosts] = useState<Post[]>(initialPosts || []);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
@@ -95,7 +101,7 @@ export default function AdminNotifications({ notifications: initialNotifications
     const notificationsChannel = window.Echo.channel('notifications');
     notificationsChannel.listen('.new-question-created', (event: any) => {
       const newNotification = event;
-      
+
       // Add notification to the list if it doesn't exist
       setNotifications(prev => {
         if (prev.some(n => n.id === newNotification.id)) {
@@ -103,21 +109,25 @@ export default function AdminNotifications({ notifications: initialNotifications
         }
         return [newNotification, ...prev];
       });
-      
+
       // Fetch the post details
-      router.get(route('admin.posts.get', { id: newNotification.data.post_id }), {}, {
-        preserveState: true,
-        onSuccess: (page) => {
-          // page is of type Page<PageProps>
-          const newPost = page.props.post as Post;
-          setPosts(prev => {
-            if (prev.some(p => p.id === newPost.id)) {
-              return prev;
-            }
-            return [newPost, ...prev];
-          });
-        }
-      });
+      router.get(
+        route('admin.posts.get', { id: newNotification.data.post_id }),
+        {},
+        {
+          preserveState: true,
+          onSuccess: page => {
+            // page is of type Page<PageProps>
+            const newPost = page.props.post as Post;
+            setPosts(prev => {
+              if (prev.some(p => p.id === newPost.id)) {
+                return prev;
+              }
+              return [newPost, ...prev];
+            });
+          },
+        },
+      );
     });
 
     return () => {
@@ -125,59 +135,65 @@ export default function AdminNotifications({ notifications: initialNotifications
     };
   }, [userId]);
 
-  const handlePostSelect = useCallback((postId: string) => {
-    setSelectedPostId(postId);
-    const post = posts.find(p => p.id === postId);
-    setSelectedPost(post || null);
-    setShowPostView(true);
+  const handlePostSelect = useCallback(
+    (postId: string) => {
+      setSelectedPostId(postId);
+      const post = posts.find(p => p.id === postId);
+      setSelectedPost(post || null);
+      setShowPostView(true);
 
-    // Mark notification as read
-    const notification = notifications.find(n => n.data.post_id === postId);
-    if (notification && !notification.read_at) {
-      router.post(
-        route('notifications.read_all', { id: notification.id }),
-        {},
-        {
-          preserveScroll: true,
-          onSuccess: () => {
-            setNotifications(prev =>
-              prev.map(n =>
-                n.id === notification.id
-                  ? { ...n, read_at: new Date().toISOString() }
-                  : n
-              )
-            );
+      // Mark notification as read
+      const notification = notifications.find(n => n.data.post_id === postId);
+      if (notification && !notification.read_at) {
+        router.post(
+          route('notifications.read_all', { id: notification.id }),
+          {},
+          {
+            preserveScroll: true,
+            onSuccess: () => {
+              setNotifications(prev =>
+                prev.map(n =>
+                  n.id === notification.id
+                    ? { ...n, read_at: new Date().toISOString() }
+                    : n,
+                ),
+              );
+            },
           },
-        }
-      );
-    }
-  }, [posts, notifications]);
+        );
+      }
+    },
+    [posts, notifications],
+  );
 
   const handleBackToList = useCallback(() => {
     setShowPostView(false);
   }, []);
 
-  const handleCommentSubmit = useCallback((comment: string) => {
-    if (!selectedPost) return;
-    
-    router.post(
-      route('comments.store'),
-      {
-        comment,
-        post_id: selectedPost.id,
-      },
-      {
-        preserveScroll: true,
-        onSuccess: (event: any) => {
-          const updatedPost = event.props?.post as Post;
-          setPosts(prev =>
-            prev.map(p => (p.id === updatedPost.id ? updatedPost : p))
-          );
-          setSelectedPost(updatedPost);
+  const handleCommentSubmit = useCallback(
+    (comment: string) => {
+      if (!selectedPost) return;
+
+      router.post(
+        route('comments.store'),
+        {
+          comment,
+          post_id: selectedPost.id,
         },
-      }
-    );
-  }, [selectedPost]);
+        {
+          preserveScroll: true,
+          onSuccess: (event: any) => {
+            const updatedPost = event.props?.post as Post;
+            setPosts(prev =>
+              prev.map(p => (p.id === updatedPost.id ? updatedPost : p)),
+            );
+            setSelectedPost(updatedPost);
+          },
+        },
+      );
+    },
+    [selectedPost],
+  );
 
   const handleMarkAllAsRead = useCallback(() => {
     router.post(
@@ -187,19 +203,20 @@ export default function AdminNotifications({ notifications: initialNotifications
         preserveScroll: true,
         onSuccess: () => {
           setNotifications(prev =>
-            prev.map(n => ({ ...n, read_at: new Date().toISOString() }))
+            prev.map(n => ({ ...n, read_at: new Date().toISOString() })),
           );
         },
-      }
+      },
     );
   }, []);
 
-  const filteredNotifications = notifications.filter(notification => 
-    notification.data.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredNotifications = notifications.filter(notification =>
+    notification.data.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
     <SidebarProvider>
+      <Head title={'Thông báo'} />
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title={'Notifications'} />
@@ -209,14 +226,16 @@ export default function AdminNotifications({ notifications: initialNotifications
               <div className="flex flex-col border rounded-lg overflow-hidden bg-card md:col-span-1">
                 <div className="p-4 border-b flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-semibold">Post Notifications</h3>
+                    <h3 className="text-lg font-semibold">
+                      Post Notifications
+                    </h3>
                     <Badge variant="secondary">
                       {notifications.filter(n => !n.read_at).length}
                     </Badge>
                   </div>
                   <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={handleMarkAllAsRead}
                     >
@@ -232,7 +251,7 @@ export default function AdminNotifications({ notifications: initialNotifications
                       placeholder="Search notifications..."
                       className="w-full rounded-md border border-input bg-background py-2 pl-8 pr-4 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={e => setSearchQuery(e.target.value)}
                     />
                   </div>
                 </div>
@@ -240,7 +259,9 @@ export default function AdminNotifications({ notifications: initialNotifications
                   {filteredNotifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-60 text-muted-foreground bg-muted/30 p-6">
                       <MessageSquare className="h-12 w-12 mb-3 opacity-40" />
-                      <p className="text-base font-medium">No notifications found</p>
+                      <p className="text-base font-medium">
+                        No notifications found
+                      </p>
                       <p className="text-sm text-muted-foreground mt-1">
                         New notifications will appear here in real-time
                       </p>
@@ -248,16 +269,23 @@ export default function AdminNotifications({ notifications: initialNotifications
                   ) : (
                     <div className="space-y-1">
                       {filteredNotifications.map(notification => {
-                        const isSelected = selectedPostId === notification.data.post_id;
+                        const isSelected =
+                          selectedPostId === notification.data.post_id;
                         const isRead = !!notification.read_at;
-                        
+
                         return (
                           <div
                             key={notification.id}
                             className={`flex items-start p-3 cursor-pointer transition-colors ${
-                              isSelected ? 'bg-muted' : isRead ? '' : 'bg-muted/50'
+                              isSelected
+                                ? 'bg-muted'
+                                : isRead
+                                  ? ''
+                                  : 'bg-muted/50'
                             } hover:bg-muted`}
-                            onClick={() => handlePostSelect(notification.data.post_id)}
+                            onClick={() =>
+                              handlePostSelect(notification.data.post_id)
+                            }
                           >
                             <div className="flex-shrink-0 mr-3">
                               <div className="w-8 h-8 rounded-full overflow-hidden">
@@ -284,11 +312,17 @@ export default function AdminNotifications({ notifications: initialNotifications
                                 {notification.data.content}
                               </p>
                               <div className="flex flex-wrap gap-1 mt-2">
-                                {notification.data.categories?.map((category, i) => (
-                                  <Badge key={i} variant="outline" className="text-xs">
-                                    {category}
-                                  </Badge>
-                                ))}
+                                {notification.data.categories?.map(
+                                  (category, i) => (
+                                    <Badge
+                                      key={i}
+                                      variant="outline"
+                                      className="text-xs"
+                                    >
+                                      {category}
+                                    </Badge>
+                                  ),
+                                )}
                               </div>
                             </div>
                           </div>
@@ -340,7 +374,9 @@ export default function AdminNotifications({ notifications: initialNotifications
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
                     <MessageSquare className="h-16 w-16 mb-4 text-muted-foreground/50" />
-                    <h3 className="text-xl font-medium mb-2">No post selected</h3>
+                    <h3 className="text-xl font-medium mb-2">
+                      No post selected
+                    </h3>
                     <p className="text-center max-w-md">
                       Select a notification to view the post content
                     </p>

@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/Components/ui/table';
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Pencil, Trash2, Plus, Search } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -30,7 +30,6 @@ interface TagsPageProps {
 }
 
 export default function TagsPage({ tags = [] }: TagsPageProps) {
-  
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | undefined>(undefined);
 
@@ -51,6 +50,7 @@ export default function TagsPage({ tags = [] }: TagsPageProps) {
 
   return (
     <SidebarProvider>
+      <Head title={'Tags'} />
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title={'All Tags'} />

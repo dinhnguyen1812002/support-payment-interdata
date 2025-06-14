@@ -5,6 +5,7 @@ import React from 'react';
 import { SiteHeader } from '@/Components/dashboard/site-header';
 import { SectionCards } from '@/Components/dashboard/section-cards';
 import { DataTable } from '@/Components/dashboard/data-table';
+import { Head } from '@inertiajs/react';
 
 interface User {
   name: string;
@@ -36,6 +37,7 @@ export default function Page({
 }: DashboardProps) {
   return (
     <SidebarProvider>
+      <Head title={'Dashboard'} />
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title={'Dashboard'} />

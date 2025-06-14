@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DataTable } from '@/Components/dashboard/Post/data-table';
 import { columns } from '@/Components/dashboard/Post/columns';
-import { usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { SidebarInset, SidebarProvider } from '@/Components/ui/sidebar';
 import { AppSidebar } from '@/Components/dashboard/app-sidebar';
 import { SiteHeader } from '@/Components/dashboard/site-header';
@@ -63,6 +63,7 @@ export default function PostsPage() {
 
   return (
     <SidebarProvider>
+      <Head title={'Tickets'} />
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title={'All Post'} />

@@ -49,6 +49,11 @@ const data = {
       icon: LayoutDashboardIcon,
     },
     {
+      title: 'Notifications',
+      url: '/admin/notifications',
+      icon: Bell,
+    },
+    {
       title: 'Post',
       url: '/admin/posts',
       icon: ListIcon,
@@ -78,11 +83,6 @@ const data = {
       title: 'Department',
       url: '/departments',
       icon: Boxes,
-    },
-    {
-      title: 'Notifications',
-      url: '/admin/notifications',
-      icon: Bell,
     },
   ],
 

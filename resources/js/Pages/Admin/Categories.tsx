@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { Inertia } from '@inertiajs/inertia';
 
 import { Button } from '@/Components/ui/button';
@@ -256,6 +256,7 @@ export default function Categories() {
 
   return (
     <SidebarProvider>
+      <Head title={'Categories'} />
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title={'Categories'} />
