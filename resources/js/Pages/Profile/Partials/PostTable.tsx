@@ -35,7 +35,10 @@ import {
 } from '@/Components/ui/alert-dialog';
 import { route } from 'ziggy-js';
 import { Post } from '@/types';
-
+import { useToast } from '@/Hooks/use-toast';
+import { toast } from "sonner"
+// import { useToast } from '@/Hooks/use-toast';
+import { Toast } from '@/Components/ui/toast';
 interface PostsTableProps {
   posts: {
     data: Post[];
@@ -58,6 +61,7 @@ export default function PostsTable({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(keyword || '');
   const [filteredPosts, setFilteredPosts] = useState<Post[]>(posts?.data || []);
+  // const { toast } = useToast();
 
   // Update filtered posts when search query changes
   useEffect(() => {
@@ -82,13 +86,43 @@ export default function PostsTable({
     setPostToDelete(post);
     setDeleteDialogOpen(true);
   };
+
+  // const handleRestore = (post: Post) => {
+  //   setPostToDelete(post);
+  //   setDeleteDialogOpen(true);
+  // };
+
   const handleEdit = (slug: string) => {
     router.get(route('posts.edit', slug));
   };
+  const handleRestore = (postId : string) => {
+    router.post(route('posts.restore', postId), {}, {
+      preserveState: true,
+      onSuccess: () => {
+        toast("Your have bên restore", {
+          description: "Post restored successfully",
+        });
+        setDeleteDialogOpen(false);
+      },
+    });
+   
+  };
   const confirmDelete = () => {
     if (postToDelete) {
-      router.delete(route('posts.destroy', postToDelete.id), {
+      const postId = postToDelete.id;
+      const postTitle = postToDelete.title;
+      
+      router.delete(route('posts.destroy', postId), {
         preserveState: true,
+        onSuccess: () => {
+         toast("Event has been created", {
+          description: "Sunday, December 03, 2023 at 9:00 AM",
+          action: {
+            label: "Undo",
+            onClick: () => handleRestore(postId),
+          },
+        });
+        },
       });
     }
     setDeleteDialogOpen(false);
@@ -121,6 +155,13 @@ export default function PostsTable({
             <div className="h-10 w-10 flex items-center justify-center">
               <Search className="h-4 w-4 text-muted-foreground" />
             </div>
+            <Button
+              onClick={() => {
+                toast("Event has been created.")
+              }}
+            >
+            Show Test Toast
+          </Button>
           </div>
         </CardTitle>
       </CardHeader>

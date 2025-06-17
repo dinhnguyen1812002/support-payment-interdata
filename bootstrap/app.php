@@ -16,10 +16,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
-
+            \App\Http\Middleware\HandlePaginationConflicts::class,
         ]);
 
-        //
+        // Add alias for easier use
+        $middleware->alias([
+            'pagination.conflicts' => \App\Http\Middleware\HandlePaginationConflicts::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -14,7 +14,7 @@ class PostController extends Controller
 {
     use AuthorizesRequests;
 
-    protected $postService;
+    protected PostService $postService;
 
     public function __construct(PostService $postService)
     {
@@ -77,11 +77,11 @@ class PostController extends Controller
         return redirect()->back()->with('success', $result['message']);
     }
 
-    public function destroy(Post $post): \Illuminate\Http\RedirectResponse
+    public function destroy(Post $post)
     {
         $result = $this->postService->deletePost($post);
 
-        return back()->with('success', $result['message']);
+        return redirect()->back()->with('success','delete post successfully.');
     }
 
     public function filterPostByCategory(Request $request, $categorySlug): \Inertia\Response
@@ -167,6 +167,16 @@ class PostController extends Controller
     /**
      * @throws AuthorizationException
      */
+    public function undoDelete(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'post_id' => 'required',
+        ]);
+        $result = $this->postService->undoDeletePost($request->integer('post_id'));
+
+        return response()->json($result, $result['success'] ? 200 : 400);
+    }
+
     public function updateStatus(Request $request, Post $post): \Illuminate\Http\RedirectResponse
     {
         $this->authorize('update', $post);
@@ -178,5 +188,16 @@ class PostController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'change status successfully.');
+    }
+    public function restore(Post $post)
+    {
+        // Ensure the post is soft-deleted
+        if ($post->trashed()) {
+            $post->restore();
+            return redirect()->back()->with('success', 'restore post successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Post cannot be restored.');
+
     }
 }

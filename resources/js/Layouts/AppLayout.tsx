@@ -478,7 +478,7 @@ export default function AppLayout({
 
       {/* Page Content */}
       <main className="flex-grow">
-        <Toaster position="top-right" />
+      
 
         {/* Page Heading */}
         {renderHeader ? (
@@ -492,6 +492,8 @@ export default function AppLayout({
         <AnimatePresence mode="wait">
           <PageTransition key={window.location.pathname}>
             {children}
+
+            <Toaster />
           </PageTransition>
         </AnimatePresence>
       </main>

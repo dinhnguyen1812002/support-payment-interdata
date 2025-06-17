@@ -5,9 +5,8 @@ import { Head, usePage } from '@inertiajs/react';
 import { SidebarInset, SidebarProvider } from '@/Components/ui/sidebar';
 import { AppSidebar } from '@/Components/dashboard/app-sidebar';
 import { SiteHeader } from '@/Components/dashboard/site-header';
-import { SectionCards } from '@/Components/dashboard/section-cards';
-import { Inertia } from '@inertiajs/inertia';
 import { PageTransition } from '@/Components/ui/page-transition';
+import { Inertia } from '@inertiajs/inertia';
 
 export type Post = {
   id: string;
@@ -26,7 +25,6 @@ export type Post = {
   };
 };
 
-// Định nghĩa type cho pagination
 type Pagination = {
   current_page: number;
   last_page: number;
@@ -34,6 +32,13 @@ type Pagination = {
   total: number;
   next_page_url: string | null;
   prev_page_url: string | null;
+  from: number;
+  to: number;
+  links: Array<{
+    page: number;
+    url: string | null;
+    active: boolean;
+  }>;
 };
 
 export default function PostsPage() {
@@ -41,32 +46,47 @@ export default function PostsPage() {
   const initialData = props.data as Post[];
   const initialPagination = props.pagination as Pagination;
 
-  // Sử dụng state để quản lý data và pagination
   const [data, setData] = useState(initialData);
   const [pagination, setPagination] = useState(initialPagination);
 
-  // Hàm xử lý chuyển trang
   const handlePageChange = (url: string | null) => {
     if (url) {
+      // Add loading state and error handling
       Inertia.visit(url, {
         preserveState: true,
         preserveScroll: true,
-        only: ['data', 'pagination'],
+        only: ['data', 'pagination', 'filters'],
+        onStart: () => {
+          // Could add loading state here
+        },
         onSuccess: page => {
-          // Thêm type casting để chỉ định kiểu dữ liệu
           setData(page.props.data as Post[]);
           setPagination(page.props.pagination as Pagination);
         },
+        onError: (errors) => {
+          console.error('Pagination error:', errors);
+
+          // Handle 409 conflicts specifically
+          if (errors.message && errors.message.includes('409')) {
+            // Retry after a short delay
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }
+        },
+        onFinish: () => {
+          // Could remove loading state here
+        }
       });
     }
   };
 
   return (
     <SidebarProvider>
-      <Head title={'Tickets'} />
+      <Head title="Tickets" />
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader title={'All Post'} />
+        <SiteHeader title="All Tickets" />
         <PageTransition>
           <div className="flex flex-1 flex-col">
             <div className="@container/main flex flex-1 flex-col gap-2">
@@ -75,6 +95,7 @@ export default function PostsPage() {
                   columns={columns}
                   data={data}
                   pagination={pagination}
+                  filters={props.filters as any}
                   onPageChange={handlePageChange}
                 />
               </div>

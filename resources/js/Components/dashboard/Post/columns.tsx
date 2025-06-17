@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from '@/Components/ui/alert-dialog';
 import { Label } from '@/Components/ui/label';
+import { useToast } from '@/Hooks/use-toast';
 
 // Define the Post type
 export type Post = {
@@ -179,6 +180,7 @@ export const columns: ColumnDef<Post>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
+      const { toast, dismiss } = useToast();
       const post = row.original;
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -188,12 +190,33 @@ export const columns: ColumnDef<Post>[] = [
 
       const confirmDelete = () => {
         router.delete(route('posts.destroy', post.id), {
-          preserveState: true,
           preserveScroll: true,
           onSuccess: () => {
-            // Có thể thêm thông báo thành công nếu cần
-            console.log('Post deleted successfully');
+            toast({
+              title: 'Deleted',
+              description: 'Post deleted. Undo?',
+              action: (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    dismiss();
+                    router.post(route('posts.undo'), { post_id: post.id }, {
+                      preserveScroll: true,
+                      onSuccess: () => {
+                        toast({ title: 'Restored', description: 'Post restored successfully' });
+                      },
+                      onError: () => {
+                        toast({ title: 'Error', description: 'Unable to restore post', variant: 'destructive' });
+                      },
+                    });
+                  }}
+                >
+                  Undo
+                </Button>
+              ),
+            });
           },
+          preserveState: true,
           onError: errors => {
             // Xử lý lỗi từ backend (ví dụ: không có quyền)
             console.error('Error deleting post:', errors);

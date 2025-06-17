@@ -257,7 +257,7 @@ export interface NotificationContextType {
 }
 
 export interface Post {
-  id: number;
+  id: string;
   title: string;
   created_at: string;
   is_published: boolean;

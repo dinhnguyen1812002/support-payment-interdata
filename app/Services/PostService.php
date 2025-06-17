@@ -24,6 +24,7 @@ class PostService
             ->orderBy('posts_count', 'desc')
             ->get();
 
+
         $tag = Tag::select(['id', 'name'])
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
@@ -218,20 +219,59 @@ class PostService
         ];
     }
 
-    public function deletePost(Post $post): array
+   public function deletePost(Post $post): array
+   {
+       DB::table('notifications')
+           ->whereJsonContains('data->post_id', $post->id)
+           ->delete();
+
+       $post->delete();
+
+       return [
+           'success' => true,
+           'message' => 'Bài viết đã được xóa thành công!',
+       ];
+   }
+    // public function deletePost(Post $post): array
+    // {
+    //     // Soft delete the post
+    //     $post->delete();
+
+    //     // Remove related notifications (optional, or move to force delete)
+    //     DB::table('notifications')
+    //         ->whereJsonContains('data->post_id', $post->id)
+    //         ->delete();
+
+    //     // Dispatch a job to force delete after 30 seconds
+    //     dispatch(function () use ($post) {
+    //         $freshPost = Post::withTrashed()->find($post->id);
+    //         if ($freshPost && $freshPost->trashed()) {
+    //             $freshPost->forceDelete();
+    //         }
+    //     })->delay(now()->addSeconds(30));
+
+    //     return [
+    //         'success' => true,
+    //         'message' => 'Post deleted. You can undo this action within 30 seconds.',
+    //         'undo_available' => true,
+    //         'post_id' => $post->id,
+    //     ];
+    // }
+    public function undoDeletePost(int $postId): array
     {
-        DB::table('notifications')
-            ->whereJsonContains('data->post_id', $post->id)
-            ->delete();
-
-        $post->delete();
-
+        $post = Post::withTrashed()->findOrFail($postId);
+        if ($post->trashed()) {
+            $post->restore();
+            return [
+                'success' => true,
+                'message' => 'Post restored successfully!',
+            ];
+        }
         return [
-            'success' => true,
-            'message' => 'Bài viết đã được xóa thành công!',
+            'success' => false,
+            'message' => 'Unable to restore post.',
         ];
     }
-
     public function getPostsByCategorySlug(string $categorySlug): array
     {
         $category = Category::where('slug', $categorySlug)->firstOrFail();
@@ -297,11 +337,12 @@ class PostService
 
         // Truy vấn thực tế từ database với điều kiện ID
         $posts = Post::whereIn('id', $postIds)
+            ->where('is_published', true)
             ->with(['user', 'categories'])
             ->withCount('upvotes')
             ->when($sort === 'latest', fn ($q) => $q->latest())
             ->when($sort === 'upvote', fn ($q) => $q->orderBy('upvotes_count', 'desc'))
-            ->paginate(10)
+            ->paginate(6)
             ->withQueryString();
 
         $user = auth()->user();

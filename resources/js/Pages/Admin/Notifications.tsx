@@ -146,7 +146,7 @@ export default function AdminNotifications({
       const notification = notifications.find(n => n.data.post_id === postId);
       if (notification && !notification.read_at) {
         router.post(
-          route('notifications.read_all', { id: notification.id }),
+          route('notifications.read-all', { id: notification.id }),
           {},
           {
             preserveScroll: true,

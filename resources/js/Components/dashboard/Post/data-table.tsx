@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   type ColumnDef,
   flexRender,
@@ -8,9 +8,7 @@ import {
   type SortingState,
   type ColumnFiltersState,
   getFilteredRowModel,
-  getPaginationRowModel,
 } from '@tanstack/react-table';
-import { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -40,9 +38,9 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from '@/Components/ui/card';
 import {
   DropdownMenu,
@@ -63,6 +61,21 @@ interface DataTableProps<TData, TValue> {
     total: number;
     next_page_url: string | null;
     prev_page_url: string | null;
+    from: number;
+    to: number;
+    links: Array<{
+      page: number;
+      url: string | null;
+      active: boolean;
+    }>;
+  };
+  filters?: {
+    search: string;
+    status: string;
+    date_from: string;
+    date_to: string;
+    sort: string;
+    direction: string;
   };
   onPageChange: (url: string | null) => void;
 }
@@ -71,10 +84,13 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   pagination,
+  filters,
   onPageChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [searchValue, setSearchValue] = useState(filters?.search || '');
+  const [statusFilter, setStatusFilter] = useState(filters?.status || 'all');
 
   const table = useReactTable({
     data,
@@ -84,7 +100,6 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     state: {
       sorting,
       columnFilters,
@@ -105,24 +120,107 @@ export function DataTable<TData, TValue>({
     }
   };
 
-  // Thêm hàm xử lý thay đổi số lượng item mỗi trang
-  const handlePerPageChange = (value: string) => {
-    Inertia.visit(window.location.pathname, {
-      data: {
-        per_page: value,
-        page: 1, // Reset về trang 1 khi thay đổi số lượng item
-      },
+  // Hàm xử lý tìm kiếm với debounce
+  const handleSearch = React.useCallback(
+    debounce((value: string) => {
+      const currentUrl = new URL(window.location.href);
+      const params = new URLSearchParams(currentUrl.search);
+
+      if (value) {
+        params.set('search', value);
+      } else {
+        params.delete('search');
+      }
+      params.set('page', '1');
+
+      Inertia.visit(`${currentUrl.pathname}?${params.toString()}`, {
+        preserveState: true,
+        preserveScroll: true,
+        only: ['data', 'pagination', 'filters'],
+      });
+    }, 500),
+    [],
+  );
+
+  // Hàm xử lý thay đổi trạng thái
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value);
+    const currentUrl = new URL(window.location.href);
+    const params = new URLSearchParams(currentUrl.search);
+
+    if (value && value !== 'all') {
+      params.set('status', value);
+    } else {
+      params.delete('status');
+    }
+    params.set('page', '1');
+
+    Inertia.visit(`${currentUrl.pathname}?${params.toString()}`, {
       preserveState: true,
       preserveScroll: true,
-      only: ['data', 'pagination'],
-      onSuccess: () => {
-        // Có thể thêm logic xử lý sau khi thành công
-      },
+      only: ['data', 'pagination', 'filters'],
     });
   };
 
+  // Hàm xử lý thay đổi số lượng item mỗi trang
+  const handlePerPageChange = (value: string) => {
+    const currentUrl = new URL(window.location.href);
+    const params = new URLSearchParams(currentUrl.search);
+
+    params.set('per_page', value);
+    params.set('page', '1');
+
+    Inertia.visit(`${currentUrl.pathname}?${params.toString()}`, {
+      preserveState: true,
+      preserveScroll: true,
+      only: ['data', 'pagination', 'filters'],
+    });
+  };
+
+  // Hàm xử lý sắp xếp
+  const handleSort = (field: string) => {
+    const currentUrl = new URL(window.location.href);
+    const params = new URLSearchParams(currentUrl.search);
+
+    const currentSort = params.get('sort');
+    const currentDirection = params.get('direction');
+
+    let newDirection = 'asc';
+    if (currentSort === field && currentDirection === 'asc') {
+      newDirection = 'desc';
+    }
+
+    params.set('sort', field);
+    params.set('direction', newDirection);
+    params.set('page', '1');
+
+    Inertia.visit(`${currentUrl.pathname}?${params.toString()}`, {
+      preserveState: true,
+      preserveScroll: true,
+      only: ['data', 'pagination', 'filters'],
+    });
+  };
+
+  // Effect để cập nhật search value và status filter khi props thay đổi
+  useEffect(() => {
+    setSearchValue(filters?.search || '');
+    setStatusFilter(filters?.status || 'all');
+  }, [filters]);
+
+  // Debounce function
+  function debounce<T extends (...args: any[]) => any>(
+    func: T,
+    wait: number,
+  ): (...args: Parameters<T>) => void {
+    // let timeout: NodeJS.Timeout;
+    return (...args: Parameters<T>) => {
+      // clearTimeout(timeout);
+      // timeout = setTimeout(() => func(...args), wait);
+    };
+  }
+
   return (
-    <div className="w-full shadow-sm ">
+    <div className="w-full shadow-sm">
       <CardHeader className="pb-2">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -137,77 +235,39 @@ export function DataTable<TData, TValue>({
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by title..."
-                value={
-                  (table.getColumn('title')?.getFilterValue() as string) ?? ''
-                }
-                onChange={event =>
-                  table.getColumn('title')?.setFilterValue(event.target.value)
-                }
+                value={searchValue}
+                onChange={event => {
+                  setSearchValue(event.target.value);
+                  handleSearch(event.target.value);
+                }}
                 className="pl-8 w-full sm:w-[250px]"
               />
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-9 gap-1">
-                  <Filter className="h-4 w-4" />
-                  <span className="hidden sm:inline">Filter</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[200px]">
-                <DropdownMenuItem
-                  onClick={() => table.getColumn('status')?.setFilterValue('')}
-                  className="justify-between"
-                >
-                  All statuses
-                  {!table.getColumn('status')?.getFilterValue() && (
-                    <Badge variant="outline" className="ml-2 bg-primary/10">
-                      Active
-                    </Badge>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() =>
-                    table.getColumn('status')?.setFilterValue('published')
-                  }
-                  className="justify-between"
-                >
-                  Published
-                  {table.getColumn('status')?.getFilterValue() ===
-                    'published' && (
-                    <Badge variant="outline" className="ml-2 bg-primary/10">
-                      Active
-                    </Badge>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() =>
-                    table.getColumn('status')?.setFilterValue('draft')
-                  }
-                  className="justify-between"
-                >
-                  Draft
-                  {table.getColumn('status')?.getFilterValue() === 'draft' && (
-                    <Badge variant="outline" className="ml-2 bg-primary/10">
-                      Active
-                    </Badge>
-                  )}
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() =>
-                    table.getColumn('status')?.setFilterValue('archived')
-                  }
-                  className="justify-between"
-                >
-                  Archived
-                  {table.getColumn('status')?.getFilterValue() ===
-                    'archived' && (
-                    <Badge variant="outline" className="ml-2 bg-primary/10">
-                      Active
-                    </Badge>
-                  )}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Select value={statusFilter} onValueChange={handleStatusChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="archived">Archived</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              onValueChange={handlePerPageChange}
+              value={pagination.per_page.toString()}
+            >
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Items per page" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10 per page</SelectItem>
+                <SelectItem value="25">25 per page</SelectItem>
+                <SelectItem value="50">50 per page</SelectItem>
+                <SelectItem value="100">100 per page</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </CardHeader>
@@ -220,7 +280,12 @@ export function DataTable<TData, TValue>({
                   {headerGroup.headers.map(header => (
                     <TableHead
                       key={header.id}
-                      className="font-semibold text-left"
+                      className="font-semibold text-left cursor-pointer"
+                      onClick={() => {
+                        if (header.column.columnDef.id) {
+                          handleSort(header.column.columnDef.id);
+                        }
+                      }}
                     >
                       {header.isPlaceholder
                         ? null
@@ -272,59 +337,23 @@ export function DataTable<TData, TValue>({
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-4 border-t">
           <div className="text-sm text-muted-foreground mb-4 sm:mb-0">
-            Showing <span className="font-medium">{data.length}</span> of{' '}
+            Showing <span className="font-medium">{pagination.from}</span> to{' '}
+            <span className="font-medium">{pagination.to}</span> of{' '}
             <span className="font-medium">{pagination.total}</span> tickets
           </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
+            {pagination.links.map((link, index) => (
               <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => onPageChange(`/admin/posts?page=1`)}
-                disabled={pagination.current_page === 1}
+                key={index}
+                variant={link.active ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => onPageChange(link.url)}
+                disabled={!link.url || link.active}
+                className={link.url ? '' : 'opacity-50 cursor-not-allowed'}
               >
-                <span className="sr-only">Go to first page</span>
-                <ChevronsLeft className="h-4 w-4" />
+                {link.page}
               </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => onPageChange(pagination.prev_page_url)}
-                disabled={!pagination.prev_page_url}
-              >
-                <span className="sr-only">Go to previous page</span>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-sm mx-2">
-                <span className="font-medium">{pagination.current_page}</span>
-                {' / '}
-                <span>{pagination.last_page}</span>
-              </span>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => onPageChange(pagination.next_page_url)}
-                disabled={!pagination.next_page_url}
-              >
-                <span className="sr-only">Go to next page</span>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() =>
-                  onPageChange(`/admin/posts?page=${pagination.last_page}`)
-                }
-                disabled={pagination.current_page === pagination.last_page}
-              >
-                <span className="sr-only">Go to last page</span>
-                <ChevronsRight className="h-4 w-4" />
-              </Button>
-            </div>
+            ))}
           </div>
         </div>
       </CardContent>

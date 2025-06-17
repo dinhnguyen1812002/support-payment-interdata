@@ -27,6 +27,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/posts/{slug}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::post('/posts/{post}/restore', [PostController::class, 'restore'])->name('posts.restore');
     Route::post('/comments', [CommentsController::class, 'store'])->name('comments.store');
 
     // Nếu bạn muốn thêm routes cho reply comments
@@ -130,18 +131,18 @@ Route::middleware(['auth'])->group(function () {
 
 // Role routes
 
-// API endpoints cho role và permission
-Route::post('/users/assign-role', [PermissionController::class, 'assignRole'])->name('users.assign-role');
-Route::post('/users/assign-permissions', [PermissionController::class, 'assignPermissions'])->name('users.assign-permissions');
-Route::post('/admin/roles', [RoleController::class, 'storeRole'])->name('admin.roles.store');
-Route::put('/admin/roles/{id}', [RoleController::class, 'updateRole'])->name('admin.roles.update');
-// Route::post('/admin/permissions', [RoleController::class, 'storePermission'])->name('admin.permissions.store');
-// Route::put('/admin/permissions/{id}', [RoleController::class, 'updatePermission'])->name('admin.permissions.update');
+// API endpoints cho role và permission - Grouped under middleware
+Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+    Route::post('/users/assign-role-api', [PermissionController::class, 'assignRole'])->name('users.assign-role-api');
+    Route::post('/users/assign-permissions-api', [PermissionController::class, 'assignPermissions'])->name('users.assign-permissions-api');
+    Route::post('/admin/roles', [RoleController::class, 'storeRole'])->name('admin.roles.store');
+    Route::put('/admin/roles/{id}', [RoleController::class, 'updateRole'])->name('admin.roles.update');
 
-// API endpoints for permissions
-Route::post('/admin/permissions', [PermissionController::class, 'store'])->name('admin.permissions.store');
-Route::put('/admin/permissions/{id}', [PermissionController::class, 'update'])->name('admin.permissions.update');
-Route::delete('/admin/permissions/{id}', [PermissionController::class, 'destroy'])->name('admin.permissions.destroy');
+    // API endpoints for permissions
+    Route::post('/admin/permissions', [PermissionController::class, 'store'])->name('admin.permissions.store');
+    Route::put('/admin/permissions/{id}', [PermissionController::class, 'update'])->name('admin.permissions.update');
+    Route::delete('/admin/permissions/{id}', [PermissionController::class, 'destroy'])->name('admin.permissions.destroy');
+});
 
 // Admin routes
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {

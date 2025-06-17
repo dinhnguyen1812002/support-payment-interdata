@@ -312,7 +312,7 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
     },
     [apiClient, showError],
   );
-  console.log('fetchAllNotifications', fetchAllNotifications);
+  // console.log('fetchAllNotifications', fetchAllNotifications);
 
   const markAsRead = useCallback(
     async (notificationId: string) => {

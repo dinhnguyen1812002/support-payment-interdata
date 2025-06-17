@@ -80,7 +80,7 @@
     "react-resizable-panels": "^2.1.7",
     "react-swipeable": "^7.0.2",
     "recharts": "^2.15.1",
-    "sonner": "^1.7.4",
+    "sonner": "^2.0.5",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "use-debounce": "^10.0.4",
