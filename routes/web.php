@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/top-voted-posts', [PostController::class, 'getTopVotePosts']);
 
+Route::get('/admin/posts/trash', [PostController::class, 'getTrash'])->name('posts.trash'); 
 // Route::get('/posts', [PostController::class, 'getPostByUser']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -27,7 +28,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/posts/{slug}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
-    Route::post('/posts/{post}/restore', [PostController::class, 'restore'])->name('posts.restore');
+    Route::post('/posts/{id}/restore', [PostController::class, 'restore'])->name('posts.restore');
     Route::post('/comments', [CommentsController::class, 'store'])->name('comments.store');
 
     // Nếu bạn muốn thêm routes cho reply comments
@@ -151,3 +152,4 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     Route::get('/posts/{id}', [AdminController::class, 'getPost'])->name('posts.get');
 });
+

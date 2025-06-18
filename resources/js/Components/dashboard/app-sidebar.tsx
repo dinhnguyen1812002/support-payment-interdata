@@ -19,6 +19,7 @@ import {
   Boxes,
   FolderKey,
   Bell,
+  Trash,
 } from 'lucide-react';
 
 import { NavDocuments } from '@/Components/dashboard/nav-documents';
@@ -83,6 +84,11 @@ const data = {
       title: 'Department',
       url: '/departments',
       icon: Boxes,
+    },
+    {
+      title: 'Trash',
+      url: '/admin/posts/trash',
+      icon: Trash,
     },
   ],
 

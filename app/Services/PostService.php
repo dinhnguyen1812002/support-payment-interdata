@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
+use App\Jobs\ForceDeletePost;
 class PostService
 {
     public function preparePostData(Post $post): array
@@ -224,9 +224,10 @@ class PostService
        DB::table('notifications')
            ->whereJsonContains('data->post_id', $post->id)
            ->delete();
-
-       $post->delete();
-
+    
+    //    $post->forceDelete();
+        $post->delete();
+    //    ForceDeletePost::dispatch($post->id)->delay(now()->addMinute());
        return [
            'success' => true,
            'message' => 'Bài viết đã được xóa thành công!',
@@ -257,7 +258,7 @@ class PostService
     //         'post_id' => $post->id,
     //     ];
     // }
-    public function undoDeletePost(int $postId): array
+    public function undoDeletePost(string $postId): array
     {
         $post = Post::withTrashed()->findOrFail($postId);
         if ($post->trashed()) {

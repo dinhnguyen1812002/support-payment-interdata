@@ -264,6 +264,7 @@ export interface Post {
   comments_count: number;
   slug: string;
   upvotes_count: number;
+  deleted_at: string;
 }
 
 export interface Department {

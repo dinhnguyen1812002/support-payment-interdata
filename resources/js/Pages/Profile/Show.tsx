@@ -31,6 +31,8 @@ import PostsTable from '@/Pages/Profile/Partials/PostTable';
 import { router } from '@inertiajs/core';
 import { route } from 'ziggy-js';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { Badge } from '@/Components/ui/badge';
+import { Toaster } from '@/Components/ui/sonner';
 
 interface Props {
   sessions: Session[];
@@ -101,8 +103,11 @@ const ProfilePage = ({
               <div className="space-y-1">
                 <h2 className="text-2xl font-semibold">{user.name}</h2>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>{user.email}</span>
+                  <span>{user.email}</span> 
+                 
+                 
                 </div>
+                <Badge variant="outline">{user.roles[0].name}</Badge>
               </div>
             </div>
           </CardContent>
@@ -220,6 +225,9 @@ const ProfilePage = ({
           </Card>
         )}
       </div>
+
+      <Toaster expand={true} closeButton />
+
     </AppLayout>
   );
 };

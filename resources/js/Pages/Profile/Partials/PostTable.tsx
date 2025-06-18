@@ -101,6 +101,14 @@ export default function PostsTable({
       onSuccess: () => {
         toast("Your have bên restore", {
           description: "Post restored successfully",
+          closeButton : true,
+          duration : 5000,
+          style: {
+            background: "white",
+            color: "black",
+           
+          },
+        
         });
         setDeleteDialogOpen(false);
       },
@@ -115,10 +123,17 @@ export default function PostsTable({
       router.delete(route('posts.destroy', postId), {
         preserveState: true,
         onSuccess: () => {
-         toast("Event has been created", {
-          description: "Sunday, December 03, 2023 at 9:00 AM",
+         toast("Ticket has been deleted", {
+          description: `${postToDelete.deleted_at} `,
+          closeButton : true,
+          duration : 5000,
+          style: {
+            background: "white",
+            color: "black",
+           
+          },
           action: {
-            label: "Undo",
+            label: "Restore",
             onClick: () => handleRestore(postId),
           },
         });
@@ -308,7 +323,7 @@ export default function PostsTable({
                 onClick={confirmDelete}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                Delete
+                remove
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

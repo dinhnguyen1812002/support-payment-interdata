@@ -248,7 +248,7 @@ export default function AppLayout({
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       asChild
-                      className="flex h-10 w-full cursor-pointer items-center h-10 border-b text-base"
+                      className="flex h-10 w-full cursor-pointer items-center border-b text-base"
                     >
                       <ThemeSwitch />
                     </DropdownMenuItem>
@@ -493,7 +493,7 @@ export default function AppLayout({
           <PageTransition key={window.location.pathname}>
             {children}
 
-            <Toaster />
+            
           </PageTransition>
         </AnimatePresence>
       </main>

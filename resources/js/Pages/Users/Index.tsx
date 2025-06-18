@@ -16,7 +16,7 @@ interface User {
     id: number;
     name: string;
     email: string;
-    profile_photo_path: string | null;
+    profile_photo_path: string | undefined;
     created_at: string;
     roles: Role[];
 }

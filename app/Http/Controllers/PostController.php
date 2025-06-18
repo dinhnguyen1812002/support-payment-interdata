@@ -172,7 +172,7 @@ class PostController extends Controller
         $request->validate([
             'post_id' => 'required',
         ]);
-        $result = $this->postService->undoDeletePost($request->integer('post_id'));
+        $result = $this->postService->undoDeletePost($request->post_id);
 
         return response()->json($result, $result['success'] ? 200 : 400);
     }
@@ -189,15 +189,23 @@ class PostController extends Controller
 
         return redirect()->back()->with('success', 'change status successfully.');
     }
-    public function restore(Post $post)
+    public function restore($id)
     {
-        // Ensure the post is soft-deleted
+        $post = Post::withTrashed()->findOrFail($id); 
+    
         if ($post->trashed()) {
             $post->restore();
-            return redirect()->back()->with('success', 'restore post successfully.');
+            return redirect()->back()->with('success', 'Post restored successfully.');
         }
-
+    
         return redirect()->back()->with('error', 'Post cannot be restored.');
+    }
+    public function getTrash()
+    {
+        $posts = Post::onlyTrashed()->get();
 
+        return Inertia::render('Posts/Trash', [
+            'posts' => $posts,
+        ]);
     }
 }

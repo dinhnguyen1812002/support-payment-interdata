@@ -38,31 +38,37 @@ import {
 
 import React from 'react';
 
-interface Role {
+// interface Role {
+//   key: string;
+//   name: string;
+//   permissions: string[];
+//   description: string;
+// }
+
+interface  Role {
   key: string;
   name: string;
   permissions: string[];
   description: string;
 }
-
 interface User {
   id: number;
   name: string;
   email: string;
-  profile_photo_path: string;
+  profile_photo_path: string | undefined;
   created_at: string;
   roles: Role[];
 }
 
 interface Props {
   users?: {
-    data: User[];
-    total: number;
-    per_page: number;
-    current_page: number;
-    last_page: number;
-    next_page_url: string | null;
-    prev_page_url: string | null;
+      data: User[];
+      total: number;
+      per_page: number;
+      current_page: number;
+      last_page: number;
+      next_page_url: string | null;
+      prev_page_url: string | null;
   };
   keyword?: string;
   notifications?: any[];
