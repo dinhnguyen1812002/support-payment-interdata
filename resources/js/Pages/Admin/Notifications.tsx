@@ -233,15 +233,15 @@ export default function AdminNotifications({
                       {notifications.filter(n => !n.read_at).length}
                     </Badge>
                   </div>
-                  <div className="flex gap-2">
+                  {/* <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={handleMarkAllAsRead}
-                    >
-                      Mark all as read
+                    > 
+                      Mark all as read 
                     </Button>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="p-4 border-b">
                   <div className="relative">

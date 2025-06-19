@@ -19,6 +19,7 @@ import {
   Eye,
   ArrowUp,
   EyeOff,
+  PlusCircle,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Link, router } from '@inertiajs/react';
@@ -170,12 +171,15 @@ export default function PostsTable({
             <div className="h-10 w-10 flex items-center justify-center">
               <Search className="h-4 w-4 text-muted-foreground" />
             </div>
-            <Button
+            {/* <Button
               onClick={() => {
                 toast("Event has been created.")
               }}
             >
             Show Test Toast
+          </Button> */}
+          <Button  onClick={()=> router.visit(route('posts.create'))}>
+            <PlusCircle />
           </Button>
           </div>
         </CardTitle>

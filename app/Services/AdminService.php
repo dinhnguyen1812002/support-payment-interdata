@@ -39,7 +39,7 @@ class AdminService
             ->map(fn ($post) => [
                 'id' => $post->id,
                 'title' => $post->title,
-                'status' => $post->is_published,
+                'is_published' => $post->is_published,
                 'vote' => (string) $post->upvotes_count,
                 'comment' => $post->comments_count,
                 'user' => [

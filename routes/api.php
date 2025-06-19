@@ -18,6 +18,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::get('/global-search', [SearchController::class, 'globleSearch'])->name('search.posts');
 // Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
 //    ->middleware('auth')
 //    ->name('notifications.read_all');
@@ -32,7 +33,6 @@ Route::get('categories', [CategoryController::class, 'index']);
 
 Route::get('/tags', [TagController::class, 'index']);
 
-Route::get('/global-search', [SearchController::class, 'globleSearch'])->name('search.posts');
 
 Route::get('/count', [PostController::class, 'getCountPost']);
 

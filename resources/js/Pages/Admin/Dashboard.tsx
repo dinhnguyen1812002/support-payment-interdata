@@ -16,7 +16,7 @@ interface User {
 interface Post {
   id: number;
   title: string;
-  status: boolean;
+  is_published: boolean;
   vote: string;
   comment: number;
   user: User;

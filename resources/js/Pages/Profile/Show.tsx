@@ -107,7 +107,7 @@ const ProfilePage = ({
                  
                  
                 </div>
-                <Badge variant="outline">{user.roles[0].name}</Badge>
+                {/* <Badge variant="outline">{user.roles[0].name}</Badge> */}
               </div>
             </div>
           </CardContent>

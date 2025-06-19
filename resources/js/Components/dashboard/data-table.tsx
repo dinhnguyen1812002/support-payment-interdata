@@ -104,7 +104,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 export const schema = z.object({
   id: z.number(),
   title: z.string(),
-  status: z.boolean(),
+  is_published: z.boolean(),
   vote: z.string(),
   comment: z.number(),
   user: z.object({
@@ -202,34 +202,34 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     accessorKey: 'title',
     header: 'Title',
     cell: ({ row }) => (
-      <div className="w-full text-left">
-        <span className=" text-muted-foreground text-left">
+      <div className="flex items-center gap-2">
+        <span className="text-muted-foreground text-left">
           {row.original.title}
         </span>
       </div>
     ),
   },
-  {
-    accessorKey: 'status',
-    header: 'Public',
-    cell: ({ row }) => (
-      // <Badge
-      //   variant="outline"
-      //   className="flex gap-1 px-1.5 text-muted-foreground [&_svg]:size-3"
-      // >
-      //   {/*{row.original.status === '1' ? (*/}
-      //   {/*  <CheckCircle2Icon className="text-green-500 dark:text-green-400" />*/}
-      //   {/*) : (*/}
-      //   {/*  <LoaderIcon />*/}
-      //   {/*)}*/}
-      //
-      //   {/*{row.original.status}*/}
-      // </Badge>
-      <div className="flex items-center gap-2">
-        <Checkbox checked={true} className="disabled" />
-      </div>
-    ),
-  },
+  // {
+  //   accessorKey: 'status',
+  //   header: 'Public',
+  //   cell: ({ row }) => (
+  //     <Badge
+  //       variant="outline"
+  //       className="flex gap-1 px-1.5 text-muted-foreground [&_svg]:size-3"
+  //     >
+  //       {row.original.is_published === true ? (
+  //         <CheckCircle2Icon className="text-green-500 dark:text-green-400" />
+  //      ) : (
+  //       <LoaderIcon />
+  //      )}
+      
+  //       {/*{row.original.status}*/}
+  //     </Badge>
+  //     // <div className="flex items-center gap-2">
+  //     //   <Checkbox  checked={true} className="disabled" />
+  //     // </div>
+  //   ),
+  // },
   {
     accessorKey: 'vote',
     header: () => <div className="w-full text-center">Vote</div>,
