@@ -20,7 +20,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import Footer from '@/Components/Footer';
 import { Button } from '@/Components/ui/button';
-import NotificationsDropdown from '@/Components/notification/NotificationsDropdown';
+import NotificationsDropdown from '@/Components/notification/Notifications';
 
 import { Toaster } from '@/Components/ui/sonner';
 import { motion, AnimatePresence } from 'framer-motion';

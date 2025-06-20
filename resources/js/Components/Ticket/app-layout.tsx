@@ -20,7 +20,7 @@ import useTypedPage from '@/Hooks/useTypedPage';
 import { Department, Notification } from '@/types';
 import type { Post } from '@/types/Post';
 import AppSidebar from '@/Components/Ticket/sidebar-nav';
-import NotificationsDropdown from '@/Components/notification/NotificationsDropdown';
+import NotificationsDropdown from '@/Components/notification/Notifications';
 
 interface AppLayoutProps {
   children: React.ReactNode;
