@@ -1,6 +1,6 @@
 // components/NotificationItem.tsx
 import React, { useCallback } from 'react';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
@@ -9,14 +9,18 @@ import { Notification } from '@/types/Notification';
 interface NotificationItemProps {
   notification: Notification;
   onMarkAsRead: (id: string) => void;
+  onHide?: (id: string) => void;
   isMarkingAsRead: boolean;
+  isHiding?: boolean;
 }
 
 
 export const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
   onMarkAsRead,
+  onHide,
   isMarkingAsRead,
+  isHiding = false,
 }) => {
   const getNotificationUrl = useCallback((notification: Notification) => {
     if (notification.type === 'comment') {
@@ -31,10 +35,16 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
     }
   }, [notification.read_at, notification.id, onMarkAsRead]);
 
+  const handleHideClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onHide?.(notification.id);
+  };
+
   return (
     <div
       className={cn(
-        'flex items-start gap-3 p-4 transition-all duration-200 border-b last:border-0 relative hover:bg-gray-50 dark:hover:bg-gray-800/50',
+        'group flex items-start gap-3 p-4 transition-all duration-200 border-b last:border-0 relative hover:bg-gray-50 dark:hover:bg-gray-800/50',
         !notification.read_at && ''
       )}
     >
@@ -66,8 +76,24 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
         </div>
       </Link>
 
-      {!notification.read_at && (
-        <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-1 flex-shrink-0">
+        {onHide && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleHideClick}
+            disabled={isHiding}
+            className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20 transition-opacity"
+            title="Hide notification"
+          >
+            {isHiding ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <X className="h-3 w-3" />
+            )}
+          </Button>
+        )}
+        {!notification.read_at && (
           <Button
             variant="ghost"
             size="sm"
@@ -86,9 +112,11 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
               <Check className="h-3 w-3" />
             )}
           </Button>
+        )}
+        {!notification.read_at && !isMarkingAsRead && (
           <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

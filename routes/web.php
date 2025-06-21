@@ -77,7 +77,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         ->name('roles.index');
     Route::post('/users/assign-role', [RoleController::class, 'assignRole'])
         ->name('users.assign-role');
-    Route::get('/admin/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/posts', [AdminController::class, 'getAllPost'])->name('admin.posts');
     Route::get('/admin/categories', [AdminController::class, 'getAllCategory'])->name('admin.categories');
     Route::post('/admin/create-category', [CategoryController::class, 'store'])->name('admin.categories.store');
@@ -89,6 +89,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 });
 Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 // Route::get('/test-event', function () {
 //    $post = Post::find('01jp1xepa4cv3en4axatkh9vdk');
 //    event(new NewQuestionCreated($post));

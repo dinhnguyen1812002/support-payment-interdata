@@ -104,7 +104,7 @@ const CategoriesSidebar: React.FC<Props> = ({
                                     variant="ghost"
                                     className={`w-full justify-between hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-3 h-auto relative text-sm
                                         ${isActive
-                                            ? "border-l-4 border-blue-600 bg-gray-100 dark:bg-gray-800"
+                                            ? "bg-gray-100 dark:bg-gray-800"
                                             : ""
                                         }`}
                                     asChild
@@ -113,12 +113,12 @@ const CategoriesSidebar: React.FC<Props> = ({
                                     <Link
                                         href={`/categories/${category.slug}/posts`}
                                         className="flex justify-between items-center w-full text-gray-600
-                                         dark:text-[#9a9cae] hover:text-gray-900 dark:hover:text-blue-600 py-1 sm:py-2"
+                                         dark:text-[#9a9cae] hover:text-gray-900 py-1 sm:py-2"
                                     >
                                         <div className="flex gap-2 items-center">
                                             <span
                                                 className={`font-bold text-sm ${
-                                                    isActive ? "text-blue-600 dark:text-blue-400 dark:hover:text-blue-600" : ""
+                                                    isActive ? "" : ""
                                                 }`}
                                             >
                                                 {category.title}

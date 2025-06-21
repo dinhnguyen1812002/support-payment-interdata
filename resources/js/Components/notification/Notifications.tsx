@@ -53,10 +53,12 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
     notifications,
     isLoading,
     markingAsRead,
+    hidingNotification,
     error,
     fetchAllNotifications,
     markAsRead,
     markAllAsRead,
+    hideNotification,
     handleNewNotification,
   } = useNotifications(initialNotifications);
 
@@ -143,7 +145,9 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
                       key={notification.id}
                       notification={notification}
                       onMarkAsRead={markAsRead}
+                      onHide={hideNotification}
                       isMarkingAsRead={markingAsRead.has(notification.id)}
+                      isHiding={hidingNotification.has(notification.id)}
                     />
                   ))
                 )}

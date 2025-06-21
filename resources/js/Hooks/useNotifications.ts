@@ -9,6 +9,7 @@ export const useNotifications = (initialNotifications: Notification[] = []) => {
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
   const [isLoading, setIsLoading] = useState(false);
   const [markingAsRead, setMarkingAsRead] = useState<Set<string>>(new Set());
+  const [hidingNotification, setHidingNotification] = useState<Set<string>>(new Set());
   const [error, setError] = useState<ErrorState | null>(null);
   
   const apiClient = useMemo(() => createApiClient(), []);
@@ -108,6 +109,30 @@ export const useNotifications = (initialNotifications: Notification[] = []) => {
     }
   }, [apiClient, showError]);
 
+  const hideNotification = useCallback(async (notificationId: string) => {
+    if (hidingNotification.has(notificationId)) return;
+    
+    try {
+      setHidingNotification(prev => new Set([...prev, notificationId]));
+      
+      await apiClient.delete(`/notifications/${notificationId}`);
+      
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+    } catch (error) {
+      console.error('Error hiding notification:', error);
+      showError({
+        type: 'hide',
+        message: 'Failed to hide notification.'
+      });
+    } finally {
+      setHidingNotification(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(notificationId);
+        return newSet;
+      });
+    }
+  }, [apiClient, hidingNotification, showError]);
+
   const handleNewNotification = useCallback((notification: Notification) => {
     setNotifications(prev => {
       const exists = prev.some(n => n.id === notification.id);
@@ -132,10 +157,12 @@ export const useNotifications = (initialNotifications: Notification[] = []) => {
     setNotifications,
     isLoading,
     markingAsRead,
+    hidingNotification,
     error,
     fetchAllNotifications,
     markAsRead,
     markAllAsRead,
+    hideNotification,
     handleNewNotification,
     showError,
   };

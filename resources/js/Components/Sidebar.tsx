@@ -84,7 +84,7 @@ export const CategoryList: React.FC<CategoryListProps> = ({
               key={id}
               className={`flex items-center px-4 py-2  hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition mt-1 ${
                 isActive
-                  ? 'border-l-4 border-blue-500 bg-gray-100 hover:text-blue-500  dark:bg-[#1B1C22]'
+                  ? 'bg-gray-100 dark:bg-[#1B1C22]'
                   : ''
               }`}
             >

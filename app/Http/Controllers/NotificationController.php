@@ -69,4 +69,26 @@ class NotificationController extends Controller
 
         return response()->json($notify);
     }
+
+    /**
+     * Delete a specific notification
+     *
+     * @param string $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id)
+    {
+        try {
+            $user = Auth::user();
+            $notification = $user->notifications()->findOrFail($id);
+            
+            $notification->delete();
+            
+            return redirect()->back()->with('success', 'Notification deleted successfully.');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to delete notification.');
+
+        }
+    }
 }

@@ -25,7 +25,7 @@ export const CONSTANTS = {
     }
     
  export interface ErrorState {
-    type: 'fetch' | 'mark-read' | 'mark-all-read' | 'connection';
+    type: 'fetch' | 'mark-read' | 'mark-all-read' | 'connection' | 'hide';
     message: string;
     retryCount?: number;
   }
