@@ -50,6 +50,7 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import { Badge } from '@/Components/ui/badge';
 import { Inertia } from '@inertiajs/inertia';
+import Pagination from '@/Components/Pagination';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -133,11 +134,16 @@ export function DataTable<TData, TValue>({
       }
       params.set('page', '1');
 
-      Inertia.visit(`${currentUrl.pathname}?${params.toString()}`, {
-        preserveState: true,
-        preserveScroll: true,
-        only: ['data', 'pagination', 'filters'],
-      });
+      Inertia.get(
+        currentUrl.pathname,
+        Object.fromEntries(params),
+        {
+          preserveState: true,
+          replace: true,
+          only: ['data', 'pagination', 'filters'],
+          preserveScroll: true,
+        }
+      );
     }, 500),
     [],
   );
@@ -155,11 +161,16 @@ export function DataTable<TData, TValue>({
     }
     params.set('page', '1');
 
-    Inertia.visit(`${currentUrl.pathname}?${params.toString()}`, {
-      preserveState: true,
-      preserveScroll: true,
-      only: ['data', 'pagination', 'filters'],
-    });
+    Inertia.get(
+      currentUrl.pathname,
+      Object.fromEntries(params),
+      {
+        preserveState: true,
+        replace: true,
+        only: ['data', 'pagination', 'filters'],
+        preserveScroll: true,
+      }
+    );
   };
 
   // Hàm xử lý thay đổi số lượng item mỗi trang
@@ -170,11 +181,16 @@ export function DataTable<TData, TValue>({
     params.set('per_page', value);
     params.set('page', '1');
 
-    Inertia.visit(`${currentUrl.pathname}?${params.toString()}`, {
-      preserveState: true,
-      preserveScroll: true,
-      only: ['data', 'pagination', 'filters'],
-    });
+    Inertia.get(
+      currentUrl.pathname,
+      Object.fromEntries(params),
+      {
+        preserveState: true,
+        replace: true,
+        only: ['data', 'pagination', 'filters'],
+        preserveScroll: true,
+      }
+    );
   };
 
   // Hàm xử lý sắp xếp
@@ -194,11 +210,16 @@ export function DataTable<TData, TValue>({
     params.set('direction', newDirection);
     params.set('page', '1');
 
-    Inertia.visit(`${currentUrl.pathname}?${params.toString()}`, {
-      preserveState: true,
-      preserveScroll: true,
-      only: ['data', 'pagination', 'filters'],
-    });
+    Inertia.get(
+      currentUrl.pathname,
+      Object.fromEntries(params),
+      {
+        preserveState: true,
+        replace: true,
+        only: ['data', 'pagination', 'filters'],
+        preserveScroll: true,
+      }
+    );
   };
 
   // Effect để cập nhật search value và status filter khi props thay đổi
@@ -212,10 +233,12 @@ export function DataTable<TData, TValue>({
     func: T,
     wait: number,
   ): (...args: Parameters<T>) => void {
-    // let timeout: NodeJS.Timeout;
+    let timeout: number | null = null;
     return (...args: Parameters<T>) => {
-      // clearTimeout(timeout);
-      // timeout = setTimeout(() => func(...args), wait);
+      if (timeout !== null) {
+        clearTimeout(timeout);
+      }
+      timeout = window.setTimeout(() => func(...args), wait);
     };
   }
 
@@ -342,18 +365,14 @@ export function DataTable<TData, TValue>({
             <span className="font-medium">{pagination.total}</span> tickets
           </div>
           <div className="flex items-center gap-2">
-            {pagination.links.map((link, index) => (
-              <Button
-                key={index}
-                variant={link.active ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => onPageChange(link.url)}
-                disabled={!link.url || link.active}
-                className={link.url ? '' : 'opacity-50 cursor-not-allowed'}
-              >
-                {link.page}
-              </Button>
-            ))}
+          {pagination && pagination.total > 0 && (
+              <Pagination
+               
+               current_page={pagination.current_page} 
+               last_page={pagination.last_page} 
+               next_page_url={pagination.next_page_url} 
+               prev_page_url={pagination.prev_page_url} />
+            )}
           </div>
         </div>
       </CardContent>
