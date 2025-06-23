@@ -127,7 +127,7 @@ return [
     */
     'validation' => [
         'page' => 'nullable|integer|min:1',
-        'per_page' => 'nullable|integer|min:' . env('PAGINATION_MIN_PER_PAGE', 5) . '|max:' . env('PAGINATION_MAX_PER_PAGE', 100),
+        'per_page' => 'nullable|integer|min:'.env('PAGINATION_MIN_PER_PAGE', 5).'|max:'.env('PAGINATION_MAX_PER_PAGE', 100),
         'search' => 'nullable|string|max:255',
         'sort' => 'nullable|string|max:50',
         'direction' => 'nullable|in:asc,desc',

@@ -131,9 +131,9 @@ export default function AppLayout({
               {/* Logo */}
               <Link href={route('/')} className="flex items-center ml-12">
                 <p
-                  className="text-xl sm:text-2xl md:text-3xl font-extrabold bg-gradient-to-r
-                    from-blue-600 to-indigo-500 text-transparent bg-clip-text
-                    hover:from-indigo-600 hover:to-blue-500 transition-all
+                  className="text-xl sm:text-2xl md:text-3xl font-extrabold
+                    bg-clip-text
+                    transition-all text-[#2C3E50] dark:text-white
                     duration-300 transform hover:scale-105"
                 >
                   Support
@@ -142,7 +142,7 @@ export default function AppLayout({
             </div>
 
             {/* Middle section: Navigation Links */}
-            <div className="hidden max-w-3xl flex-1 items-center justify-start ml-10 sm:flex  ">
+            <div className="hidden max-w-3xl flex-1 items-center justify-start ml-10 sm:flex">
               <div className="flex space-x-3 md:space-x-6">
                 <NavLink href={route('/')} active={route().current('/')}>
                   Home

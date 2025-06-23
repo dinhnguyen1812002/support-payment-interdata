@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
@@ -19,19 +18,19 @@ class HandlePaginationConflicts
     {
         try {
             $response = $next($request);
-            
+
             // Check if this is a pagination request that might cause conflicts
             if ($this->isPaginationRequest($request)) {
                 $this->logPaginationRequest($request);
-                
+
                 // Add headers to prevent caching issues
                 $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
                 $response->headers->set('Pragma', 'no-cache');
                 $response->headers->set('Expires', '0');
             }
-            
+
             return $response;
-            
+
         } catch (\Exception $e) {
             // Log the error for debugging
             Log::error('Pagination request failed', [
@@ -40,32 +39,32 @@ class HandlePaginationConflicts
                 'params' => $request->all(),
                 'user_id' => auth()->id(),
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            
+
             // If it's an AJAX/Inertia request, return JSON error
             if ($request->expectsJson() || $request->header('X-Inertia')) {
                 return response()->json([
                     'message' => 'Pagination request failed. Please try again.',
-                    'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+                    'error' => config('app.debug') ? $e->getMessage() : 'Internal server error',
                 ], 500);
             }
-            
+
             throw $e;
         }
     }
-    
+
     /**
      * Check if this is a pagination-related request
      */
     private function isPaginationRequest(Request $request): bool
     {
-        return $request->has(['page', 'per_page']) || 
-               $request->has('search') || 
+        return $request->has(['page', 'per_page']) ||
+               $request->has('search') ||
                $request->has('sort') ||
                str_contains($request->path(), 'admin/');
     }
-    
+
     /**
      * Log pagination request details for debugging
      */
@@ -78,7 +77,7 @@ class HandlePaginationConflicts
                 'params' => $request->all(),
                 'user_id' => auth()->id(),
                 'user_agent' => $request->userAgent(),
-                'ip' => $request->ip()
+                'ip' => $request->ip(),
             ]);
         }
     }

@@ -71,12 +71,12 @@ class AdminService
             $waitTimeout = config('pagination.lock.wait_timeout', 5);
             $cacheEnabled = config('pagination.cache.enabled', true);
 
-            if (!$lockEnabled) {
+            if (! $lockEnabled) {
                 return $this->fetchPostsData($request, $perPage, $startTime);
             }
 
             // Add mutex lock to prevent concurrent pagination conflicts
-            $lockKey = config('pagination.cache.prefix', 'pagination') . '_admin_posts_' . auth()->id() . '_' . md5($request->fullUrl());
+            $lockKey = config('pagination.cache.prefix', 'pagination').'_admin_posts_'.auth()->id().'_'.md5($request->fullUrl());
 
             return \Cache::lock($lockKey, $lockTimeout)->block($waitTimeout, function () use ($request, $perPage, $startTime) {
                 return $this->fetchPostsData($request, $perPage, $startTime);
@@ -86,7 +86,7 @@ class AdminService
             \Log::warning('Pagination request timeout', [
                 'user_id' => auth()->id(),
                 'url' => $request->fullUrl(),
-                'execution_time' => (microtime(true) - $startTime) * 1000
+                'execution_time' => (microtime(true) - $startTime) * 1000,
             ]);
 
             // Fallback without lock
@@ -99,8 +99,8 @@ class AdminService
         $cacheEnabled = config('pagination.cache.enabled', true);
         $cacheTtl = config('pagination.cache.ttl', 300);
 
-        if ($cacheEnabled && !$isTimeout) {
-            $cacheKey = config('pagination.cache.prefix', 'pagination') . '_posts_' . md5($request->fullUrl());
+        if ($cacheEnabled && ! $isTimeout) {
+            $cacheKey = config('pagination.cache.prefix', 'pagination').'_posts_'.md5($request->fullUrl());
 
             $data = \Cache::remember($cacheKey, $cacheTtl, function () use ($request, $perPage) {
                 $posts = $this->fetchPaginatedPosts($request, $perPage);
@@ -142,10 +142,10 @@ class AdminService
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'like', '%'.$searchTerm.'%')
-                  ->orWhere('content', 'like', '%'.$searchTerm.'%')
-                  ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
-                      $userQuery->where('name', 'like', '%'.$searchTerm.'%');
-                  });
+                    ->orWhere('content', 'like', '%'.$searchTerm.'%')
+                    ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
+                        $userQuery->where('name', 'like', '%'.$searchTerm.'%');
+                    });
             });
         }
 
@@ -304,7 +304,7 @@ class AdminService
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', '%'.$searchTerm.'%')
-                  ->orWhere('email', 'like', '%'.$searchTerm.'%');
+                    ->orWhere('email', 'like', '%'.$searchTerm.'%');
             });
         }
 

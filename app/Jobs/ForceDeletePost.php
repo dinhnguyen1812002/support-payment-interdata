@@ -11,13 +11,13 @@ use Illuminate\Queue\SerializesModels;
 
 class ForceDeletePost implements ShouldQueue
 {
-    use Queueable, InteractsWithQueue, Dispatchable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * Create a new job instance.
      */
     public $postId;
-    
+
     public function __construct($postId)
     {
         $this->postId = $postId;
@@ -29,10 +29,8 @@ class ForceDeletePost implements ShouldQueue
     public function handle(): void
     {
         $post = Post::withTrashed()->findOrFail($this->postId);
-        if($post->trashed()) {
+        if ($post->trashed()) {
             $post->forceDelete();
         }
     }
-
-   
 }

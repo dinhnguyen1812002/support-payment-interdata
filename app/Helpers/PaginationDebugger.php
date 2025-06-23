@@ -42,7 +42,7 @@ class PaginationDebugger
                 'laravel_version' => app()->version(),
                 'environment' => config('app.env'),
                 'debug' => config('app.debug'),
-            ]
+            ],
         ];
 
         if (config('app.debug')) {
@@ -62,21 +62,21 @@ class PaginationDebugger
         // Check for invalid page numbers
         if ($request->has('page')) {
             $page = $request->get('page');
-            if (!is_numeric($page) || $page < 1) {
-                $issues[] = 'Invalid page number: ' . $page;
+            if (! is_numeric($page) || $page < 1) {
+                $issues[] = 'Invalid page number: '.$page;
             }
         }
 
         // Check for invalid per_page values
         if ($request->has('per_page')) {
             $perPage = $request->get('per_page');
-            if (!is_numeric($perPage) || $perPage < 1 || $perPage > 100) {
-                $issues[] = 'Invalid per_page value: ' . $perPage;
+            if (! is_numeric($perPage) || $perPage < 1 || $perPage > 100) {
+                $issues[] = 'Invalid per_page value: '.$perPage;
             }
         }
 
         // Check for conflicting sort parameters
-        if ($request->has('sort') && !$request->has('direction')) {
+        if ($request->has('sort') && ! $request->has('direction')) {
             $issues[] = 'Sort parameter provided without direction';
         }
 
@@ -84,19 +84,19 @@ class PaginationDebugger
         if ($request->has(['date_from', 'date_to'])) {
             $dateFrom = $request->get('date_from');
             $dateTo = $request->get('date_to');
-            
+
             if (strtotime($dateFrom) > strtotime($dateTo)) {
                 $issues[] = 'date_from is after date_to';
             }
         }
 
         // Check for authentication issues
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             $issues[] = 'User not authenticated';
         }
 
         // Check for CSRF token issues
-        if (!$request->hasValidSignature() && $request->method() !== 'GET') {
+        if (! $request->hasValidSignature() && $request->method() !== 'GET') {
             $issues[] = 'Potential CSRF token issue';
         }
 
@@ -115,27 +115,27 @@ class PaginationDebugger
                 case str_contains($issue, 'Invalid page number'):
                     $suggestions[] = 'Reset page to 1 or use a valid positive integer';
                     break;
-                    
+
                 case str_contains($issue, 'Invalid per_page'):
                     $suggestions[] = 'Use per_page value between 1 and 100';
                     break;
-                    
+
                 case str_contains($issue, 'Sort parameter'):
                     $suggestions[] = 'Add direction parameter (asc/desc) when using sort';
                     break;
-                    
+
                 case str_contains($issue, 'date_from is after date_to'):
                     $suggestions[] = 'Ensure date_from is before or equal to date_to';
                     break;
-                    
+
                 case str_contains($issue, 'not authenticated'):
                     $suggestions[] = 'User needs to login again';
                     break;
-                    
+
                 case str_contains($issue, 'CSRF token'):
                     $suggestions[] = 'Refresh page to get new CSRF token';
                     break;
-                    
+
                 default:
                     $suggestions[] = 'Check request parameters and try again';
             }
@@ -150,7 +150,7 @@ class PaginationDebugger
     public static function logPerformance(string $operation, float $startTime, array $additionalData = []): void
     {
         $executionTime = microtime(true) - $startTime;
-        
+
         $performanceData = array_merge([
             'operation' => $operation,
             'execution_time_ms' => round($executionTime * 1000, 2),

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Tag;
 use App\Services\AdminService;
 use App\Services\CategoryService;
-use App\Helpers\PaginationDebugger;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -38,12 +37,12 @@ class AdminController extends Controller
     public function getAllPost(Request $request)
     {
 
-            $this->authorize('view posts');
-            $perPage = $request->get('per_page', 10);
-            $postData = $this->adminService->getAllPosts($request, $perPage);
-            return Inertia::render('Admin/Post', $postData);
+        $this->authorize('view posts');
+        $perPage = $request->get('per_page', 10);
+        $postData = $this->adminService->getAllPosts($request, $perPage);
 
-       
+        return Inertia::render('Admin/Post', $postData);
+
     }
 
     public function getAllCategory(Request $request)

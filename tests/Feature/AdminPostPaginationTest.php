@@ -14,7 +14,7 @@ class AdminPostPaginationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Tạo user admin
         $this->admin = User::factory()->create();
         $this->admin->assignRole('admin');
@@ -30,12 +30,11 @@ class AdminPostPaginationTest extends TestCase
             ->get('/admin/posts?per_page=10');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => 
-            $page->component('Admin/Post')
-                ->has('data', 10) // Kiểm tra có 10 items
-                ->has('pagination.total', 25) // Tổng 25 items
-                ->has('pagination.per_page', 10) // 10 items per page
-                ->has('pagination.current_page', 1) // Trang hiện tại là 1
+        $response->assertInertia(fn ($page) => $page->component('Admin/Post')
+            ->has('data', 10) // Kiểm tra có 10 items
+            ->has('pagination.total', 25) // Tổng 25 items
+            ->has('pagination.per_page', 10) // 10 items per page
+            ->has('pagination.current_page', 1) // Trang hiện tại là 1
         );
     }
 
@@ -50,9 +49,8 @@ class AdminPostPaginationTest extends TestCase
             ->get('/admin/posts?search=Laravel');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => 
-            $page->has('data', 1)
-                ->where('data.0.title', 'Laravel Tutorial')
+        $response->assertInertia(fn ($page) => $page->has('data', 1)
+            ->where('data.0.title', 'Laravel Tutorial')
         );
     }
 
@@ -67,8 +65,7 @@ class AdminPostPaginationTest extends TestCase
             ->get('/admin/posts?status=published');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => 
-            $page->has('data', 2)
+        $response->assertInertia(fn ($page) => $page->has('data', 2)
         );
     }
 
@@ -84,10 +81,9 @@ class AdminPostPaginationTest extends TestCase
             ->get('/admin/posts?sort=title&direction=asc');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => 
-            $page->where('data.0.title', 'A Post')
-                ->where('data.1.title', 'B Post')
-                ->where('data.2.title', 'C Post')
+        $response->assertInertia(fn ($page) => $page->where('data.0.title', 'A Post')
+            ->where('data.1.title', 'B Post')
+            ->where('data.2.title', 'C Post')
         );
     }
 
@@ -102,10 +98,9 @@ class AdminPostPaginationTest extends TestCase
             ->get('/admin/posts?status=published&per_page=10&page=2');
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => 
-            $page->has('data', 5) // Trang 2 có 5 items còn lại
-                ->where('pagination.current_page', 2)
-                ->where('filters.status', 'published')
+        $response->assertInertia(fn ($page) => $page->has('data', 5) // Trang 2 có 5 items còn lại
+            ->where('pagination.current_page', 2)
+            ->where('filters.status', 'published')
         );
     }
 }

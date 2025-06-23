@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Data\Post\CreatePostData;
 use App\Events\NewQuestionCreated;
+use App\Jobs\ForceDeletePost;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
@@ -14,7 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use App\Jobs\ForceDeletePost;
+
 class PostService
 {
     public function preparePostData(Post $post): array
@@ -23,7 +24,6 @@ class PostService
             ->withCount('posts')
             ->orderBy('posts_count', 'desc')
             ->get();
-
 
         $tag = Tag::select(['id', 'name'])
             ->withCount('posts')
@@ -219,20 +219,21 @@ class PostService
         ];
     }
 
-   public function deletePost(Post $post): array
-   {
-       DB::table('notifications')
-           ->whereJsonContains('data->post_id', $post->id)
-           ->delete();
-    
-    //    $post->forceDelete();
+    public function deletePost(Post $post): array
+    {
+        DB::table('notifications')
+            ->whereJsonContains('data->post_id', $post->id)
+            ->delete();
+
+        //    $post->forceDelete();
         $post->delete();
-    //    ForceDeletePost::dispatch($post->id)->delay(now()->addMinute());
-       return [
-           'success' => true,
-           'message' => 'Bài viết đã được xóa thành công!',
-       ];
-   }
+
+        //    ForceDeletePost::dispatch($post->id)->delay(now()->addMinute());
+        return [
+            'success' => true,
+            'message' => 'Bài viết đã được xóa thành công!',
+        ];
+    }
     // public function deletePost(Post $post): array
     // {
     //     // Soft delete the post
@@ -263,16 +264,19 @@ class PostService
         $post = Post::withTrashed()->findOrFail($postId);
         if ($post->trashed()) {
             $post->restore();
+
             return [
                 'success' => true,
                 'message' => 'Post restored successfully!',
             ];
         }
+
         return [
             'success' => false,
             'message' => 'Unable to restore post.',
         ];
     }
+
     public function getPostsByCategorySlug(string $categorySlug): array
     {
         $category = Category::where('slug', $categorySlug)->firstOrFail();

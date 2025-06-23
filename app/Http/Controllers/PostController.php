@@ -81,7 +81,7 @@ class PostController extends Controller
     {
         $result = $this->postService->deletePost($post);
 
-        return redirect()->back()->with('success','delete post successfully.');
+        return redirect()->back()->with('success', 'delete post successfully.');
     }
 
     public function filterPostByCategory(Request $request, $categorySlug): \Inertia\Response
@@ -189,17 +189,20 @@ class PostController extends Controller
 
         return redirect()->back()->with('success', 'change status successfully.');
     }
+
     public function restore($id)
     {
-        $post = Post::withTrashed()->findOrFail($id); 
-    
+        $post = Post::withTrashed()->findOrFail($id);
+
         if ($post->trashed()) {
             $post->restore();
+
             return redirect()->back()->with('success', 'Post restored successfully.');
         }
-    
+
         return redirect()->back()->with('error', 'Post cannot be restored.');
     }
+
     public function getTrash()
     {
         $posts = Post::onlyTrashed()->get();

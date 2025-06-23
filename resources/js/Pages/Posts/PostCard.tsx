@@ -51,14 +51,15 @@ const BlogCard: React.FC<BlogCardProps> = ({
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
           {isAuthenticated ? (
             <Link href={route('posts.create')} className="w-full sm:w-auto">
-              <Button className="inline-flex items-center justify-center rounded px-3 py-1 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-600 border-0 h-10">
+
+              <Button variant="default">
                 <span className="hidden sm:inline">Ask Question</span>
                 <span className="sm:hidden">Ask Question</span>
               </Button>
             </Link>
           ) : (
             <Link href="/login" className="w-full sm:w-auto">
-              <Button className="w-full h-10 sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-600">
+              <Button variant="default">
                 <span className="hidden sm:inline">Ask Question</span>
                 <span className="sm:hidden">Ask Question</span>
               </Button>
@@ -82,14 +83,14 @@ const BlogCard: React.FC<BlogCardProps> = ({
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
           {isAuthenticated ? (
             <Link href={route('posts.create')} className="w-full sm:w-auto">
-              <Button className="inline-flex items-center justify-center rounded px-3 py-1 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-600 border-0 h-10">
+                <Button variant="default">
                 <span className="hidden sm:inline">Ask Question</span>
                 <span className="sm:hidden">Ask Question</span>
               </Button>
             </Link>
           ) : (
             <Link href="/login" className="w-full sm:w-auto">
-              <Button className="w-full h-10 sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-600">
+              <Button variant="default">
                 <span className="hidden sm:inline">Ask Question</span>
                 <span className="sm:hidden">Ask Question</span>
               </Button>

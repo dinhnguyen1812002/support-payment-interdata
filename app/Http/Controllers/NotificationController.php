@@ -49,7 +49,7 @@ class NotificationController extends Controller
                         'data' => $notification->data,
                         'read_at' => $notification->read_at,
                         'created_at' => $notification->created_at->diffForHumans(),
-                        'time' => $notification->created_at->diffForHumans()    ,
+                        'time' => $notification->created_at->diffForHumans(),
                     ];
                 });
 
@@ -73,7 +73,7 @@ class NotificationController extends Controller
     /**
      * Delete a specific notification
      *
-     * @param string $id
+     * @param  string  $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
@@ -81,11 +81,11 @@ class NotificationController extends Controller
         try {
             $user = Auth::user();
             $notification = $user->notifications()->findOrFail($id);
-            
+
             $notification->delete();
-            
+
             return redirect()->back()->with('success', 'Notification deleted successfully.');
-            
+
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to delete notification.');
 

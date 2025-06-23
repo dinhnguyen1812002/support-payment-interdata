@@ -82,11 +82,10 @@ export const CategoryList: React.FC<CategoryListProps> = ({
           {processedCategories.map(({ id, title, number, link, isActive }) => (
             <div
               key={id}
-              className={`flex items-center px-4 py-2  hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition mt-1 ${
-                isActive
+              className={`flex items-center px-4 py-2  hover:bg-gray-100 dark:hover:bg-[#1B1C22] rounded-md transition mt-1 ${isActive
                   ? 'bg-gray-100 dark:bg-[#1B1C22]'
                   : ''
-              }`}
+                }`}
             >
               {title === 'Search' ? (
                 <div
@@ -95,34 +94,31 @@ export const CategoryList: React.FC<CategoryListProps> = ({
                 >
                   <span
                     className={`font-bold text-sm text-gray-600
-                                         dark:text-[#9a9cae] hover:text-gray-900 dark:hover:text-blue-600 ${
-                                           isActive
-                                             ? 'text-blue-600 dark:text-blue-400 dark:hover:text-blue-600'
-                                             : ''
-                                         }`}
+                                         dark:text-[#9a9cae] hover:text-gray-900  ${isActive
+                        ? ''
+                        : ''
+                      }`}
                   >
                     {title}
                   </span>
-                  <span
-                    className="text-gray-600
-                                         dark:text-[#9a9cae] hover:text-gray-900 dark:hover:text-blue-600"
+                  {/* <span
+                    className="text-gray-600 dark:text-[#9a9cae] hover:text-gray-900 dark:hover:text-blue-600"
                   >
                     {keyCmd}
-                  </span>
+                  </span> */}
                 </div>
               ) : (
                 <Link
                   href={link}
                   className="w-full flex h-5 items-center justify-between text-gray-600
-                                         dark:text-[#9a9cae] hover:text-gray-900 dark:hover:text-blue-600"
+                                         dark:text-[#9a9cae] hover:text-gray-900 "
                   onClick={() => handleCategoryClick(title, link)}
                 >
                   <span
-                    className={`text-sm font-medium transition-colors   ${
-                      isActive
-                        ? ' dark:text-blue-400 dark:hover:text-blue-600'
+                    className={`text-sm font-medium transition-colors   ${isActive
+                        ? ' '
                         : ''
-                    }`}
+                      }`}
                   >
                     {title}
                   </span>

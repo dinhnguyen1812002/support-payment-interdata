@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/top-voted-posts', [PostController::class, 'getTopVotePosts']);
 
-Route::get('/admin/posts/trash', [PostController::class, 'getTrash'])->name('posts.trash'); 
+Route::get('/admin/posts/trash', [PostController::class, 'getTrash'])->name('posts.trash');
 // Route::get('/posts', [PostController::class, 'getPostByUser']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -153,4 +153,3 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     Route::get('/posts/{id}', [AdminController::class, 'getPost'])->name('posts.get');
 });
-

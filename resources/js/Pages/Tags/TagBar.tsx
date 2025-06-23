@@ -91,9 +91,9 @@ const CategoriesSidebar: React.FC<Props> = ({
                                 <Button
                                     key={tag.id}
                                     variant="ghost"
-                                    className={`w-full justify-between hover:bg-gray-100 dark:hover:bg-gray-800 px-4 py-3 h-auto relative text-sm
+                                    className={`w-full justify-between hover:bg-gray-100 dark:hover:bg-[#1B1C22] px-4 py-3 h-auto relative text-sm
                                         ${isActive
-                                        ? "bg-gray-100 dark:bg-gray-800"
+                                        ? "bg-gray-100 dark:bg-[#1B1C22]"
                                         : ""
                                     }`}
                                     asChild
