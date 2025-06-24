@@ -116,7 +116,7 @@ export default function AppLayout({
         )}
       >
         {/* Primary Navigation Menu */}
-        <div className="max-w-[1450px] mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="max-w-[1450px] mx-auto px-3 sm:px-4 lg:px-6 ">
           <div className="flex justify-between h-14 sm:h-16 md:h-18 lg:h-20">
             {/* Left section: Logo and menu toggle */}
             <div className="flex items-center space-x-1">
@@ -142,7 +142,7 @@ export default function AppLayout({
             </div>
 
             {/* Middle section: Navigation Links */}
-            <div className="hidden max-w-3xl flex-1 items-center justify-start ml-10 sm:flex">
+            <div className="hidden max-w-2xl flex-1 items-center justify-start sm:flex">
               <div className="flex space-x-3 md:space-x-6">
                 <NavLink href={route('/')} active={route().current('/')}>
                   Home
@@ -165,7 +165,7 @@ export default function AppLayout({
             </div>
 
             {/* Right section: User controls */}
-            <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4 ">
+            <div className="flex items-center space-x-2 sm:space-x-2 md:space-x-4 ">
               <div>
                 <SearchCommandDialog open={open} setOpen={setOpen} />
                 {/*<Input type="search" placeholder="Search..."></Input>*/}

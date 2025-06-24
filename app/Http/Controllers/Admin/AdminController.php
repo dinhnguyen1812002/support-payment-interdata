@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tag;
 use App\Services\AdminService;
 use App\Services\CategoryService;
+use App\Services\TicketAutomationService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,10 +19,13 @@ class AdminController extends Controller
 
     protected CategoryService $categoryService;
 
-    public function __construct(AdminService $AdminService, CategoryService $categoryService)
+    protected TicketAutomationService $automationService;
+
+    public function __construct(AdminService $AdminService, CategoryService $categoryService, TicketAutomationService $automationService)
     {
         $this->adminService = $AdminService;
         $this->categoryService = $categoryService;
+        $this->automationService = $automationService;
     }
 
     public function dashboard()
@@ -29,6 +33,9 @@ class AdminController extends Controller
         $this->authorize('view admin dashboard');
 
         $data = $this->adminService->getDashboardData(auth()->user());
+
+        // Add automation stats to dashboard
+        $data['automation_stats'] = $this->automationService->getAutomationStats();
 
         return Inertia::render('Admin/Dashboard', $data);
 

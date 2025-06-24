@@ -128,11 +128,11 @@ export default function DepartmentCards({
                       </Button>
                     </div>
                     <Button
-                      variant="ghost"
+                      variant="default"
                       size="sm"
                       onClick={openCreateDialog}
                     >
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardHeader>

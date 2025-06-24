@@ -45,47 +45,63 @@ const data = {
   },
   navMain: [
     {
+      id: 1,
       title: 'Dashboard',
       url: '/admin/',
       icon: LayoutDashboardIcon,
     },
     {
+      id: 2,
       title: 'Notifications',
       url: '/admin/notifications',
       icon: Bell,
     },
     {
+      id: 3,
       title: 'Post',
       url: '/admin/posts',
       icon: ListIcon,
     },
     {
+      id: 4,
       title: 'User',
       url: '/users',
       icon: ContactRound,
     },
     {
+      id: 5,
       title: 'Categories',
       url: '/admin/categories',
       icon: ChartColumnStacked,
     },
     {
+      id: 6,
       title: 'tag',
       url: '/admin/tags',
       icon: FileTextIcon,
     },
+
     {
+      id: 7,
       title: 'roles and permission',
       url: '/admin/roles-permissions',
       icon: FolderKey,
     },
 
     {
+      id: 8,
       title: 'Department',
       url: '/departments',
       icon: Boxes,
     },
     {
+      id: 9,
+      title: 'Automation Rules',
+      url: '/admin/automation-rules',
+      icon: SettingsIcon,
+    },
+    {
+      id: 10,
       title: 'Trash',
       url: '/admin/posts/trash',
       icon: Trash,

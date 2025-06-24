@@ -299,7 +299,7 @@ const EditPost = ({ post, categories, notifications, keyword, tags }: EditPostPr
                                                 <Button
                                                     type="submit"
                                                     disabled={processing}
-                                                    className="h-10 px-6 sm:w-50 bg-blue-500 hover:bg-blue-600 text-white"
+                                                   variant="default"
                                                 >
                                                     {processing ? (
                                                         <div className="flex items-center">

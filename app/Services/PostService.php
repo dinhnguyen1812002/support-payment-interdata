@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Data\Post\CreatePostData;
+use App\Events\NewPostCreated;
 use App\Events\NewQuestionCreated;
 use App\Jobs\ForceDeletePost;
 use App\Models\Category;
+use App\Models\Departments;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
@@ -18,6 +20,13 @@ use Illuminate\Support\Str;
 
 class PostService
 {
+    protected TicketAutomationService $automationService;
+
+    public function __construct(TicketAutomationService $automationService)
+    {
+        $this->automationService = $automationService;
+    }
+
     public function preparePostData(Post $post): array
     {
         $categories = Category::select(['id', 'title', 'slug'])
@@ -47,6 +56,17 @@ class PostService
                 'comments' => $comments,
                 'upvote_count' => $post->upvotes_count,
                 'has_upvote' => $hasUpvote,
+                'priority' => $post->priority,
+                'priority_name' => $post->priority_name,
+                'priority_score' => $post->priority_score,
+                'status' => $post->status,
+                'status_name' => $post->status_name,
+                'category_type' => $post->category_type,
+                'category_type_name' => $post->category_type_name,
+                'assignee' => $post->assignee,
+                'department' => $post->department,
+                'is_auto_assigned' => $post->isAutoAssigned(),
+                'automation_history' => $post->getAutomationHistory(),
             ],
             'categories' => $categories,
             'tag' => $tag,
@@ -112,6 +132,17 @@ class PostService
 
         // Start database transaction to ensure data integrity
         return DB::transaction(function () use ($postData, $slug) {
+            // Auto-categorize and prioritize based on content
+            $categoryType = $this->automationService->categorizePost((object) [
+                'title' => $postData->title,
+                'content' => $postData->content,
+            ]);
+
+            $priority = $this->automationService->calculatePriority((object) [
+                'title' => $postData->title,
+                'content' => $postData->content,
+            ]);
+
             // Create post with only necessary data
             $post = Post::create([
                 'title' => $postData->title,
@@ -119,6 +150,9 @@ class PostService
                 'slug' => $slug,
                 'is_published' => $postData->is_published,
                 'user_id' => auth()->id(),
+                'category_type' => $categoryType,
+                'priority' => $priority,
+                'status' => 'open',
             ]);
 
             // Batch attach relationships - more efficient than individual attaches
@@ -130,6 +164,9 @@ class PostService
                 $post->tags()->attach($postData->tags);
             }
             $post->load('tags', 'categories', 'user');
+
+            // Apply automation rules after relationships are loaded
+            $this->automationService->applyAutomationRules($post);
             // Queue these operations to improve response time
             dispatch(function () use ($post) {
                 $this->notifyUsers($post);
@@ -475,6 +512,17 @@ class PostService
             ];
         }
 
+        // Auto-categorize and prioritize based on content
+        $categoryType = $this->automationService->categorizePost((object) [
+            'title' => $data['title'],
+            'content' => $data['content'],
+        ]);
+
+        $priority = $this->automationService->calculatePriority((object) [
+            'title' => $data['title'],
+            'content' => $data['content'],
+        ]);
+
         $post = Post::create([
             'title' => $data['title'],
             'content' => $data['content'],
@@ -483,6 +531,9 @@ class PostService
             'user_id' => $data['user_id'],
             'product_id' => $data['product_id'],
             'product_name' => $data['product_name'],
+            'category_type' => $categoryType,
+            'priority' => $priority,
+            'status' => 'open',
         ]);
 
         if (! empty($data['categories'])) {
@@ -494,6 +545,9 @@ class PostService
         }
 
         $post->load('tags', 'categories', 'user');
+
+        // Apply automation rules
+        $this->automationService->applyAutomationRules($post);
 
         $this->notifyUsers($post);
 

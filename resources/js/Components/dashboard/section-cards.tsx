@@ -1,4 +1,4 @@
-import { TrendingDownIcon, TrendingUpIcon } from 'lucide-react';
+import { TrendingDownIcon, TrendingUpIcon, Settings, Target } from 'lucide-react';
 
 import { Badge } from '@/Components/ui/badge';
 import {
@@ -10,11 +10,19 @@ import {
 } from '@/Components/ui/card';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+interface AutomationStats {
+  total_rules: number;
+  active_rules: number;
+  total_matches: number;
+  recent_matches: number;
+}
+
 interface Props {
   totalPosts: number;
   totalUsers: number;
+  automationStats?: AutomationStats;
 }
-export function SectionCards({ totalPosts, totalUsers }: Props) {
+export function SectionCards({ totalPosts, totalUsers, automationStats }: Props) {
   return (
     <div
       className="*:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4 grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t
@@ -64,6 +72,52 @@ export function SectionCards({ totalPosts, totalUsers }: Props) {
           {/*</div>*/}
         </CardFooter>
       </Card>
+
+      {/* Automation Stats Cards */}
+      {automationStats && (
+        <>
+          <Card className="@container/card">
+            <CardHeader className="relative">
+              <CardDescription>Active Automation Rules</CardDescription>
+              <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                {automationStats.active_rules}
+              </CardTitle>
+              <div className="absolute right-4 top-4">
+                <Settings className="size-5 text-muted-foreground" />
+              </div>
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-1 text-sm">
+              <div className="line-clamp-1 flex gap-2 font-medium">
+                {automationStats.total_rules} total rules
+              </div>
+              <div className="text-muted-foreground">
+                Automating ticket processing
+              </div>
+            </CardFooter>
+          </Card>
+
+          <Card className="@container/card">
+            <CardHeader className="relative">
+              <CardDescription>Automation Matches</CardDescription>
+              <CardTitle className="@[250px]/card:text-3xl text-2xl font-semibold tabular-nums">
+                {automationStats.recent_matches}
+              </CardTitle>
+              <div className="absolute right-4 top-4">
+                <Target className="size-5 text-muted-foreground" />
+              </div>
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-1 text-sm">
+              <div className="line-clamp-1 flex gap-2 font-medium">
+                {automationStats.total_matches} total matches
+              </div>
+              <div className="text-muted-foreground">
+                Last 7 days activity
+              </div>
+            </CardFooter>
+          </Card>
+        </>
+      )}
+
       {/*<Card className="@container/card">*/}
       {/*    <CardHeader className="relative">*/}
       {/*        <CardDescription>Active Accounts</CardDescription>*/}

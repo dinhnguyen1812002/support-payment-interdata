@@ -16,7 +16,25 @@ class Post extends Model
 {
     use HasFactory, HasUlids, Notifiable, Searchable, SoftDeletes;
 
-    protected $fillable = ['title', 'content', 'user_id', 'is_published', 'slug', 'image', 'product_id', 'product_name'];
+    protected $fillable = [
+        'title',
+        'content',
+        'user_id',
+        'is_published',
+        'slug',
+        'image',
+        'product_id',
+        'product_name',
+        'department_id',
+        'status',
+        'priority',
+        'assignee_id',
+        'category_type',
+        'priority_score',
+        'automation_applied',
+        'auto_assigned_at',
+        'auto_assigned_by_rule_id',
+    ];
 
     //    protected $fillable = [
     //        'title',
@@ -43,6 +61,30 @@ class Post extends Model
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'category_post');
+    }
+
+    // Quan hệ với department
+    public function department()
+    {
+        return $this->belongsTo(Departments::class);
+    }
+
+    // Quan hệ với assignee
+    public function assignee()
+    {
+        return $this->belongsTo(User::class, 'assignee_id');
+    }
+
+    // Quan hệ với automation rule
+    public function autoAssignedByRule()
+    {
+        return $this->belongsTo(AutomationRule::class, 'auto_assigned_by_rule_id');
+    }
+
+    // Quan hệ với post tag priorities
+    public function tagPriorities()
+    {
+        return $this->hasMany(PostTagPriority::class);
     }
 
     // Quan hệ với comments
@@ -220,5 +262,163 @@ class Post extends Model
     public function receivesBroadcastNotificationsOn()
     {
         return 'users.'.$this->id;
+    }
+
+    /**
+     * Cast attributes
+     */
+    protected $casts = [
+        'automation_applied' => 'array',
+        'auto_assigned_at' => 'datetime',
+        'priority_score' => 'integer',
+        'is_published' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Priority levels with their display names
+     */
+    public const PRIORITY_LEVELS = [
+        'low' => 'Thấp',
+        'medium' => 'Trung bình',
+        'high' => 'Cao',
+        'urgent' => 'Khẩn cấp',
+    ];
+
+    /**
+     * Status levels with their display names
+     */
+    public const STATUS_LEVELS = [
+        'open' => 'Mở',
+        'in_progress' => 'Đang xử lý',
+        'resolved' => 'Đã giải quyết',
+        'closed' => 'Đã đóng',
+    ];
+
+    /**
+     * Category types with their display names
+     */
+    public const CATEGORY_TYPES = [
+        'technical' => 'Kỹ thuật',
+        'payment' => 'Thanh toán',
+        'consultation' => 'Tư vấn',
+        'general' => 'Tổng quát',
+    ];
+
+    /**
+     * Get human readable priority
+     */
+    public function getPriorityNameAttribute(): string
+    {
+        return self::PRIORITY_LEVELS[$this->priority] ?? $this->priority;
+    }
+
+    /**
+     * Get human readable status
+     */
+    public function getStatusNameAttribute(): string
+    {
+        return self::STATUS_LEVELS[$this->status] ?? $this->status;
+    }
+
+    /**
+     * Get human readable category type
+     */
+    public function getCategoryTypeNameAttribute(): string
+    {
+        return self::CATEGORY_TYPES[$this->category_type] ?? $this->category_type;
+    }
+
+    /**
+     * Calculate priority score based on various factors
+     */
+    public function calculatePriorityScore(): int
+    {
+        $score = PostTagPriority::getPriorityScore($this->priority);
+
+        // Adjust based on tag priorities
+        $tagPriorityBonus = $this->tagPriorities()->avg('priority_score') ?? 0;
+        $score = ($score + $tagPriorityBonus) / 2;
+
+        // Adjust based on age (older tickets get higher priority)
+        $ageInHours = $this->created_at->diffInHours(now());
+        if ($ageInHours > 24) {
+            $score += min(20, $ageInHours / 24 * 5); // Max 20 points bonus
+        }
+
+        return min(100, max(0, (int) $score));
+    }
+
+    /**
+     * Update priority score
+     */
+    public function updatePriorityScore(): void
+    {
+        $this->update(['priority_score' => $this->calculatePriorityScore()]);
+    }
+
+    /**
+     * Scope for filtering by priority
+     */
+    public function scopeByPriority($query, string $priority)
+    {
+        return $query->where('priority', $priority);
+    }
+
+    /**
+     * Scope for filtering by status
+     */
+    public function scopeByStatus($query, string $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    /**
+     * Scope for filtering by category type
+     */
+    public function scopeByCategoryType($query, string $categoryType)
+    {
+        return $query->where('category_type', $categoryType);
+    }
+
+    /**
+     * Scope for filtering by department
+     */
+    public function scopeByDepartment($query, $departmentId)
+    {
+        return $query->where('department_id', $departmentId);
+    }
+
+    /**
+     * Scope for filtering by assignee
+     */
+    public function scopeByAssignee($query, $userId)
+    {
+        return $query->where('assignee_id', $userId);
+    }
+
+    /**
+     * Scope for ordering by priority score
+     */
+    public function scopeOrderByPriority($query, string $direction = 'desc')
+    {
+        return $query->orderBy('priority_score', $direction);
+    }
+
+    /**
+     * Check if post is auto-assigned
+     */
+    public function isAutoAssigned(): bool
+    {
+        return ! is_null($this->auto_assigned_at);
+    }
+
+    /**
+     * Get formatted automation history
+     */
+    public function getAutomationHistory(): array
+    {
+        return $this->automation_applied ?? [];
     }
 }

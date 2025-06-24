@@ -86,6 +86,21 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/admin/tags', [AdminController::class, 'getAllTags'])->name('admin.tags');
     Route::get('/admin/roles-permissions', [AdminController::class, 'getAllRolesAndPermissions'])->name('admin.roles-permissions');
 
+    // Automation Rules routes
+    Route::resource('/admin/automation-rules', \App\Http\Controllers\Admin\AutomationRuleController::class)->names([
+        'index' => 'admin.automation-rules.index',
+        'create' => 'admin.automation-rules.create',
+        'store' => 'admin.automation-rules.store',
+        'show' => 'admin.automation-rules.show',
+        'edit' => 'admin.automation-rules.edit',
+        'update' => 'admin.automation-rules.update',
+        'destroy' => 'admin.automation-rules.destroy',
+    ]);
+    Route::patch('/admin/automation-rules/{automationRule}/toggle', [\App\Http\Controllers\Admin\AutomationRuleController::class, 'toggleActive'])->name('admin.automation-rules.toggle');
+    Route::post('/admin/automation-rules/{automationRule}/test', [\App\Http\Controllers\Admin\AutomationRuleController::class, 'test'])->name('admin.automation-rules.test');
+    Route::get('/admin/automation-stats', [\App\Http\Controllers\Admin\AutomationRuleController::class, 'stats'])->name('admin.automation-rules.stats');
+    Route::post('/admin/bulk-update-scores', [\App\Http\Controllers\Admin\AutomationRuleController::class, 'bulkUpdateScores'])->name('admin.bulk-update-scores');
+
 });
 Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
