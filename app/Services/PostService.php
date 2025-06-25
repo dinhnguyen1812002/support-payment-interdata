@@ -486,12 +486,19 @@ class PostService
     {
         // Nếu bài viết thuộc về một phòng ban cụ thể
         if ($post->department_id) {
-            $department = Departments::find($post->department_id);
-            if ($department) {
+            $department = Departments::with(['users' => function ($query) {
+                $query->whereHas('roles', function ($q) {
+                    $q->whereIn('name', ['admin', 'employee']);
+                });
+            }])->find($post->department_id);
+
+            if ($department && $department->users->isNotEmpty()) {
                 // Gửi thông báo cho tất cả người dùng trong phòng ban
+                // Chỉ gửi cho những người dùng có vai trò phù hợp
                 $department->users->each(function ($user) use ($post) {
                     // Không gửi thông báo cho người tạo bài viết
-                    if ($user->id !== $post->user_id) {
+                    // và đảm bảo người dùng có quyền nhận thông báo
+                    if ($user->id !== $post->user_id ) {
                         $user->notify(new NewPostNotification($post));
                     }
                 });

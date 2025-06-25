@@ -112,6 +112,10 @@ class AutomationRuleController extends Controller
 
         return Inertia::render('Admin/AutomationRules/Show', [
             'rule' => $automationRule,
+            'categoryTypes' => AutomationRule::CATEGORY_TYPES,
+            'priorityLevels' => AutomationRule::PRIORITY_LEVELS,
+            'categories' => Category::select('id', 'title')->get(),
+            'tags' => Tag::select('id', 'name')->get(),
         ]);
     }
 

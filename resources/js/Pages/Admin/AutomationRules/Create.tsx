@@ -293,6 +293,58 @@ export default function CreateAutomationRule({
                       </div>
                     </div>
 
+                    {/* Categories */}
+                    <div className="space-y-2">
+                      <Label>Categories</Label>
+                      <p className="text-sm text-gray-600">Select categories to apply this rule to</p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {categories.map((category) => (
+                          <div key={category.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`category-${category.id}`}
+                              checked={data.conditions.category_ids.includes(category.id)}
+                              onCheckedChange={(checked) => {
+                                const newCategories = checked
+                                  ? [...data.conditions.category_ids, category.id]
+                                  : data.conditions.category_ids.filter(id => id !== category.id);
+                                setData('conditions', {
+                                  ...data.conditions,
+                                  category_ids: newCategories,
+                                });
+                              }}
+                            />
+                            <Label htmlFor={`category-${category.id}`}>{category.title}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Tags */}
+                    <div className="space-y-2">
+                      <Label>Tags</Label>
+                      <p className="text-sm text-gray-600">Select tags to apply this rule to</p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {tags.map((tag) => (
+                          <div key={tag.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`tag-${tag.id}`}
+                              checked={data.conditions.tag_ids.includes(tag.id)}
+                              onCheckedChange={(checked) => {
+                                const newTags = checked
+                                  ? [...data.conditions.tag_ids, tag.id]
+                                  : data.conditions.tag_ids.filter(id => id !== tag.id);
+                                setData('conditions', {
+                                  ...data.conditions,
+                                  tag_ids: newTags,
+                                });
+                              }}
+                            />
+                            <Label htmlFor={`tag-${tag.id}`}>{tag.name}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* Actions */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-medium">Actions to Take</h3>

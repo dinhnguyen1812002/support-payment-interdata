@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { AppSidebar } from '@/Components/dashboard/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/Components/ui/sidebar';
 import { SiteHeader } from '@/Components/dashboard/site-header';
@@ -9,8 +9,6 @@ import { Badge } from '@/Components/ui/badge';
 import { 
   Plus, 
   Settings, 
-  ToggleLeft, 
-  ToggleRight, 
   Eye, 
   Edit, 
   Trash2,
@@ -19,12 +17,18 @@ import {
   Users,
   Clock
 } from 'lucide-react';
+import { Category, Tag, Department, User } from '@/types';
+import { toast } from 'sonner';
 
 interface AutomationRule {
   id: number;
   name: string;
   description: string;
   is_active: boolean;
+  categories: Category[];
+  tags: Tag[];
+  departments: Department[];
+  users: User[];
   category_type: string;
   assigned_priority: string;
   execution_order: number;
@@ -79,6 +83,19 @@ const categoryColors = {
 };
 
 export default function AutomationRules({ rules, stats, search }: AutomationRulesProps) {
+  function handleDelete(id: number): void {
+    router.delete(`/admin/automation-rules/${id}`, {
+      onSuccess: () => {
+        console.log('Automation rule deleted successfully');
+        toast.success('Automation rule deleted successfully');
+      },
+      onError: (errors) => {
+        toast.error('Failed to delete automation rule');
+      },
+    }); 
+    
+  }
+
   return (
     <SidebarProvider>
       <Head title="Automation Rules" />
@@ -222,7 +239,8 @@ export default function AutomationRules({ rules, stats, search }: AutomationRule
                                 <Edit className="h-4 w-4" />
                               </Button>
                             </Link>
-                            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700"
+                             onClick={() => handleDelete(rule.id)}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
