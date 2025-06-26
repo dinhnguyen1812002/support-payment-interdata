@@ -57,11 +57,15 @@ class AutomationRuleController extends Controller
     {
         Gate::authorize('view admin dashboard');
 
+        $categories = Category::select('id', 'title')->get();
+        $tags = Tag::select('id', 'name')->get();
+        $departments = Departments::select('id', 'name')->get();
+        $users = User::role(['admin', 'employee'])->select('id', 'name')->get();
         return Inertia::render('Admin/AutomationRules/Create', [
-            'categories' => Category::select('id', 'title')->get(),
-            'tags' => Tag::select('id', 'name')->get(),
-            'departments' => Departments::select('id', 'name')->get(),
-            'users' => User::role(['admin', 'employee'])->select('id', 'name')->get(),
+            'categories' => $categories,
+            'tags' => $tags,
+            'departments' => $departments,
+            'users' => $users,
             'categoryTypes' => AutomationRule::CATEGORY_TYPES,
             'priorityLevels' => AutomationRule::PRIORITY_LEVELS,
         ]);
@@ -110,12 +114,14 @@ class AutomationRuleController extends Controller
             $query->latest()->limit(10);
         }]);
 
+        $categories = Category::select('id', 'title')->get();
+        $tags = Tag::select('id', 'name')->get();
         return Inertia::render('Admin/AutomationRules/Show', [
             'rule' => $automationRule,
             'categoryTypes' => AutomationRule::CATEGORY_TYPES,
             'priorityLevels' => AutomationRule::PRIORITY_LEVELS,
-            'categories' => Category::select('id', 'title')->get(),
-            'tags' => Tag::select('id', 'name')->get(),
+            'categories' => $categories,
+            'tags' => $tags,
         ]);
     }
 
@@ -126,12 +132,16 @@ class AutomationRuleController extends Controller
     {
         Gate::authorize('view admin dashboard');
 
+        $categories = Category::select('id', 'title')->get();
+        $tags = Tag::select('id', 'name')->get();
+        $departments = Departments::select('id', 'name')->get();
+        $users = User::role(['admin', 'employee'])->select('id', 'name')->get();
         return Inertia::render('Admin/AutomationRules/Edit', [
             'rule' => $automationRule,
-            'categories' => Category::select('id', 'title')->get(),
-            'tags' => Tag::select('id', 'name')->get(),
-            'departments' => Departments::select('id', 'name')->get(),
-            'users' => User::role(['admin', 'employee'])->select('id', 'name')->get(),
+            'categories' => $categories,
+            'tags' => $tags,
+            'departments' => $departments,
+            'users' => $users,
             'categoryTypes' => AutomationRule::CATEGORY_TYPES,
             'priorityLevels' => AutomationRule::PRIORITY_LEVELS,
         ]);

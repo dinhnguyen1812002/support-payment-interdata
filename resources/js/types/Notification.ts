@@ -13,7 +13,8 @@ export const CONSTANTS = {
       profile_photo_url?: string;
       categories?: any[];
       type_notification?: string;
-      comment_id?: string;
+      comment_id?: string;  
+      time?: string;
     }
     
  export interface Notification {

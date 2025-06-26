@@ -7,7 +7,6 @@ use App\Models\Post;
 use App\Models\User;
 use App\Services\TicketAutomationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class TicketAutomationTest extends TestCase
@@ -26,7 +25,7 @@ class TicketAutomationTest extends TestCase
     {
         $post = (object) [
             'title' => 'API lỗi không hoạt động',
-            'content' => 'Server trả về error 500, cần khắc phục technical issue này'
+            'content' => 'Server trả về error 500, cần khắc phục technical issue này',
         ];
 
         $category = $this->automationService->categorizePost($post);
@@ -38,7 +37,7 @@ class TicketAutomationTest extends TestCase
     {
         $post = (object) [
             'title' => 'Thanh toán bị lỗi',
-            'content' => 'Khách hàng không thể payment, billing system có vấn đề'
+            'content' => 'Khách hàng không thể payment, billing system có vấn đề',
         ];
 
         $category = $this->automationService->categorizePost($post);
@@ -50,7 +49,7 @@ class TicketAutomationTest extends TestCase
     {
         $post = (object) [
             'title' => 'Khẩn cấp: Hệ thống down',
-            'content' => 'Critical error, cần xử lý urgent ngay lập tức'
+            'content' => 'Critical error, cần xử lý urgent ngay lập tức',
         ];
 
         $priority = $this->automationService->calculatePriority($post);
@@ -62,7 +61,7 @@ class TicketAutomationTest extends TestCase
     {
         $post = (object) [
             'title' => 'Đề xuất enhancement',
-            'content' => 'Suggestion cho tính năng mới, không gấp, có thể đợi'
+            'content' => 'Suggestion cho tính năng mới, không gấp, có thể đợi',
         ];
 
         $priority = $this->automationService->calculatePriority($post);

@@ -1,11 +1,12 @@
-import React from 'react';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
 import { AppSidebar } from '@/Components/dashboard/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/Components/ui/sidebar';
 import { SiteHeader } from '@/Components/dashboard/site-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
+import { Input } from '@/Components/ui/input';
 import { 
   Plus, 
   Settings, 
@@ -15,86 +16,114 @@ import {
   Activity,
   Target,
   Users,
-  Clock
+  Clock,
+  Search,
+  Filter,
+  SortAsc,
+  SortDesc
 } from 'lucide-react';
-import { Category, Tag, Department, User } from '@/types';
+
 import { toast } from 'sonner';
+import { AutomationRule, AutomationRulesProps } from '@/types/rules';
+import { StatsCard } from '@/Components/rule/StatsCard';
+import { RuleCard } from '@/Components/rule/RuleCard';
+import { EmptyState } from '@/Components/notification/NotificationStates';
 
-interface AutomationRule {
-  id: number;
-  name: string;
-  description: string;
-  is_active: boolean;
-  categories: Category[];
-  tags: Tag[];
-  departments: Department[];
-  users: User[];
-  category_type: string;
-  assigned_priority: string;
-  execution_order: number;
-  matched_count: number;
-  last_matched_at: string | null;
-  assigned_department?: {
-    id: string;
-    name: string;
-  };
-  assigned_user?: {
-    id: number;
-    name: string;
-  };
-}
 
-interface Stats {
-  total_rules: number;
-  active_rules: number;
-  total_matches: number;
-  recent_matches: number;
-  top_rules: Array<{
-    id: number;
-    name: string;
-    matched_count: number;
-  }>;
-}
 
-interface AutomationRulesProps {
-  rules: {
-    data: AutomationRule[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-  };
-  stats: Stats;
-  search: string;
-}
+// Constants moved outside component to prevent recreation
 
-const priorityColors = {
-  low: 'bg-gray-100 text-gray-800',
-  medium: 'bg-blue-100 text-blue-800',
-  high: 'bg-orange-100 text-orange-800',
-  urgent: 'bg-red-100 text-red-800',
-};
+const SORT_OPTIONS = [
+  { value: 'name', label: 'Name' },
+  { value: 'matched_count', label: 'Matches' },
+  { value: 'execution_order', label: 'Order' },
+  { value: 'last_matched_at', label: 'Last Used' },
+] as const;
 
-const categoryColors = {
-  technical: 'bg-purple-100 text-purple-800',
-  payment: 'bg-green-100 text-green-800',
-  consultation: 'bg-yellow-100 text-yellow-800',
-  general: 'bg-gray-100 text-gray-800',
-};
+// Memoized components for better performance
 
-export default function AutomationRules({ rules, stats, search }: AutomationRulesProps) {
-  function handleDelete(id: number): void {
+
+
+export default function AutomationRules({ rules, stats, search: initialSearch }: AutomationRulesProps) {
+  // Local state for client-side filtering and sorting
+  const [localSearch, setLocalSearch] = useState(initialSearch || '');
+  const [sortBy, setSortBy] = useState<'name' | 'matched_count' | 'execution_order' | 'last_matched_at'>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [filterByStatus, setFilterByStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [isDeleting, setIsDeleting] = useState<number | null>(null);
+
+  // Memoized filtered and sorted rules
+  const filteredAndSortedRules = useMemo(() => {
+    let filtered = rules.data.filter(rule => {
+      const matchesSearch = localSearch === '' || 
+        rule.name.toLowerCase().includes(localSearch.toLowerCase()) ||
+        rule.description?.toLowerCase().includes(localSearch.toLowerCase());
+      
+      const matchesStatus = filterByStatus === 'all' || 
+        (filterByStatus === 'active' && rule.is_active) ||
+        (filterByStatus === 'inactive' && !rule.is_active);
+      
+      return matchesSearch && matchesStatus;
+    });
+
+    // Sort rules
+    filtered.sort((a, b) => {
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+      
+      if (sortBy === 'last_matched_at') {
+        aValue = aValue ? new Date(aValue as string).getTime() : 0;
+        bValue = bValue ? new Date(bValue as string).getTime() : 0;
+      }
+      
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortOrder === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      
+      const numA = Number(aValue) || 0;
+      const numB = Number(bValue) || 0;
+      
+      return sortOrder === 'asc' ? numA - numB : numB - numA;
+    });
+
+    return filtered;
+  }, [rules.data, localSearch, sortBy, sortOrder, filterByStatus]);
+
+  // Memoized stats calculations
+  const calculatedStats = useMemo(() => ({
+    ...stats,
+    efficiency: stats.active_rules > 0 
+      ? Math.round((stats.total_matches / stats.active_rules) * 100) / 100 
+      : 0
+  }), [stats]);
+
+  // Optimized delete handler with loading state
+  const handleDelete = useCallback((id: number) => {
+    if (isDeleting) return;
+    
+    setIsDeleting(id);
     router.delete(`/admin/automation-rules/${id}`, {
       onSuccess: () => {
-        console.log('Automation rule deleted successfully');
         toast.success('Automation rule deleted successfully');
+        setIsDeleting(null);
       },
-      onError: (errors) => {
+      onError: () => {
         toast.error('Failed to delete automation rule');
+        setIsDeleting(null);
       },
-    }); 
-    
-  }
+    });
+  }, [isDeleting]);
+
+  const handleSortToggle = useCallback((newSortBy: typeof sortBy) => {
+    if (sortBy === newSortBy) {
+      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(newSortBy);
+      setSortOrder('asc');
+    }
+  }, [sortBy]);
 
   return (
     <SidebarProvider>
@@ -108,59 +137,30 @@ export default function AutomationRules({ rules, stats, search }: AutomationRule
               
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Rules</CardTitle>
-                    <Settings className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.total_rules}</div>
-                    <p className="text-xs text-muted-foreground">
-                      {stats.active_rules} active
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Matches</CardTitle>
-                    <Target className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.total_matches}</div>
-                    <p className="text-xs text-muted-foreground">
-                      All time applications
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Recent Matches</CardTitle>
-                    <Activity className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{stats.recent_matches}</div>
-                    <p className="text-xs text-muted-foreground">
-                      Last 7 days
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Efficiency</CardTitle>
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
-                      {stats.active_rules > 0 ? Math.round((stats.total_matches / stats.active_rules) * 100) / 100 : 0}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Avg matches per rule
-                    </p>
-                  </CardContent>
-                </Card>
+                <StatsCard
+                  title="Total Rules"
+                  value={calculatedStats.total_rules}
+                  subtitle={`${calculatedStats.active_rules} active`}
+                  icon={Settings}
+                />
+                <StatsCard
+                  title="Total Matches"
+                  value={calculatedStats.total_matches.toLocaleString()}
+                  subtitle="All time applications"
+                  icon={Target}
+                />
+                <StatsCard
+                  title="Recent Matches"
+                  value={calculatedStats.recent_matches.toLocaleString()}
+                  subtitle="Last 7 days"
+                  icon={Activity}
+                />
+                <StatsCard
+                  title="Efficiency"
+                  value={calculatedStats.efficiency}
+                  subtitle="Avg matches per rule"
+                  icon={Clock}
+                />
               </div>
 
               {/* Main Content */}
@@ -185,83 +185,90 @@ export default function AutomationRules({ rules, stats, search }: AutomationRule
                 </CardHeader>
                 
                 <CardContent>
-                  <div className="space-y-4">
-                    {rules.data.map((rule) => (
-                      <div key={rule.id} className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="font-semibold text-lg">{rule.name}</h3>
-                              <div className="flex items-center gap-2">
-                                {rule.is_active ? (
-                                  <Badge variant="default" className="bg-green-100 text-green-800">
-                                    Active
-                                  </Badge>
-                                ) : (
-                                  <Badge variant="secondary">Inactive</Badge>
-                                )}
-                                <Badge className={categoryColors[rule.category_type as keyof typeof categoryColors]}>
-                                  {rule.category_type}
-                                </Badge>
-                                <Badge className={priorityColors[rule.assigned_priority as keyof typeof priorityColors]}>
-                                  {rule.assigned_priority}
-                                </Badge>
-                              </div>
-                            </div>
-                            
-                            {rule.description && (
-                              <p className="text-gray-600 mb-3">{rule.description}</p>
-                            )}
-                            
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                              <span>Order: {rule.execution_order}</span>
-                              <span>Matches: {rule.matched_count}</span>
-                              {rule.assigned_department && (
-                                <span>Dept: {rule.assigned_department.name}</span>
-                              )}
-                              {rule.assigned_user && (
-                                <span>Assignee: {rule.assigned_user.name}</span>
-                              )}
-                              {rule.last_matched_at && (
-                                <span>Last used: {new Date(rule.last_matched_at).toLocaleDateString()}</span>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center gap-2 ml-4">
-                            <Link href={`/admin/automation-rules/${rule.id}`}>
-                              <Button variant="ghost" size="sm">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </Link>
-                            <Link href={`/admin/automation-rules/${rule.id}/edit`}>
-                              <Button variant="ghost" size="sm">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </Link>
-                            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700"
-                             onClick={() => handleDelete(rule.id)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                  {/* Filters and Search */}
+                  <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Search rules..."
+                        value={localSearch}
+                        onChange={(e) => setLocalSearch(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
                     
-                    {rules.data.length === 0 && (
+                    <div className="flex gap-2">
+                      <select
+                        value={filterByStatus}
+                        onChange={(e) => setFilterByStatus(e.target.value as typeof filterByStatus)}
+                        className="px-3 py-2 border rounded-md text-sm bg-white"
+                      >
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                      
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                        className="px-3 py-2 border rounded-md text-sm bg-white"
+                      >
+                        {SORT_OPTIONS.map(option => (
+                          <option key={option.value} value={option.value}>
+                            Sort by {option.label}
+                          </option>
+                        ))}
+                      </select>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSortToggle(sortBy)}
+                        className="px-3"
+                      >
+                        {sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Rules List */}
+                  <div className="space-y-4">
+                    {filteredAndSortedRules.length > 0 ? (
+                      filteredAndSortedRules.map((rule) => (
+                        <RuleCard
+                          key={rule.id}
+                          rule={rule}
+                          onDelete={handleDelete}
+                        />
+                      ))
+                    ) : localSearch || filterByStatus !== 'all' ? (
                       <div className="text-center py-8">
-                        <Settings className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No automation rules</h3>
-                        <p className="text-gray-500 mb-4">Get started by creating your first automation rule.</p>
-                        <Link href="/admin/automation-rules/create">
-                          <Button>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Create Rule
-                          </Button>
-                        </Link>
+                        <Filter className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No rules found</h3>
+                        <p className="text-gray-500 mb-4">
+                          Try adjusting your search or filter criteria.
+                        </p>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setLocalSearch('');
+                            setFilterByStatus('all');
+                          }}
+                        >
+                          Clear Filters
+                        </Button>
                       </div>
+                    ) : (
+                      <EmptyState />
                     )}
                   </div>
+
+                  {/* Pagination Info */}
+                  {filteredAndSortedRules.length > 0 && (
+                    <div className="mt-6 text-sm text-gray-500 text-center">
+                      Showing {filteredAndSortedRules.length} of {rules.total} rules
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

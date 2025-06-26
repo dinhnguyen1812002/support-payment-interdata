@@ -15,7 +15,7 @@ return new class extends Migration
             $table->enum('type', ['technical', 'payment', 'consultation', 'general'])->default('general')->after('description');
             $table->boolean('is_active')->default(true)->after('type');
             $table->integer('sort_order')->default(0)->after('is_active');
-            
+
             // Index for performance
             $table->index(['type', 'is_active']);
         });

@@ -47,7 +47,8 @@ export default function DepartmentShow({
   }, [selectedPostId, localPosts]);
 
   const filteredPosts = useMemo(() => {
-    return localPosts.filter(post => {
+    return localPosts
+      .filter(post => {
       const matchesSearch =
         searchQuery === '' ||
         post.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||

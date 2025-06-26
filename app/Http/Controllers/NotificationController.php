@@ -37,6 +37,7 @@ class NotificationController extends Controller
             $limit = $request->input('limit', 10);
 
             // Get both read and unread notifications, with unread first
+            
             $notifications = $user->notifications()
                 ->orderByRaw('read_at IS NULL DESC') // Unread first
                 ->orderBy('created_at', 'desc')

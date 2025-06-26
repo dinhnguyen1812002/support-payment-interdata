@@ -109,6 +109,7 @@ class DepartmentController extends Controller
             ->with(['user', 'categories', 'tags'])
             ->withCount('upvotes')
             ->withCount('comments')
+            ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($post) {
                 $comments = $post->getFormattedComments();

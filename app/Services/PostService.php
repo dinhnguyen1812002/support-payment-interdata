@@ -173,6 +173,8 @@ class PostService
                 $this->notifyDepartment($post);
             })->afterCommit();
 
+
+            
             dispatch(function () use ($post) {
                 // Broadcast đến kênh notifications chung
                 broadcast(new NewQuestionCreated($post))->toOthers();
@@ -498,7 +500,7 @@ class PostService
                 $department->users->each(function ($user) use ($post) {
                     // Không gửi thông báo cho người tạo bài viết
                     // và đảm bảo người dùng có quyền nhận thông báo
-                    if ($user->id !== $post->user_id ) {
+                    if ($user->id !== $post->user_id) {
                         $user->notify(new NewPostNotification($post));
                     }
                 });

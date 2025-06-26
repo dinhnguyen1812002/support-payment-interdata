@@ -54,8 +54,9 @@ class TestAutomationCommand extends Command
         $this->info('Creating sample posts for testing...');
 
         $user = User::first();
-        if (!$user) {
+        if (! $user) {
             $this->error('No users found. Please create a user first.');
+
             return;
         }
 
@@ -107,9 +108,9 @@ class TestAutomationCommand extends Command
             $this->line("  Score: {$post->priority_score}");
 
             if ($post->category_type === $postData['expected_category'] && $post->priority === $postData['expected_priority']) {
-                $this->info("  ✅ Automation worked correctly!");
+                $this->info('  ✅ Automation worked correctly!');
             } else {
-                $this->warn("  ⚠️  Automation may need adjustment");
+                $this->warn('  ⚠️  Automation may need adjustment');
             }
             $this->newLine();
         }
@@ -130,11 +131,11 @@ class TestAutomationCommand extends Command
             ]
         );
 
-        if (!empty($stats['top_rules'])) {
+        if (! empty($stats['top_rules'])) {
             $this->info('Top Performing Rules:');
             $this->table(
                 ['Rule Name', 'Matches'],
-                collect($stats['top_rules'])->map(fn($rule) => [$rule['name'], $rule['matched_count']])->toArray()
+                collect($stats['top_rules'])->map(fn ($rule) => [$rule['name'], $rule['matched_count']])->toArray()
             );
         }
     }
@@ -146,7 +147,7 @@ class TestAutomationCommand extends Command
         // Test categorization
         $testPost = (object) [
             'title' => 'API lỗi không thể kết nối database',
-            'content' => 'Server trả về error 500, cần khắc phục technical issue này gấp'
+            'content' => 'Server trả về error 500, cần khắc phục technical issue này gấp',
         ];
 
         $category = $this->automationService->categorizePost($testPost);

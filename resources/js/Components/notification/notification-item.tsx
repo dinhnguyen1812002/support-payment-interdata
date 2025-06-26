@@ -71,10 +71,10 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
             {notification.data.message}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            {notification.created_at}
+            {notification.data.time || notification.created_at}
           </p>
         </div>
-      </Link>
+      </Link> 
 
       <div className="flex items-center gap-1 flex-shrink-0">
         {onHide && (
