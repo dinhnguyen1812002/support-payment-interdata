@@ -9,6 +9,12 @@ use Parsedown;
 
 class DocsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('can:view-documentation');
+    }
+
     public function adminIndex()
     {
         $parsedown = new Parsedown();
@@ -39,7 +45,7 @@ class DocsController extends Controller
             return Inertia::render('Admin/Docs/Index', [
                 'files' => [],
                 'error' => 'Failed to load documentation files: ' . $e->getMessage(),
-            ])->with(['error' => 'Error loading documentation']);
+            ]);
         }
 
         return Inertia::render('Admin/Docs/Index', [
@@ -62,7 +68,11 @@ class DocsController extends Controller
         if (is_null($file)) {
             $file = 'index.md';
         }
-
+        $file = basename($file);
+        if (!preg_match('/^[a-zA-Z0-9_-]+\.md$/', $file)) {
+            $file = 'index.md';
+        }
+        
         $filePath = base_path("docs/{$file}");
 
         // Validate file existence and extension

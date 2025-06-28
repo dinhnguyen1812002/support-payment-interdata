@@ -93,11 +93,42 @@ class NotificationController extends Controller
         }
     }
 
-    public function getDepartmentNotification($departmentId)
+    public function getDepartmentNotification(Request $request, $departmentId): \Illuminate\Http\JsonResponse
     {
-        $notify = Notification::where('department_id', $departmentId)->get();
+        try {
+            $user = Auth::user();
+            
+            // Ensure user can only access their department's notifications
+            if ($user->department_id != $departmentId) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+            
+            $notifications = $user->notifications()
+                ->where('department_id', $departmentId)
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($notification) {
+                    return [
+                        'id'         => $notification->id,
+                        'type'       => class_basename($notification->type),
+                        'data'       => $notification->data,
+                        'read_at'    => $notification->read_at,
+                        'time' => $notification->created_at->diffForHumans(),
+                    ];
+                });
 
-        return response()->json($notify);
+            return response()->json($notifications);
+        } catch (\Exception $e) {
+            \Log::error('Failed to retrieve department notifications', [
+                'department_id' => $departmentId,
+                'user_id' => $user->id ?? null,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve department notifications',
+            ], 500);
+        }
     }
 }
 
