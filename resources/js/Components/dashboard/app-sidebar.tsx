@@ -102,6 +102,12 @@ const data = {
     },
     {
       id: 10,
+      title: 'Documentation',
+      url: '/admin/docs',
+      icon: FileTextIcon,
+    },
+    {
+      id: 11,
       title: 'Trash',
       url: '/admin/posts/trash',
       icon: Trash,

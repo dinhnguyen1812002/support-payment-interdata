@@ -226,3 +226,159 @@
 .post-container {
     @apply flex-1 w-full max-w-5xl mx-auto mt-4 sm:mt-5 md:mt-7 px-4 sm:px-6 md:px-4 dark:bg-[#0F1014] bg-white  transition-all lg:border-l lg:pl-8 xl:pl-12;
 }
+
+
+
+
+.mdx-editor-container {
+    min-height: 400px;
+  }
+  
+  .mdx-editor {
+    border: none !important;
+    font-family: inherit;
+  }
+  
+  .mdx-editor.view-mode {
+    --mdxeditor-font-family: inherit;
+  }
+  
+  .mdx-editor.view-mode .mdxeditor-root-contenteditable {
+    padding: 2rem;
+    background: transparent;
+  }
+  
+  .mdx-editor.edit-mode .mdxeditor-root-contenteditable {
+    padding: 1rem 2rem;
+    min-height: 400px;
+  }
+  
+  .mdx-editor .mdxeditor-toolbar {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem 1rem;
+    background: #f9fafb;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+    color: rgb(55 65 81);
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor ul,
+  .mdx-editor .mdxeditor-rich-text-editor ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor blockquote {
+    border-left: 4px solid #3b82f6;
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    background: rgba(59, 130, 246, 0.05);
+    padding: 1rem;
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor code {
+    background: #f3f4f6;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor pre {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor th,
+  .mdx-editor .mdxeditor-rich-text-editor td {
+    border: 1px solid #e5e7eb;
+    padding: 0.75rem;
+    text-align: left;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor th {
+    background: #f9fafb;
+    font-weight: 600;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor a {
+    color: #3b82f6;
+    text-decoration: underline;
+    text-decoration-color: rgba(59, 130, 246, 0.3);
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor a:hover {
+    color: #1d4ed8;
+    text-decoration-color: #1d4ed8;
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .mdx-editor .mdxeditor-rich-text-editor hr {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 2rem 0;
+  }
+  
+  @media (max-width: 640px) {
+    .mdx-editor.view-mode .mdxeditor-root-contenteditable,
+    .mdx-editor.edit-mode .mdxeditor-root-contenteditable {
+      padding: 1rem;
+    }
+  }

@@ -14,7 +14,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\UpvoteController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\DocsController;
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/top-voted-posts', [PostController::class, 'getTopVotePosts']);
@@ -58,15 +58,18 @@ Route::post('/notifications/read-all', [NotificationController::class, 'markAllA
     ->name('notifications.read_all');
 Route::get('/send-email', [\Illuminate\Notifications\Notification::class, 'sendEmailNotification']);
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return redirect('/');
-    })->name('dashboard');
-});
+
+
+// Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+//     Route::get('/admin/docs/{file?}', [DocsController::class, 'show'])
+//         ->where('file', '.*\.md')
+//         ->name('admin.docs.show');
+
+//     Route::get('/dashboard', function () {
+//         return view('dashboard');
+//     })->name('dashboard');
+// });
+
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/permissions', [PermissionController::class, 'index'])
         ->name('permissions.index')
@@ -101,9 +104,13 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/admin/automation-stats', [\App\Http\Controllers\Admin\AutomationRuleController::class, 'stats'])->name('admin.automation-rules.stats');
     Route::post('/admin/bulk-update-scores', [\App\Http\Controllers\Admin\AutomationRuleController::class, 'bulkUpdateScores'])->name('admin.bulk-update-scores');
 
+    // Documentation routes
+    Route::get('/admin/docs', [DocsController::class, 'adminIndex'])->name('admin.docs.index');
+    Route::get('/admin/docs/{file?}', [DocsController::class, 'show'])->name('admin.docs.show');
+
 });
-Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
-Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+// Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+// Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 // Route::get('/test-event', function () {
 //    $post = Post::find('01jp1xepa4cv3en4axatkh9vdk');
@@ -111,6 +118,10 @@ Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])
 //
 //    return 'Event dispatched!';
 // });
+
+
+Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read_all');
+Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 Route::resource('/admin/tags', TagController::class)->only(['store', 'update', 'destroy']);
 
 Route::get('/user/profile', [\App\Http\Controllers\UserController::class, 'show'])
@@ -168,3 +179,5 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 
     Route::get('/posts/{id}', [AdminController::class, 'getPost'])->name('posts.get');
 });
+
+

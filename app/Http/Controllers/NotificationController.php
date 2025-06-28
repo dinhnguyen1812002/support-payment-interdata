@@ -92,4 +92,12 @@ class NotificationController extends Controller
 
         }
     }
+
+    public function getDepartmentNotification($departmentId)
+    {
+        $notify = Notification::where('department_id', $departmentId)->get();
+
+        return response()->json($notify);
+    }
 }
+

@@ -1,6 +1,8 @@
 import { Category, Tag } from '@/types';
 import { Comment } from '@/types/CommentTypes';
 export interface Post {
+  is_read: any;
+  department_id: string;
   id: string;
   title: string;
   content: string;

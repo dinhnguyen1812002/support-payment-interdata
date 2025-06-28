@@ -68,3 +68,7 @@ Route::get('/users/search', [Departments::class, 'search'])->name('search.depart
 
 Route::delete('/departments/{department}/users/{user}', [DepartmentController::class, 'removeUser'])->name('departments.remove.user');
 Route::get('/notify', [NotificationController::class, 'getNotification']);
+Route::get('/notify/department/{departmentId}', [NotificationController::class, 'getDepartmentNotification']);
+Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])
+    ->middleware('auth')
+    ->name('notifications.read_all');

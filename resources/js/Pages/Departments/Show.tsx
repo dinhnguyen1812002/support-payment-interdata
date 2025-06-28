@@ -189,9 +189,8 @@ export default function DepartmentShow({
       <AppLayout
         title={department.name}
         department={department}
-        // notifications={localPosts}
+        notifications={initialNotifications}
         post={localPosts}
-        notifications={[]}
       >
         <div className="flex overflow-hidden h-[calc(100vh-4rem)] relative">
           <div
@@ -336,3 +335,6 @@ export default function DepartmentShow({
     </TooltipProvider>
   );
 }
+
+
+      

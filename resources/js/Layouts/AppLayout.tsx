@@ -96,6 +96,7 @@ export default function AppLayout({
     router.post(route('logout'));
   }
   const role = page.props.auth.user?.roles.map(role => role.name).toString();
+  const department = page.props.department;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -159,6 +160,14 @@ export default function AppLayout({
                     active={route().current('admin.dashboard')}
                   >
                     Dashboard
+                  </NavLink>
+                )}
+                {department && (
+                  <NavLink
+                    href={route('departments.show', { department: department.slug })}
+                    active={route().current('departments.show', { department: department.slug })}
+                  >
+                    {department.name}
                   </NavLink>
                 )}
               </div>
