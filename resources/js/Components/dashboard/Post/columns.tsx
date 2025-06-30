@@ -26,37 +26,48 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/Components/ui/alert-dialog';
-import { Label } from '@/Components/ui/label';
+
 import { useToast } from '@/Hooks/use-toast';
 
-// Define the Post type
+// Define the Post type to match backend data structure
 export type Post = {
   id: string;
   title: string;
-  slug: string;
-  status: 'published' | 'private';
-  votes: number;
-  comments: number;
-  createdAt: string;
-  updatedAt: string;
+  slug?: string;
+  status: string;
+  upvotes_count: number;
+  comments_count: number;
+  created_at: string;
   user: {
     id: string;
     name: string;
     email: string;
-    avatarUrl: string;
+    avatarUrl?: string;
+    profile_photo_path?: string;
   };
+  categories?: any[];
+  assignee?: {
+    id: string;
+    name: string;
+    email: string;
+    avatarUrl?: string;
+    profile_photo_path?: string;
+  } | null;
+  department?: any;
 };
 
 export const columns: ColumnDef<Post>[] = [
   {
     accessorKey: 'user',
+    id: 'user',
     header: 'Author',
     cell: ({ row }) => {
       const user = row.getValue('user') as Post['user'];
+      const avatarUrl = user.avatarUrl || (user.profile_photo_path ? `/storage/${user.profile_photo_path}` : null);
       return (
         <div className="flex items-center gap-2">
           <Avatar className="h-8 w-8 rounded-md">
-            <AvatarImage src={user.avatarUrl} alt={user.name} />
+            <AvatarImage src={avatarUrl || undefined} alt={user.name} />
             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
@@ -69,6 +80,7 @@ export const columns: ColumnDef<Post>[] = [
   },
   {
     accessorKey: 'title',
+    id: 'title',
     header: ({ column }) => {
       return (
         <Button
@@ -92,19 +104,30 @@ export const columns: ColumnDef<Post>[] = [
   },
   {
     accessorKey: 'status',
+    id: 'status',
     header: 'Status',
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
-      return (
-        <Label className="flex cursor-pointer">
-          {row.getValue('status') === 'published' ? 'Public' : 'Private'}
-        </Label>
-      );
+      const getStatusBadge = (status: string) => {
+        switch (status?.toLowerCase()) {
+          case 'published':
+          case 'public':
+            return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Published</Badge>;
+          case 'private':
+          case 'draft':
+            return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Private</Badge>;
+          case 'archived':
+            return <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">Archived</Badge>;
+          default:
+            return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">{status || 'Unknown'}</Badge>;
+        }
+      };
+      return getStatusBadge(status);
     },
   },
 
   {
-    accessorKey: 'votes',
+    accessorKey: 'upvotes_count',
     header: ({ column }) => {
       return (
         <Button
@@ -118,11 +141,11 @@ export const columns: ColumnDef<Post>[] = [
       );
     },
     cell: ({ row }) => {
-      return <div className="text-center">{row.getValue('votes')}</div>;
+      return <div className="text-center">{row.getValue('upvotes_count') || 0}</div>;
     },
   },
   {
-    accessorKey: 'comments',
+    accessorKey: 'comments_count',
     header: ({ column }) => {
       return (
         <Button
@@ -136,11 +159,11 @@ export const columns: ColumnDef<Post>[] = [
       );
     },
     cell: ({ row }) => {
-      return <div className="text-center">{row.getValue('comments')}</div>;
+      return <div className="text-center">{row.getValue('comments_count') || 0}</div>;
     },
   },
   {
-    accessorKey: 'createdAt',
+    accessorKey: 'created_at',
     header: ({ column }) => {
       return (
         <Button
@@ -154,27 +177,48 @@ export const columns: ColumnDef<Post>[] = [
       );
     },
     cell: ({ row }) => {
-      const date = new Date(row.getValue('createdAt'));
-      return <div>{format(date, 'dd/MM/yyyy')}</div>;
+      const createdAt = row.getValue('created_at') as string;
+      const date = new Date(createdAt);
+      return (
+        <span className="text-sm text-muted-foreground">
+          {date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          })}
+        </span>
+      );
     },
   },
   {
-    accessorKey: 'updatedAt',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          className="whitespace-nowrap"
-        >
-          Updated At
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
+    accessorKey: 'assignee',
+    id: 'assignee',
+    header: 'Assignee',
     cell: ({ row }) => {
-      const date = new Date(row.getValue('updatedAt'));
-      return <div>{format(date, 'dd/MM/yyyy')}</div>;
+      const assignee = row.getValue('assignee') as Post['assignee'];
+
+      if (!assignee) {
+        return (
+          <div className="text-sm text-muted-foreground">
+            Unassigned
+          </div>
+        );
+      }
+
+      const avatarUrl = assignee.avatarUrl || (assignee.profile_photo_path ? `/storage/${assignee.profile_photo_path}` : null);
+
+      return (
+        <div className="flex items-center gap-2">
+          <Avatar className="h-6 w-6 rounded-md">
+            <AvatarImage src={avatarUrl || undefined} alt={assignee.name} />
+            <AvatarFallback className="text-xs">{assignee.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">{assignee.name}</span>
+            <span className="text-xs text-muted-foreground">{assignee.email}</span>
+          </div>
+        </div>
+      );
     },
   },
   {

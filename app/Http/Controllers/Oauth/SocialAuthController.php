@@ -26,6 +26,7 @@ class SocialAuthController extends Controller
             } else {
                 $user = User::create([
                     'name' => $socialUser->name,
+
                     'email' => $socialUser->email,
                     'provider' => 'google',
                     'provider_id' => $socialUser->id,
@@ -38,7 +39,9 @@ class SocialAuthController extends Controller
                 'data' => ['success' => true, 'token' => auth()->user()->createToken('authToken')->plainTextToken],
                 'origin' => config('app.url'),
             ]);
+
         } catch (\Exception $e) {
+
             return view('auth/social-callback', [
                 'data' => ['success' => false, 'error' => 'Đăng nhập thất bại.'],
                 'origin' => config('app.url'),

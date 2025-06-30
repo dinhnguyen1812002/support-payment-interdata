@@ -201,7 +201,14 @@ class Post extends Model
     {
         return $this->comments()
             ->whereNull('parent_id')
-            ->with(['user:id,name,profile_photo_path', 'allReplies.user:id,name,profile_photo_path'])
+            ->with([
+                'user:id,name,profile_photo_path',
+                'user.roles:id,name',
+                'user.departments:id,name',
+                'allReplies.user:id,name,profile_photo_path',
+                'allReplies.user.roles:id,name',
+                'allReplies.user.departments:id,name'
+            ])
             ->latest()
             ->get()
             ->map(function ($comment) {
@@ -218,6 +225,8 @@ class Post extends Model
                 'id' => $comment->user->id,
                 'name' => $comment->user->name,
                 'profile_photo_path' => $comment->user->profile_photo_path,
+                'roles' => $comment->user->getRoleNames(),
+                'departments' => $comment->user->departments->pluck('name'),
             ],
             'comment' => $comment->comment,
             'created_at' => $comment->created_at,
@@ -422,3 +431,6 @@ class Post extends Model
         return $this->automation_applied ?? [];
     }
 }
+
+
+

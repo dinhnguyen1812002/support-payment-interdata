@@ -52,42 +52,39 @@ import { Badge } from '@/Components/ui/badge';
 import { Inertia } from '@inertiajs/inertia';
 import Pagination from '@/Components/Pagination';
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  pagination: {
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    next_page_url: string | null;
-    prev_page_url: string | null;
-    from: number;
-    to: number;
-    links: Array<{
-      page: number;
-      url: string | null;
-      active: boolean;
-    }>;
-  };
-  filters?: {
-    search: string;
-    status: string;
-    date_from: string;
-    date_to: string;
-    sort: string;
-    direction: string;
-  };
-  onPageChange: (url: string | null) => void;
+interface PaginationData {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  next_page_url: string | null;
+  prev_page_url: string | null;
+  from: number;
+  to: number;
+  links: Array<{
+    page: number;
+    url: string | null;
+    active: boolean;
+  }>;
 }
 
-export function DataTable<TData, TValue>({
+interface DataTableProps {
+  columns: any[];
+  data: any[];
+  pagination: PaginationData;
+  filters: any;
+  onPageChange: (url: string | null) => void;
+  isLoading?: boolean;
+}
+
+export function DataTable({
   columns,
   data,
   pagination,
   filters,
   onPageChange,
-}: DataTableProps<TData, TValue>) {
+  isLoading = false
+}: DataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [searchValue, setSearchValue] = useState(filters?.search || '');
@@ -107,19 +104,7 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  // Function to get status badge color
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'published':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      case 'draft':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      case 'archived':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
-      default:
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-    }
-  };
+
 
   // Hàm xử lý tìm kiếm với debounce
   const handleSearch = React.useCallback(
@@ -273,6 +258,7 @@ export function DataTable<TData, TValue>({
               <SelectContent>
                 <SelectItem value="all">All statuses</SelectItem>
                 <SelectItem value="published">Published</SelectItem>
+                <SelectItem value="private">Private</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
                 <SelectItem value="archived">Archived</SelectItem>
               </SelectContent>
@@ -322,18 +308,23 @@ export function DataTable<TData, TValue>({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map(row => (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    Loading data...
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                    className="hover:bg-muted/50 transition-colors text-left"
+                    data-state={row.getIsSelected() && "selected"}
                   >
-                    {row.getVisibleCells().map(cell => (
+                    {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext(),
+                          cell.getContext()
                         )}
                       </TableCell>
                     ))}
@@ -341,17 +332,8 @@ export function DataTable<TData, TValue>({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    <div className="flex flex-col items-center justify-center py-8">
-                      <Ticket className="h-10 w-10 text-muted-foreground mb-2 opacity-20" />
-                      <p className="text-muted-foreground">No tickets found</p>
-                      <p className="text-sm text-muted-foreground">
-                        Try adjusting your search or filter
-                      </p>
-                    </div>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    No results found.
                   </TableCell>
                 </TableRow>
               )}
@@ -379,3 +361,4 @@ export function DataTable<TData, TValue>({
     </div>
   );
 }
+

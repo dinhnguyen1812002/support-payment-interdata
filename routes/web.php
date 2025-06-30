@@ -99,6 +99,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         'update' => 'admin.automation-rules.update',
         'destroy' => 'admin.automation-rules.destroy',
     ]);
+
     Route::patch('/admin/automation-rules/{automationRule}/toggle', [\App\Http\Controllers\Admin\AutomationRuleController::class, 'toggleActive'])->name('admin.automation-rules.toggle');
     Route::post('/admin/automation-rules/{automationRule}/test', [\App\Http\Controllers\Admin\AutomationRuleController::class, 'test'])->name('admin.automation-rules.test');
     Route::get('/admin/automation-stats', [\App\Http\Controllers\Admin\AutomationRuleController::class, 'stats'])->name('admin.automation-rules.stats');
@@ -112,6 +113,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 // Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 // Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+
 // Route::get('/test-event', function () {
 //    $post = Post::find('01jp1xepa4cv3en4axatkh9vdk');
 //    event(new NewQuestionCreated($post));

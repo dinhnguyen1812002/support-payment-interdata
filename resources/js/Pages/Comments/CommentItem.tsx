@@ -3,6 +3,7 @@ import { router } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
+import { Badge } from '@/Components/ui/badge';
 import { MessageCircle, Trash2, MoreHorizontal, Flag, X } from 'lucide-react';
 import {
   DropdownMenu,
@@ -35,6 +36,56 @@ const CommentItem: React.FC<CommentItemProps> = ({
   const avatarUrl = getAvatarUrl(comment.user);
   const canDelete = currentUser?.id === comment.user.id;
   const formattedDate = formatTimeAgo(comment.created_at);
+
+  // Constants for HR detection
+  const HR_ROLES = ['admin', 'department_manager'] as const;
+  const HR_DEPARTMENTS = ['hr', 'human resources', 'nhân sự', 'support'] as const;
+
+  // Function to check if user is HR staff and get their badge info
+  // This function identifies HR staff based on roles (admin, department_manager)
+  // or departments (HR, Support, etc.) and returns appropriate badge styling
+  const getHRBadgeInfo = (user: User): { isHR: boolean; badgeText: string; badgeClass: string } => {
+    if (!user.roles?.length && !user.departments?.length) {
+      return { isHR: false, badgeText: '', badgeClass: '' };
+    }
+
+    // Check if user has admin role
+    const isAdmin = user.roles?.some(role => role === 'admin');
+    if (isAdmin) {
+      return {
+        isHR: true,
+        badgeText: 'Admin',
+        badgeClass: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-red-200 dark:border-red-700'
+      };
+    }
+
+    // Check if user has department_manager role
+    const isDeptManager = user.roles?.some(role => role === 'department_manager');
+    if (isDeptManager) {
+      return {
+        isHR: true,
+        badgeText: 'Quản lý',
+        badgeClass: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 border-purple-200 dark:border-purple-700'
+      };
+    }
+
+    // Check if user belongs to HR department (you can customize department names)
+    const hasHRDepartment = user.departments?.some(dept =>
+      HR_DEPARTMENTS.includes(dept.toLowerCase() as any)
+    );
+
+    if (hasHRDepartment) {
+      return {
+        isHR: true,
+        badgeText: 'Nhân sự',
+        badgeClass: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-700'
+      };
+    }
+
+    return { isHR: false, badgeText: '', badgeClass: '' };
+  };
+
+  const hrBadgeInfo = getHRBadgeInfo(comment.user);
 
   const handleReply = (content: string) => {
     // Convert comment.id to number if it's a string
@@ -96,7 +147,11 @@ const CommentItem: React.FC<CommentItemProps> = ({
   return (
     <div className={`flex gap-4 ${indentationClass}`}>
       <div className="flex-1 space-y-4">
-        <Card className="overflow-hidden dark:bg-[#0F1014] border-gray-200 dark:border-gray-700">
+        <Card className={`overflow-hidden dark:bg-[#0F1014] ${
+          hrBadgeInfo.isHR
+            ? 'border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/20'
+            : 'border-gray-200 dark:border-gray-700'
+        }`}>
           <CardContent className="relative pt-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-3">
@@ -106,9 +161,19 @@ const CommentItem: React.FC<CommentItemProps> = ({
                 </Avatar>
 
                 <div className="flex flex-col justify-center">
-                  <h3 className="text-gray-800 text-sm font-semibold leading-tight mb-0.5 dark:text-gray-200">
-                    {comment.user.name}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-gray-800 text-sm font-semibold leading-tight dark:text-gray-200">
+                      {comment.user.name}
+                    </h3>
+                    {hrBadgeInfo.isHR && (
+                      <Badge
+                        variant="secondary"
+                        className={`text-xs px-2 py-0.5 ${hrBadgeInfo.badgeClass}`}
+                      >
+                        {hrBadgeInfo.badgeText}
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-500 font-semibold leading-tight dark:text-gray-400">
                     {formattedDate}
                   </p>

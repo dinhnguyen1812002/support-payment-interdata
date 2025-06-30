@@ -32,24 +32,34 @@ const CommentsContent: React.FC<
 
   const channelRef = useRef<any>(null);
   const isUnmountedRef = useRef(false);
+  const processedCommentsRef = useRef<Set<string>>(new Set());
+  const submittingRef = useRef<boolean>(false);
 
   // Thêm useEffect để debug comments state
 
   const handleCommentSubmit = useCallback(
     async (content: string, parentId?: string) => {
-      if (!currentUser) return;
+      if (!currentUser || submittingRef.current) return;
+
+      // Prevent duplicate submissions
+      submittingRef.current = true;
 
       console.log('Submitting comment:', content, 'parentId:', parentId);
 
-      // Tạo comment tạm thời (optimistic)
+      // Create unique optimistic ID
+      const optimisticId = `temp-${currentUser.id}-${Date.now()}-${Math.random()}`;
+
+      // Tạo comment tạm thời (optimistic) với HR badge info
       const optimisticComment: Comment = {
-        id: 'temp-' + new Date().getTime(), // Sử dụng ID tạm thời dễ nhận biết hơn
+        id: optimisticId,
         comment: content,
         created_at: new Date().toISOString(),
         user: {
           id: currentUser.id,
           name: currentUser.name,
           profile_photo_path: currentUser.profile_photo_path,
+          roles: currentUser.roles || [],
+          departments: currentUser.departments || [],
         },
         parent_id: parentId || undefined,
         replies: [],
@@ -73,6 +83,11 @@ const CommentsContent: React.FC<
         console.error('Error submitting comment:', error);
         // Xóa comment tạm thời nếu có lỗi
         removeComment(optimisticComment.id);
+      } finally {
+        // Reset submission flag after a delay to prevent rapid submissions
+        setTimeout(() => {
+          submittingRef.current = false;
+        }, 1000);
       }
     },
     [onCommentSubmit, currentUser, addComment, addReply, removeComment],
@@ -90,6 +105,15 @@ const CommentsContent: React.FC<
         if (!isUnmountedRef.current && e.comment) {
           console.log('New comment received:', e.comment);
 
+          // Check if we've already processed this comment
+          if (processedCommentsRef.current.has(e.comment.id)) {
+            console.log('Comment already processed, skipping:', e.comment.id);
+            return;
+          }
+
+          // Mark comment as processed
+          processedCommentsRef.current.add(e.comment.id);
+
           // Use callback form of state updates to avoid stale closures
           setComments(prevComments => {
             // Kiểm tra và xóa comment tạm thời nếu tồn tại
@@ -102,6 +126,7 @@ const CommentsContent: React.FC<
             );
 
             if (optimisticComment) {
+              console.log('Replacing optimistic comment with real comment:', optimisticComment.id, '->', e.comment.id);
               // Remove optimistic comment first
               const withoutOptimistic = prevComments.filter(
                 c => c.id !== optimisticComment.id,
@@ -137,6 +162,7 @@ const CommentsContent: React.FC<
             );
 
             if (!realCommentExists) {
+              console.log('Adding new real-time comment:', e.comment.id);
               if (e.comment.parent_id) {
                 return prevComments.map(comment =>
                   comment.id === e.comment.parent_id
@@ -151,6 +177,7 @@ const CommentsContent: React.FC<
               }
             }
 
+            console.log('Comment already exists, skipping:', e.comment.id);
             return prevComments;
           });
         }
@@ -163,10 +190,11 @@ const CommentsContent: React.FC<
         }
       };
 
-      // Sửa lại cách lắng nghe sự kiện - thử cả hai cách
+      // Listen for real-time events
       channel.listen('.CommentPosted', handleCommentPosted);
-      // channel.listen('CommentPosted', handleCommentPosted);
       channel.listen('.CommentDeleted', handleCommentDeleted);
+
+      console.log(`Listening for real-time comments on channel: ${channelName}`);
 
       return () => {
         isUnmountedRef.current = true;
@@ -189,6 +217,9 @@ const CommentsContent: React.FC<
   useEffect(() => {
     return () => {
       isUnmountedRef.current = true;
+      // Clear processed comments on unmount
+      processedCommentsRef.current.clear();
+      submittingRef.current = false;
     };
   }, []);
 

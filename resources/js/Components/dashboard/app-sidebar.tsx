@@ -45,72 +45,71 @@ const data = {
   },
   navMain: [
     {
-      id: 1,
       title: 'Dashboard',
       url: '/admin/',
       icon: LayoutDashboardIcon,
+      isActive: true,
     },
     {
-      id: 2,
-      title: 'Notifications',
-      url: '/admin/notifications',
-      icon: Bell,
+      title: 'Content Management',
+      url: '#',
+      icon: FileTextIcon,
+      items: [
+        {
+          title: 'Posts',
+          url: '/admin/posts',
+        },
+        {
+          title: 'Categories',
+          url: '/admin/categories',
+        },
+        {
+          title: 'Tags',
+          url: '/admin/tags',
+        },
+        {
+          title: 'Trash',
+          url: '/admin/posts/trash',
+        },
+      ],
     },
     {
-      id: 3,
-      title: 'Post',
-      url: '/admin/posts',
-      icon: ListIcon,
-    },
-    {
-      id: 4,
-      title: 'User',
-      url: '/users',
+      title: 'User Management',
+      url: '#',
       icon: ContactRound,
+      items: [
+        {
+          title: 'Users',
+          url: '/users',
+        },
+        {
+          title: 'Roles & Permissions',
+          url: '/admin/roles-permissions',
+        },
+        {
+          title: 'Departments',
+          url: '/departments',
+        },
+      ],
     },
     {
-      id: 5,
-      title: 'Categories',
-      url: '/admin/categories',
-      icon: ChartColumnStacked,
-    },
-    {
-      id: 6,
-      title: 'tag',
-      url: '/admin/tags',
-      icon: FileTextIcon,
-    },
-
-    {
-      id: 7,
-      title: 'roles and permission',
-      url: '/admin/roles-permissions',
-      icon: FolderKey,
-    },
-
-    {
-      id: 8,
-      title: 'Department',
-      url: '/departments',
-      icon: Boxes,
-    },
-    {
-      id: 9,
-      title: 'Automation Rules',
-      url: '/admin/automation-rules',
+      title: 'System',
+      url: '#',
       icon: SettingsIcon,
-    },
-    {
-      id: 10,
-      title: 'Documentation',
-      url: '/admin/docs',
-      icon: FileTextIcon,
-    },
-    {
-      id: 11,
-      title: 'Trash',
-      url: '/admin/posts/trash',
-      icon: Trash,
+      items: [
+        {
+          title: 'Notifications',
+          url: '/admin/notifications',
+        },
+        {
+          title: 'Automation Rules',
+          url: '/admin/automation-rules',
+        },
+        {
+          title: 'Documentation',
+          url: '/admin/docs',
+        },
+      ],
     },
   ],
 
@@ -162,3 +161,4 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   );
 }
+

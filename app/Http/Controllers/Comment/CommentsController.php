@@ -29,7 +29,7 @@ class CommentsController extends Controller
             'parent_id' => $validated['parent_id'] ?? null,
         ]);
 
-        $comment->load('user');
+        $comment->load(['user.roles', 'user.departments']);
 
         broadcast(new CommentPosted($comment))->toOthers();
         broadcast(new NewCommentCreated($comment))->toOthers();
@@ -46,7 +46,12 @@ class CommentsController extends Controller
     {
         $comments = $post->comments()
             ->whereNull('parent_id')
-            ->with(['user', 'replies.user'])
+            ->with([
+                'user.roles',
+                'user.departments',
+                'replies.user.roles',
+                'replies.user.departments'
+            ])
             ->latest()
             ->paginate(5);
 

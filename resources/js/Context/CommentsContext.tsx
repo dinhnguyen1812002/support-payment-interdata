@@ -41,9 +41,26 @@ export const CommentsProvider: React.FC<CommentsProviderProps> = ({
   const addComment = useCallback((comment: Comment) => {
     console.log('Adding comment to state:', comment);
     setComments(prev => {
-      // Kiểm tra xem comment đã tồn tại chưa
+      // Kiểm tra xem comment đã tồn tại chưa (bao gồm cả optimistic và real comments)
       const exists = prev.some(c => c.id === comment.id);
-      if (exists) return prev;
+      if (exists) {
+        console.log('Comment already exists, skipping:', comment.id);
+        return prev;
+      }
+
+      // Kiểm tra xem có comment tạm thời nào trùng nội dung không
+      const duplicateOptimistic = prev.find(c =>
+        c.isOptimistic &&
+        c.comment === comment.comment &&
+        c.user.id === comment.user.id &&
+        !comment.isOptimistic
+      );
+
+      if (duplicateOptimistic) {
+        console.log('Replacing optimistic comment with real comment:', duplicateOptimistic.id, '->', comment.id);
+        return prev.map(c => c.id === duplicateOptimistic.id ? comment : c);
+      }
+
       return [comment, ...prev];
     });
   }, []);
@@ -51,14 +68,40 @@ export const CommentsProvider: React.FC<CommentsProviderProps> = ({
   const addReply = useCallback((parentId: string, reply: Comment) => {
     console.log('Adding reply to parent:', parentId, reply);
     setComments(prev =>
-      prev.map(comment =>
-        comment.id === parentId
-          ? {
+      prev.map(comment => {
+        if (comment.id === parentId) {
+          const existingReplies = comment.replies || [];
+
+          // Check if reply already exists
+          const exists = existingReplies.some(r => r.id === reply.id);
+          if (exists) {
+            console.log('Reply already exists, skipping:', reply.id);
+            return comment;
+          }
+
+          // Check for optimistic reply to replace
+          const duplicateOptimistic = existingReplies.find(r =>
+            r.isOptimistic &&
+            r.comment === reply.comment &&
+            r.user.id === reply.user.id &&
+            !reply.isOptimistic
+          );
+
+          if (duplicateOptimistic) {
+            console.log('Replacing optimistic reply with real reply:', duplicateOptimistic.id, '->', reply.id);
+            return {
               ...comment,
-              replies: [...(comment.replies || []), reply],
-            }
-          : comment,
-      ),
+              replies: existingReplies.map(r => r.id === duplicateOptimistic.id ? reply : r),
+            };
+          }
+
+          return {
+            ...comment,
+            replies: [...existingReplies, reply],
+          };
+        }
+        return comment;
+      }),
     );
   }, []);
 

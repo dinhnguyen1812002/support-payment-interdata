@@ -33,7 +33,7 @@ class AdminController extends Controller
         $this->authorize('view admin dashboard');
 
         $data = $this->adminService->getDashboardData(auth()->user());
-
+        // $data['posts'] = $this->adminService->getTopPosts();
         // Add automation stats to dashboard
         $data['automation_stats'] = $this->automationService->getAutomationStats();
 

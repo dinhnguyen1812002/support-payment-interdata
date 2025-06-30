@@ -100,13 +100,19 @@ import {
 } from '@/Components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { de } from 'date-fns/locale';
 
 export const schema = z.object({
   id: z.number(),
   title: z.string(),
+  status: z.string(),
+  priority: z.string(),
+  created_at: z.string(),
   is_published: z.boolean(),
   vote: z.string(),
   comment: z.number(),
+  department: z.string(),
+  assignee: z.string(),
   user: z.object({
     name: z.string(),
     email: z.string(),
@@ -132,6 +138,13 @@ function DragHandle({ id }: { id: number }) {
       <span className="sr-only">Drag to reorder</span>
     </Button>
   );
+}
+
+interface DataTableProps {
+  data: any[];
+  showAssignees?: boolean;  // We'll keep the prop name but handle singular data
+  showDepartments?: boolean;
+  // ...other existing props
 }
 
 const columns: ColumnDef<z.infer<typeof schema>>[] = [
@@ -209,63 +222,94 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
       </div>
     ),
   },
-  // {
-  //   accessorKey: 'status',
-  //   header: 'Public',
-  //   cell: ({ row }) => (
-  //     <Badge
-  //       variant="outline"
-  //       className="flex gap-1 px-1.5 text-muted-foreground [&_svg]:size-3"
-  //     >
-  //       {row.original.is_published === true ? (
-  //         <CheckCircle2Icon className="text-green-500 dark:text-green-400" />
-  //      ) : (
-  //       <LoaderIcon />
-  //      )}
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const status = row.getValue('status') as string;
+      const statusMap = {
+        open: { label: 'Open', color: 'bg-blue-100 text-blue-800' },
+        in_progress: { label: 'In Progress', color: 'bg-yellow-100 text-yellow-800' },
+        resolved: { label: 'Resolved', color: 'bg-green-100 text-green-800' },
+        closed: { label: 'Closed', color: 'bg-gray-100 text-gray-800' },
+      };
+      const statusInfo = statusMap[status as keyof typeof statusMap] || { label: status, color: 'bg-gray-100 text-gray-800' };
       
-  //       {/*{row.original.status}*/}
-  //     </Badge>
-  //     // <div className="flex items-center gap-2">
-  //     //   <Checkbox  checked={true} className="disabled" />
-  //     // </div>
+      return (
+        <Badge className={`${statusInfo.color} capitalize`}>
+          {row.original.status}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: 'priority',
+    header: 'Priority',
+    cell: ({ row }) => {
+      const priority = row.original.priority;
+      const priorityMap = {
+        low: { label: 'Low', color: 'bg-green-100 text-green-800' },
+        medium: { label: 'Medium', color: 'bg-blue-100 text-blue-800' },
+        high: { label: 'High', color: 'bg-yellow-100 text-yellow-800' },
+        urgent: { label: 'Urgent', color: 'bg-red-100 text-red-800' },
+      };
+      const priorityInfo = priorityMap[priority as keyof typeof priorityMap] || { label: priority, color: 'bg-gray-100 text-gray-800' };
+      
+      return (
+        <Badge className={`${priorityInfo.color} capitalize`}>
+          {priority || 'Unknown'}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: 'created_at',
+    header: 'created_at',
+    cell: ({ row }) => {
+     return(
+      <span className="text-muted-foreground text-left">
+      {row.original.created_at}
+    </span>
+    )
+    },
+  },
+
+  // {
+  //   accessorKey: 'vote',
+  //   header: () => <div className="w-full text-center">Vote</div>,
+  //   cell: ({ row }) => <div className="text-center">{row.original.vote}</div>,
+  // },
+  // {
+  //   accessorKey: 'comment',
+  //   header: () => <div className="w-full text-center">Comments</div>,
+  //   cell: ({ row }) => (
+  //     <div className="text-center">{row.original.comment}</div>
   //   ),
   // },
-  {
-    accessorKey: 'vote',
-    header: () => <div className="w-full text-center">Vote</div>,
-    cell: ({ row }) => <div className="text-center">{row.original.vote}</div>,
-  },
-  {
-    accessorKey: 'comment',
-    header: () => <div className="w-full text-center">Comments</div>,
-    cell: ({ row }) => (
-      <div className="text-center">{row.original.comment}</div>
-    ),
-  },
-  {
-    id: 'actions',
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
-            size="icon"
-          >
-            <MoreVerticalIcon />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuItem>Favorite</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
+  // {
+  //   id: 'actions',
+  //   cell: () => (
+  //     <DropdownMenu>
+  //       <DropdownMenuTrigger asChild>
+  //         <Button
+  //           variant="ghost"
+  //           className="flex size-8 text-muted-foreground data-[state=open]:bg-muted"
+  //           size="icon"
+  //         >
+  //           <MoreVerticalIcon />
+  //           <span className="sr-only">Open menu</span>
+  //         </Button>
+  //       </DropdownMenuTrigger>
+  //       <DropdownMenuContent align="end" className="w-32">
+  //         <DropdownMenuItem>Edit</DropdownMenuItem>
+  //         <DropdownMenuItem>Make a copy</DropdownMenuItem>
+  //         <DropdownMenuItem>Favorite</DropdownMenuItem>
+  //         <DropdownMenuSeparator />
+  //         <DropdownMenuItem>Delete</DropdownMenuItem>
+  //       </DropdownMenuContent>
+  //     </DropdownMenu>
+  //   ),
+  // },
 ];
 
 function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
@@ -295,9 +339,9 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
 
 export function DataTable({
   data: initialData,
-}: {
-  data: z.infer<typeof schema>[];
-}) {
+  showAssignees = false,
+  showDepartments = false,
+}: DataTableProps) {
   const [data, setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -765,3 +809,16 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
     </Sheet>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

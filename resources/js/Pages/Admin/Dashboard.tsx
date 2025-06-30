@@ -20,6 +20,9 @@ interface Post {
   vote: string;
   comment: number;
   user: User;
+  priority: string;
+  status: string;
+  created_at: string;
 }
 
 interface AutomationStats {
@@ -49,6 +52,7 @@ export default function Page({
   totalUsers,
   automation_stats,
 }: DashboardProps) {
+  console.log(posts);
   return (
     <SidebarProvider>
       <Head title={'Dashboard'} />
@@ -59,7 +63,11 @@ export default function Page({
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <SectionCards totalPosts={totalPosts} totalUsers={totalUsers} automationStats={automation_stats} />
-              <DataTable data={posts} />
+              <DataTable 
+                data={posts} 
+                showAssignees={true}
+                showDepartments={true}
+              />
             </div>
           </div>
         </div>
@@ -67,3 +75,4 @@ export default function Page({
     </SidebarProvider>
   );
 }
+
