@@ -11,7 +11,7 @@ class Comments extends Model
     use HasFactory;
     use HasUlids;
 
-    protected $fillable = ['post_id', 'user_id', 'parent_id', 'comment'];
+    protected $fillable = ['post_id', 'user_id', 'parent_id', 'comment', 'is_hr_response'];
 
     public function post()
     {

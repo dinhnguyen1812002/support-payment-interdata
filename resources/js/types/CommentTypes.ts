@@ -1,3 +1,4 @@
+
 export interface User {
   id: number;
   name: string;
@@ -8,7 +9,7 @@ export interface User {
 
 export interface Comment {
   id: string;
-  comment: string;
+  content: string;
   created_at: string;
   user: User;
   parent_id?: string;

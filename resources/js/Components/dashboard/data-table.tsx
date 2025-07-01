@@ -142,9 +142,9 @@ function DragHandle({ id }: { id: number }) {
 
 interface DataTableProps {
   data: any[];
-  showAssignees?: boolean;  // We'll keep the prop name but handle singular data
+  showAssignees?: boolean;
   showDepartments?: boolean;
-  // ...other existing props
+  refreshKey?: number;
 }
 
 const columns: ColumnDef<z.infer<typeof schema>>[] = [
@@ -341,6 +341,7 @@ export function DataTable({
   data: initialData,
   showAssignees = false,
   showDepartments = false,
+  refreshKey = 0,
 }: DataTableProps) {
   const [data, setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
@@ -354,6 +355,11 @@ export function DataTable({
     pageIndex: 0,
     pageSize: 10,
   });
+
+  // Update data when refreshKey changes
+  React.useEffect(() => {
+    setData(initialData);
+  }, [initialData, refreshKey]);
   const sortableId = React.useId();
   const sensors = useSensors(
     useSensor(MouseSensor, {}),

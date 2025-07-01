@@ -52,7 +52,7 @@ const CommentsContent: React.FC<
       // Tạo comment tạm thời (optimistic) với HR badge info
       const optimisticComment: Comment = {
         id: optimisticId,
-        comment: content,
+        content: content,
         created_at: new Date().toISOString(),
         user: {
           id: currentUser.id,
@@ -120,7 +120,7 @@ const CommentsContent: React.FC<
             const optimisticComment = prevComments.find(
               c =>
                 c.isOptimistic &&
-                c.comment === e.comment.comment &&
+                c.content === e.comment.content &&
                 c.user.id === e.comment.user.id &&
                 c.parent_id === e.comment.parent_id,
             );

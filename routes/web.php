@@ -105,6 +105,20 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/admin/automation-stats', [\App\Http\Controllers\Admin\AutomationRuleController::class, 'stats'])->name('admin.automation-rules.stats');
     Route::post('/admin/bulk-update-scores', [\App\Http\Controllers\Admin\AutomationRuleController::class, 'bulkUpdateScores'])->name('admin.bulk-update-scores');
 
+    // Ticket bulk operations routes
+    Route::post('/admin/tickets/assign', [\App\Http\Controllers\Admin\TicketBulkController::class, 'assign'])->name('admin.tickets.assign');
+    Route::post('/admin/tickets/bulk-assign', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkAssign'])->name('admin.tickets.bulk-assign');
+    Route::post('/admin/tickets/bulk-status', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkStatus'])->name('admin.tickets.bulk-status');
+    Route::post('/admin/tickets/bulk-priority', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkPriority'])->name('admin.tickets.bulk-priority');
+    Route::post('/admin/tickets/bulk-department', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkDepartment'])->name('admin.tickets.bulk-department');
+    Route::post('/admin/tickets/bulk-close-resolved', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkCloseResolved'])->name('admin.tickets.bulk-close-resolved');
+    Route::post('/admin/tickets/bulk-add-tags', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkAddTags'])->name('admin.tickets.bulk-add-tags');
+    Route::post('/admin/tickets/bulk-duplicate', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkDuplicate'])->name('admin.tickets.bulk-duplicate');
+    Route::post('/admin/tickets/bulk-archive', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkArchive'])->name('admin.tickets.bulk-archive');
+    Route::post('/admin/tickets/bulk-delete', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkDelete'])->name('admin.tickets.bulk-delete');
+    Route::get('/admin/tickets/{ticket}', [\App\Http\Controllers\Admin\TicketBulkController::class, 'show'])->name('admin.tickets.show');
+    Route::get('/admin/tickets/{ticket}/comments', [\App\Http\Controllers\Admin\TicketBulkController::class, 'getComments'])->name('admin.tickets.comments');
+    Route::post('/admin/tickets/{ticket}/respond', [\App\Http\Controllers\Admin\TicketBulkController::class, 'addResponse'])->name('admin.tickets.respond');
     // Documentation routes
     Route::get('/admin/docs', [DocsController::class, 'adminIndex'])->name('admin.docs.index');
     Route::get('/admin/docs/{file?}', [DocsController::class, 'show'])->name('admin.docs.show');
@@ -180,6 +194,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/notifications', [AdminController::class, 'notifications'])->name('notifications');
 
     Route::get('/posts/{id}', [AdminController::class, 'getPost'])->name('posts.get');
+    Route::get('/assignment-data', [AdminController::class, 'getAssignmentData'])->name('assignment-data');
 });
 
 

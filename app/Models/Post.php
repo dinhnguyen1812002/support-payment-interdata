@@ -228,9 +228,10 @@ class Post extends Model
                 'roles' => $comment->user->getRoleNames(),
                 'departments' => $comment->user->departments->pluck('name'),
             ],
-            'comment' => $comment->comment,
-            'created_at' => $comment->created_at,
+            'content' => $comment->comment,
+            'created_at' => $comment->created_at->format('Y-m-d H:i:s'),
             'parent_id' => $comment->parent_id,
+            'is_hr_response' => $comment->is_hr_response ?? false,
             'replies' => $comment->allReplies->map(function ($reply) {
                 return $this->formatComment($reply);
             }),

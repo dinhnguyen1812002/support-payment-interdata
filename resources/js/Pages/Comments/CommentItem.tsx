@@ -227,7 +227,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
             <div className="mt-3">
               <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
-                {comment.comment}
+                {comment.content}
               </p>
             </div>
           </CardContent>

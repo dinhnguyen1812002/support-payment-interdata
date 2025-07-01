@@ -45,6 +45,7 @@ class AdminService
             return [
                 'id' => $post->id,
                 'title' => $post->title,
+                'slug' => $post->slug,
                 'status' => $post->status,
                 'priority' => $post->priority,
                 'created_at' => $post->created_at->format('d/m/Y'),

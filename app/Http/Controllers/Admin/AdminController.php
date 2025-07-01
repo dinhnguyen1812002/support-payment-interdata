@@ -203,4 +203,29 @@ class AdminController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Get departments and users for ticket assignment
+     */
+    public function getAssignmentData()
+    {
+        $this->authorize('view admin dashboard');
+
+        $departments = \App\Models\Departments::select(['id', 'name'])
+            ->orderBy('name')
+            ->get();
+
+        $users = \App\Models\User::select(['id', 'name', 'email', 'profile_photo_path'])
+            ->with(['departments:id,name'])
+            ->whereHas('roles', function($query) {
+                $query->whereIn('name', ['admin', 'support', 'staff']);
+            })
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'departments' => $departments,
+            'users' => $users
+        ]);
+    }
 }
