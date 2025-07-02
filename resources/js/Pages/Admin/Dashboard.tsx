@@ -132,12 +132,12 @@ export default function Page({
               )}
 
               {/* Enhanced Statistics Cards */}
-              <SectionCards
+              {/* <SectionCards
                 totalPosts={totalPosts}
                 totalUsers={totalUsers}
                 automationStats={automation_stats}
                 ticketStats={ticketStats}
-              />
+              /> */}
               {/* <TicketAnalytics
                       posts={posts}
                       automationStats={automation_stats}
@@ -149,7 +149,7 @@ export default function Page({
               />
 
               {/* Main Dashboard Content */}
-
+              
             </div>
           </div>
         </div>

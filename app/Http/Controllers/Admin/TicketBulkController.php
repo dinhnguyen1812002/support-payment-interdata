@@ -701,4 +701,54 @@ class TicketBulkController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Update single ticket status
+     */
+    public function updateStatus(Request $request, $ticket)
+    {
+        // $this->authorize('manage tickets');
+
+        $validated = $request->validate([
+            'status' => 'required|string|in:open,in_progress,resolved,closed'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Find the ticket
+            $post = \App\Models\Post::where('slug', $ticket)
+                ->orWhere('id', $ticket)
+                ->firstOrFail();
+
+            $oldStatus = $post->status;
+            $post->status = $validated['status'];
+            $post->save();
+
+            // Log the status change
+            Log::info('Ticket status updated', [
+                'ticket_id' => $post->id,
+                'old_status' => $oldStatus,
+                'new_status' => $validated['status'],
+                'updated_by' => auth()->id()
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Status updated successfully');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to update ticket status', [
+                'ticket' => $ticket,
+                'status' => $validated['status'] ?? null,
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'message' => 'Failed to update status. Please try again.'
+            ], 500);
+        }
+    }
 }

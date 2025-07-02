@@ -48,6 +48,7 @@ import {
   Building
 } from 'lucide-react';
 import { Link, router } from '@inertiajs/react';
+import { StatusUpdateDropdown } from './status-update-dropdown';
 import { formatDistanceToNow } from 'date-fns';
 
 interface Post {
@@ -469,10 +470,10 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                 >
                   Ticket
                 </TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Priority</TableHead>
+               
                 <TableHead>Assignee</TableHead>
                 <TableHead>Department</TableHead>
+
                 <TableHead 
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => {
@@ -482,6 +483,8 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                 >
                   Created
                 </TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Priority</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -522,24 +525,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={`${getStatusColor(ticket.status)}`}>
-                        <span className="flex items-center gap-1">
-                          {getStatusIcon(ticket.status)}
-                          {ticket.status.replace('_', ' ').toUpperCase()}
-                        </span>
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={`${getPriorityColor(ticket.priority)}`}>
-                        {ticket.priority.toUpperCase()}
-                      </Badge>
-                      {ticket.priority_score && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Score: {ticket.priority_score}
-                        </div>
-                      )}
-                    </TableCell>
+
                     <TableCell>
                       {ticket.assignee ? (
                         <div className="flex items-center gap-2">
@@ -568,6 +554,23 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                         <Calendar className="h-3 w-3" />
                         <span>{ticket.created_at}</span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <StatusUpdateDropdown
+                        ticketId={ticket.id}
+                        currentStatus={ticket.status}
+                        onStatusUpdated={onRefresh}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={`${getPriorityColor(ticket.priority)}`}>
+                        {ticket.priority.toUpperCase()}
+                      </Badge>
+                      {ticket.priority_score && (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Score: {ticket.priority_score}
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>

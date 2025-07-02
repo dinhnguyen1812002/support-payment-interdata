@@ -119,6 +119,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/admin/tickets/{ticket}', [\App\Http\Controllers\Admin\TicketBulkController::class, 'show'])->name('admin.tickets.show');
     Route::get('/admin/tickets/{ticket}/comments', [\App\Http\Controllers\Admin\TicketBulkController::class, 'getComments'])->name('admin.tickets.comments');
     Route::post('/admin/tickets/{ticket}/respond', [\App\Http\Controllers\Admin\TicketBulkController::class, 'addResponse'])->name('admin.tickets.respond');
+    Route::post('/admin/tickets/{ticket}/status', [\App\Http\Controllers\Admin\TicketBulkController::class, 'updateStatus'])->name('admin.tickets.update-status');
     // Documentation routes
     Route::get('/admin/docs', [DocsController::class, 'adminIndex'])->name('admin.docs.index');
     Route::get('/admin/docs/{file?}', [DocsController::class, 'show'])->name('admin.docs.show');
