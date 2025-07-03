@@ -33,11 +33,12 @@ interface Comment {
   id: number;
   content: string;
   created_at: string;
+ 
   user: {
     id: number;
     name: string;
     email: string;
-    profile_photo_path?: string;
+    profile?: string;
   };
   is_hr_response?: boolean;
 }
@@ -51,11 +52,12 @@ interface Ticket {
   priority: string;
   created_at: string;
   updated_at: string;
+  profile?: string;
   user: {
     id: number;
     name: string;
     email: string;
-    profile_photo_path?: string;
+    profile?: string;
   };
   assignee?: {
     id: number;
@@ -127,6 +129,8 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
     }
   };
 
+  console.log(ticket);
+
   return (
      <SidebarProvider>
       <Head title="Tickets" />
@@ -139,10 +143,10 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
        <Link href="/admin">
           <Button variant="outline" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
+          
            </Button>
         </Link>
-        <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 className="font-semibold text-xl text-gray-800 leading-tight dark:text-white">
           Ticket Detail
         </h2>
        </div>
@@ -241,7 +245,7 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
                       <span className="text-sm font-medium text-muted-foreground block mb-2">Reporter</span>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={ticket.user.profile_photo_path || ''} />
+                          <AvatarImage src={ticket.profile || ''} />
                           <AvatarFallback>
                             {ticket.user.name.charAt(0).toUpperCase()}
                           </AvatarFallback>

@@ -552,12 +552,18 @@ class TicketBulkController extends Controller
     {
         $this->authorize('view admin dashboard');
 
-        $post = \App\Models\Post::where('slug', $ticket)
-            ->orWhere('id', $ticket)
-            ->with(['user', 'categories', 'tags', 'assignee', 'department'])
-            ->withCount('upvotes')
-            ->firstOrFail();
-
+       $post = Post::where('slug', $ticket)
+    ->orWhere('id', $ticket)
+    ->with([
+        'user:id,name,profile_photo_path,email', // ✅ chú ý dùng 'user', không phải 'users'
+        'categories',
+        'tags',
+        'assignee',
+        'department'
+    ])
+    ->withCount('upvotes')
+    ->firstOrFail();
+    
         $comments = $post->getFormattedComments();
 
         $ticketData = [
@@ -570,6 +576,9 @@ class TicketBulkController extends Controller
             'created_at' => $post->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $post->updated_at->format('Y-m-d H:i:s'),
             'user' => $post->user,
+            'profile' => $post->user->profile_photo_path
+                ? asset('storage/'.$post->user->profile_photo_path)
+                : 'https://ui-avatars.com/api/?name='.urlencode($post->user->name).'&color=7F9CF5&background=EBF4FF',
             'assignee' => $post->assignee,
             'department' => $post->department,
             'categories' => $post->categories,
@@ -590,7 +599,7 @@ class TicketBulkController extends Controller
     {
         $this->authorize('view admin dashboard');
 
-        $post = \App\Models\Post::where('slug', $ticket)
+        $post = Post::where('slug', $ticket)
             ->orWhere('id', $ticket)
             ->with(['user', 'categories', 'tags', 'assignee', 'department'])
             ->withCount('upvotes')
@@ -637,12 +646,12 @@ class TicketBulkController extends Controller
             DB::beginTransaction();
 
             // Find the ticket
-            $post = \App\Models\Post::where('slug', $ticket)
+            $post = Post::where('slug', $ticket)
                 ->orWhere('id', $ticket)
                 ->firstOrFail();
 
             // Create the comment
-            $comment = new \App\Models\Comments([
+            $comment = new Comments([
                 'comment' => $validated['content'],
                 'user_id' => auth()->id(),
                 'post_id' => $post->id,
@@ -717,7 +726,7 @@ class TicketBulkController extends Controller
             DB::beginTransaction();
 
             // Find the ticket
-            $post = \App\Models\Post::where('slug', $ticket)
+            $post = Post::where('slug', $ticket)
                 ->orWhere('id', $ticket)
                 ->firstOrFail();
 

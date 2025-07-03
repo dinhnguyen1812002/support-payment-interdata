@@ -71,7 +71,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
     // Check if user belongs to HR department (you can customize department names)
     const hasHRDepartment = user.departments?.some(dept =>
-      HR_DEPARTMENTS.includes(dept.toLowerCase() as any)
+      HR_DEPARTMENTS.includes(dept as any)
     );
 
     if (hasHRDepartment) {

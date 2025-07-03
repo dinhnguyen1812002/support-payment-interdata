@@ -19,6 +19,7 @@ interface Comment {
     id: number
     name: string
     email: string
+    profile?: string
     profile_photo_path?: string
   }
   is_hr_response?: boolean
@@ -32,6 +33,8 @@ interface Ticket {
   status: string
   priority: string
   created_at: string
+  updated_at: string
+  profile?: string
   user: {
     id: number
     name: string
@@ -42,11 +45,21 @@ interface Ticket {
     id: number
     name: string
     email: string
+    profile_photo_path?: string
   }
   department?: {
     id: number
     name: string
   }
+  categories?: Array<{
+    id: number
+    title: string
+  }>
+  tags?: Array<{
+    id: number
+    name: string
+  }>
+  upvote_count?: number
   comments: Comment[]
 }
 
@@ -63,35 +76,7 @@ export function TicketResponseForm({ ticket, onCommentAdded }: TicketResponseFor
     is_hr_response: false,
   })
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "open":
-        return "bg-blue-100 text-blue-800"
-      case "in_progress":
-        return "bg-yellow-100 text-yellow-800"
-      case "resolved":
-        return "bg-green-100 text-green-800"
-      case "closed":
-        return "bg-gray-100 text-gray-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "urgent":
-        return "bg-red-100 text-red-800"
-      case "high":
-        return "bg-orange-100 text-orange-800"
-      case "medium":
-        return "bg-yellow-100 text-yellow-800"
-      case "low":
-        return "bg-green-100 text-green-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -110,7 +95,7 @@ export function TicketResponseForm({ ticket, onCommentAdded }: TicketResponseFor
           onCommentAdded(response.props.comment)
         }
       },
-      onError: (errors) => {
+      onError: () => {
         toast.error("Failed to send response. Please try again.")
       },
       onFinish: () => {
@@ -120,35 +105,36 @@ export function TicketResponseForm({ ticket, onCommentAdded }: TicketResponseFor
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white min-h-screen">
+    <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-[#0a0a0a] min-h-screen">
       {/* Ticket Header */}
       <div className="mb-8">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{ticket.title}</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 dark:text-white">{ticket.title}</h1>
+            <p className="text-gray-600 dark:text-white">
               Ticket #{ticket.id} • Created by {ticket.user.name}
             </p>
           </div>
-          <div className="flex gap-2">
+          {/* <div className="flex gap-2">
             <Badge className={getPriorityColor(ticket.priority)}>
               {ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}
             </Badge>
             <Badge className={getStatusColor(ticket.status)}>
               {ticket.status.replace("_", " ").charAt(0).toUpperCase() + ticket.status.replace("_", " ").slice(1)}
             </Badge>
-          </div>
+          </div> */}
         </div>
 
         <div className="prose max-w-none mb-6">
-          <div className="text-gray-700 leading-relaxed text-lg" dangerouslySetInnerHTML={{ __html: ticket.content }} />
+          <div className="text-gray-700 dark:text-white leading-relaxed text-lg" 
+          dangerouslySetInnerHTML={{ __html: ticket.content }} />
         </div>
 
         <div className="flex items-center gap-6 text-sm text-gray-500 pb-8 border-b border-gray-200">
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
             <span>{ticket.created_at}</span>
-          </div>
+          </div> */}
           {ticket.assignee && (
             <div className="flex items-center gap-2">
               <User className="h-4 w-4" />
@@ -167,7 +153,7 @@ export function TicketResponseForm({ ticket, onCommentAdded }: TicketResponseFor
       {/* Comments/Responses */}
       {ticket.comments && ticket.comments.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
             <MessageSquare className="h-5 w-5" />
             Responses ({ticket.comments.length})
           </h2>
@@ -176,22 +162,24 @@ export function TicketResponseForm({ ticket, onCommentAdded }: TicketResponseFor
             {ticket.comments.map((comment) => (
               <div key={comment.id} className="flex gap-4">
                 <Avatar className="h-10 w-10 flex-shrink-0">
-                  <AvatarImage src={comment.user.profile_photo_path || "/placeholder.svg"} />
+                  <AvatarImage src={ "/storage/"+ comment.user.profile_photo_path || "/placeholder.svg"} />
                   <AvatarFallback className="bg-gray-100 text-gray-600">
                     {comment.user.name.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
 
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="font-medium text-gray-900">{comment.user.name}</span>
+                  <div className="flex items-center gap-3 mb-3 ">
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {comment.user.name}
+                    </span>
                     {comment.is_hr_response && (
                       <Badge className="bg-blue-50 text-blue-700 border-blue-200">HR Staff</Badge>
                     )}
                     <span className="text-sm text-gray-500">{comment.created_at}</span>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-200">
+                  <div className="bg-gray-50 rounded-lg p-4">
                     <p className="text-gray-700 leading-relaxed">{comment.content}</p>
                   </div>
                 </div>
@@ -205,7 +193,7 @@ export function TicketResponseForm({ ticket, onCommentAdded }: TicketResponseFor
 
       {/* Response Form */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
           <Send className="h-5 w-5" />
           Add Your Response
         </h2>

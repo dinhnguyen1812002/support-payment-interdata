@@ -43,6 +43,7 @@ const data = {
     email: 'm@example.com',
     avatar: '/avatars/shadcn.jpg',
   },
+  
   navMain: [
     {
       title: 'Dashboard',
