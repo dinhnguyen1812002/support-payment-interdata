@@ -173,8 +173,6 @@ class PostService
                 $this->notifyDepartment($post);
             })->afterCommit();
 
-
-            
             dispatch(function () use ($post) {
                 // Broadcast đến kênh notifications chung
                 broadcast(new NewQuestionCreated($post))->toOthers();

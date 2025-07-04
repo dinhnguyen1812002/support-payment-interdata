@@ -217,7 +217,7 @@ class AdminController extends Controller
 
         $users = \App\Models\User::select(['id', 'name', 'email', 'profile_photo_path'])
             ->with(['departments:id,name'])
-            ->whereHas('roles', function($query) {
+            ->whereHas('roles', function ($query) {
                 $query->whereIn('name', ['admin', 'support', 'staff']);
             })
             ->orderBy('name')
@@ -225,7 +225,7 @@ class AdminController extends Controller
 
         return response()->json([
             'departments' => $departments,
-            'users' => $users
+            'users' => $users,
         ]);
     }
 }

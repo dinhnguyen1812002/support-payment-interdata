@@ -37,7 +37,7 @@ class NotificationController extends Controller
             $limit = $request->input('limit', 10);
 
             // Get both read and unread notifications, with unread first
-            
+
             $notifications = $user->notifications()
                 ->orderByRaw('read_at IS NULL DESC') // Unread first
                 ->orderBy('created_at', 'desc')
@@ -97,22 +97,22 @@ class NotificationController extends Controller
     {
         try {
             $user = Auth::user();
-            
+
             // Ensure user can only access their department's notifications
             if ($user->department_id != $departmentId) {
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
-            
+
             $notifications = $user->notifications()
                 ->where('department_id', $departmentId)
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->map(function ($notification) {
                     return [
-                        'id'         => $notification->id,
-                        'type'       => class_basename($notification->type),
-                        'data'       => $notification->data,
-                        'read_at'    => $notification->read_at,
+                        'id' => $notification->id,
+                        'type' => class_basename($notification->type),
+                        'data' => $notification->data,
+                        'read_at' => $notification->read_at,
                         'time' => $notification->created_at->diffForHumans(),
                     ];
                 });
@@ -122,8 +122,9 @@ class NotificationController extends Controller
             \Log::error('Failed to retrieve department notifications', [
                 'department_id' => $departmentId,
                 'user_id' => $user->id ?? null,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve department notifications',
@@ -131,4 +132,3 @@ class NotificationController extends Controller
         }
     }
 }
-

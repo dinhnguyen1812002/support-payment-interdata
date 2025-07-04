@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Post;
-use App\Models\User;
 use App\Models\Departments;
+use App\Models\Post;
 use App\Models\Tag;
+use App\Models\User;
+use App\Services\TicketAssignmentService;
+use App\Services\TicketBulkOperationsService;
+use App\Services\TicketDeletionService;
+use App\Services\TicketResponseService;
+use App\Services\TicketStatusService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,58 +20,33 @@ use Illuminate\Validation\Rule;
 
 class TicketBulkController extends Controller
 {
-    use authorizesRequests;
+    use AuthorizesRequests;
+
+    public function __construct(
+        private TicketAssignmentService $assignmentService,
+        private TicketStatusService $statusService,
+        private TicketResponseService $responseService,
+        private TicketDeletionService $deletionService,
+        private TicketBulkOperationsService $bulkOperationsService
+    ) {}
 
     /**
      * Assign a single ticket to a user
      */
     public function assign(Request $request)
     {
+        $this->authorize('manage tickets');
+
         $validated = $request->validate([
             'ticket_id' => 'required|exists:posts,id',
             'assignee_id' => 'required|exists:users,id',
             'notes' => 'nullable|string|max:500',
-            'send_notification' => 'boolean'
+            'send_notification' => 'boolean',
         ]);
-        
-        try {
-            $ticket = Post::findOrFail($validated['ticket_id']);
-            $assignee = User::findOrFail($validated['assignee_id']);
 
-            $ticket->update([
-                'assignee_id' => $validated['assignee_id'],
-                'status' => $ticket->status === 'open' ? 'in_progress' : $ticket->status
-            ]);
+        $result = $this->assignmentService->assignTicket($validated);
 
-            // Log the assignment
-            Log::info('Ticket assigned', [
-                'ticket_id' => $ticket->id,
-                'assignee_id' => $assignee->id,
-                'assigned_by' => auth()->id(),
-                'notes' => $validated['notes'] ?? null
-            ]);
-
-            // TODO: Send notification if requested
-            if ($validated['send_notification'] ?? true) {
-                // Implement notification logic here
-            }
-
-            return response()->json([
-                'message' => "Ticket assigned to {$assignee->name} successfully",
-                'ticket' => $ticket->fresh(['assignee', 'department', 'user'])
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error('Ticket assignment failed', [
-                'error' => $e->getMessage(),
-                'ticket_id' => $validated['ticket_id'],
-                'assignee_id' => $validated['assignee_id']
-            ]);
-
-            return response()->json([
-                'message' => 'Failed to assign ticket'
-            ], 500);
-        }
+        return response()->json($result, $result['success'] ? 200 : 500);
     }
 
     /**
@@ -74,56 +54,19 @@ class TicketBulkController extends Controller
      */
     public function bulkAssign(Request $request)
     {
-      
+        $this->authorize('manage tickets');
 
         $validated = $request->validate([
             'ticket_ids' => 'required|array|min:1',
             'ticket_ids.*' => 'exists:posts,id',
             'assignee_id' => 'required|exists:users,id',
             'reason' => 'nullable|string|max:500',
-            'send_notification' => 'boolean'
+            'send_notification' => 'boolean',
         ]);
 
-        try {
-            DB::beginTransaction();
+        $result = $this->assignmentService->bulkAssign($validated);
 
-            $assignee = User::findOrFail($validated['assignee_id']);
-            $updated = Post::whereIn('id', $validated['ticket_ids'])
-                ->update([
-                    'assignee_id' => $validated['assignee_id'],
-                    'updated_at' => now()
-                ]);
-
-            // Also update status from 'open' to 'in_progress' for newly assigned tickets
-            Post::whereIn('id', $validated['ticket_ids'])
-                ->where('status', 'open')
-                ->update(['status' => 'in_progress']);
-
-            DB::commit();
-
-            Log::info('Bulk ticket assignment completed', [
-                'ticket_count' => $updated,
-                'assignee_id' => $assignee->id,
-                'assigned_by' => auth()->id(),
-                'reason' => $validated['reason'] ?? null
-            ]);
-
-            return response()->json([
-                'message' => "{$updated} tickets assigned to {$assignee->name} successfully"
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Bulk ticket assignment failed', [
-                'error' => $e->getMessage(),
-                'ticket_ids' => $validated['ticket_ids'],
-                'assignee_id' => $validated['assignee_id']
-            ]);
-
-            return response()->json([
-                'message' => 'Failed to assign tickets'
-            ], 500);
-        }
+        return response()->json($result, $result['success'] ? 200 : 500);
     }
 
     /**
@@ -131,50 +74,19 @@ class TicketBulkController extends Controller
      */
     public function bulkStatus(Request $request)
     {
-      
+        $this->authorize('manage tickets');
 
         $validated = $request->validate([
             'ticket_ids' => 'required|array|min:1',
             'ticket_ids.*' => 'exists:posts,id',
             'status' => ['required', Rule::in(['open', 'in_progress', 'resolved', 'closed'])],
             'reason' => 'nullable|string|max:500',
-            'send_notification' => 'boolean'
+            'send_notification' => 'boolean',
         ]);
 
-        try {
-            DB::beginTransaction();
+        $result = $this->statusService->bulkUpdateStatus($validated);
 
-            $updated = Post::whereIn('id', $validated['ticket_ids'])
-                ->update([
-                    'status' => $validated['status'],
-                    'updated_at' => now()
-                ]);
-
-            DB::commit();
-
-            Log::info('Bulk status update completed', [
-                'ticket_count' => $updated,
-                'new_status' => $validated['status'],
-                'updated_by' => auth()->id(),
-                'reason' => $validated['reason'] ?? null
-            ]);
-
-            return response()->json([
-                'message' => "{$updated} tickets updated to {$validated['status']} status successfully"
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Bulk status update failed', [
-                'error' => $e->getMessage(),
-                'ticket_ids' => $validated['ticket_ids'],
-                'status' => $validated['status']
-            ]);
-
-            return response()->json([
-                'message' => 'Failed to update ticket status'
-            ], 500);
-        }
+        return response()->json($result, $result['success'] ? 200 : 500);
     }
 
     /**
@@ -182,50 +94,19 @@ class TicketBulkController extends Controller
      */
     public function bulkPriority(Request $request)
     {
-      
+        $this->authorize('manage tickets');
 
         $validated = $request->validate([
             'ticket_ids' => 'required|array|min:1',
             'ticket_ids.*' => 'exists:posts,id',
             'priority' => ['required', Rule::in(['low', 'medium', 'high', 'urgent'])],
             'reason' => 'nullable|string|max:500',
-            'send_notification' => 'boolean'
+            'send_notification' => 'boolean',
         ]);
 
-        try {
-            DB::beginTransaction();
+        $result = $this->bulkOperationsService->bulkUpdatePriority($validated);
 
-            $updated = Post::whereIn('id', $validated['ticket_ids'])
-                ->update([
-                    'priority' => $validated['priority'],
-                    'updated_at' => now()
-                ]);
-
-            DB::commit();
-
-            Log::info('Bulk priority update completed', [
-                'ticket_count' => $updated,
-                'new_priority' => $validated['priority'],
-                'updated_by' => auth()->id(),
-                'reason' => $validated['reason'] ?? null
-            ]);
-
-            return response()->json([
-                'message' => "{$updated} tickets updated to {$validated['priority']} priority successfully"
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Bulk priority update failed', [
-                'error' => $e->getMessage(),
-                'ticket_ids' => $validated['ticket_ids'],
-                'priority' => $validated['priority']
-            ]);
-
-            return response()->json([
-                'message' => 'Failed to update ticket priority'
-            ], 500);
-        }
+        return response()->json($result, $result['success'] ? 200 : 500);
     }
 
     /**
@@ -233,14 +114,13 @@ class TicketBulkController extends Controller
      */
     public function bulkDepartment(Request $request)
     {
-      
 
         $validated = $request->validate([
             'ticket_ids' => 'required|array|min:1',
             'ticket_ids.*' => 'exists:posts,id',
             'department_id' => 'required|exists:departments,id',
             'reason' => 'nullable|string|max:500',
-            'send_notification' => 'boolean'
+            'send_notification' => 'boolean',
         ]);
 
         try {
@@ -250,8 +130,8 @@ class TicketBulkController extends Controller
             $updated = Post::whereIn('id', $validated['ticket_ids'])
                 ->update([
                     'department_id' => $validated['department_id'],
-                    'assignee_id' => null, // Clear assignee when transferring departments
-                    'updated_at' => now()
+                    'assignee_id' => null,
+                    'updated_at' => now(),
                 ]);
 
             DB::commit();
@@ -261,11 +141,11 @@ class TicketBulkController extends Controller
                 'new_department_id' => $department->id,
                 'department_name' => $department->name,
                 'transferred_by' => auth()->id(),
-                'reason' => $validated['reason'] ?? null
+                'reason' => $validated['reason'] ?? null,
             ]);
 
             return response()->json([
-                'message' => "{$updated} tickets transferred to {$department->name} successfully"
+                'message' => "{$updated} tickets transferred to {$department->name} successfully",
             ]);
 
         } catch (\Exception $e) {
@@ -273,11 +153,11 @@ class TicketBulkController extends Controller
             Log::error('Bulk department transfer failed', [
                 'error' => $e->getMessage(),
                 'ticket_ids' => $validated['ticket_ids'],
-                'department_id' => $validated['department_id']
+                'department_id' => $validated['department_id'],
             ]);
 
             return response()->json([
-                'message' => 'Failed to transfer tickets'
+                'message' => 'Failed to transfer tickets',
             ], 500);
         }
     }
@@ -287,13 +167,12 @@ class TicketBulkController extends Controller
      */
     public function bulkCloseResolved(Request $request)
     {
-      
 
         $validated = $request->validate([
             'ticket_ids' => 'required|array|min:1',
             'ticket_ids.*' => 'exists:posts,id',
             'reason' => 'nullable|string|max:500',
-            'send_notification' => 'boolean'
+            'send_notification' => 'boolean',
         ]);
 
         try {
@@ -303,7 +182,7 @@ class TicketBulkController extends Controller
                 ->where('status', 'resolved')
                 ->update([
                     'status' => 'closed',
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ]);
 
             DB::commit();
@@ -311,22 +190,22 @@ class TicketBulkController extends Controller
             Log::info('Bulk close resolved tickets completed', [
                 'ticket_count' => $updated,
                 'closed_by' => auth()->id(),
-                'reason' => $validated['reason'] ?? null
+                'reason' => $validated['reason'] ?? null,
             ]);
 
             return response()->json([
-                'message' => "{$updated} resolved tickets closed successfully"
+                'message' => "{$updated} resolved tickets closed successfully",
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Bulk close resolved tickets failed', [
                 'error' => $e->getMessage(),
-                'ticket_ids' => $validated['ticket_ids']
+                'ticket_ids' => $validated['ticket_ids'],
             ]);
 
             return response()->json([
-                'message' => 'Failed to close resolved tickets'
+                'message' => 'Failed to close resolved tickets',
             ], 500);
         }
     }
@@ -336,7 +215,6 @@ class TicketBulkController extends Controller
      */
     public function bulkAddTags(Request $request)
     {
-      
 
         $validated = $request->validate([
             'ticket_ids' => 'required|array|min:1',
@@ -344,7 +222,7 @@ class TicketBulkController extends Controller
             'tags' => 'required|array|min:1',
             'tags.*' => 'string|max:50',
             'reason' => 'nullable|string|max:500',
-            'send_notification' => 'boolean'
+            'send_notification' => 'boolean',
         ]);
 
         try {
@@ -367,11 +245,11 @@ class TicketBulkController extends Controller
                 'ticket_count' => count($tickets),
                 'tags' => $validated['tags'],
                 'added_by' => auth()->id(),
-                'reason' => $validated['reason'] ?? null
+                'reason' => $validated['reason'] ?? null,
             ]);
 
             return response()->json([
-                'message' => "Tags added to " . count($tickets) . " tickets successfully"
+                'message' => 'Tags added to '.count($tickets).' tickets successfully',
             ]);
 
         } catch (\Exception $e) {
@@ -379,11 +257,11 @@ class TicketBulkController extends Controller
             Log::error('Bulk add tags failed', [
                 'error' => $e->getMessage(),
                 'ticket_ids' => $validated['ticket_ids'],
-                'tags' => $validated['tags']
+                'tags' => $validated['tags'],
             ]);
 
             return response()->json([
-                'message' => 'Failed to add tags to tickets'
+                'message' => 'Failed to add tags to tickets',
             ], 500);
         }
     }
@@ -393,13 +271,12 @@ class TicketBulkController extends Controller
      */
     public function bulkDuplicate(Request $request)
     {
-      
 
         $validated = $request->validate([
             'ticket_ids' => 'required|array|min:1',
             'ticket_ids.*' => 'exists:posts,id',
             'reason' => 'nullable|string|max:500',
-            'send_notification' => 'boolean'
+            'send_notification' => 'boolean',
         ]);
 
         try {
@@ -412,7 +289,7 @@ class TicketBulkController extends Controller
             $duplicatedCount = 0;
             foreach ($originalTickets as $ticket) {
                 $duplicate = $ticket->replicate();
-                $duplicate->title = '[DUPLICATE] ' . $ticket->title;
+                $duplicate->title = '[DUPLICATE] '.$ticket->title;
                 $duplicate->status = 'open';
                 $duplicate->assignee_id = null;
                 $duplicate->created_at = now();
@@ -432,22 +309,22 @@ class TicketBulkController extends Controller
                 'original_count' => count($originalTickets),
                 'duplicated_count' => $duplicatedCount,
                 'duplicated_by' => auth()->id(),
-                'reason' => $validated['reason'] ?? null
+                'reason' => $validated['reason'] ?? null,
             ]);
 
             return response()->json([
-                'message' => "{$duplicatedCount} tickets duplicated successfully"
+                'message' => "{$duplicatedCount} tickets duplicated successfully",
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Bulk duplicate tickets failed', [
                 'error' => $e->getMessage(),
-                'ticket_ids' => $validated['ticket_ids']
+                'ticket_ids' => $validated['ticket_ids'],
             ]);
 
             return response()->json([
-                'message' => 'Failed to duplicate tickets'
+                'message' => 'Failed to duplicate tickets',
             ], 500);
         }
     }
@@ -457,13 +334,12 @@ class TicketBulkController extends Controller
      */
     public function bulkArchive(Request $request)
     {
-      
 
         $validated = $request->validate([
             'ticket_ids' => 'required|array|min:1',
             'ticket_ids.*' => 'exists:posts,id',
             'reason' => 'nullable|string|max:500',
-            'send_notification' => 'boolean'
+            'send_notification' => 'boolean',
         ]);
 
         try {
@@ -472,7 +348,7 @@ class TicketBulkController extends Controller
             $updated = Post::whereIn('id', $validated['ticket_ids'])
                 ->update([
                     'status' => 'archived',
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ]);
 
             DB::commit();
@@ -480,22 +356,22 @@ class TicketBulkController extends Controller
             Log::info('Bulk archive tickets completed', [
                 'ticket_count' => $updated,
                 'archived_by' => auth()->id(),
-                'reason' => $validated['reason'] ?? null
+                'reason' => $validated['reason'] ?? null,
             ]);
 
             return response()->json([
-                'message' => "{$updated} tickets archived successfully"
+                'message' => "{$updated} tickets archived successfully",
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Bulk archive tickets failed', [
                 'error' => $e->getMessage(),
-                'ticket_ids' => $validated['ticket_ids']
+                'ticket_ids' => $validated['ticket_ids'],
             ]);
 
             return response()->json([
-                'message' => 'Failed to archive tickets'
+                'message' => 'Failed to archive tickets',
             ], 500);
         }
     }
@@ -505,44 +381,18 @@ class TicketBulkController extends Controller
      */
     public function bulkDelete(Request $request)
     {
-      
+        $this->authorize('manage tickets');
 
         $validated = $request->validate([
             'ticket_ids' => 'required|array|min:1',
             'ticket_ids.*' => 'exists:posts,id',
             'reason' => 'required|string|max:500',
-            'send_notification' => 'boolean'
+            'send_notification' => 'boolean',
         ]);
 
-        try {
-            DB::beginTransaction();
+        $result = $this->deletionService->bulkDelete($validated['ticket_ids']);
 
-            $deleted = Post::whereIn('id', $validated['ticket_ids'])
-                ->delete(); // This will soft delete if using SoftDeletes trait
-
-            DB::commit();
-
-            Log::info('Bulk delete tickets completed', [
-                'ticket_count' => $deleted,
-                'deleted_by' => auth()->id(),
-                'reason' => $validated['reason']
-            ]);
-
-            return response()->json([
-                'message' => "{$deleted} tickets deleted successfully"
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Bulk delete tickets failed', [
-                'error' => $e->getMessage(),
-                'ticket_ids' => $validated['ticket_ids']
-            ]);
-
-            return response()->json([
-                'message' => 'Failed to delete tickets'
-            ], 500);
-        }
+        return response()->json($result, $result['success'] ? 200 : 500);
     }
 
     /**
@@ -552,18 +402,18 @@ class TicketBulkController extends Controller
     {
         $this->authorize('view admin dashboard');
 
-       $post = Post::where('slug', $ticket)
-    ->orWhere('id', $ticket)
-    ->with([
-        'user:id,name,profile_photo_path,email', // ✅ chú ý dùng 'user', không phải 'users'
-        'categories',
-        'tags',
-        'assignee',
-        'department'
-    ])
-    ->withCount('upvotes')
-    ->firstOrFail();
-    
+        $post = Post::where('slug', $ticket)
+            ->orWhere('id', $ticket)
+            ->with([
+                'user:id,name,profile_photo_path,email', 
+                'categories',
+                'tags',
+                'assignee',
+                'department',
+            ])
+            ->withCount('upvotes')
+            ->firstOrFail();
+        // boardcast(new NewPostCreated($post))->toOthers();            
         $comments = $post->getFormattedComments();
 
         $ticketData = [
@@ -588,7 +438,7 @@ class TicketBulkController extends Controller
         ];
 
         return inertia('Admin/TicketDetail', [
-            'ticket' => $ticketData
+            'ticket' => $ticketData,
         ]);
     }
 
@@ -635,80 +485,26 @@ class TicketBulkController extends Controller
      */
     public function addResponse(Request $request, $ticket)
     {
-      
+        $this->authorize('view admin dashboard');
 
         $validated = $request->validate([
             'content' => 'required|string|max:5000',
-            'is_hr_response' => 'boolean'
+            'is_hr_response' => 'boolean',
+            'parent_id' => 'nullable|exists:comments,id',
         ]);
 
-        try {
-            DB::beginTransaction();
+        // Find the ticket
+        $post = Post::where('slug', $ticket)
+            ->orWhere('id', $ticket)
+            ->firstOrFail();
 
-            // Find the ticket
-            $post = Post::where('slug', $ticket)
-                ->orWhere('id', $ticket)
-                ->firstOrFail();
+        $result = $this->responseService->addResponse($post, $validated);
 
-            // Create the comment
-            $comment = new Comments([
-                'comment' => $validated['content'],
-                'user_id' => auth()->id(),
-                'post_id' => $post->id,
-                'is_hr_response' => $validated['is_hr_response'] ?? false
-            ]);
-
-            $comment->save();
-
-            // Update ticket's updated_at timestamp
-            $post->touch();
-
-            // If this is an HR response and ticket is open, mark as in_progress
-            if ($validated['is_hr_response'] && $post->status === 'open') {
-                $post->update(['status' => 'in_progress']);
-            }
-
-            DB::commit();
-
-            Log::info('Ticket response added', [
-                'ticket_id' => $post->id,
-                'comment_id' => $comment->id,
-                'user_id' => auth()->id(),
-                'is_hr_response' => $validated['is_hr_response'] ?? false
-            ]);
-
-            // Load the comment with user relationship
-            $comment->load('user');
-
-            // return response()->json([
-            //     'message' => 'Response added successfully',
-            //     'comment' => [
-            //         'id' => $comment->id,
-            //         'content' => $comment->comment,
-            //         'created_at' => $comment->created_at->format('Y-m-d H:i:s'),
-            //         'is_hr_response' => $comment->is_hr_response,
-            //         'user' => [
-            //             'id' => $comment->user->id,
-            //             'name' => $comment->user->name,
-            //             'email' => $comment->user->email,
-            //             'profile_photo_path' => $comment->user->profile_photo_path
-            //         ]
-            //     ]
-            // ]);
-            return redirect()->back()->with('success', 'Response added successfully');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to add ticket response', [
-                'error' => $e->getMessage(),
-                'ticket' => $ticket,
-                'user_id' => auth()->id()
-            ]);
-
-            return response()->json([
-                'message' => 'Failed to add response'
-            ], 500);
+        if ($result['success']) {
+            return back()->with('success', $result['message']);
         }
+
+        return back()->withErrors(['error' => $result['message']]);
     }
 
     /**
@@ -719,7 +515,7 @@ class TicketBulkController extends Controller
         // $this->authorize('manage tickets');
 
         $validated = $request->validate([
-            'status' => 'required|string|in:open,in_progress,resolved,closed'
+            'status' => 'required|string|in:open,in_progress,resolved,closed',
         ]);
 
         try {
@@ -739,7 +535,7 @@ class TicketBulkController extends Controller
                 'ticket_id' => $post->id,
                 'old_status' => $oldStatus,
                 'new_status' => $validated['status'],
-                'updated_by' => auth()->id()
+                'updated_by' => auth()->id(),
             ]);
 
             DB::commit();
@@ -752,11 +548,11 @@ class TicketBulkController extends Controller
                 'ticket' => $ticket,
                 'status' => $validated['status'] ?? null,
                 'user_id' => auth()->id(),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
-                'message' => 'Failed to update status. Please try again.'
+                'message' => 'Failed to update status. Please try again.',
             ], 500);
         }
     }

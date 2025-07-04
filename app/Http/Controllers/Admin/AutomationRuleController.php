@@ -61,6 +61,7 @@ class AutomationRuleController extends Controller
         $tags = Tag::select('id', 'name')->get();
         $departments = Departments::select('id', 'name')->get();
         $users = User::role(['admin', 'employee'])->select('id', 'name')->get();
+
         return Inertia::render('Admin/AutomationRules/Create', [
             'categories' => $categories,
             'tags' => $tags,
@@ -116,6 +117,7 @@ class AutomationRuleController extends Controller
 
         $categories = Category::select('id', 'title')->get();
         $tags = Tag::select('id', 'name')->get();
+
         return Inertia::render('Admin/AutomationRules/Show', [
             'rule' => $automationRule,
             'categoryTypes' => AutomationRule::CATEGORY_TYPES,
@@ -136,6 +138,7 @@ class AutomationRuleController extends Controller
         $tags = Tag::select('id', 'name')->get();
         $departments = Departments::select('id', 'name')->get();
         $users = User::role(['admin', 'employee'])->select('id', 'name')->get();
+
         return Inertia::render('Admin/AutomationRules/Edit', [
             'rule' => $automationRule,
             'categories' => $categories,

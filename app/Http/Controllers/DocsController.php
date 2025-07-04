@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Parsedown;
 
@@ -17,9 +16,9 @@ class DocsController extends Controller
 
     public function adminIndex()
     {
-        $parsedown = new Parsedown();
+        $parsedown = new Parsedown;
         $parsedown->setSafeMode(true); // Enable safe mode for security
-        $filesystem = new Filesystem();
+        $filesystem = new Filesystem;
         $docsPath = base_path('docs');
 
         // Ensure docs directory exists
@@ -32,7 +31,7 @@ class DocsController extends Controller
                 $filePath = "{$docsPath}/{$file}";
                 if ($filesystem->exists($filePath)) {
                     $content = $filesystem->get($filePath);
-                    $preview = mb_substr(strip_tags($parsedown->text($content)), 0, 200) . '...';
+                    $preview = mb_substr(strip_tags($parsedown->text($content)), 0, 200).'...';
                     $fileContents[] = [
                         'name' => $file,
                         'preview' => $preview,
@@ -44,7 +43,7 @@ class DocsController extends Controller
         } catch (\Exception $e) {
             return Inertia::render('Admin/Docs/Index', [
                 'files' => [],
-                'error' => 'Failed to load documentation files: ' . $e->getMessage(),
+                'error' => 'Failed to load documentation files: '.$e->getMessage(),
             ]);
         }
 
@@ -56,9 +55,9 @@ class DocsController extends Controller
 
     public function show($file = null)
     {
-        $parsedown = new Parsedown();
+        $parsedown = new Parsedown;
         $parsedown->setSafeMode(true);
-        $filesystem = new Filesystem();
+        $filesystem = new Filesystem;
         $docsPath = base_path('docs');
 
         // Ensure docs directory exists
@@ -69,14 +68,14 @@ class DocsController extends Controller
             $file = 'index.md';
         }
         $file = basename($file);
-        if (!preg_match('/^[a-zA-Z0-9_-]+\.md$/', $file)) {
+        if (! preg_match('/^[a-zA-Z0-9_-]+\.md$/', $file)) {
             $file = 'index.md';
         }
-        
+
         $filePath = base_path("docs/{$file}");
 
         // Validate file existence and extension
-        if (!$filesystem->exists($filePath) || pathinfo($filePath, PATHINFO_EXTENSION) !== 'md') {
+        if (! $filesystem->exists($filePath) || pathinfo($filePath, PATHINFO_EXTENSION) !== 'md') {
             return Inertia::render('Admin/Docs/Show', [
                 'files' => $files,
                 'content' => '# File Not Found\nThe requested documentation file does not exist.',
@@ -106,11 +105,11 @@ class DocsController extends Controller
 
     protected function getDocumentationFiles($docsPath)
     {
-        $filesystem = new Filesystem();
-        
-        if (!$filesystem->exists($docsPath)) {
+        $filesystem = new Filesystem;
+
+        if (! $filesystem->exists($docsPath)) {
             $filesystem->makeDirectory($docsPath, 0755, true);
-            $filesystem->put($docsPath . '/index.md', '# Welcome to Documentation');
+            $filesystem->put($docsPath.'/index.md', '# Welcome to Documentation');
         }
 
         return collect($filesystem->files($docsPath))
@@ -129,6 +128,6 @@ class DocsController extends Controller
         $pow = min($pow, count($units) - 1);
         $bytes /= (1 << (10 * $pow));
 
-        return round($bytes, 2) . ' ' . $units[$pow];
+        return round($bytes, 2).' '.$units[$pow];
     }
 }

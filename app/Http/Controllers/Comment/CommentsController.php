@@ -50,7 +50,7 @@ class CommentsController extends Controller
                 'user.roles',
                 'user.departments',
                 'replies.user.roles',
-                'replies.user.departments'
+                'replies.user.departments',
             ])
             ->latest()
             ->paginate(5);

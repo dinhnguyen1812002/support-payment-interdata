@@ -180,6 +180,11 @@ class PostController extends Controller
     public function updateStatus(Request $request, Post $post): \Illuminate\Http\RedirectResponse
     {
         $this->authorize('update', $post);
+        
+        if ($post->user_id !== auth()->id()) {
+            throw new AuthorizationException('You are not authorized to update this post!');
+        }
+
         $request->validate([
             'is_published' => 'required|boolean',
         ]);

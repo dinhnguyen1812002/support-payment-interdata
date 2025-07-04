@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Comment\CommentsController;
 use App\Http\Controllers\Department\DepartmentController;
+use App\Http\Controllers\DocsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Oauth\SocialAuthController;
 use App\Http\Controllers\Permission\PermissionController;
@@ -14,7 +15,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\UpvoteController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DocsController;
+
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/top-voted-posts', [PostController::class, 'getTopVotePosts']);
@@ -57,8 +58,6 @@ Route::post('/notifications/read-all', [NotificationController::class, 'markAllA
     ->middleware('auth')
     ->name('notifications.read_all');
 Route::get('/send-email', [\Illuminate\Notifications\Notification::class, 'sendEmailNotification']);
-
-
 
 // Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 //     Route::get('/admin/docs/{file?}', [DocsController::class, 'show'])
@@ -136,7 +135,6 @@ Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])
 //    return 'Event dispatched!';
 // });
 
-
 Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read_all');
 Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 Route::resource('/admin/tags', TagController::class)->only(['store', 'update', 'destroy']);
@@ -197,5 +195,3 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/posts/{id}', [AdminController::class, 'getPost'])->name('posts.get');
     Route::get('/assignment-data', [AdminController::class, 'getAssignmentData'])->name('assignment-data');
 });
-
-

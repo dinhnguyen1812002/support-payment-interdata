@@ -542,7 +542,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                     <TableCell>
                       {ticket.department ? (
                         <div className="flex items-center gap-1">
-                          <Building className="h-3 w-3" />
+                          {/* <Building className="h-3 w-3" /> */}
                           <span className="text-sm">{ticket.department.name}</span>
                         </div>
                       ) : (

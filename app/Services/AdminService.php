@@ -14,52 +14,51 @@ class AdminService
     public function getDashboardData(User $currentUser)
     {
         // return Cache::remember('admin_dashboard_ '.$currentUser->id, now()->addMinutes(30), function () use ($currentUser) {
-           
+
         // });
-         return [
-                'posts' => $this->getTopPosts(),
-                'totalUsers' => $this->getTotalUsers(),
-                'totalPosts' => $this->getTotalPosts(),
-                'user' => [
-                    'name' => $currentUser->name,
-                    'email' => $currentUser->email,
-                    'profile_photo_path' => $currentUser->profile_photo_path,
-                ],
-            ];
+        return [
+            'posts' => $this->getTopPosts(),
+            'totalUsers' => $this->getTotalUsers(),
+            'totalPosts' => $this->getTotalPosts(),
+            'user' => [
+                'name' => $currentUser->name,
+                'email' => $currentUser->email,
+                'profile_photo_path' => $currentUser->profile_photo_path,
+            ],
+        ];
 
     }
 
     public function getTopPosts(): array
     {
         return Post::with([
-            'user:id,name,profile_photo_path,email', 
+            'user:id,name,profile_photo_path,email',
             'categories:id,title',
             'assignee:id,name,profile_photo_path,email',
-            'department:id,name'
+            'department:id,name',
         ])
-        ->withCount(['upvotes', 'comments'])
-        ->orderBy('created_at', 'desc')
-        ->limit(10)
-        ->get()
-        ->map(function ($post) {
-            return [
-                'id' => $post->id,
-                'title' => $post->title,
-                'slug' => $post->slug,
-                'status' => $post->status,
-                'priority' => $post->priority,
-                'created_at' => $post->created_at->format('d/m/Y'),
-                'user' => $post->user,
-                'categories' => $post->categories,
-                'upvotes_count' => $post->upvotes_count,
-                'comments_count' => $post->comments_count,
-                'assignee' => $post->assignee,
-                'department' => $post->department
-            ];
-        })
-        ->toArray(); // Add this to convert the Collection to an array
+            ->withCount(['upvotes', 'comments'])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(function ($post) {
+                return [
+                    'id' => $post->id,
+                    'title' => $post->title,
+                    'slug' => $post->slug,
+                    'status' => $post->status,
+                    'priority' => $post->priority,
+                    'created_at' => $post->created_at->format('d/m/Y'),
+                    'user' => $post->user,
+                    'categories' => $post->categories,
+                    'upvotes_count' => $post->upvotes_count,
+                    'comments_count' => $post->comments_count,
+                    'assignee' => $post->assignee,
+                    'department' => $post->department,
+                ];
+            })
+            ->toArray(); // Add this to convert the Collection to an array
     }
-
 
     private function getTotalUsers(): int
     {
@@ -75,23 +74,23 @@ class AdminService
     {
         $startTime = microtime(true);
         $requestId = uniqid('req_');
-        
+
         try {
             // Log the request for debugging
-            \Log::info("Post listing request started", [
+            \Log::info('Post listing request started', [
                 'request_id' => $requestId,
                 'user_id' => auth()->id(),
                 'url' => $request->fullUrl(),
-                'per_page' => $perPage
+                'per_page' => $perPage,
             ]);
-            
+
             // Use configuration values
             $lockEnabled = config('pagination.lock.enabled', true);
             $lockTimeout = config('pagination.lock.timeout', 10);
             $waitTimeout = config('pagination.lock.wait_timeout', 5);
             $cacheEnabled = config('pagination.cache.enabled', true);
 
-            if (!$lockEnabled) {
+            if (! $lockEnabled) {
                 return $this->fetchPostsData($request, $perPage, $startTime, false, $requestId);
             }
 
@@ -118,9 +117,9 @@ class AdminService
                 'user_id' => auth()->id(),
                 'url' => $request->fullUrl(),
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            
+
             // Return empty data structure with error flag
             return [
                 'data' => [],
@@ -131,10 +130,10 @@ class AdminService
                     'total' => 0,
                     'from' => 0,
                     'to' => 0,
-                    'links' => []
+                    'links' => [],
                 ],
                 'filters' => $this->getCurrentFilters($request),
-                'error' => 'An error occurred while fetching data'
+                'error' => 'An error occurred while fetching data',
             ];
         }
     }
@@ -145,11 +144,11 @@ class AdminService
             $cacheEnabled = config('pagination.cache.enabled', true);
             $cacheTtl = config('pagination.cache.ttl', 300);
 
-            if ($cacheEnabled && !$isTimeout) {
+            if ($cacheEnabled && ! $isTimeout) {
                 $cacheKey = config('pagination.cache.prefix', 'pagination').'_posts_'.md5($request->fullUrl());
 
                 $data = \Cache::remember($cacheKey, $cacheTtl, function () use ($request, $perPage, $requestId) {
-                    \Log::info("Fetching fresh posts data for cache", ['request_id' => $requestId]);
+                    \Log::info('Fetching fresh posts data for cache', ['request_id' => $requestId]);
                     $posts = $this->fetchPaginatedPosts($request, $perPage);
 
                     return [
@@ -159,7 +158,7 @@ class AdminService
                     ];
                 });
             } else {
-                \Log::info("Fetching posts data directly (cache disabled or timeout)", ['request_id' => $requestId]);
+                \Log::info('Fetching posts data directly (cache disabled or timeout)', ['request_id' => $requestId]);
                 $posts = $this->fetchPaginatedPosts($request, $perPage);
 
                 $data = [
@@ -170,17 +169,17 @@ class AdminService
             }
 
             // Validate data structure before returning
-            if (!isset($data['data']) || !is_array($data['data'])) {
-                \Log::warning("Invalid data structure detected", [
+            if (! isset($data['data']) || ! is_array($data['data'])) {
+                \Log::warning('Invalid data structure detected', [
                     'request_id' => $requestId,
-                    'data_keys' => array_keys($data)
+                    'data_keys' => array_keys($data),
                 ]);
                 $data['data'] = [];
             }
 
-            if (!isset($data['pagination']) || !is_array($data['pagination'])) {
-                \Log::warning("Invalid pagination structure detected", [
-                    'request_id' => $requestId
+            if (! isset($data['pagination']) || ! is_array($data['pagination'])) {
+                \Log::warning('Invalid pagination structure detected', [
+                    'request_id' => $requestId,
                 ]);
                 $data['pagination'] = [
                     'current_page' => 1,
@@ -189,24 +188,24 @@ class AdminService
                     'total' => count($data['data'] ?? []),
                     'from' => 1,
                     'to' => count($data['data'] ?? []),
-                    'links' => []
+                    'links' => [],
                 ];
             }
 
-            \Log::info("Posts data fetched successfully", [
+            \Log::info('Posts data fetched successfully', [
                 'request_id' => $requestId,
                 'execution_time' => (microtime(true) - $startTime) * 1000,
-                'record_count' => count($data['data'] ?? [])
+                'record_count' => count($data['data'] ?? []),
             ]);
 
             return $data;
         } catch (\Exception $e) {
-            \Log::error("Exception in fetchPostsData", [
+            \Log::error('Exception in fetchPostsData', [
                 'request_id' => $requestId,
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
-            
+
             throw $e;
         }
     }
@@ -214,12 +213,12 @@ class AdminService
     private function fetchPaginatedPosts(Request $request, int $perPage): LengthAwarePaginator
     {
         $query = Post::with([
-            'user:id,name,profile_photo_path,email', 
+            'user:id,name,profile_photo_path,email',
             'categories:id,title',
             'assignee:id,name,profile_photo_path,email',
-            'department:id,name'
+            'department:id,name',
         ])
-        ->withCount(['upvotes', 'comments']);
+            ->withCount(['upvotes', 'comments']);
 
         // Apply search filter
         if ($request->filled('search')) {
@@ -296,7 +295,7 @@ class AdminService
                 'upvotes_count' => $post->upvotes_count,
                 'comments_count' => $post->comments_count,
                 'assignee' => $post->assignee,
-                'department' => $post->department
+                'department' => $post->department,
             ];
         })->toArray();
     }
@@ -333,10 +332,10 @@ class AdminService
                 'links' => $this->generatePaginationLinks($paginator),
             ];
         } catch (\Exception $e) {
-            \Log::error("Error formatting pagination", [
-                'message' => $e->getMessage()
+            \Log::error('Error formatting pagination', [
+                'message' => $e->getMessage(),
             ]);
-            
+
             // Return a safe default structure
             return [
                 'current_page' => 1,
@@ -432,12 +431,3 @@ class AdminService
         ];
     }
 }
-
-
-
-
-
-
-
-
-

@@ -207,7 +207,7 @@ class Post extends Model
                 'user.departments:id,name',
                 'allReplies.user:id,name,profile_photo_path',
                 'allReplies.user.roles:id,name',
-                'allReplies.user.departments:id,name'
+                'allReplies.user.departments:id,name',
             ])
             ->latest()
             ->get()
@@ -432,6 +432,3 @@ class Post extends Model
         return $this->automation_applied ?? [];
     }
 }
-
-
-

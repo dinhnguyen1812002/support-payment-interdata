@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
+import useTypedPage from '@/Hooks/useTypedPage';
 
 import { Button } from '@/Components/ui/button';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
@@ -88,6 +89,8 @@ interface TicketDetailProps {
 export default function TicketDetail({ ticket: initialTicket }: TicketDetailProps) {
   const [ticket, setTicket] = useState<Ticket>(initialTicket);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const page = useTypedPage();
+  const currentUser = page.props.auth?.user;
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -161,7 +164,7 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
           </Button>
         </div>
         <div className="py-6">
-          <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+          <div className="container mx-auto sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
@@ -169,6 +172,12 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
                 <TicketResponseForm
                   ticket={ticket}
                   onCommentAdded={handleCommentAdded}
+                  currentUser={currentUser ? {
+                    id: currentUser.id,
+                    name: currentUser.name,
+                    email: currentUser.email,
+                    profile_photo_path: currentUser.profile_photo_path || undefined
+                  } : undefined}
                 />
               </div>
 
@@ -264,7 +273,7 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
                           <span className="text-sm font-medium text-muted-foreground block mb-2">Assigned to</span>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={ticket.assignee.profile_photo_path || ''} />
+                              <AvatarImage src={`/storage/${ ticket.assignee.profile_photo_path || ''}`} />
                               <AvatarFallback>
                                 {ticket.assignee.name.charAt(0).toUpperCase()}
                               </AvatarFallback>
