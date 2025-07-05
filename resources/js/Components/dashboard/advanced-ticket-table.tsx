@@ -49,7 +49,7 @@ import {
 } from 'lucide-react';
 import { Link, router } from '@inertiajs/react';
 import { StatusUpdateDropdown } from './status-update-dropdown';
-import { formatDistanceToNow } from 'date-fns';
+
 
 interface Post {
   id: number;
@@ -60,13 +60,13 @@ interface Post {
   user: {
     name: string;
     email: string;
-    profile_photo_path: string | null;
+    profile_photo_url: string | null;
   };
   assignee?: {
     id: number;
     name: string;
     email: string;
-    profile_photo_path: string | null;
+    profile_photo_url: string | null;
   };
   department?: {
     id: number;
@@ -381,7 +381,8 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                     onClick={() => handleBulkAssign(assignee.id)}
                   >
                     <Avatar className="h-6 w-6 mr-2">
-                      <AvatarImage src={assignee.profile_photo_path || ''} />
+                      {/* <AvatarImage src={'/storage/$} alt={assignee.name} /> */}
+                      <AvatarImage src={ assignee.profile_photo_url  || ''} />
                       <AvatarFallback>{assignee.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     {assignee.name}
@@ -530,7 +531,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                       {ticket.assignee ? (
                         <div className="flex items-center gap-2">
                           <Avatar className="h-6 w-6">
-                            <AvatarImage src={ticket.assignee.profile_photo_path || ''} />
+                            <AvatarImage src={ticket.assignee.profile_photo_url || ''} />
                             <AvatarFallback>{ticket.assignee.name.charAt(0)}</AvatarFallback>
                           </Avatar>
                           <span className="text-sm">{ticket.assignee.name}</span>

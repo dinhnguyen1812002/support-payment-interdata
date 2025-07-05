@@ -35,3 +35,4 @@ export interface BlogPost {
   upvotes_count: number;
   tags: Tag[];
 }
+

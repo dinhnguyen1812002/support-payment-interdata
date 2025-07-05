@@ -32,11 +32,13 @@ class TicketBulkOperationsService
                 'reason' => $data['reason'] ?? null,
             ]);
 
-            return [
-                'success' => true,
-                'message' => "{$updated} tickets updated to {$data['priority']} priority successfully",
-                'updated_count' => $updated,
-            ];
+            // return [
+            //     'success' => true,
+            //     'message' => "{$updated} tickets updated to {$data['priority']} priority successfully",
+            //     'updated_count' => $updated,
+            // ];
+            return redirect()->back()->with('success', "{$updated} tickets updated to {$data['priority']} priority successfully");
+
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -46,10 +48,7 @@ class TicketBulkOperationsService
                 'priority' => $data['priority'],
             ]);
 
-            return [
-                'success' => false,
-                'message' => 'Failed to update ticket priorities',
-            ];
+           return redirect()->back()->with('error', 'Failed to update ticket priorities');
         }
     }
 

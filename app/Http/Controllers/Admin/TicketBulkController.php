@@ -94,8 +94,7 @@ class TicketBulkController extends Controller
      */
     public function bulkPriority(Request $request)
     {
-        $this->authorize('manage tickets');
-
+    
         $validated = $request->validate([
             'ticket_ids' => 'required|array|min:1',
             'ticket_ids.*' => 'exists:posts,id',

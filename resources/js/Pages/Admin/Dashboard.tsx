@@ -15,37 +15,40 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import { AlertTriangle, Clock, CheckCircle, Users, TrendingUp, Activity } from 'lucide-react';
-import { QuickActions } from '@/Components/dashboard/quick-actions';
+// import { QuickActions } from '@/Components/dashboard/quick-actions';
 import { RecentActivity } from '@/Components/dashboard/recent-activity';
 import { TicketAnalytics } from '@/Components/dashboard/ticket-analytics';
+import { Ticket } from '@/types/ticket';
 
 interface User {
   name: string;
   email: string;
-  profile_photo_path: string | null;
+  profile_photo_url: string | null;
 }
 
 interface Post {
   id: number;
   title: string;
-  slug: string;
-  is_published: boolean;
-  vote: string;
-  comment: number;
-  user: User;
-  priority: string;
   status: string;
+  priority: string;
   created_at: string;
+  user: {
+    name: string;
+    email: string;
+    profile_photo_url: string | null;
+  };
   assignee?: {
     id: number;
     name: string;
     email: string;
-    profile_photo_path: string | null;
+    profile_photo_url: string | null;
   };
   department?: {
     id: number;
     name: string;
   };
+  comment?: number;
+  priority_score?: number;
 }
 
 interface AutomationStats {

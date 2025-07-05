@@ -36,6 +36,7 @@ import {
   SidebarMenuItem,
 } from '@/Components/ui/sidebar';
 import { route } from 'ziggy-js';
+import { NavProjects } from './nav-projects';
 
 const data = {
   user: {
@@ -43,13 +44,19 @@ const data = {
     email: 'm@example.com',
     avatar: '/avatars/shadcn.jpg',
   },
-  
+
+  dashboard :{
+    title: 'Dashboard',
+    url: '/admin/dashboard',
+    icon: LayoutDashboardIcon,
+    isActive: true,
+  },
   navMain: [
     {
       title: 'Dashboard',
-      url: '/admin/',
+      url: '/admin/dashboard',
       icon: LayoutDashboardIcon,
-      isActive: true,
+
     },
     {
       title: 'Content Management',
@@ -143,7 +150,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <a href="/">
+              <a href="/admin/dashboard">
                 <ArrowUpCircleIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">Support payment</span>
               </a>
@@ -152,9 +159,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        <NavProjects items={data.dashboard} />
         <NavMain items={data.navMain} />
-        {/*<NavDocuments items={data.documents} />*/}
-        {/*<NavSecondary items={data.navSecondary} className="mt-auto" />*/}
+        
+        {/* <NavDocuments items={data.user} /> */}
+         {/* <NavMain items={data.dashboard} /> */}
+        {/* <NavSecondary items={data.navMain} className="mt-auto" /> */}
+
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
