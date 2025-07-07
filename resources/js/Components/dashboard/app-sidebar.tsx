@@ -37,6 +37,7 @@ import {
 } from '@/Components/ui/sidebar';
 import { route } from 'ziggy-js';
 import { NavProjects } from './nav-projects';
+import { itemsEqual } from '@dnd-kit/sortable/dist/utilities';
 
 const data = {
   user: {
@@ -45,21 +46,41 @@ const data = {
     avatar: '/avatars/shadcn.jpg',
   },
 
-  dashboard :{
-    title: 'Dashboard',
-    url: '/admin/dashboard',
-    icon: LayoutDashboardIcon,
-    isActive: true,
-  },
-  navMain: [
+  dashboard: [
     {
-      title: 'Dashboard',
-      url: '/admin/dashboard',
+      name: 'Dashboard',
+      url: '/admin',
       icon: LayoutDashboardIcon,
+    }
+  ],
 
+  // Single navigation items (không dropdown)
+  singleNavItems: [
+    {
+      title: 'Reports',
+      url: '/admin/reports',
+      icon: BarChartIcon,
     },
     {
-      title: 'Content Management',
+      title: 'Settings',
+      url: '/admin/settings',
+      icon: SettingsIcon,
+    },
+  ],
+  navMain: [
+    // {
+    //   title: 'Dashboard',
+    //   url: '/admin/',
+    //   icon: LayoutDashboardIcon,
+    //   items: [
+    //     {
+    //       title: 'Home',
+    //       url: '/admin',
+    //     },
+    //   ]
+    // },
+    {
+      title: 'Ticket',
       url: '#',
       icon: FileTextIcon,
       items: [
@@ -82,7 +103,7 @@ const data = {
       ],
     },
     {
-      title: 'User Management',
+      title: 'User',
       url: '#',
       icon: ContactRound,
       items: [
@@ -150,7 +171,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <a href="/admin/dashboard">
+              <a href="/admin">
                 <ArrowUpCircleIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">Support payment</span>
               </a>
@@ -161,11 +182,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavProjects items={data.dashboard} />
         <NavMain items={data.navMain} />
-        
-        {/* <NavDocuments items={data.user} /> */}
-         {/* <NavMain items={data.dashboard} /> */}
-        {/* <NavSecondary items={data.navMain} className="mt-auto" /> */}
-
+        <NavSecondary items={data.singleNavItems} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

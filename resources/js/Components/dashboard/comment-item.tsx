@@ -80,7 +80,7 @@ interface CommentItemProps {
               )}
             </span>
             {comment.is_hr_response && (
-              <Badge className="bg-blue-50 text-blue-700 border-blue-200">HR Staff</Badge>
+              <Badge className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-50">HR Staff</Badge>
             )}
             {depth > 0 && (
               <Badge variant="outline" className="text-xs">Reply</Badge>

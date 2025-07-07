@@ -44,7 +44,10 @@ const stripHtml = (html: string): string => {
 
 const formatDate = (dateString: string): string => {
   try {
-    return format(new Date(dateString), 'MM/dd/yyyy');
+    if (!dateString) return 'Invalid date';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Invalid date';
+    return format(date, 'MM/dd/yyyy');
   } catch {
     return 'Invalid date';
   }

@@ -8,10 +8,21 @@ export interface Post {
   content: string;
   created_at: string;
   is_published: boolean;
+  status?: string;
+  priority?: string;
   user: {
     id: number;
     name: string;
     profile_photo_path: string;
+  };
+  assignee?: {
+    id: number;
+    name: string;
+    profile_photo_path?: string;
+  };
+  department?: {
+    id: number;
+    name: string;
   };
   categories: Category[];
   tags: Tag[];

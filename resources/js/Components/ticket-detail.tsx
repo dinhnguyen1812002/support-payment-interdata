@@ -186,13 +186,23 @@ const TicketDetail: React.FC<TicketDetailProps> = ({
                 {ticket.user.name}
               </span>
               <span className="text-xs text-muted-foreground">
-                {new Date(ticket.created_at).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {(() => {
+                  try {
+                    const date = new Date(ticket.created_at);
+                    if (isNaN(date.getTime())) {
+                      return 'Invalid date';
+                    }
+                    return date.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    });
+                  } catch (error) {
+                    return 'Invalid date';
+                  }
+                })()}
               </span>
             </div>
           </div>

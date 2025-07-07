@@ -97,11 +97,24 @@ export function TicketAnalytics({ posts, automationStats }: TicketAnalyticsProps
     }).reverse();
 
     const dailyData = last7Days.map(date => {
-      const count = posts.filter(post => 
-        post.created_at.split('T')[0] === date
-      ).length;
+      const count = posts.filter(post => {
+        try {
+          return post.created_at && post.created_at.split('T')[0] === date;
+        } catch {
+          return false;
+        }
+      }).length;
+
+      let formattedDate;
+      try {
+        const dateObj = new Date(date);
+        formattedDate = isNaN(dateObj.getTime()) ? 'Invalid' : dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+      } catch {
+        formattedDate = 'Invalid';
+      }
+
       return {
-        date: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),
+        date: formattedDate,
         tickets: count
       };
     });

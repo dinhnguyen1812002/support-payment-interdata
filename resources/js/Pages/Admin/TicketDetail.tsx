@@ -218,9 +218,31 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-muted-foreground">Created</span>
                       <div className="text-sm text-right">
-                        <div>{new Date(ticket.created_at).toLocaleDateString('vi-VN')}</div>
+                        <div>
+                          {(() => {
+                            try {
+                              const date = new Date(ticket.created_at);
+                              if (isNaN(date.getTime())) {
+                                return 'Invalid date';
+                              }
+                              return date.toLocaleDateString('vi-VN');
+                            } catch (error) {
+                              return 'Invalid date';
+                            }
+                          })()}
+                        </div>
                         <div className="text-xs text-muted-foreground">
-                          {new Date(ticket.created_at).toLocaleTimeString('vi-VN')}
+                          {(() => {
+                            try {
+                              const date = new Date(ticket.created_at);
+                              if (isNaN(date.getTime())) {
+                                return 'Invalid time';
+                              }
+                              return date.toLocaleTimeString('vi-VN');
+                            } catch (error) {
+                              return 'Invalid time';
+                            }
+                          })()}
                         </div>
                       </div>
                     </div>

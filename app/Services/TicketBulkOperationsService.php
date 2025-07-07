@@ -12,7 +12,7 @@ class TicketBulkOperationsService
     /**
      * Bulk update ticket priority
      */
-    public function bulkUpdatePriority(array $data): array
+    public function bulkUpdatePriority(array $data)
     {
         try {
             DB::beginTransaction();

@@ -18,6 +18,7 @@ import { Button } from '@/Components/ui/button';
 import { toast } from '@/Hooks/use-toast';
 import { ChevronDown, Globe, Lock, Loader2 } from 'lucide-react';
 import { route } from 'ziggy-js';
+import { assign } from 'lodash';
 
 interface PostContentProps {
   post: {
@@ -32,6 +33,7 @@ interface PostContentProps {
     upvote_count: number;
     has_upvote: boolean;
     next_page_url: string | null;
+   
   };
   comments: Comment[];
   currentUser: { id: number; name: string; profile_photo_path: string } | null;

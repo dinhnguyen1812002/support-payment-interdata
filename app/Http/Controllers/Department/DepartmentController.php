@@ -103,10 +103,9 @@ class DepartmentController extends Controller
         // Get notifications for the current user
         $notifications = auth()->user()->unreadNotifications;
 
-        // Get posts related to notifications
-        $postIds = collect($notifications)->pluck('data.post_id')->filter()->unique()->values()->toArray();
-        $posts = Post::whereIn('id', $postIds)
-            ->with(['user', 'categories', 'tags'])
+        // Get all tickets/posts belonging to this department
+        $posts = Post::where('department_id', $department->id)
+            ->with(['user', 'categories', 'tags', 'assignee', 'department'])
             ->withCount('upvotes')
             ->withCount('comments')
             ->orderBy('created_at', 'desc')
@@ -119,15 +118,20 @@ class DepartmentController extends Controller
                     'id' => $post->id,
                     'title' => $post->title,
                     'content' => $post->content,
+                    'status' => $post->status,
+                    'priority' => $post->priority,
                     'created_at' => $post->created_at->diffForHumans(),
                     'updated_at' => $post->updated_at,
                     'published_at' => $post->published_at,
                     'user' => $post->user,
+                    'assignee' => $post->assignee,
+                    'department' => $post->department,
                     'categories' => $post->categories,
                     'tags' => $post->tags,
                     'comments' => $comments,
                     'upvote_count' => $post->upvotes_count,
                     'has_upvote' => $hasUpvoted,
+                    'product_name' => $post->product_name,
                 ];
             });
 
