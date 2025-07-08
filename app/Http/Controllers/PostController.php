@@ -21,12 +21,19 @@ class PostController extends Controller
         $this->postService = $postService;
     }
 
-    public function index(Request $request): \Inertia\Response
+    public function index(): \Inertia\Response
     {
-        $data = $this->postService->getPostsForIndex($request);
+       
 
-        return Inertia::render('Posts/Index', $data);
+        return Inertia::render('Dashboard');
     }
+
+    // public function index(Request $request): \Inertia\Response
+    // {
+    //     $data = $this->postService->getPostsForIndex($request);
+
+    //     return Inertia::render('Posts/Index', $data);
+    // }
 
     public function create(): \Inertia\Response
     {

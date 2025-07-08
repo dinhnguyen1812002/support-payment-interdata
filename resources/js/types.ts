@@ -124,6 +124,7 @@ export interface Category {
   title: string;
   slug: string;
   description: string;
+  logo?: string;
   posts_count?: number;
 }
 export interface Tag {

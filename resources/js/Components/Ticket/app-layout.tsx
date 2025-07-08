@@ -21,6 +21,7 @@ import { Department, Notification } from '@/types';
 import type { Post } from '@/types/Post';
 import AppSidebar from '@/Components/Ticket/sidebar-nav';
 import NotificationsDropdown from '@/Components/notification/Notifications';
+import { NavigationProgress } from '@/Components/ui/navigation-progress';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -42,6 +43,7 @@ export function AppLayout({
 
   return (
     <SidebarProvider>
+      <NavigationProgress />
       <AppSidebar
         id={department?.id}
         name={department.name}

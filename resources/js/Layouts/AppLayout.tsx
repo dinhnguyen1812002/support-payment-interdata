@@ -91,6 +91,7 @@ export default function AppLayout({
   const handleCategoryClick = () => {
     setOpen(true);
   };
+  
   function logout(e: React.FormEvent) {
     e.preventDefault();
     router.post(route('logout'));

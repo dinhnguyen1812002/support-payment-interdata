@@ -85,6 +85,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/admin/create-category', [CategoryController::class, 'store'])->name('admin.categories.store');
     Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
     Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+    Route::delete('/admin/categories/{category}/remove-logo', [CategoryController::class, 'removeLogo'])->name('admin.categories.remove-logo');
     Route::get('/admin/tags', [AdminController::class, 'getAllTags'])->name('admin.tags');
     Route::get('/admin/roles-permissions', [AdminController::class, 'getAllRolesAndPermissions'])->name('admin.roles-permissions');
 

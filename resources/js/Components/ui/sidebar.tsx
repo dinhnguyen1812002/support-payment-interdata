@@ -4,6 +4,7 @@ import { VariantProps, cva } from 'class-variance-authority';
 import { PanelLeft } from 'lucide-react';
 
 import { useIsMobile } from '@/Hooks/use-mobile';
+import { useSidebarState } from '@/Hooks/use-sidebar-state';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -72,25 +73,33 @@ const SidebarProvider = React.forwardRef<
     ref,
   ) => {
     const isMobile = useIsMobile();
-    const [openMobile, setOpenMobile] = React.useState(false);
+    const sidebarState = useSidebarState(defaultOpen);
 
-    // This is the internal state of the sidebar.
-    // We use openProp and setOpenProp for control from outside the component.
-    const [_open, _setOpen] = React.useState(defaultOpen);
-    const open = openProp ?? _open;
+    // Use external control if provided, otherwise use internal state
+    const open = openProp ?? sidebarState.isOpen;
+    const openMobile = sidebarState.isMobileOpen;
+
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
         const openState = typeof value === 'function' ? value(open) : value;
         if (setOpenProp) {
           setOpenProp(openState);
         } else {
-          _setOpen(openState);
+          sidebarState.setOpen(openState);
         }
 
-        // This sets the cookie to keep the sidebar state.
+        // Keep the cookie for backward compatibility
         document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
       },
-      [setOpenProp, open],
+      [setOpenProp, open, sidebarState],
+    );
+
+    const setOpenMobile = React.useCallback(
+      (value: boolean | ((value: boolean) => boolean)) => {
+        const openState = typeof value === 'function' ? value(openMobile) : value;
+        sidebarState.setMobileOpen(openState);
+      },
+      [openMobile, sidebarState],
     );
 
     // Helper to toggle the sidebar.

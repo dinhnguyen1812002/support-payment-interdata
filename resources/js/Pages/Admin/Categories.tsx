@@ -253,7 +253,7 @@ export default function Categories() {
       <ChevronRight className="ml-1 h-4 w-4 -rotate-90" />
     );
   };
-
+console.log(data);
   return (
     <SidebarProvider>
       <Head title={'Categories'} />

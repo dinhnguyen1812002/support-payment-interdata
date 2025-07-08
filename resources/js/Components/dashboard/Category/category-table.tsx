@@ -22,6 +22,7 @@ import {
   FolderOpen,
   Pencil,
   Trash,
+  Image as ImageIcon,
 } from 'lucide-react';
 import type { Category, Paginate } from '@/types';
 
@@ -60,6 +61,7 @@ export default function CategoryTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableHead>Logo</TableHead>
               <TableHead
                 className="cursor-pointer"
                 onClick={() => handleSort('title')}
@@ -120,6 +122,21 @@ export default function CategoryTable({
             ) : data.length > 0 ? (
               data.map(category => (
                 <TableRow key={category.id} className="group">
+                  <TableCell>
+                    <div className="flex items-center justify-center">
+                      {category.logo ? (
+                        <img
+                          src={category.logo}
+                          alt={`${category.title} logo`}
+                          className="w-8 h-8 object-cover rounded-md border"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-muted rounded-md flex items-center justify-center">
+                          <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       <span>{category.title}</span>

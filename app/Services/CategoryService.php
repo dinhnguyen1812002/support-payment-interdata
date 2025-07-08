@@ -26,8 +26,9 @@ class CategoryService
         $cacheDuration = now()->addMinutes(5);
 
         return Cache::remember($cacheKey, $cacheDuration, function () use ($request, $perPage) {
-            $query = Category::select(['id', 'title', 'slug', 'description'])
-                ->withCount('posts');
+            $query = Category::select(['id', 'title', 'slug', 'description', 'logo'])
+                ->withCount('posts')
+                ->latest();
 
             // Apply search filter if provided
             if ($request->has('search')) {
@@ -57,6 +58,7 @@ class CategoryService
                 'title' => $category->title,
                 'slug' => $category->slug,
                 'description' => $category->description,
+                'logo' => $category->logo_url,
                 'posts_count' => $category->posts_count,
             ];
         })->values()->all();

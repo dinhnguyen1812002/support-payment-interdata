@@ -15,7 +15,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/Components/ui/dialog"
-import {X} from "lucide-react"
+import {X, Upload} from "lucide-react"
 
 // Define the validation schema
 const formSchema = z.object({
@@ -44,6 +44,9 @@ const formSchema = z.object({
             message: "Description must not exceed 500 characters.",
         })
         .optional(),
+    logo: z
+        .any()
+        .optional(),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -56,6 +59,7 @@ interface CategoryFormProps {
         title?: string
         slug?: string
         description?: string
+        logo?: string
     },
     isEditing?: boolean,
     onSuccess?: () => void,
@@ -71,12 +75,16 @@ export default function CategoryDialogForm({
                                                isStandalone
                                            }: CategoryFormProps) {
 
+    const [logoFile, setLogoFile] = React.useState<File | null>(null)
+    const [logoPreview, setLogoPreview] = React.useState<string | null>(initialData?.logo || null)
+
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             title: initialData?.title || "",
             slug: initialData?.slug || "",
             description: initialData?.description || "",
+            logo: undefined,
         },
     })
 
@@ -87,15 +95,50 @@ export default function CategoryDialogForm({
                 title: initialData?.title || "",
                 slug: initialData?.slug || "",
                 description: initialData?.description || "",
+                logo: undefined,
             })
+            setLogoPreview(initialData?.logo || null)
+            setLogoFile(null)
         }
     }, [form, initialData, open])
 
+    // Handle logo file change
+    const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (file) {
+            setLogoFile(file)
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                setLogoPreview(e.target?.result as string)
+            }
+            reader.readAsDataURL(file)
+            form.setValue('logo', file)
+        }
+    }
+
+    // Handle logo removal
+    const handleLogoRemove = () => {
+        setLogoFile(null)
+        setLogoPreview(null)
+        form.setValue('logo', undefined)
+    }
+
     // Handle form submission
     const onSubmit = (values: FormValues) => {
+        const formData = new FormData()
+        formData.append('title', values.title)
+        formData.append('slug', values.slug)
+        if (values.description) {
+            formData.append('description', values.description)
+        }
+        if (logoFile) {
+            formData.append('logo', logoFile)
+        }
+
         if (isEditing && initialData?.id) {
             // If editing, use PUT request
-            Inertia.put(`/admin/categories/${initialData.id}`, values, {
+            formData.append('_method', 'PUT')
+            Inertia.post(`/admin/categories/${initialData.id}`, formData, {
                 onSuccess: () => {
                     onOpenChange(false)
                     if (onSuccess) onSuccess()
@@ -103,7 +146,7 @@ export default function CategoryDialogForm({
             })
         } else {
             // If creating new, use POST request
-            Inertia.post("/admin/create-category", values, {
+            Inertia.post("/admin/create-category", formData, {
                 onSuccess: () => {
                     onOpenChange(false)
                     if (onSuccess) onSuccess()
@@ -204,6 +247,60 @@ export default function CategoryDialogForm({
                             )}
                         />
 
+                        <FormField
+                            control={form.control}
+                            name="logo"
+                            render={() => (
+                                <FormItem>
+                                    <FormLabel>Logo</FormLabel>
+                                    <FormControl>
+                                        <div className="space-y-4">
+                                            {logoPreview ? (
+                                                <div className="relative inline-block">
+                                                    <img
+                                                        src={logoPreview}
+                                                        alt="Logo preview"
+                                                        className="w-32 h-32 object-cover rounded-lg border"
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                                                        onClick={handleLogoRemove}
+                                                    >
+                                                        <X className="h-3 w-3" />
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                                                    <div className="mt-2">
+                                                        <label htmlFor="logo-upload" className="cursor-pointer">
+                                                            <span className="text-sm font-medium text-blue-600 hover:text-blue-500">
+                                                                Upload a logo
+                                                            </span>
+                                                            <input
+                                                                id="logo-upload"
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="sr-only"
+                                                                onChange={handleLogoChange}
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                    <p className="text-xs text-gray-500 mt-1">
+                                                        PNG, JPG, GIF up to 10MB
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </FormControl>
+                                    <FormDescription>Upload a logo for this category (optional).</FormDescription>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
                         <DialogFooter className="mt-6">
                             <Button type="button" variant="outline" onClick={handleDialogClose}>
                                 Cancel

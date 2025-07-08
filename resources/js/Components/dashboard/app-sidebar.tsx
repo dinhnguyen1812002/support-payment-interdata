@@ -38,6 +38,7 @@ import {
 import { route } from 'ziggy-js';
 import { NavProjects } from './nav-projects';
 import { itemsEqual } from '@dnd-kit/sortable/dist/utilities';
+import { Link } from '@inertiajs/react';
 
 const data = {
   user: {
@@ -171,10 +172,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <a href="/admin">
+              <Link href="/admin">
                 <ArrowUpCircleIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">Support payment</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

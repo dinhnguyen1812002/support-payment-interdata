@@ -3,6 +3,7 @@ import { SidebarInset, SidebarProvider } from '@/Components/ui/sidebar';
 import { PageProps } from '@inertiajs/core';
 import React, { useState, useEffect } from 'react';
 import { SiteHeader } from '@/Components/dashboard/site-header';
+import { NavigationProgress } from '@/Components/ui/navigation-progress';
 import { SectionCards } from '@/Components/dashboard/section-cards';
 
 import { Head } from '@inertiajs/react';
@@ -110,6 +111,7 @@ export default function Page({
   return (
     <SidebarProvider>
       <Head title={'Support Dashboard'} />
+      <NavigationProgress />
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title={'Support Dashboard'} />
@@ -149,10 +151,7 @@ export default function Page({
                       posts={posts}
                       refreshKey={refreshKey}
                       onRefresh={() => setRefreshKey(prev => prev + 1)}
-              />
-
-              {/* Main Dashboard Content */}
-              
+              />              
             </div>
           </div>
         </div>

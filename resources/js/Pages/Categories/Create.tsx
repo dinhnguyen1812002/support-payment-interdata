@@ -1,11 +1,15 @@
 import React from "react";
-import CategoryDialogForm from "@/Pages/Categories/category-form";
+import { Head } from "@inertiajs/react";
+import { CategoryForm } from "@/Components/forms/category-form";
+import AppLayout from "@/Layouts/AppLayout";
 
 export default function Create() {
     return (
-        <div className="container mx-auto py-10">
-            <h1 className="text-3xl font-bold mb-6">Create Category</h1>
-            {/*<CategoryDialogForm isStandalone={true} redirectUrl="/categories" />*/}
-        </div>
+        <AppLayout title="Create Category" canLogin={false} canRegister={false} notifications={[]}>
+            <Head title="Create Category" />
+            <div className="container mx-auto py-10">
+                <CategoryForm mode="create" />
+            </div>
+        </AppLayout>
     )
 }

@@ -367,7 +367,7 @@ console.log(localPosts);
             )}
 
             {selectedPost ? (
-              <ScrollArea className="h-min-screen">  
+              <ScrollArea className="h-[calc(100vh-100px)]">  
                 <PostContent
                   post={selectedPost}
                   comments={selectedPost.comments || []}
