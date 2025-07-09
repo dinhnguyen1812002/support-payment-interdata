@@ -125,7 +125,9 @@ export interface Category {
   slug: string;
   description: string;
   logo?: string;
+  logo_url?: string;
   posts_count?: number;
+  
 }
 export interface Tag {
   id: number;

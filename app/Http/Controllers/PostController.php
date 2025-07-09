@@ -9,6 +9,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Category;
 
 class PostController extends Controller
 {
@@ -23,9 +24,12 @@ class PostController extends Controller
 
     public function index(): \Inertia\Response
     {
-       
+        // Fetch categories with posts count and logo URL
+        $categories = Category::withCount('posts')->latest()->get();  
 
-        return Inertia::render('Dashboard');
+        return Inertia::render('Dashboard', [
+            'categories' => $categories,
+        ]);
     }
 
     // public function index(Request $request): \Inertia\Response

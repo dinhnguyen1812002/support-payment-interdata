@@ -10,11 +10,13 @@ import React from "react"
 import AppLayout from "@/Layouts/AppLayout"
 import CategoryTable from "@/Components/dashboard/Category/category-table"
 import CatergorySection from "@/Components/dashboard/Category/CatergorySection"
+import { Category } from "@/types"
 
-export default function Page() {
+
+export default function Page({categories}: {categories: Category[]  }) {
   return (
     <AppLayout title={""} canLogin={false} canRegister={false} notifications={[]}>
-        <CatergorySection />
+        <CatergorySection   categories={categories}/>
     </AppLayout>
   )
 }
