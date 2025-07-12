@@ -15,7 +15,7 @@ import { Category } from "@/types"
 
 export default function Page({categories}: {categories: Category[]  }) {
   return (
-    <AppLayout title={""} canLogin={false} canRegister={false} notifications={[]}>
+    <AppLayout title={"Hệ thống hỗ trợ khách hàng"} canLogin={true} canRegister={true} notifications={[]}>
         <CatergorySection   categories={categories}/>
     </AppLayout>
   )

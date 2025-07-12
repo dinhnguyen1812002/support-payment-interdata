@@ -118,11 +118,10 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
   // const selectedCategoryData = categories.find(c => c.id === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-white
-     dark:bg-[#0F1014] justify-center">
+    <div className="min-h-screen bg-white dark:bg-[#0F1014] justify-center">
       {/* Header */}
       <div className="bg-white dark:bg-[#0F1014] shadow-sm sticky top-0 z-20 border-b border-gray-100 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -165,7 +164,7 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
       </div>
 
       {/* Filters */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-8">
           {/* Search */}
           <div className="relative flex-1 max-w-md flex">
@@ -188,7 +187,7 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
           
           
           {/* Priority Filter */}
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-gray-400 dark:text-gray-500" />
             <select
               value={priorityFilter}
@@ -201,7 +200,7 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
         </div>
 
         {/* Category Grid */}

@@ -131,7 +131,7 @@ export default function AppLayout({
               </div>
 
               {/* Logo */}
-              <Link href={route('/')} className="flex items-center ml-12">
+              <Link href={route('/')} className="flex items-center ml-2">
                 <p
                   className="text-xl sm:text-2xl md:text-3xl font-extrabold
                     bg-clip-text
