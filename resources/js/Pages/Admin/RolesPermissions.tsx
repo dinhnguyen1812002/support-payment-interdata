@@ -437,12 +437,12 @@ export default function RolesPermissions({
                           Manage system permissions
                         </CardDescription>
                       </div>
-                      <Button
+                      {/* <Button
                         onClick={handleAddPermission}
                         className="flex items-center gap-2"
                       >
                         <Plus className="h-4 w-4" /> Add Permission
-                      </Button>
+                      </Button> */}
                     </CardHeader>
                     <CardContent>
                       <Table>

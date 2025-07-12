@@ -135,7 +135,7 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
             </div>
 
             {/* Dark Mode Toggle */}
-            <div className="flex items-center">
+            {/* <div className="flex items-center">
               <button
                 onClick={toggleDarkMode}
                 className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
@@ -147,7 +147,7 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
                   <Moon className="w-5 h-5 text-gray-600" />
                 )}
               </button>
-            </div>
+            </div> */}
 
             {/* {selectedCategory && (
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl px-6 py-4">

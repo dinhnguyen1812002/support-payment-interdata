@@ -149,6 +149,9 @@ export default function AppLayout({
                 <NavLink href={route('/')} active={route().current('/')}>
                   Home
                 </NavLink>
+                 <NavLink href={route('all')} active={route().current('all')}>
+                  Ticket
+                </NavLink>
                 {/*<NavLink*/}
                 {/*  href={route('posts.create')}*/}
                 {/*  active={route().current('posts.create')}*/}

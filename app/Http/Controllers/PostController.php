@@ -32,12 +32,12 @@ class PostController extends Controller
         ]);
     }
 
-    // public function index(Request $request): \Inertia\Response
-    // {
-    //     $data = $this->postService->getPostsForIndex($request);
+    public function getAllTicket(Request $request): \Inertia\Response
+    {
+        $data = $this->postService->getPostsForIndex($request);
 
-    //     return Inertia::render('Posts/Index', $data);
-    // }
+        return Inertia::render('Posts/Index', $data);
+    }
 
     public function create(): \Inertia\Response
     {

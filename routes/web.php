@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
+Route::get('/all', [PostController::class, 'getAllTicket'])->name('all');
 Route::get('/top-voted-posts', [PostController::class, 'getTopVotePosts']);
 
 Route::get('/admin/posts/trash', [PostController::class, 'getTrash'])->name('posts.trash');
