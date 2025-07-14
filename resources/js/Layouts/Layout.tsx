@@ -35,7 +35,7 @@ const MainLayout: React.FC<IndexProps & { category?: Category }> = ({
       canRegister={true}
       notifications={notifications}
     >
-      <div className="max-w-[1400px] mx-auto lg:px-4 dark:bg-[#0F1014]">
+      <div className="max-w-[1450px] mx-auto lg:px-4 dark:bg-[#0F1014]">
         <div className="flex">
           {/* Main Content Area with Search Functionality */}
           <SearchComponent initialSearch={keyword} route="/posts/search">
