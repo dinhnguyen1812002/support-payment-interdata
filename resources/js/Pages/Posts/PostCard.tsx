@@ -10,6 +10,7 @@ import UpvoteButton from '@/Components/VoteButton';
 import { route } from 'ziggy-js';
 import { Button } from '@/Components/ui/button';
 import Pagination from '@/Components/Pagination';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 
 interface BlogCardProps {
   posts: BlogPost[];
@@ -123,15 +124,21 @@ const BlogCard: React.FC<BlogCardProps> = ({
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center py-1">
-                      <Avatar className="flex items-center justify-center rounded-lg h-9 w-9 bg-green-100 dark:bg-green-900 text-2xl font-semibold uppercase dark:text-green-200">
+                      {/* <Avatar className="flex items-center justify-center rounded-lg h-9 w-9 bg-green-100 dark:bg-green-900 text-2xl font-semibold uppercase dark:text-green-200">
                         <AvatarImage
                           src={post.user.profile_photo_url}
                           alt={post.user.name}
                         />
-                        <AvatarFallback>
-                          {post.user.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
+                       
+                      </Avatar> */}
+                      <AvatarWithFallback
+                        src={post.user.profile_photo_url}
+                        name={post.user.name}
+                        alt={post.user.name}
+                        className="h-9 w-9"
+                        variant="identicon"
+                        square={true}
+                      />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-800 dark:text-gray-200">

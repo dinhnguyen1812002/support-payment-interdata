@@ -82,9 +82,7 @@ class UserController extends UserProfileController
                         'id' => $user->id,
                         'name' => $user->name,
                         'email' => $user->email,
-                        'profile_photo_path' => $user->profile_photo_path
-                            ? asset('storage/'.$user->profile_photo_path)
-                            : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&color=7F9CF5&background=EBF4FF',
+                        'profile_photo_path' => $user->profile_photo_path,
                         'created_at' => $user->created_at->toDateTimeString(),
                         'roles' => $user->roles->pluck('name')->toArray(),
                     ];

@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Add alias for easier use
         $middleware->alias([
             'pagination.conflicts' => \App\Http\Middleware\HandlePaginationConflicts::class,
+            'comment.rate.limit' => \App\Http\Middleware\CommentRateLimit::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

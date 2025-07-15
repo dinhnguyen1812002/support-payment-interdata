@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { router, useForm } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
 
@@ -7,10 +7,9 @@ import { CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Switch } from '@/Components/ui/switch';
-import { AlertCircle, Hash, Loader2, X, CircleAlert } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
-import { Badge } from '@/Components/ui/badge';
 import { Category, Notification, Tag } from '@/types';
 
 import SearchComponent from '@/Components/Search';
@@ -24,7 +23,7 @@ import Sidebar from '@/Components/Sidebar';
 import QuillEditor from '@/Components/QuillEditor';
 import ReactQuill from 'react-quill';
 import SearchInput from '@/Components/search-input';
-import SingleTagInput from '@/Components/tag-input';
+import SingleTagInput, { MultiSelectInput } from '@/Components/tag-input';
 import LatestPosts from '@/Pages/Posts/LatestPost';
 
 interface CreatePostProps {
@@ -33,23 +32,8 @@ interface CreatePostProps {
   notifications: Notification[];
   keyword: string;
 }
-interface FormData {
-  title: string;
-  content: string;
-  is_published: boolean;
-  categories: number[];
-  tags: number[];
-}
-
-const CreatePost = (
-  { categories, notifications, keyword, tags }: CreatePostProps,
-  category: Category,
-) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
+const CreatePost = ({ categories, notifications, keyword, tags }: CreatePostProps) => {
   const [selectedTag, setSelectedTag] = React.useState<number | null>(null);
-
-  const [categorySearchFocused, setCategorySearchFocused] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const quillRef = useRef<ReactQuill>(null);
 
   const { data, setData, post, processing, errors, reset } = useForm({
@@ -61,18 +45,8 @@ const CreatePost = (
   });
 
   // Handlers
-  const handleCategorySelect = (categoryId: number) => {
-    if (data.categories.length < 3) {
-      setData('categories', [...data.categories, categoryId]);
-      setSearchTerm('');
-    }
-  };
-
-  const handleCategoryRemove = (categoryId: number) => {
-    setData(
-      'categories',
-      data.categories.filter(id => id !== categoryId),
-    );
+  const handleCategoryChange = (categoryIds: number[]) => {
+    setData('categories', categoryIds);
   };
 
   // Add a handler for tag selection
@@ -91,7 +65,7 @@ const CreatePost = (
       preserveScroll: true,
       onSuccess: () => {
         reset();
-        setDialogOpen(true);
+        // Post created successfully
       },
       onError: errors => {
         console.error('Form submission errors:', errors);
@@ -99,15 +73,7 @@ const CreatePost = (
     });
   };
 
-  const selectedCategories = categories.filter(category =>
-    data.categories.includes(category.id),
-  );
 
-  const filteredCategories = categories.filter(
-    category =>
-      category.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !data.categories.includes(category.id),
-  );
 
   const handleSearch = (value: string) => {
     if (value.trim()) {
@@ -255,7 +221,7 @@ const CreatePost = (
                           </p>
                         )}
                       </div>
-
+                  
                       {/* Categories */}
                       <div className="space-y-2 mt-5">
                         <Label className="text-base flex items-center text-customBlue1 font-bold">
@@ -266,67 +232,26 @@ const CreatePost = (
                                 <span className="text-red-500 mr-1">*</span>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>Choose at least one</p>
+                                <p>Choose at least one (max 3)</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                         </Label>
 
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          {selectedCategories.map(category => (
-                            <Badge
-                              key={category.id}
-                              variant="outline"
-                              className="px-3 py-1.5 text-sm flex items-center gap-1"
-                            >
-                              {category.title}
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleCategoryRemove(category.id)
-                                }
-                                className="ml-1 hover:bg-primary-dark rounded-full p-0.5"
-                              >
-                                <X className="w-3.5 h-3.5" />
-                              </button>
-                            </Badge>
-                          ))}
-                        </div>
+                        <MultiSelectInput
+                          options={categories}
+                          selectedItems={data.categories}
+                          setSelectedItems={handleCategoryChange}
+                          placeholder="Search and select categories..."
+                          maxItems={3}
+                        />
 
-                        <div className="relative">
-                          <Input
-                            placeholder="Search categories..."
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                            onFocus={() => setCategorySearchFocused(true)}
-                            onBlur={() =>
-                              setTimeout(
-                                () => setCategorySearchFocused(false),
-                                200,
-                              )
-                            }
-                            className="h-12"
-                            disabled={data.categories.length >= 3}
-                          />
-
-                          {categorySearchFocused &&
-                            filteredCategories.length > 0 && (
-                              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-[#0F1014] text-customBlue1 rounded-md border shadow-lg max-h-60 overflow-auto">
-                                {filteredCategories.map(category => (
-                                  <button
-                                    key={category.id}
-                                    type="button"
-                                    onClick={() =>
-                                      handleCategorySelect(category.id)
-                                    }
-                                    className="w-full px-4 py-2 text-left hover:text-blue-500 flex items-center gap-2"
-                                  >
-                                    {category.title}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                        </div>
+                        {errors.categories && (
+                          <p className="text-sm text-red-500 flex items-center">
+                            <AlertCircle className="w-4 h-4 mr-1" />{' '}
+                            {errors.categories}
+                          </p>
+                        )}
                       </div>
 
                       {/* Action Buttons */}

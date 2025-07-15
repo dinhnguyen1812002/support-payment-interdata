@@ -9,7 +9,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,14 +53,14 @@ export default function NavUser() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage
-                  src={page.props.auth.user?.profile_photo_url}
-                  alt={page.props.auth.user?.name}
-                  className="rounded-lg"
-                />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-              </Avatar>
+              <AvatarWithFallback
+                src={page.props.auth.user?.profile_photo_url}
+                name={page.props.auth.user?.name || 'User'}
+                alt={page.props.auth.user?.name}
+                className="h-8 w-8"
+                variant="initials"
+                square={true}
+              />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user?.name}</span>
                 <span className="truncate text-xs">{user?.email}</span>
@@ -76,14 +76,14 @@ export default function NavUser() {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage
-                    src={page.props.auth.user?.profile_photo_url}
-                    alt={page.props.auth.user?.name}
-                    className="rounded-lg"
-                  />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                </Avatar>
+                <AvatarWithFallback
+                  src={page.props.auth.user?.profile_photo_url}
+                  name={page.props.auth.user?.name || 'User'}
+                  alt={page.props.auth.user?.name}
+                  className="h-8 w-8"
+                  variant="initials"
+                  square={true}
+                />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user?.name}</span>
                   <span className="truncate text-xs">{user?.email}</span>

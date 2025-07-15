@@ -42,7 +42,7 @@ class NewCommentCreated implements ShouldBroadcast
                 'name' => $this->comment->user->name,
                 'profile_photo_url' => $this->comment->user->profile_photo_path
                     ? asset('storage/'.$this->comment->user->profile_photo_path)
-                    : 'https://ui-avatars.com/api/?name='.urlencode($this->comment->user->name).'&color=7F9CF5&background=EBF4FF',
+                    : null,
                 'categories' => $this->comment->post->categories->pluck('name')->toArray(),
                 'type_notification' => 'comment',
             ],

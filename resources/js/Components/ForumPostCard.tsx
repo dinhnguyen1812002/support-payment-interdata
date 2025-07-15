@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertCircle, ChevronRight, Clock, PenLine } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import { Badge } from '@/Components/ui/badge';
 import { Link } from '@inertiajs/react';
 import {BlogPost, Category, Comment} from '@/types';
@@ -49,18 +49,13 @@ const ForumPostCard: React.FC<ForumPostCardProps> = ({ post }) => {
                         {/* User info and metadata */}
                         <div className="flex items-center justify-between mt-4">
                             <div className="flex items-center gap-3">
-                                <Avatar className="h-8 w-8">
-                                    <AvatarImage
-                                        src={post.user.profile_photo_path
-                                            ? `/storage/${post.user.profile_photo_path}`
-                                            : `https://ui-avatars.com/api/?name=${encodeURI(post.user.name)}&color=7F9CF5&background=EBF4FF`
-                                        }
-                                        alt={post.user.name}
-                                    />
-                                    <AvatarFallback className="bg-green-100 text-green-700">
-                                        {post.user.name[0]}
-                                    </AvatarFallback>
-                                </Avatar>
+                                <AvatarWithFallback
+                                    src={post.user.profile_photo_path ? `/storage/${post.user.profile_photo_path}` : null}
+                                    name={post.user.name}
+                                    alt={post.user.name}
+                                    className="h-8 w-8"
+                                    variant="geometric"
+                                />
                                 <div className="flex items-center gap-2">
                                     <span className="font-medium text-gray-900">{post.user.name}</span>
                                     <span className="text-sm text-gray-500">

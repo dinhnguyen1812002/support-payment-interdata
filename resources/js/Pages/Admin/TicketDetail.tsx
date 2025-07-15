@@ -15,7 +15,7 @@ import { PageTransition } from '@/Components/ui/page-transition';
 import { SidebarProvider, SidebarInset } from '@/Components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import { Separator } from '@/Components/ui/separator';
 import { StatusUpdateDropdown } from '@/Components/dashboard/status-update-dropdown';
 import {
@@ -275,12 +275,13 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
                     <div>
                       <span className="text-sm font-medium text-muted-foreground block mb-2">Reporter</span>
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={ticket.profile || ''} />
-                          <AvatarFallback>
-                            {ticket.user.name.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
+                        <AvatarWithFallback
+                          src={ticket.profile ? `/storage/${ticket.profile}` : null}
+                          name={ticket.user.name}
+                          alt={ticket.user.name}
+                          className="h-8 w-8"
+                          variant="geometric"
+                        />
                         <div>
                           <div className="text-sm font-medium">{ticket.user.name}</div>
                           <div className="text-xs text-muted-foreground">{ticket.user.email}</div>
@@ -294,12 +295,13 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
                         <div>
                           <span className="text-sm font-medium text-muted-foreground block mb-2">Assigned to</span>
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={`/storage/${ ticket.assignee.profile_photo_path || ''}`} />
-                              <AvatarFallback>
-                                {ticket.assignee.name.charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
+                            <AvatarWithFallback
+                              src={ticket.assignee.profile_photo_path ? `/storage/${ticket.assignee.profile_photo_path}` : null}
+                              name={ticket.assignee.name}
+                              alt={ticket.assignee.name}
+                              className="h-8 w-8"
+                              variant="identicon"
+                            />
                             <div>
                               <div className="text-sm font-medium">{ticket.assignee.name}</div>
                               <div className="text-xs text-muted-foreground">{ticket.assignee.email}</div>

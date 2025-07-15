@@ -16,6 +16,7 @@ import CommentList from './CommentList';
 import { CommentsResponse, Comment, User } from '@/types/CommentTypes';
 import { useComments } from '@/Context/CommentsContext';
 import { formatTimeAgo, getAvatarUrl } from '@/lib/utils';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 
 interface CommentItemProps {
   comment: Comment;
@@ -155,10 +156,18 @@ const CommentItem: React.FC<CommentItemProps> = ({
           <CardContent className="relative pt-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-3">
-                <Avatar className="h-9 w-9 rounded-md">
+                {/* <Avatar className="h-9 w-9 rounded-md">
                   <AvatarImage src={avatarUrl} alt={comment.user.name} />
                   <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+                </Avatar> */}
+                <AvatarWithFallback
+                  src={avatarUrl}
+                  name={comment.user.name}
+                  alt={comment.user.name}
+                  className="h-9 w-9"
+                  variant="geometric"
+                  square={true}
+                />
 
                 <div className="flex flex-col justify-center">
                   <div className="flex items-center gap-2">

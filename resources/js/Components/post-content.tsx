@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, router } from '@inertiajs/react';
 import { Badge } from '@/Components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import UpvoteButton from '@/Components/VoteButton';
 import CommentsSection from '@/Pages/Comments/CommentsSection';
 import { Comment, CommentsResponse } from '@/types/CommentTypes';
@@ -60,7 +60,7 @@ const PostContent: React.FC<PostContentProps> = ({
 
   const authorAvatar = post.user.profile_photo_path
     ? `/storage/${post.user.profile_photo_path}`
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name)}&color=7F9CF5&background=EBF4FF`;
+    : null;
 
   // Check if the current user is authorized to update the post status
   const canUpdateStatus = currentUser && currentUser.id === post.user.id;
@@ -130,10 +130,14 @@ const PostContent: React.FC<PostContentProps> = ({
         </div>
         <div className="flex items-center mb-4 justify-between">
           <div className="flex items-center space-x-2">
-            <Avatar className="h-10 w-10 rounded-md">
-              <AvatarImage src={authorAvatar} alt={post.user.name} />
-              <AvatarFallback>{post.user.name.charAt(0)}</AvatarFallback>
-            </Avatar>
+            <AvatarWithFallback
+              src={authorAvatar}
+              name={post.user.name}
+              alt={post.user.name}
+              className="h-10 w-10"
+              variant="geometric"
+              square={true}
+            />
             <div>
               <p className="text-base font-medium text-gray-800 dark:text-gray-200">
                 {post.user.name}

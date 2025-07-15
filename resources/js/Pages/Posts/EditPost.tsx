@@ -7,15 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Switch } from '@/Components/ui/switch';
-import { Loader2, AlertCircle, Send, X, Hash, CircleAlert } from 'lucide-react';
+import { Loader2, AlertCircle, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/Components/ui/button';
-import { Badge } from '@/Components/ui/badge';
+
 import Sidebar from '@/Components/Sidebar';
 import QuillEditor from '@/Components/QuillEditor';
 import SearchInput from '@/Components/search-input';
 import SearchComponent from '@/Components/Search';
-import SingleTagInput from '@/Components/tag-input';
+import SingleTagInput, { MultiSelectInput } from '@/Components/tag-input';
 import LatestPosts from '@/Pages/Posts/LatestPost';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/Components/ui/tooltip';
 import { router } from '@inertiajs/core';
@@ -38,8 +38,6 @@ interface EditPostProps {
 }
 
 const EditPost = ({ post, categories, notifications, keyword, tags }: EditPostProps) => {
-    const [categorySearchFocused, setCategorySearchFocused] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
     const [selectedTag, setSelectedTag] = useState<number | null>(post.tags[0] || null); // Pre-select the first tag
     const quillRef = useRef<ReactQuill>(null);
 
@@ -51,17 +49,9 @@ const EditPost = ({ post, categories, notifications, keyword, tags }: EditPostPr
         tags: post.tags || [],
     });
 
-    // Handle category selection
-    const handleCategorySelect = (categoryId: number) => {
-        if (data.categories.length < 3) {
-            setData('categories', [...data.categories, categoryId]);
-            setSearchTerm('');
-        }
-    };
-
-    // Handle category removal
-    const handleCategoryRemove = (categoryId: number) => {
-        setData('categories', data.categories.filter((id) => id !== categoryId));
+    // Handle category changes
+    const handleCategoryChange = (categoryIds: number[]) => {
+        setData('categories', categoryIds);
     };
 
     // Handle tag selection
@@ -101,17 +91,7 @@ const EditPost = ({ post, categories, notifications, keyword, tags }: EditPostPr
         });
     };
 
-    // Filter categories for search
-    const filteredCategories = categories.filter(
-        (category) =>
-            category.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            !data.categories.includes(category.id)
-    );
 
-    // Get selected category objects
-    const selectedCategoryObjects = categories.filter((category) =>
-        data.categories.includes(category.id)
-    );
 
     // Handle search
     const handleSearch = (value: string) => {
@@ -223,59 +203,21 @@ const EditPost = ({ post, categories, notifications, keyword, tags }: EditPostPr
 
                                             {/* Categories */}
                                             <div className="space-y-2 mt-10">
-                                                <Label className="text-base font-medium flex items-center mt-14">
+                                                <Label className="text-base font-bold flex items-center mt-14 text-customBlue1">
                                                     Category <span className="text-red-500">*</span>
                                                     <span className="text-sm text-muted-foreground ml-2">
-                                                        ({data.categories.length})
+                                                        ({data.categories.length}/3)
                                                     </span>
                                                 </Label>
-                                                <div className="flex flex-wrap gap-2 mb-2">
-                                                    {selectedCategoryObjects.map((category) => (
-                                                        <Badge
-                                                            key={category.id}
-                                                            variant="outline"
-                                                            className="px-3 py-1.5 text-sm flex items-center gap-1"
-                                                        >
-                                                            <Hash className="w-3.5 h-3.5" />
-                                                            {category.title}
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleCategoryRemove(category.id)}
-                                                                className="ml-1 hover:bg-primary-dark rounded-full p-0.5"
-                                                            >
-                                                                <X className="w-3.5 h-3.5" />
-                                                            </button>
-                                                        </Badge>
-                                                    ))}
-                                                </div>
-                                                <div className="relative">
-                                                    <Input
-                                                        placeholder="Tìm kiếm danh mục..."
-                                                        value={searchTerm}
-                                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                                        onFocus={() => setCategorySearchFocused(true)}
-                                                        onBlur={() =>
-                                                            setTimeout(() => setCategorySearchFocused(false), 200)
-                                                        }
-                                                        className="h-12"
-                                                        disabled={data.categories.length >= 3}
-                                                    />
-                                                    {categorySearchFocused && filteredCategories.length > 0 && (
-                                                        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-[#0F1014] text-customBlue1 rounded-md border shadow-lg max-h-60 overflow-auto">
-                                                            {filteredCategories.map((category) => (
-                                                                <button
-                                                                    key={category.id}
-                                                                    type="button"
-                                                                    onClick={() => handleCategorySelect(category.id)}
-                                                                    className="w-full px-4 py-2 text-left hover:text-blue-500 flex items-center gap-2"
-                                                                >
-                                                                    <Hash className="w-4 h-4 text-muted-foreground" />
-                                                                    {category.title}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
+
+                                                <MultiSelectInput
+                                                    options={categories}
+                                                    selectedItems={data.categories}
+                                                    setSelectedItems={handleCategoryChange}
+                                                    placeholder="Search and select categories..."
+                                                    maxItems={3}
+                                                />
+
                                                 {errors.categories && (
                                                     <p className="text-sm text-red-500 flex items-center">
                                                         <AlertCircle className="w-4 h-4 mr-1" /> {errors.categories}

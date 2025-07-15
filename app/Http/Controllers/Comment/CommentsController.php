@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Comment;
 use App\Events\CommentPosted;
 use App\Events\NewCommentCreated;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCommentRequest;
 use App\Models\Comments;
 use App\Models\Post;
 use App\Notifications\NewCommentNotification;
@@ -14,19 +15,21 @@ use Inertia\Inertia;
 
 class CommentsController extends Controller
 {
-    public function store(Request $request)
+    public function store(StoreCommentRequest $request)
     {
-        $validated = $request->validate([
-            'comment' => 'required|string|max:1000',
-            'post_id' => 'required|exists:posts,id',
-            'parent_id' => 'nullable|exists:comments,id',
-        ]);
+        $validated = $request->validated();
+
+        // Check if user is HR staff and set is_hr_response flag
+        $isHrResponse = auth()->user()->departments->contains(function ($department) {
+            return $department->name === 'HR' || $department->name === 'Human Resources';
+        });
 
         $comment = Comments::create([
             'comment' => $validated['comment'],
             'post_id' => $validated['post_id'],
             'user_id' => auth()->id(),
             'parent_id' => $validated['parent_id'] ?? null,
+            'is_hr_response' => $isHrResponse,
         ]);
 
         $comment->load(['user.roles', 'user.departments']);

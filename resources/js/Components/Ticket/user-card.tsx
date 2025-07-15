@@ -7,7 +7,7 @@ import {
   CardHeader,
 } from '@/Components/ui/card';
 import { Label } from '@/Components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import {
   User as UserIcon,
   Mail,
@@ -177,12 +177,15 @@ export default function UserCard({
       <CardContent>
         <div className="flex items-start gap-4">
           {/* Avatar bên trái */}
-          <Avatar className="h-20 w-20 rounded-lg">
-            <AvatarImage src={profile_photo_path} alt={`${name}'s photo`} />
-            <AvatarFallback className="bg-primary/20 text-primary text-lg">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+          <AvatarWithFallback
+            src={profile_photo_path ? `/storage/${profile_photo_path}` : null}
+            name={name}
+            alt={`${name}'s photo`}
+            className="h-20 w-20"
+            variant="geometric"
+            square={true}
+            size={80}
+          />
 
           {/* Thông tin bên phải */}
           <div className="flex flex-col justify-center space-y-3 w-full">

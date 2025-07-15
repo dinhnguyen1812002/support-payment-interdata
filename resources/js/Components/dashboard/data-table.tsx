@@ -99,7 +99,7 @@ import {
   TableRow,
 } from '@/Components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import { de } from 'date-fns/locale';
 
 export const schema = z.object({
@@ -186,19 +186,14 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
       // Access user directly from row.original
       return (
         <div className="flex items-center gap-2">
-          <Avatar className="h-8 w-8 rounded-md">
-            <AvatarImage
-              src={
-                row.original.user?.profile_photo_path
-                  ? `/storage/${row.original.user.profile_photo_path}`
-                  : `https://ui-avatars.com/api/?name=${encodeURI(row.original.user?.name || 'User')}&color=7F9CF5&background=EBF4FF`
-              }
-              alt={row.original.user?.name || 'User'}
-            />
-            <AvatarFallback>
-              {(row.original.user?.name || 'U').charAt(0)}
-            </AvatarFallback>
-          </Avatar>
+          <AvatarWithFallback
+            src={row.original.user?.profile_photo_path ? `/storage/${row.original.user.profile_photo_path}` : null}
+            name={row.original.user?.name || 'User'}
+            alt={row.original.user?.name || 'User'}
+            className="h-8 w-8"
+            variant="identicon"
+            square={true}
+          />
           <div className="flex flex-col">
             <span className="font-medium">
               {row.original.user?.name || 'Unknown user'}

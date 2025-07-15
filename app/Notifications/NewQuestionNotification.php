@@ -59,7 +59,7 @@ class NewQuestionNotification extends Notification
             'name' => $this->post->user->name,
             'profile_photo_url' => $this->post->user->profile_photo_path
                 ? asset('storage/'.$this->post->user->profile_photo_path)
-                : 'https://ui-avatars.com/api/?name='.urlencode($this->post->user->name).'&color=7F9CF5&background=EBF4FF',
+                : null,
             'tags' => $this->post->tags->pluck('name')->toArray(),
             'categories' => $this->post->categories->pluck('title')->toArray(),
             'product_id' => $this->post->product_id,

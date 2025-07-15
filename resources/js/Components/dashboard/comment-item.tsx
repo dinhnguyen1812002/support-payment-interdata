@@ -6,7 +6,7 @@ import { Button } from "@/Components/ui/button"
 import { Textarea } from "@/Components/ui/textarea"
 import { Label } from "@/Components/ui/label"
 import { Badge } from "@/Components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar"
+import { AvatarWithFallback } from "@/Components/ui/avatar-with-fallback"
 import { Send, User, Clock, MessageSquare, AlertCircle, X, Reply, CornerDownRight } from "lucide-react"
 import { useForm } from "@inertiajs/react"
 import { toast } from "sonner"
@@ -64,12 +64,13 @@ interface CommentItemProps {
   return (
     <div className={`${depth > 0 ? 'ml-8  pl-4' : ''}`}>
       <div className={`flex gap-4 ${isOptimistic ? 'opacity-70' : ''}`}>
-        <Avatar className="h-10 w-10 flex-shrink-0">
-          <AvatarImage src={comment.user.profile_photo_path ? "/storage/" + comment.user.profile_photo_path : "/placeholder.svg"} />
-          <AvatarFallback className="bg-gray-100 text-gray-600">
-            {comment.user.name.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <AvatarWithFallback
+          src={comment.user.profile_photo_path ? `/storage/${comment.user.profile_photo_path}` : null}
+          name={comment.user.name}
+          alt={comment.user.name}
+          className="h-10 w-10 flex-shrink-0"
+          variant="identicon"
+        />
 
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-3">

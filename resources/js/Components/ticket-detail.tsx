@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, router } from '@inertiajs/react';
 import { Badge } from '@/Components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import CommentsSection from '@/Pages/Comments/CommentsSection';
 import { Comment, CommentsResponse } from '@/types/CommentTypes';
 import { Category, Tag } from '@/types';
@@ -81,9 +81,7 @@ const TicketDetail: React.FC<TicketDetailProps> = ({
 
   const authorAvatar = ticket.user.profile_photo_path
     ? `/storage/${ticket.user.profile_photo_path}`
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        ticket.user.name
-      )}&color=7F9CF5&background=EBF4FF`;
+    : null;
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -175,12 +173,14 @@ const TicketDetail: React.FC<TicketDetailProps> = ({
         {/* Ticket Metadata */}
         <div className="flex items-center mb-4 justify-between">
           <div className="flex items-center space-x-2">
-            <Avatar className="h-10 w-10 rounded-md">
-              <AvatarImage src={authorAvatar} alt={ticket.user.name} />
-              <AvatarFallback className="rounded-md">
-                {ticket.user.name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
+            <AvatarWithFallback
+              src={authorAvatar}
+              name={ticket.user.name}
+              alt={ticket.user.name}
+              className="h-10 w-10"
+              variant="geometric"
+              square={true}
+            />
             <div className="flex flex-col">
               <span className="text-sm font-medium dark:text-[#F5F5F5]">
                 {ticket.user.name}

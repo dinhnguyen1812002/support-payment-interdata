@@ -19,7 +19,7 @@ import {
   CardDescription,
 } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import { Search, ChevronLeft, ChevronRight, Users, Filter } from 'lucide-react';
 import { Inertia } from '@inertiajs/inertia';
 import {
@@ -199,7 +199,7 @@ export default function UsersTable({
                     className="hover:bg-muted/30 transition-colors"
                   >
                     <TableCell>
-                      <Avatar className="h-9 w-9">
+                      {/* <Avatar className="h-9 w-9">
                         <AvatarImage
                           src={user.profile_photo_path}
                           alt={user.name}
@@ -207,7 +207,15 @@ export default function UsersTable({
                         <AvatarFallback className="bg-primary/10 text-primary">
                           {getInitials(user.name)}
                         </AvatarFallback>
-                      </Avatar>
+                      </Avatar> */}
+                      {/* <AvatarWithFallback
+                        src={user.profile_photo_path ? `/storage/${user.profile_photo_path}` : null}
+                        name={user.name}
+                        alt={user.name}
+                        className="h-9 w-9"
+                        variant="identicon"
+                        square={true}
+                      /> */}
                     </TableCell>
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell className="text-muted-foreground">

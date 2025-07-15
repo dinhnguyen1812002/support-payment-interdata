@@ -21,7 +21,10 @@ class AdminController extends Controller
 
     protected TicketAutomationService $automationService;
 
-    public function __construct(AdminService $AdminService, CategoryService $categoryService, TicketAutomationService $automationService)
+    public function __construct(AdminService $AdminService,
+                                CategoryService $categoryService,
+                                TicketAutomationService $automationService
+                                )
     {
         $this->adminService = $AdminService;
         $this->categoryService = $categoryService;

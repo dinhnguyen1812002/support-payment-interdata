@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import { Button } from '@/Components/ui/button';
 import { 
   Clock, 
@@ -139,12 +139,13 @@ export function RecentActivity({ posts }: RecentActivityProps) {
               key={post.id}
               className="flex items-start space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
             >
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={post.user.profile_photo_path || ''} />
-                <AvatarFallback>
-                  {post.user.name.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <AvatarWithFallback
+                src={post.user.profile_photo_path ? `/storage/${post.user.profile_photo_path}` : null}
+                name={post.user.name}
+                alt={post.user.name}
+                className="h-8 w-8"
+                variant="geometric"
+              />
               
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between">

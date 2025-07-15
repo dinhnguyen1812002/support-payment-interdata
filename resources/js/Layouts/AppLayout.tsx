@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import Footer from '@/Components/Footer';
 import { Button } from '@/Components/ui/button';
 import NotificationsDropdown from '@/Components/notification/Notifications';
@@ -223,16 +223,14 @@ export default function AppLayout({
                         </span>
                       </div>
 
-                      <Avatar className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-md">
-                        <AvatarImage
-                          src={page.props.auth.user?.profile_photo_url}
-                          alt={page.props.auth.user?.name}
-                          className="rounded-lg"
-                        />
-                        <AvatarFallback>
-                          {page.props.auth.user?.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <AvatarWithFallback
+                        src={page.props.auth.user?.profile_photo_url}
+                        name={page.props.auth.user?.name || 'User'}
+                        alt={page.props.auth.user?.name}
+                        className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10"
+                        variant="initials"
+                        square={true}
+                      />
                     </Button>
                   </DropdownMenuTrigger>
 
@@ -389,15 +387,15 @@ export default function AppLayout({
           {page.props.auth.user && (
             <div className="pt-4 pb-1 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center px-4">
-                {page.props.jetstream.managesProfilePhotos ? (
-                  <div className="shrink-0 mr-3">
-                    <img
-                      className="object-cover w-10 h-10 rounded-full"
-                      src={page.props.auth.user?.profile_photo_url}
-                      alt={page.props.auth.user?.name}
-                    />
-                  </div>
-                ) : null}
+                <div className="shrink-0 mr-3">
+                  <AvatarWithFallback
+                    src={page.props.auth.user?.profile_photo_url}
+                    name={page.props.auth.user?.name || 'User'}
+                    alt={page.props.auth.user?.name}
+                    className="w-10 h-10"
+                    variant="geometric"
+                  />
+                </div>
 
                 <div>
                   <div className="text-base font-medium text-gray-800 dark:text-gray-200">

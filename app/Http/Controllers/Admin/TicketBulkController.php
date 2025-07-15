@@ -426,9 +426,7 @@ class TicketBulkController extends Controller
             'created_at' => $post->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $post->updated_at->format('Y-m-d H:i:s'),
             'user' => $post->user,
-            'profile' => $post->user->profile_photo_path
-                ? asset('storage/'.$post->user->profile_photo_path)
-                : 'https://ui-avatars.com/api/?name='.urlencode($post->user->name).'&color=7F9CF5&background=EBF4FF',
+            'profile' => $post->user->profile_photo_path,
             'assignee' => $post->assignee,
             'department' => $post->department,
             'categories' => $post->categories,

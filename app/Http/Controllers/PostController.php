@@ -227,4 +227,8 @@ class PostController extends Controller
             'posts' => $posts,
         ]);
     }
+
+    public function demoAvatar(){
+        return Inertia::render('Demo/AvatarDemo');
+    }
 }

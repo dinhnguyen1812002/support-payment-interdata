@@ -82,7 +82,7 @@ const DashboardCategoryCard: React.FC<DashboardCategoryCardProps> = ({
           </div>
           
           {/* Selection indicator */}
-          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+          {/* <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
             isSelected
               ? 'border-blue-500 bg-blue-500'
               : 'border-gray-300 dark:border-gray-600 group-hover:border-blue-400 dark:group-hover:border-blue-500'
@@ -90,7 +90,7 @@ const DashboardCategoryCard: React.FC<DashboardCategoryCardProps> = ({
             {isSelected && (
               <div className="w-2 h-2 bg-white rounded-full"></div>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
 

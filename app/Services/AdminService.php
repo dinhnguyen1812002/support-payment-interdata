@@ -312,9 +312,9 @@ class AdminService
         ];
     }
 
-    private function getDefaultAvatarUrl(string $name): string
+    private function getDefaultAvatarUrl(string $name): ?string
     {
-        return 'https://ui-avatars.com/api/?name='.urlencode($name).'&color=7F9CF5&background=EBF4FF';
+        return null; // Let frontend handle fallback with AvatarWithFallback component
     }
 
     private function formatPagination(LengthAwarePaginator $paginator): array
@@ -424,7 +424,7 @@ class AdminService
                     'email' => $user->email,
                     'created_at' => $user->created_at->toISOString(),
                     'updated_at' => $user->updated_at->toISOString(),
-                    'profile_photo_path' => $user->profile_photo_path,
+                    'profile_photo_path' => $user->profile_photo_path ? asset('storage/'.$user->profile_photo_path) : null,
                 ];
             })->values()->all(),
             'pagination' => $this->formatPagination($users),

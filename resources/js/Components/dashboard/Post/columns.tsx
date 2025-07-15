@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, ArrowUpDown } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import { Button } from '@/Components/ui/button';
 import {
   DropdownMenu,
@@ -66,10 +66,14 @@ export const columns: ColumnDef<Post>[] = [
       const avatarUrl = user.avatarUrl || (user.profile_photo_path ? `/storage/${user.profile_photo_path}` : null);
       return (
         <div className="flex items-center gap-2">
-          <Avatar className="h-8 w-8 rounded-md">
-            <AvatarImage src={avatarUrl || undefined} alt={user.name} />
-            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-          </Avatar>
+          <AvatarWithFallback
+            src={avatarUrl}
+            name={user.name}
+            alt={user.name}
+            className="h-8 w-8"
+            variant="initials"
+            square={true}
+          />
           <div className="flex flex-col">
             <span className="font-medium">{user.name}</span>
             <span className="text-xs text-muted-foreground">{user.email}</span>
@@ -209,10 +213,15 @@ export const columns: ColumnDef<Post>[] = [
 
       return (
         <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6 rounded-md">
-            <AvatarImage src={avatarUrl || undefined} alt={assignee.name} />
-            <AvatarFallback className="text-xs">{assignee.name.charAt(0)}</AvatarFallback>
-          </Avatar>
+          <AvatarWithFallback
+            src={avatarUrl}
+            name={assignee.name}
+            alt={assignee.name}
+            className="h-6 w-6"
+            variant="geometric"
+            square={true}
+            size={24}
+          />
           <div className="flex flex-col">
             <span className="text-sm font-medium">{assignee.name}</span>
             <span className="text-xs text-muted-foreground">{assignee.email}</span>

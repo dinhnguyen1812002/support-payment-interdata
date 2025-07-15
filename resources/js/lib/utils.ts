@@ -28,7 +28,7 @@ export function formatDate(date: string): string {
 export const getAvatarUrl = (user: { name: string; profile_photo_path: string | null }) => {
     return user.profile_photo_path
         ? `/storage/${user.profile_photo_path}`
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&color=7F9CF5&background=EBF4FF`;
+        : null;
 };
 
 export const formatTimeAgo = (dateString: string) => {

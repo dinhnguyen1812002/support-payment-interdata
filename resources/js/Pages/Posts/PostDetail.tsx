@@ -8,7 +8,7 @@ import { route } from 'ziggy-js';
 import { Category, Notification, Tag } from '@/types';
 import UpvoteButton from '@/Components/VoteButton';
 import SearchComponent from '@/Components/Search';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import LatestPosts from '@/Pages/Posts/LatestPost';
 import Sidebar from '@/Components/Sidebar';
 import SearchInput from '@/Components/search-input';
@@ -60,11 +60,11 @@ const PostDetail: React.FC<PostDetailProps> = ({
 
   const userAvatar = auth?.user?.profile_photo_path
     ? `/storage/${auth.user.profile_photo_path}`
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent(auth?.user?.name || 'Guest')}&color=7F9CF5&background=EBF4FF`;
+    : null;
 
   const authorAvatar = post.user.profile_photo_path
     ? `/storage/${post.user.profile_photo_path}`
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user.name)}&color=7F9CF5&background=EBF4FF`;
+    : null;
 
   const handleSearch = (value: string) => {
     if (value.trim()) {

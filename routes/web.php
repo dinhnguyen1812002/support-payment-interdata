@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/all', [PostController::class, 'getAllTicket'])->name('all');
 Route::get('/top-voted-posts', [PostController::class, 'getTopVotePosts']);
-
+Route::get('/demo/avatar', [PostController::class, 'demoAvatar']);
+Route::get('/demo/avatar-demo', [PostController::class, 'demoAvatar'])->name('demo.avatar');
 Route::get('/admin/posts/trash', [PostController::class, 'getTrash'])->name('posts.trash');
 // Route::get('/posts', [PostController::class, 'getPostByUser']);
 Route::middleware(['auth'])->group(function () {
@@ -31,7 +32,9 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::post('/posts/{id}/restore', [PostController::class, 'restore'])->name('posts.restore');
-    Route::post('/comments', [CommentsController::class, 'store'])->name('comments.store');
+    Route::post('/comments', [CommentsController::class, 'store'])
+        ->middleware('comment.rate.limit')
+        ->name('comments.store');
 
     // Nếu bạn muốn thêm routes cho reply comments
     Route::post('/comments/{comment}/reply', [CommentsController::class, 'reply'])->name('comments.reply');
