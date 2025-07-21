@@ -509,7 +509,9 @@ export default function AppLayout({
         </AnimatePresence>
       </main>
 
-      <Footer />
+    
+      <Footer/>
     </div>
+    
   );
 }

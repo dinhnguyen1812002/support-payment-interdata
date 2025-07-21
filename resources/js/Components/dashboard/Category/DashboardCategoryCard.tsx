@@ -3,6 +3,7 @@ import { FileText, Users } from 'lucide-react';
 import { Category } from '@/types';
 import { route } from 'ziggy-js';
 import { router } from '@inertiajs/react';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 
 interface DashboardCategoryCardProps extends Category {
   isSelected: boolean;
@@ -54,7 +55,13 @@ const DashboardCategoryCard: React.FC<DashboardCategoryCardProps> = ({
                 className="w-8 h-8 object-cover rounded"
               />
             ) : (
-              <FileText className="w-6 h-6" />
+              <AvatarWithFallback
+                src={logo}
+                name={title}
+                alt={title}
+                className="h-8 w-8"
+                variant="geometric"
+              />
             )}
           </div>
           

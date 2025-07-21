@@ -165,6 +165,13 @@ Route::get('/preview-email', function () {
 });
 Route::get('/form', [\App\Http\Controllers\Ticket\TicketController::class, 'showForm']);
 
+// Ticket routes
+Route::get('/tickets', [\App\Http\Controllers\Ticket\TicketController::class, 'index'])->name('tickets.index');
+Route::get('/tickets/create', [\App\Http\Controllers\Ticket\TicketController::class, 'create'])->name('tickets.create');
+Route::get('/tickets/search', [\App\Http\Controllers\Ticket\TicketController::class, 'search'])->name('tickets.search');
+Route::get('/tickets/{slug}', [\App\Http\Controllers\Ticket\TicketController::class, 'show'])->name('tickets.show');
+Route::post('/tickets', [\App\Http\Controllers\Ticket\TicketController::class, 'store'])->name('tickets.store');
+
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
 
 Route::middleware(['auth'])->group(function () {

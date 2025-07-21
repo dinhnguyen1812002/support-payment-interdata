@@ -125,14 +125,31 @@ class Post extends Model
             'title' => $this->title,
             'content' => $this->getExcerpt(),
             'slug' => $this->slug,
-            'upvote_count' => $this->upvotes_count,
+            'status' => $this->status ?? 'open',
+            'priority' => $this->priority ?? 'medium',
+            'upvote_count' => $this->upvotes_count ?? 0,
             'is_published' => $this->is_published,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
             'user' => $this->user ? [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
-                'profile_photo_url' => $this->user->profile_photo_path
+                'email' => $this->user->email,
+                'profile_photo_path' => $this->user->profile_photo_path
                     ? asset('storage/'.$this->user->profile_photo_path)
                     : null
+            ] : null,
+            'assignee' => $this->assignee ? [
+                'id' => $this->assignee->id,
+                'name' => $this->assignee->name,
+                'email' => $this->assignee->email,
+                'profile_photo_path' => $this->assignee->profile_photo_path
+                    ? asset('storage/'.$this->assignee->profile_photo_path)
+                    : null
+            ] : null,
+            'department' => $this->department ? [
+                'id' => $this->department->id,
+                'name' => $this->department->name,
             ] : null,
             'tags' => $this->tags->map(function ($tag) {
                 return [
@@ -147,9 +164,9 @@ class Post extends Model
                     'slug' => $category->slug,
                 ];
             })->toArray(),
-            'comments_count' => $this->comments_count,
-            'created_at' => $this->created_at->diffForHumans(),
-            // Add other fields as needed
+            'comments' => $this->getFormattedComments(),
+            'comments_count' => $this->comments_count ?? 0,
+            'has_upvote' => auth()->check() ? $this->isUpvotedBy(auth()->id()) : false,
         ];
     }
 
@@ -224,7 +241,9 @@ class Post extends Model
             'user' => [
                 'id' => $comment->user->id,
                 'name' => $comment->user->name,
-                'profile_photo_path' => $comment->user->profile_photo_path,
+                'profile_photo_path' => $comment->user->profile_photo_path
+                    ? asset('storage/'.$comment->user->profile_photo_path)
+                    : null,
                 'roles' => $comment->user->getRoleNames(),
                 'departments' => $comment->user->departments->pluck('name'),
             ],

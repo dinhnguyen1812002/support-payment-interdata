@@ -25,7 +25,6 @@ export interface Ticket {
   priority: string
   created_at: string
   updated_at: string
-  profile?: string
   user: {
     id: number
     name: string
@@ -51,5 +50,6 @@ export interface Ticket {
     name: string
   }>
   upvote_count?: number
+  has_upvote?: boolean
   comments: Comment[]
 }

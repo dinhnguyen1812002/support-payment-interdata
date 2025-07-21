@@ -178,8 +178,12 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
               rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 dark:text-white shadow-sm"
             />
               <Link href="/posts/create" className="w-full sm:w-auto ml-2">
-             <Button className="h-full  rounded-xl dark:bg-gray-700 dark:text-white" variant={"outline"} >
+             {/* <Button className="h-full  rounded-xl dark:bg-gray-700 dark:text-white" variant={"outline"} >
                 <Plus className="h-4 w-4 mr-2" />
+            Tạo ticket
+            </Button> */}
+            <Button className="h-full rounded-xl ">
+              <Plus className="h-4 w-4 mr-2" />
             Tạo ticket
             </Button>
             </Link>

@@ -299,3 +299,58 @@ export interface PaginatedData<T> {
   to: number;
   total: number;
 }
+
+
+export interface Ticket {
+  id: string;
+  title: string;
+  description: string;
+  category: Category;
+  priority: string;
+  status: string;
+  author: User;
+  assignee?: User;
+  createdAt: string;
+  updatedAt: string;
+  replies: Reply[];
+  tags: string[];
+  upvotes: number;
+  upvotedBy: string[];
+}
+
+export interface Reply {
+  id: string;
+  content: string;
+  author: User;
+  createdAt: Date;
+  isStaff: boolean;
+}
+
+// export interface User {
+//   id: string;
+//   name: string;
+//   email: string;
+//   avatar?: string;
+//   isStaff: boolean;
+// }
+
+// export interface Notification {
+//   id: string;
+//   title: string;
+//   message: string;
+//   type: 'info' | 'success' | 'warning' | 'error';
+//   read: boolean;
+//   createdAt: Date;
+//   ticketId?: string;
+// }
+
+
+
+export interface TicketFilters {
+  category?: Category;
+  priority?: string;
+  status?: string
+  search?: string;
+  myTickets?: boolean;
+  sortBy?: string;
+}

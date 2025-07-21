@@ -243,7 +243,7 @@ const CreatePost = ({ categories, notifications, keyword, tags }: CreatePostProp
                           selectedItems={data.categories}
                           setSelectedItems={handleCategoryChange}
                           placeholder="Search and select categories..."
-                          maxItems={3}
+                          maxItems={1}
                         />
 
                         {errors.categories && (
