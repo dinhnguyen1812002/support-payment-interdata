@@ -117,7 +117,7 @@ class Post extends Model
         return Str::limit(strip_tags($this->content), 150);
     }
 
-    // Định dạng dữ liệu bài viết
+    // Định dạng dữ liệu bài viết cho list view
     public function toFormattedArray()
     {
         return [
@@ -129,7 +129,7 @@ class Post extends Model
             'priority' => $this->priority ?? 'medium',
             'upvote_count' => $this->upvotes_count ?? 0,
             'is_published' => $this->is_published,
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at->diffForHumans(),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
             'user' => $this->user ? [
                 'id' => $this->user->id,
@@ -164,10 +164,18 @@ class Post extends Model
                     'slug' => $category->slug,
                 ];
             })->toArray(),
-            'comments' => $this->getFormattedComments(),
+            'comments' => $this->comments,
             'comments_count' => $this->comments_count ?? 0,
             'has_upvote' => auth()->check() ? $this->isUpvotedBy(auth()->id()) : false,
         ];
+    }
+
+    // Định dạng dữ liệu bài viết cho detail view (với comments đầy đủ)
+    public function toDetailArray()
+    {
+        $baseArray = $this->toFormattedArray();
+        $baseArray['comments'] = $this->getFormattedComments();
+        return $baseArray;
     }
 
     // Phương thức lấy danh sách bài viết với tìm kiếm, phân trang và sắp xếp

@@ -5,10 +5,10 @@ import {
   Clock,
   Tag,
   ChevronUp,
-  ArrowLeft,
   Send,
   Settings,
   User,
+  ArrowBigUp,
 } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
@@ -17,27 +17,36 @@ import { Textarea } from '@/Components/ui/textarea';
 import { Separator } from '@/Components/ui/separator';
 import { Card } from '@/Components/ui/card';
 import { Ticket } from '@/types/ticket';
-import { usePage, router } from '@inertiajs/react';
 import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
-import AppLayout from '@/Layouts/AppLayout';
+import TicketLayout from '@/Layouts/TicketLayout';
 import useTypedPage from '@/Hooks/useTypedPage';
+import { ScrollArea } from '@/Components/ui/scroll-area';
 
 interface TicketDetailPageProps {
   ticket: Ticket;
   categories?: any[];
-  tags?: any[];
   departments?: any[];
   users?: any[];
   notifications?: any[];
+  filters?: {
+    status?: string;
+    priority?: string;
+    department?: string;
+    assignee?: string;
+    category?: string;
+    search?: string;
+    myTickets?: boolean;
+    sortBy?: string;
+  };
 }
 
 export default function TicketDetail({
   ticket,
   categories = [],
-  tags = [],
   departments = [],
   users = [],
   notifications = [],
+  filters = {},
 }: TicketDetailPageProps) {
  
   const page = useTypedPage();
@@ -117,26 +126,23 @@ export default function TicketDetail({
     }, 1000);
   };
 
-  const handleBack = () => {
-    router.get('/tickets');
-  };
+
 
   return (
-    <AppLayout
+    <TicketLayout
       title={`Ticket #${ticket.id} - ${ticket.title}`}
-      canLogin={true}
-      canRegister={true}
+      categories={categories}
+      departments={departments}
+      users={users}
+      filters={filters}
       notifications={notifications}
+      backUrl="/tickets"
+      backLabel="Back to tickets"
     >
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto space-y-6">
-            {/* Back Button */}
-            <Button variant="ghost" onClick={handleBack} className="gap-2 mb-4">
-              <ArrowLeft className="h-4 w-4" />
-              Back to tickets
-            </Button>
-
+      <ScrollArea className='h-screen' >
+ <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto space-y-6">
+          
             {/* Content */}
             <Card className="p-6">
               <div className="flex items-start justify-between">
@@ -189,7 +195,8 @@ export default function TicketDetail({
                         <span>{ticket.comments?.length || 0} replies</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <ChevronUp className="w-4 h-4" />
+                       
+                        <ArrowBigUp  className="w-5 h-8" />
                         <span>{ticket.upvote_count || 0} upvotes</span>
                       </div>
                     </div>
@@ -492,9 +499,10 @@ export default function TicketDetail({
                 </div>
               </div>
             </Card>
-          </div>
         </div>
       </div>
-    </AppLayout>
+      </ScrollArea>
+     
+    </TicketLayout>
   );
 }

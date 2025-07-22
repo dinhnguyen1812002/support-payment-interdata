@@ -85,6 +85,7 @@ class PostService
         $categories = $this->getCategories();
         $tags = $this->getTags();
         $postCount = Post::count();
+        $myTicketsCount = auth()->check() ? Post::where('user_id', auth()->id())->count() : 0;
 
         $user = auth()->user();
         $notifications = $user?->unreadNotifications ?? [];
@@ -97,12 +98,62 @@ class PostService
             'categories' => $categories,
             'tags' => $tags,
             'postCount' => $postCount,
+            'myTicketsCount' => $myTicketsCount,
             'upvote_count' => $posts->sum('upvote_count'),
             'pagination' => $this->getPaginationData($posts),
             'keyword' => $search,
             'notifications' => $notifications,
             'sort' => $sort,
             'selectedTag' => $tag,
+        ];
+    }
+
+    public function getMyTickets(Request $request): array
+    {
+        $search = $request->input('search', '');
+        $sort = $request->input('sort', 'latest');
+        $tag = $request->input('tag', null);
+
+        // Get only current user's posts
+        $posts = Post::where('user_id', auth()->id())
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                      ->orWhere('content', 'like', "%{$search}%");
+                });
+            })
+            ->when($tag, function ($query, $tag) {
+                return $query->whereHas('tags', function ($q) use ($tag) {
+                    $q->where('tags.id', $tag);
+                });
+            })
+            ->with(['user', 'categories', 'tags', 'comments'])
+            ->withCount(['comments', 'upvotes'])
+            ->orderBy($sort === 'oldest' ? 'created_at' : 'created_at', $sort === 'oldest' ? 'asc' : 'desc')
+            ->paginate(6);
+
+        $categories = $this->getCategories();
+        $tags = $this->getTags();
+        $allTicketsCount = Post::count();
+        $myTicketsCount = Post::where('user_id', auth()->id())->count();
+
+        $user = auth()->user();
+        $notifications = $user?->unreadNotifications ?? [];
+
+        return [
+            'posts' => $posts->map(function ($post) {
+                return $post->toFormattedArray();
+            }),
+            'categories' => $categories,
+            'tags' => $tags,
+            'postCount' => $allTicketsCount,
+            'myTicketsCount' => $myTicketsCount,
+            'pagination' => $this->getPaginationData($posts),
+            'keyword' => $search,
+            'notifications' => $notifications,
+            'sort' => $sort,
+            'selectedTag' => $tag,
+            'filters' => ['myTickets' => true], // Mark this as my tickets view
         ];
     }
 

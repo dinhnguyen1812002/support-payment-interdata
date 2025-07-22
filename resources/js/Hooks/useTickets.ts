@@ -49,7 +49,8 @@ export function useTickets(initialTickets?: any[], initialFilters?: TicketFilter
         tags: ticket.tags || [],
         upvote_count: ticket.upvote_count || 0,
         has_upvote: ticket.has_upvote || false,
-        comments: ticket.comments || []
+        comments: ticket.comments || [],
+        comments_count: ticket.comments_count || 0
       }));
     }
     return [];
@@ -194,6 +195,7 @@ export function useTickets(initialTickets?: any[], initialFilters?: TicketFilter
     notifications,
     unreadNotifications,
     filters,
+    currentUser,
     updateFilters,
     createTicket,
     toggleUpvote,

@@ -39,11 +39,18 @@ class PostController extends Controller
         return Inertia::render('Posts/Index', $data);
     }
 
+    public function getMyTickets(Request $request): \Inertia\Response
+    {
+        $data = $this->postService->getMyTickets($request);
+
+        return Inertia::render('Posts/Index', $data);
+    }
+
     public function create(): \Inertia\Response
     {
         $data = $this->postService->getCreatePageData();
 
-        return Inertia::render('Posts/Create', $data);
+        return Inertia::render('Ticket/CreateTicket', $data);
     }
 
     public function store(CreatePostData $postData): \Illuminate\Http\RedirectResponse
@@ -54,7 +61,7 @@ class PostController extends Controller
             return redirect()->back()->withErrors($result['errors'])->withInput();
         }
 
-        return redirect()->route('/')->with('success', $result['message']);
+        return redirect()->back()->with('success', $result['message']);
     }
 
     public function show(string $slug): \Inertia\Response
@@ -226,9 +233,5 @@ class PostController extends Controller
         return Inertia::render('Posts/Trash', [
             'posts' => $posts,
         ]);
-    }
-
-    public function demoAvatar(){
-        return Inertia::render('Demo/AvatarDemo');
     }
 }

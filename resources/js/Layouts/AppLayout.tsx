@@ -504,13 +504,12 @@ export default function AppLayout({
           <PageTransition key={window.location.pathname}>
             {children}
 
-            
           </PageTransition>
         </AnimatePresence>
       </main>
 
     
-      <Footer/>
+      {/* <Footer/> */}
     </div>
     
   );

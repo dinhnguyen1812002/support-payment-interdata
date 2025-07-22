@@ -17,20 +17,6 @@ interface TicketCardProps {
 export function TicketCard({ ticket, onClick }: TicketCardProps) {
   const hasUpvoted = ticket.has_upvote || false;
 
-  // Temporary debug - remove after testing
-  if (ticket.id === 1 || Math.random() < 0.1) {
-    console.log('TicketCard Debug - Ticket data:', {
-      id: ticket.id,
-      title: ticket.title,
-      upvote_count: ticket.upvote_count,
-      has_upvote: ticket.has_upvote,
-      user: ticket.user,
-      tags: ticket.tags,
-      comments: ticket.comments,
-      created_at: ticket.created_at
-    });
-  }
-
   const getPriorityColor = (priority: string | undefined) => {
     switch (priority) {
       case "low":
@@ -148,17 +134,18 @@ export function TicketCard({ ticket, onClick }: TicketCardProps) {
                 </span>
               </div>
 
-              {ticket.comments && Array.isArray(ticket.comments) && ticket.comments.length > 0 && (
+              {(ticket.comments_count ?? 0) >= 0 && (
                 <div className="flex items-center gap-1 text-muted-foreground">
                   <MessageCircle className="w-4 h-4" />
-                  <span>{ticket.comments.length}</span>
+                  <span>{ticket.comments_count}</span>
                 </div>
               )}
 
               <div className="flex items-center gap-1 text-muted-foreground">
                 <Clock className="w-4 h-4" />
                 <span className="text-xs">
-                  {formatDistanceToNow(new Date(ticket.created_at), { addSuffix: true })}
+                  
+                  {ticket.created_at}
                 </span>
               </div>
 

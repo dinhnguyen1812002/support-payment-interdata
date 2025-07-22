@@ -304,11 +304,11 @@ export interface PaginatedData<T> {
 export interface Ticket {
   id: string;
   title: string;
-  description: string;
-  category: Category;
+  content: string;
+  category: Category[];
   priority: string;
   status: string;
-  author: User;
+  user: User;
   assignee?: User;
   createdAt: string;
   updatedAt: string;

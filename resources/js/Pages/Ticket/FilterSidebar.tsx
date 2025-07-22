@@ -30,10 +30,6 @@ interface FilterSidebarProps {
   currentUser?: any;
 }
 
-
-
-
-
 const sortOptions = [
   { value: "newest", label: "Newest First" },
   { value: "oldest", label: "Oldest First" },
@@ -91,7 +87,7 @@ export function FilterSidebar({
   );
 
   return (
-    <div className="w-80 bg-card p-6 border-r">
+    <div className="w-full h-full bg-card p-6 border-r overflow-y-auto ">
       <div className="space-y-6">
         {/* Header */}
         {/* <div className="flex items-center justify-between">
@@ -108,7 +104,7 @@ export function FilterSidebar({
 
         {/* Search */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Search</label>
+          {/* <label className="text-sm font-medium">Search</label> */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -119,39 +115,9 @@ export function FilterSidebar({
             />
           </div>
         </div>
+          <hr/>
+      
 
-        <Separator />
-
-        {/* View Toggle */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium text-foreground">View</label>
-          <div className="bg-muted/30 p-1 rounded-lg space-y-1">
-            <button
-              onClick={() => updateFilters({ myTickets: false })}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-left transition-all duration-200 font-medium ${
-                !filters.myTickets
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Users className="h-4 w-4 shrink-0" />
-              <span>All Tickets</span>
-            </button>
-            <button
-              onClick={() => updateFilters({ myTickets: true })}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-left transition-all duration-200 font-medium ${
-                filters.myTickets
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <User className="h-4 w-4 shrink-0" />
-              <span>My Tickets</span>
-            </button>
-          </div>
-        </div>
-
-        <Separator />
 
         {/* Category */}
         <div className="space-y-3">
@@ -259,7 +225,7 @@ export function FilterSidebar({
         </div>
 
         {/* Active Filters */}
-        {hasActiveFilters && (
+        {/* {hasActiveFilters && (
           <>
             <Separator />
             <div className="space-y-3">
@@ -305,7 +271,7 @@ export function FilterSidebar({
               </div>
             </div>
           </>
-        )}
+        )} */}
       </div>
     </div>
   );

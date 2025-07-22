@@ -9,26 +9,30 @@ import React from "react";
 import { Ticket } from "@/types/ticket";
 import { useTickets } from "@/Hooks/useTickets";
 import TicketDetail from "./TicketDetail";
+import { ScrollArea } from "@/Components/ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger } from "@/Components/ui/tabs";
+import { router } from "@inertiajs/react";
 
 interface TicketListProps {
   tickets: Ticket[];
   filters?: any;
+  allTicketsCount?: number;
+  myTicketsCount?: number;
 }
 
-export function TicketList({ tickets: initialTickets = [], filters: initialFilters = {} }: TicketListProps) {
-  const { tickets, currentPage, totalPages, ticketsPerPage, goToPage, totalTickets, filters } =
+export function TicketList({
+  tickets: initialTickets = [],
+  filters: initialFilters = {},
+  allTicketsCount = 0,
+  myTicketsCount = 0
+}: TicketListProps) {
+  const { tickets, currentPage, totalPages, ticketsPerPage, totalTickets, filters } =
     useTickets(initialTickets, initialFilters);
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
-  const getPageTitle = () => {
-    if (filters.myTickets) {
-      return `My Tickets (${totalTickets})`;
-    }
-    return `All Tickets (${totalTickets})`;
-  };
   // If a ticket is selected, show the details page
   if (selectedTicket) {
     return (
-      // <TicketDetails
+      // <TicketDetailsTicketCard Debug - Ticket data: 
       //   ticket={selectedTicket}
       //   onBack={() => setSelectedTicket(null)}
       // />
@@ -52,12 +56,22 @@ export function TicketList({ tickets: initialTickets = [], filters: initialFilte
   const startIndex = (currentPage - 1) * ticketsPerPage + 1;
   const endIndex = Math.min(currentPage * ticketsPerPage, totalTickets);
 
+  const handleTabChange = (value: string) => {
+    if (value === 'my-tickets') {
+      // Navigate to my tickets route
+      router.get('/tickets/my');
+    } else {
+      // Navigate to all tickets route
+      router.get('/tickets');
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">
-            {getPageTitle()}
+            Support Tickets
           </h2>
           <p className="text-muted-foreground">
             {filters.myTickets
@@ -66,6 +80,23 @@ export function TicketList({ tickets: initialTickets = [], filters: initialFilte
           </p>
         </div>
         {/* <CreateTicketDialog /> */}
+      </div>
+
+      {/* Tabs for filtering */}
+      <div className="flex items-center justify-between">
+        <Tabs
+          value={filters.myTickets ? 'my-tickets' : 'all-tickets'}
+          onValueChange={handleTabChange}
+        >
+          <TabsList>
+            <TabsTrigger value="all-tickets">
+              All Tickets ({filters.myTickets ? allTicketsCount : totalTickets})
+            </TabsTrigger>
+            <TabsTrigger value="my-tickets">
+              My Tickets ({filters.myTickets ? totalTickets : myTicketsCount})
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
       {/* Tickets List */}
       <Card className="overflow-hidden">

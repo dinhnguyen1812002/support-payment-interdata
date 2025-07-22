@@ -89,8 +89,6 @@ class TicketService
             'tags' => $this->getTags(),
             'departments' => $this->getDepartments(),
             'users' => $this->getUsers(),
-
-
             'ticketCount' => $tickets->total(),
             'pagination' => $this->getPaginationData($tickets),
             'keyword' => $search,
@@ -272,4 +270,6 @@ class TicketService
             'sort' => $sort,
         ];
     }
+
+
 }

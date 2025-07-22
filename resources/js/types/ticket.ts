@@ -52,4 +52,5 @@ export interface Ticket {
   upvote_count?: number
   has_upvote?: boolean
   comments: Comment[]
+  comments_count?: number
 }
