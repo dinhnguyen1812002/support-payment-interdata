@@ -43,7 +43,16 @@ class PostController extends Controller
     {
         $data = $this->postService->getMyTickets($request);
 
-        return Inertia::render('Posts/Index', $data);
+        return Inertia::render('Ticket/MyTickets', $data);
+    }
+
+    /**
+     * Get my tickets data for AJAX requests
+     */
+    public function getMyTicketsData(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $this->postService->getMyTickets($request);
+        return response()->json(['props' => $data]);
     }
 
     public function create(): \Inertia\Response

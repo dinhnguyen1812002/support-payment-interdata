@@ -37,6 +37,38 @@ class TicketController extends Controller
     }
 
     /**
+     * Get tickets data for AJAX requests
+     */
+    public function getTicketsData(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $this->ticketService->getTicketsForIndex($request);
+        return response()->json(['props' => $data]);
+    }
+
+    /**
+     * Display ticket manager with SPA-like navigation
+     */
+    // public function manager(Request $request): \Inertia\Response
+    // {
+    //     // Get all tickets data
+    //     $allTicketsData = $this->ticketService->getTicketsForIndex($request);
+
+    //     // Get my tickets count
+    //     $myTicketsCount = auth()->check() ?
+    //         \App\Models\Post::where('user_id', auth()->id())->count() : 0;
+
+    //     $data = array_merge($allTicketsData, [
+    //         'allTicketsCount' => $allTicketsData['ticketCount'],
+    //         'myTicketsCount' => $myTicketsCount,
+    //         'initialTickets' => $allTicketsData['tickets'],
+    //         'initialPagination' => $allTicketsData['pagination'],
+    //         'initialFilters' => $allTicketsData['filters'],
+    //     ]);
+
+    //     return Inertia::render('Ticket/TicketSPA', $data);
+    // }
+    
+    /**
      * Show the form for creating a new ticket
      */
     public function create(): \Inertia\Response
@@ -61,8 +93,12 @@ class TicketController extends Controller
             ->withCount('upvotes')
             ->firstOrFail();
 
-        // Get formatted comments
-        $comments = $post->getFormattedComments();
+        // Get formatted comments in the expected format for CommentsSection
+        $formattedComments = $post->getFormattedComments();
+        $comments = [
+            'data' => $formattedComments,
+            'next_page_url' => null
+        ];
 
         // Check if current user has upvoted this ticket
         $hasUpvote = auth()->check() ? $post->isUpvotedBy(auth()->id()) : false;

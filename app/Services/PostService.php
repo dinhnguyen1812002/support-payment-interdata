@@ -140,20 +140,25 @@ class PostService
         $user = auth()->user();
         $notifications = $user?->unreadNotifications ?? [];
 
+        // Get departments and users for the interface
+        $departments = Departments::all();
+        $users = User::all();
+
         return [
-            'posts' => $posts->map(function ($post) {
+            'tickets' => $posts->map(function ($post) {
                 return $post->toFormattedArray();
             }),
             'categories' => $categories,
             'tags' => $tags,
-            'postCount' => $allTicketsCount,
-            'myTicketsCount' => $myTicketsCount,
+            'departments' => $departments,
+            'users' => $users,
             'pagination' => $this->getPaginationData($posts),
-            'keyword' => $search,
             'notifications' => $notifications,
-            'sort' => $sort,
-            'selectedTag' => $tag,
-            'filters' => ['myTickets' => true], // Mark this as my tickets view
+            'filters' => [
+                'myTickets' => true,
+                'search' => $search,
+                'sortBy' => $sort,
+            ],
         ];
     }
 

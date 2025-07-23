@@ -22,6 +22,12 @@ class NewCommentCreated implements ShouldBroadcast
 
     public function broadcastOn(): Channel
     {
+        // Ensure post and user exist before broadcasting
+        if (!$this->comment->post || !$this->comment->post->user) {
+            // Return a dummy channel that won't be used
+            return new Channel('dummy-channel');
+        }
+
         return new Channel('notifications-comment.'.$this->comment->post->user_id);
     }
 
@@ -32,6 +38,26 @@ class NewCommentCreated implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
+        // Ensure post and user exist before broadcasting
+        if (!$this->comment->post || !$this->comment->post->user || !$this->comment->user) {
+            return [
+                'id' => (string) $this->comment->id,
+                'data' => [
+                    'post_id' => (string) $this->comment->post_id,
+                    'title' => 'Unknown Post',
+                    'message' => "New comment: {$this->comment->comment}",
+                    'slug' => '',
+                    'name' => 'Unknown User',
+                    'profile_photo_url' => null,
+                    'categories' => [],
+                    'type_notification' => 'comment',
+                ],
+                'read_at' => null,
+                'created_at' => $this->comment->created_at->diffForHumans(),
+                'type' => 'comment',
+            ];
+        }
+
         return [
             'id' => (string) $this->comment->id,
             'data' => [
@@ -43,7 +69,7 @@ class NewCommentCreated implements ShouldBroadcast
                 'profile_photo_url' => $this->comment->user->profile_photo_path
                     ? asset('storage/'.$this->comment->user->profile_photo_path)
                     : null,
-                'categories' => $this->comment->post->categories->pluck('name')->toArray(),
+                'categories' => $this->comment->post->categories ? $this->comment->post->categories->pluck('name')->toArray() : [],
                 'type_notification' => 'comment',
             ],
             'read_at' => null,

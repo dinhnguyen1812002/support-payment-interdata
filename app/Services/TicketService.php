@@ -99,6 +99,9 @@ class TicketService
                 'priority' => $priority,
                 'department' => $department,
                 'assignee' => $assignee,
+                'search' => $search,
+                'myTickets' => false,
+                'sortBy' => $sort,
             ],
         ];
     }

@@ -14,11 +14,13 @@ use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UpvoteController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Ticket\TicketController;
 use Illuminate\Support\Facades\Route;
 
 // Homepage
 Route::get('/', [PostController::class, 'index'])->name('/');
 Route::get('/all', [PostController::class, 'getAllTicket'])->name('all');
+// Route::get('/mytickets' , PostController::class, 'getMyTickets')->name('mytickets');
 Route::get('/top-voted-posts', [PostController::class, 'getTopVotePosts']);
 Route::get('/demo/avatar', [PostController::class, 'demoAvatar']);
 Route::get('/demo/avatar-demo', [PostController::class, 'demoAvatar'])->name('demo.avatar');
@@ -33,7 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::post('/posts/{id}/restore', [PostController::class, 'restore'])->name('posts.restore');
     Route::post('/comments', [CommentsController::class, 'store'])
-        ->middleware('comment.rate.limit')
+        // ->middleware('comment.rate.limit') // Temporarily disabled for testing
         ->name('comments.store');
 
     // Nếu bạn muốn thêm routes cho reply comments
@@ -163,15 +165,22 @@ Route::get('/notifications', [NotificationController::class, 'index'])->name('no
 Route::get('/preview-email', function () {
     return view('mail.notification');
 });
-Route::get('/form', [\App\Http\Controllers\Ticket\TicketController::class, 'showForm']);
+Route::get('/form', [TicketController::class, 'showForm']);
 
 // Ticket routes
-Route::get('/tickets', [\App\Http\Controllers\Ticket\TicketController::class, 'index'])->name('tickets.index');
-Route::get('/tickets/my', [\App\Http\Controllers\PostController::class, 'getMyTickets'])->name('tickets.my')->middleware('auth');
-Route::get('/tickets/create', [\App\Http\Controllers\Ticket\TicketController::class, 'create'])->name('tickets.create');
-Route::get('/tickets/search', [\App\Http\Controllers\Ticket\TicketController::class, 'search'])->name('tickets.search');
-Route::get('/tickets/{slug}', [\App\Http\Controllers\Ticket\TicketController::class, 'show'])->name('tickets.show');
-Route::post('/tickets', [\App\Http\Controllers\Ticket\TicketController::class, 'store'])->name('tickets.store');
+Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+// Route::get('/tickets/spa', [\App\Http\Controllers\Ticket\TicketController::class, 'manager'])->name('tickets.spa');
+Route::get('/tickets/my-tickets', [PostController::class, 'getMyTickets'])->name('tickets.my')->middleware('auth');
+Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
+Route::get('/tickets/search', [TicketController::class, 'search'])->name('tickets.search');
+Route::get('/tickets/{slug}', [TicketController::class, 'show'])->name('tickets.show');
+Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
+
+// AJAX API routes for ticket data
+// Route::middleware(['web'])->group(function () {
+//     Route::get('/api/tickets/data', [\App\Http\Controllers\Ticket\TicketController::class, 'getTicketsData'])->name('tickets.data');
+//     Route::get('/api/tickets/my/data', [\App\Http\Controllers\PostController::class, 'getMyTicketsData'])->name('tickets.my.data')->middleware('auth');
+// });
 
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
 

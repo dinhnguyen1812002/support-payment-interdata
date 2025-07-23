@@ -245,7 +245,7 @@ class Post extends Model
     protected function formatComment($comment)
     {
         return [
-            'id' => $comment->id,
+            'id' => (string) $comment->id,
             'user' => [
                 'id' => $comment->user->id,
                 'name' => $comment->user->name,
@@ -257,7 +257,7 @@ class Post extends Model
             ],
             'content' => $comment->comment,
             'created_at' => $comment->created_at->format('Y-m-d H:i:s'),
-            'parent_id' => $comment->parent_id,
+            'parent_id' => $comment->parent_id ? (string) $comment->parent_id : null,
             'is_hr_response' => $comment->is_hr_response ?? false,
             'replies' => $comment->allReplies->map(function ($reply) {
                 return $this->formatComment($reply);

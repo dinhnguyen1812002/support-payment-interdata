@@ -15,6 +15,7 @@ export interface Comment {
   parent_id?: string;
   replies: Comment[];
   isOptimistic?: boolean; // Add this field
+  is_hr_response?: boolean; // Add HR response indicator
 }
 
 export interface CommentsResponse {

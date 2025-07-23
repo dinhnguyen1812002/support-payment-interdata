@@ -8,7 +8,7 @@ class CommentData extends Data
 {
     public function __construct(
         public string $comment,
-        public int $post_id,
+        public string $post_id,
         public int $user_id,
         public ?int $parent_id = null
     ) {}

@@ -17,6 +17,11 @@ class CommentsController extends Controller
 {
     public function store(StoreCommentRequest $request)
     {
+        \Log::info('Comment store request received', [
+            'user_id' => auth()->id(),
+            'request_data' => $request->all()
+        ]);
+
         $validated = $request->validated();
 
         // Check if user is HR staff and set is_hr_response flag
@@ -26,13 +31,19 @@ class CommentsController extends Controller
 
         $comment = Comments::create([
             'comment' => $validated['comment'],
-            'post_id' => $validated['post_id'],
+            'post_id' => request()->post_id,
             'user_id' => auth()->id(),
             'parent_id' => $validated['parent_id'] ?? null,
             'is_hr_response' => $isHrResponse,
         ]);
 
         $comment->load(['user.roles', 'user.departments']);
+
+        \Log::info('Comment created successfully', [
+            'comment_id' => $comment->id,
+            'user_id' => $comment->user_id,
+            'post_id' => $comment->post_id
+        ]);
 
         broadcast(new CommentPosted($comment))->toOthers();
         broadcast(new NewCommentCreated($comment))->toOthers();

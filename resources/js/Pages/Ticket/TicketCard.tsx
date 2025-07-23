@@ -167,8 +167,8 @@ export function TicketCard({ ticket, onClick }: TicketCardProps) {
                 ticket.priority
               )}`}
             >
-              {(ticket.priority || 'medium').charAt(0).toUpperCase() +
-                (ticket.priority || 'medium').slice(1)}
+              {(ticket.priority ).charAt(0).toUpperCase() +
+                (ticket.priority ).slice(1)}
             </Badge>
             <Badge
               className={`text-xs justify-center ${getStatusColor(

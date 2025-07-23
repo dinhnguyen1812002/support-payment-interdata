@@ -117,7 +117,7 @@ const TicketLayout: React.FC<TicketLayoutProps> = ({
                             }
                             onValueChange={value => {
                               if (value === 'my-tickets') {
-                                router.get('/tickets', { myTickets: true });
+                                router.get('/tickets/my-tickets');
                               } else {
                                 router.get('/tickets');
                               }

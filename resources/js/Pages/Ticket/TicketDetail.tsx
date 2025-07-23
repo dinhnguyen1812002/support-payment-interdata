@@ -7,7 +7,6 @@ import {
   ChevronUp,
   Send,
   Settings,
-  User,
   ArrowBigUp,
 } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
@@ -16,18 +15,36 @@ import { Button } from '@/Components/ui/button';
 import { Textarea } from '@/Components/ui/textarea';
 import { Separator } from '@/Components/ui/separator';
 import { Card } from '@/Components/ui/card';
-import { Ticket } from '@/types/ticket';
+import { Ticket, Comment as TicketComment } from '@/types/ticket';
 import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import TicketLayout from '@/Layouts/TicketLayout';
 import useTypedPage from '@/Hooks/useTypedPage';
 import { ScrollArea } from '@/Components/ui/scroll-area';
+import CommentForm from '../Comments/CommentForm';
+import { router } from '@inertiajs/react';
+import { route } from 'ziggy-js';
+import CommentsSection from '../Comments/CommentsSection';
+import { Category, Department } from '@/types';
+import { Notification } from '@/types/Notification';
+import { CommentsResponse } from '@/types/CommentTypes';
+
+
+export interface User {
+  id: number;
+  name: string;
+  profile_photo_path: string | null;
+  roles?: string[];
+  departments?: string[];
+}
+
 
 interface TicketDetailPageProps {
   ticket: Ticket;
-  categories?: any[];
-  departments?: any[];
-  users?: any[];
-  notifications?: any[];
+  categories?: Category[];
+  departments?: Department[];
+  users?: User[];
+  auth: { user: { id: number; name: string; profile_photo_path: string } };
+  notifications?: Notification[];
   filters?: {
     status?: string;
     priority?: string;
@@ -38,6 +55,8 @@ interface TicketDetailPageProps {
     myTickets?: boolean;
     sortBy?: string;
   };
+
+  comments?: Comment[];
 }
 
 export default function TicketDetail({
@@ -45,15 +64,24 @@ export default function TicketDetail({
   categories = [],
   departments = [],
   users = [],
+  auth,
   notifications = [],
   filters = {},
 }: TicketDetailPageProps) {
- 
   const page = useTypedPage();
   const currentUser = page.props.auth?.user;
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const user = auth.user || null;
 
+  // Convert user to match CommentsSection expected type
+  const commentUser = user ? {
+    id: user.id,
+    name: user.name,
+    profile_photo_path: user.profile_photo_path,
+    roles: currentUser?.roles?.map(role => role.name) || [],
+    departments: currentUser?.departments?.map(dept => dept.name) || []
+  } : null;
   // Check if current user has upvoted this ticket
   const hasUpvoted = ticket.has_upvote || false;
 
@@ -67,13 +95,15 @@ export default function TicketDetail({
   const isAdmin = hasRole('admin');
   const isStaff = hasRole('staff') || hasRole('department_manager');
   const canManageTicket = isAdmin || isStaff;
-
-  // Debug: Log user roles (remove in production)
+  const [body, setBody] = useState('');
+  // Debug: Log user roles and comments (remove in production)
   console.log('Current user:', currentUser);
-  console.log('User roles:', currentUser?.roles);
-  console.log('Is admin:', isAdmin);
-  console.log('Is staff:', isStaff);
-  console.log('Can manage ticket:', canManageTicket);
+  console.log('Ticket comments:', ticket.comments);
+  console.log('Comment user:', commentUser);
+  // console.log('User roles:', currentUser?.roles);
+  // console.log('Is admin:', isAdmin);
+  // console.log('Is staff:', isStaff);
+  // console.log('Can manage ticket:', canManageTicket);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -112,21 +142,36 @@ export default function TicketDetail({
     console.log('Upvote ticket:', ticket.id);
   };
 
-  const handleSubmitComment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!comment.trim() || isSubmitting) return;
-
+  const handleCommentSubmit = (content: string, parentId?: string) => {
     setIsSubmitting(true);
 
-    // TODO: Implement comment submission with Inertia
-    setTimeout(() => {
-      console.log('Comment submitted:', comment);
-      setComment('');
-      setIsSubmitting(false);
-    }, 1000);
+    console.log('Submitting comment:', {
+      comment: content,
+      post_id: ticket.id,
+      parent_id: parentId || null,
+    });
+
+    router.post(
+      route('comments.store'),
+      {
+        comment: content,
+        post_id: ticket.id,
+        parent_id: parentId || null,
+      },
+      {
+        onSuccess: (response) => {
+          console.log('Comment submitted successfully:', response);
+          setBody('');
+          setIsSubmitting(false);
+        },
+        preserveScroll: true,
+        onError: errors => {
+          console.error('Error submitting comment:', errors);
+          setIsSubmitting(false);
+        },
+      },
+    );
   };
-
-
 
   return (
     <TicketLayout
@@ -139,10 +184,9 @@ export default function TicketDetail({
       backUrl="/tickets"
       backLabel="Back to tickets"
     >
-      <ScrollArea className='h-screen' >
- <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-6">
-          
+      <ScrollArea className="h-screen">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto space-y-6">
             {/* Content */}
             <Card className="p-6">
               <div className="flex items-start justify-between">
@@ -192,11 +236,10 @@ export default function TicketDetail({
                       </div>
                       <div className="flex items-center gap-1">
                         <MessageCircle className="w-4 h-4" />
-                        <span>{ticket.comments?.length || 0} replies</span>
+                        <span>{ticket.comments?.data?.length || 0} replies</span>
                       </div>
                       <div className="flex items-center gap-1">
-                       
-                        <ArrowBigUp  className="w-5 h-8" />
+                        <ArrowBigUp className="w-5 h-8" />
                         <span>{ticket.upvote_count || 0} upvotes</span>
                       </div>
                     </div>
@@ -243,7 +286,7 @@ export default function TicketDetail({
                     <div className="text-sm font-medium">Author</div>
                     <div className="flex items-center gap-2">
                       <AvatarWithFallback
-                        src={ ticket.user?.profile_photo_path}
+                        src={ticket.user?.profile_photo_path}
                         name={ticket.user?.name || 'Unknown'}
                         className="w-5 h-5"
                       />
@@ -371,14 +414,14 @@ export default function TicketDetail({
                 )}
 
                 {/* Comments */}
-                {ticket.comments && ticket.comments.length > 0 && (
+                {/* {ticket.comments && ticket.comments.data && ticket.comments.data.length > 0 && (
                   <div className="space-y-4">
                     <h3 className="font-semibold flex items-center gap-2">
                       <MessageCircle className="w-4" />
-                      Comments ({ticket.comments.length})
+                      Comments ({ticket.comments.data.length})
                     </h3>
                     <div className="space-y-4">
-                      {ticket.comments.map(comment => (
+                      {ticket.comments.data.map(comment => (
                         <div key={comment.id} className="border rounded-lg p-4">
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-3">
@@ -419,11 +462,11 @@ export default function TicketDetail({
                       ))}
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {/* Comment Form */}
                 <Separator />
-                <div className="space-y-4">
+                {/* <div className="space-y-4">
                   <h3 className="font-semibold flex items-center gap-2">
                     <MessageCircle className="w-4 h-4" />
                     Add a comment
@@ -431,12 +474,7 @@ export default function TicketDetail({
                   {currentUser ? (
                     <form onSubmit={handleSubmitComment} className="space-y-4">
                       <div className="flex items-start gap-3">
-                        {/* <AvatarWithFallback
-                          src={currentUser.profile_photo_path}
-                          name={currentUser.name}
-                          className="w-8 h-8 mt-1"
-                        /> */}
-                        <AvatarWithFallback 
+                        <AvatarWithFallback
                           src={currentUser.profile_photo_url}
                           name={currentUser.name}
                           className="w-8 h-8 mt-1"
@@ -458,12 +496,18 @@ export default function TicketDetail({
                                 </span>
                               </span>
                               {isAdmin && (
-                                <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs bg-red-50 text-red-700 border-red-200"
+                                >
                                   Admin
                                 </Badge>
                               )}
                               {isStaff && !isAdmin && (
-                                <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                                >
                                   Staff
                                 </Badge>
                               )}
@@ -496,13 +540,18 @@ export default function TicketDetail({
                       </p>
                     </div>
                   )}
-                </div>
+                </div> */}
+                <CommentsSection
+                  initialComments={ticket.comments}
+                  onCommentSubmit={handleCommentSubmit}
+                  postId={ticket.id}
+                  currentUser={commentUser}
+                />
               </div>
             </Card>
+          </div>
         </div>
-      </div>
       </ScrollArea>
-     
     </TicketLayout>
   );
 }

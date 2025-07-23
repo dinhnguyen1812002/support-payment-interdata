@@ -107,11 +107,11 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
               <div className="flex space-x-2">
                 Showing {pagination?.from || 1}-
                 {pagination?.to || tickets.length} of {ticketCount} tickets
-                {pagination && pagination.last_page > 1 && (
+                {/* {pagination && pagination.last_page > 1 && (
                   <div>
                     Page {pagination.current_page} of {pagination.last_page}
                   </div>
-                )}
+                )} */}
               </div>
 
           {/* Pagination */}
@@ -127,8 +127,6 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
             )}
             </div>
           )}
-
-          
         </div>
       </div>
     </TicketLayout>

@@ -1,3 +1,5 @@
+import { CommentsResponse } from "./CommentTypes"
+
 export interface Comment {
   id: number
   content: string
@@ -17,7 +19,7 @@ export interface Comment {
 }
 
 export interface Ticket {
-  id: number
+  id: string
   slug: string
   title: string
   content: string
@@ -51,6 +53,6 @@ export interface Ticket {
   }>
   upvote_count?: number
   has_upvote?: boolean
-  comments: Comment[]
+  comments: CommentsResponse
   comments_count?: number
 }

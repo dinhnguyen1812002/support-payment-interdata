@@ -75,13 +75,13 @@ const CommentItem: React.FC<CommentItemProps> = ({
       HR_DEPARTMENTS.includes(dept as any)
     );
 
-    if (hasHRDepartment) {
-      return {
-        isHR: true,
-        badgeText: 'Nhân sự',
-        badgeClass: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-700'
-      };
-    }
+    // if (hasHRDepartment) {
+    //   return {
+    //     isHR: true,
+    //     badgeText: 'Nhân sự',
+    //     badgeClass: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-700'
+    //   };
+    // }
 
     return { isHR: false, badgeText: '', badgeClass: '' };
   };
@@ -148,11 +148,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
   return (
     <div className={`flex gap-4 ${indentationClass}`}>
       <div className="flex-1 space-y-4">
-        <Card className={`overflow-hidden dark:bg-[#0F1014] ${
-          hrBadgeInfo.isHR
-            ? 'border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/20'
-            : 'border-gray-200 dark:border-gray-700'
-        }`}>
+        <Card className={`overflow-hidden dark:bg-[#0F1014]`
+        }>
           <CardContent className="relative pt-4">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center space-x-3">
