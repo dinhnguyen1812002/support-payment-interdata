@@ -113,6 +113,7 @@ class PostService
         $search = $request->input('search', '');
         $sort = $request->input('sort', 'latest');
         $tag = $request->input('tag', null);
+        $category = $request->input('category', null);
 
         // Get only current user's posts
         $posts = Post::where('user_id', auth()->id())
@@ -125,6 +126,16 @@ class PostService
             ->when($tag, function ($query, $tag) {
                 return $query->whereHas('tags', function ($q) use ($tag) {
                     $q->where('tags.id', $tag);
+                });
+            })
+            ->when($category, function ($query, $category) {
+                return $query->whereHas('categories', function ($q) use ($category) {
+                    // Support both slug and ID for backward compatibility
+                    if (is_numeric($category)) {
+                        $q->where('categories.id', $category);
+                    } else {
+                        $q->where('categories.slug', $category);
+                    }
                 });
             })
             ->with(['user', 'categories', 'tags', 'comments'])
@@ -157,6 +168,7 @@ class PostService
             'filters' => [
                 'myTickets' => true,
                 'search' => $search,
+                'category' => $category,
                 'sortBy' => $sort,
             ],
         ];

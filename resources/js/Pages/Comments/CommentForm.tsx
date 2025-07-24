@@ -196,19 +196,45 @@ const CommentForm: React.FC<CommentFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex flex-col space-y-2 relative">
-        <Textarea
-          ref={textareaRef}
-          value={comment}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          autoFocus={autoFocus}
-          className={`min-h-24 max-h-72 resize-none focus:ring-2 focus:ring-blue-500 dark:bg-[#15171C] dark:text-gray-100 transition-all duration-200 ${
-            showErrors && errors.length > 0 ? 'border-red-500 focus:ring-red-500' : ''
-          }`}
-          disabled={isLoading}
-          maxLength={MAX_COMMENT_LENGTH}
-        />
+        <div className="relative">
+  <Textarea
+    ref={textareaRef}
+    value={comment}
+    onChange={handleInputChange}
+    onKeyDown={handleKeyDown}
+    placeholder={placeholder}
+    autoFocus={autoFocus}
+    className={`min-h-24 max-h-72 resize-none pr-10 focus:ring-2 focus:ring-blue-500 dark:bg-[#15171C] dark:text-gray-100 transition-all duration-200 ${
+      showErrors && errors.length > 0 ? 'border-red-500 focus:ring-red-500' : ''
+    }`}
+    disabled={isLoading}
+    maxLength={MAX_COMMENT_LENGTH}
+  />
+
+  {/* Emoji icon inside textarea */}
+  <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+    <PopoverTrigger asChild>
+      <button
+        type="button"
+        disabled={isLoading}
+        className="absolute right-2 bottom-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+      >
+        <Smile className="w-5 h-5" />
+      </button>
+    </PopoverTrigger>
+    <PopoverContent
+      className="p-0 border-none w-auto"
+      side="top"
+      sideOffset={5}
+    >
+      <EmojiPicker
+        onEmojiClick={handleEmojiClick}
+        searchDisabled={false}
+        skinTonesDisabled={true}
+      />
+    </PopoverContent>
+  </Popover>
+</div>
 
         {/* Character counter with color indicator */}
         <div className={`text-xs ${
@@ -233,55 +259,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
           </Alert>
         )}
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                  disabled={isLoading}
-                >
-                  <Smile className="w-5 h-5" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="p-0 border-none w-auto"
-                side="top"
-                sideOffset={5}
-              >
-                <EmojiPicker
-                  onEmojiClick={handleEmojiClick}
-                  searchDisabled={false}
-                  skinTonesDisabled={true}
-                />
-              </PopoverContent>
-            </Popover>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="text-xs text-gray-400 cursor-help flex items-center gap-1">
-                    <Info className="w-3 h-3" />
-                    Ctrl + Enter to send
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-xs">
-                  <div className="text-xs space-y-1">
-                    <p><strong>Validation Rules:</strong></p>
-                    <p>• Minimum {MIN_COMMENT_LENGTH} characters</p>
-                    <p>• Maximum {MAX_COMMENT_LENGTH} characters</p>
-                    <p>• Must contain alphanumeric characters</p>
-                    <p>• No excessive repetition or spam</p>
-                    <p>• Rate limit: 1 comment per {RATE_LIMIT_MS / 1000} seconds</p>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-
+        <div className="flex items-center justify-end">
           <Button
             type="submit"
             disabled={

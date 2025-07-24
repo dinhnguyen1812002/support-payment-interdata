@@ -2,6 +2,7 @@
 
 use App\Events\NewQuestionCreated;
 use App\Http\Controllers\Admin\AdminController;
+use Inertia\Inertia;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Comment\CommentsController;
 use App\Http\Controllers\Department\DepartmentController;
@@ -24,6 +25,45 @@ Route::get('/all', [PostController::class, 'getAllTicket'])->name('all');
 Route::get('/top-voted-posts', [PostController::class, 'getTopVotePosts']);
 Route::get('/demo/avatar', [PostController::class, 'demoAvatar']);
 Route::get('/demo/avatar-demo', [PostController::class, 'demoAvatar'])->name('demo.avatar');
+
+Route::get('/demo/upvote', function () {
+    $tickets = \App\Models\Post::with(['user'])
+        ->withCount('upvotes')
+        ->take(3)
+        ->get()
+        ->map(function ($post) {
+            return [
+                'id' => $post->id,
+                'title' => $post->title,
+                'content' => $post->getExcerpt(),
+                'upvote_count' => $post->upvotes_count ?? 0,
+                'has_upvote' => auth()->check() ? $post->isUpvotedBy(auth()->id()) : false,
+            ];
+        });
+
+    return Inertia::render('Demo/UpvoteDemo', [
+        'tickets' => $tickets
+    ]);
+})->name('demo.upvote');
+
+Route::get('/demo/category-filter', function () {
+    $categories = \App\Models\Category::select(['id', 'title', 'slug', 'description'])
+        ->withCount('posts')
+        ->orderBy('posts_count', 'desc')
+        ->get();
+
+    return Inertia::render('Demo/CategoryFilterDemo', [
+        'categories' => $categories
+    ]);
+})->name('demo.category-filter');
+
+Route::get('/demo/search', function () {
+    return Inertia::render('Demo/SearchDemo');
+})->name('demo.search');
+
+// API endpoint for search suggestions
+Route::get('/api/search/suggestions', [\App\Http\Controllers\Ticket\TicketController::class, 'apiSearchSuggestions'])
+    ->name('api.search.suggestions');
 Route::get('/admin/posts/trash', [PostController::class, 'getTrash'])->name('posts.trash');
 // Route::get('/posts', [PostController::class, 'getPostByUser']);
 Route::middleware(['auth'])->group(function () {
@@ -35,7 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::post('/posts/{id}/restore', [PostController::class, 'restore'])->name('posts.restore');
     Route::post('/comments', [CommentsController::class, 'store'])
-        // ->middleware('comment.rate.limit') // Temporarily disabled for testing
+        ->middleware('comment.rate.limit')
         ->name('comments.store');
 
     // Nếu bạn muốn thêm routes cho reply comments
@@ -51,7 +91,7 @@ Route::get('/tags/{tagsSlug}/posts', [PostController::class, 'filterPostByTag'])
 
 Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
 
-Route::post('/posts/{post}/upvote', [UpvoteController::class, 'upvote'])
+Route::post('/posts/{id}/upvote', [UpvoteController::class, 'upvote'])
     ->name('posts.upvote');
 Route::patch('/posts/{post}/update-status', [PostController::class, 'updateStatus'])
     ->name('posts.update-status');
@@ -122,10 +162,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/admin/tickets/bulk-duplicate', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkDuplicate'])->name('admin.tickets.bulk-duplicate');
     Route::post('/admin/tickets/bulk-archive', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkArchive'])->name('admin.tickets.bulk-archive');
     Route::post('/admin/tickets/bulk-delete', [\App\Http\Controllers\Admin\TicketBulkController::class, 'bulkDelete'])->name('admin.tickets.bulk-delete');
-    Route::get('/admin/tickets/{ticket}', [\App\Http\Controllers\Admin\TicketBulkController::class, 'show'])->name('admin.tickets.show');
-    Route::get('/admin/tickets/{ticket}/comments', [\App\Http\Controllers\Admin\TicketBulkController::class, 'getComments'])->name('admin.tickets.comments');
-    Route::post('/admin/tickets/{ticket}/respond', [\App\Http\Controllers\Admin\TicketBulkController::class, 'addResponse'])->name('admin.tickets.respond');
-    Route::post('/admin/tickets/{ticket}/status', [\App\Http\Controllers\Admin\TicketBulkController::class, 'updateStatus'])->name('admin.tickets.update-status');
+    Route::get('/admin/tickets/{slug}', [\App\Http\Controllers\Admin\TicketBulkController::class, 'show'])->name('admin.tickets.show');
+    Route::get('/admin/tickets/{slug}/comments', [\App\Http\Controllers\Admin\TicketBulkController::class, 'getComments'])->name('admin.tickets.comments');
+    Route::post('/admin/tickets/{slug}/respond', [\App\Http\Controllers\Admin\TicketBulkController::class, 'addResponse'])->name('admin.tickets.respond');
+    Route::post('/admin/tickets/{slug}/status', [\App\Http\Controllers\Admin\TicketBulkController::class, 'updateStatus'])->name('admin.tickets.update-status');
     // Documentation routes
     Route::get('/admin/docs', [DocsController::class, 'adminIndex'])->name('admin.docs.index');
     Route::get('/admin/docs/{file?}', [DocsController::class, 'show'])->name('admin.docs.show');

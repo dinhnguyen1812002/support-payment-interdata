@@ -89,6 +89,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isLoading, setIsLoading] = useState(false);
@@ -103,10 +104,14 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
       const matchesAssignee = assigneeFilter === 'all' || 
                              (assigneeFilter === 'unassigned' && !ticket.assignee) ||
                              (ticket.assignee && ticket.assignee.id.toString() === assigneeFilter);
-      const matchesDepartment = departmentFilter === 'all' || 
+      const matchesDepartment = departmentFilter === 'all' ||
                                (ticket.department && ticket.department.id.toString() === departmentFilter);
+      const matchesCategory = categoryFilter === 'all' ||
+                             ((ticket as any).categories && (ticket as any).categories.some((cat: any) =>
+                               cat.slug === categoryFilter || cat.id.toString() === categoryFilter
+                             ));
 
-      return matchesSearch && matchesStatus && matchesPriority && matchesAssignee && matchesDepartment;
+      return matchesSearch && matchesStatus && matchesPriority && matchesAssignee && matchesDepartment && matchesCategory;
     });
 
     // Sort tickets

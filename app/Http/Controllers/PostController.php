@@ -43,6 +43,9 @@ class PostController extends Controller
     {
         $data = $this->postService->getMyTickets($request);
 
+        // Add search suggestions
+        $data['searchSuggestions'] = $this->getSearchSuggestions();
+
         return Inertia::render('Ticket/MyTickets', $data);
     }
 
@@ -242,5 +245,55 @@ class PostController extends Controller
         return Inertia::render('Posts/Trash', [
             'posts' => $posts,
         ]);
+    }
+
+    /**
+     * Get search suggestions from various sources
+     */
+    private function getSearchSuggestions(): array
+    {
+        // Get popular search terms from user's tickets
+        $userId = auth()->id();
+        $userTerms = \DB::table('posts')
+            ->select(\DB::raw('LOWER(title) as term'))
+            ->where('user_id', $userId)
+            ->where('is_published', true)
+            ->whereNotNull('title')
+            ->get()
+            ->pluck('term')
+            ->flatMap(function ($title) {
+                // Extract meaningful words from titles
+                $words = preg_split('/[\s\-_]+/', $title);
+                return array_filter($words, function ($word) {
+                    return strlen($word) >= 3 && !in_array(strtolower($word), [
+                        'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'its', 'may', 'new', 'now', 'old', 'see', 'two', 'who', 'boy', 'did', 'she', 'use', 'way', 'why', 'oil', 'sit', 'set'
+                    ]);
+                });
+            })
+            ->countBy()
+            ->sortDesc()
+            ->take(5)
+            ->keys()
+            ->toArray();
+
+        // Get category names as suggestions
+        $categoryTerms = \App\Models\Category::select('title')
+            ->get()
+            ->pluck('title')
+            ->map(fn($title) => strtolower($title))
+            ->toArray();
+
+        // Get common terms for personal tickets
+        $personalTerms = [
+            'my issue', 'my request', 'my problem', 'my question',
+            'urgent', 'help needed', 'follow up', 'update',
+            'resolved', 'pending', 'in progress'
+        ];
+
+        // Combine and deduplicate
+        $allSuggestions = array_unique(array_merge($userTerms, $categoryTerms, $personalTerms));
+
+        // Return top 12 suggestions
+        return array_slice($allSuggestions, 0, 12);
     }
 }

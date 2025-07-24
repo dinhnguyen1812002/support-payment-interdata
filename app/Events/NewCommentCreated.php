@@ -66,9 +66,7 @@ class NewCommentCreated implements ShouldBroadcast
                 'message' => "New comment on your post: {$this->comment->comment}",
                 'slug' => $this->comment->post->slug,
                 'name' => $this->comment->user->name,
-                'profile_photo_url' => $this->comment->user->profile_photo_path
-                    ? asset('storage/'.$this->comment->user->profile_photo_path)
-                    : null,
+                'profile_photo_url' => $this->comment->user->profile_photo_url,
                 'categories' => $this->comment->post->categories ? $this->comment->post->categories->pluck('name')->toArray() : [],
                 'type_notification' => 'comment',
             ],

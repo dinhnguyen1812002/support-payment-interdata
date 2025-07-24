@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+
 import { Card, CardContent } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Badge } from '@/Components/ui/badge';
-import { MessageCircle, Trash2, MoreHorizontal, Flag, X } from 'lucide-react';
+import { MessageCircle, Trash2, MoreHorizontal, X } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import {
 } from '@/Components/ui/dropdown-menu';
 import CommentForm from './CommentForm';
 import CommentList from './CommentList';
-import { CommentsResponse, Comment, User } from '@/types/CommentTypes';
+import { Comment, User } from '@/types/CommentTypes';
 import { useComments } from '@/Context/CommentsContext';
 import { formatTimeAgo, getAvatarUrl } from '@/lib/utils';
 import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';

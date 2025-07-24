@@ -17,10 +17,10 @@ class CommentsController extends Controller
 {
     public function store(StoreCommentRequest $request)
     {
-        \Log::info('Comment store request received', [
-            'user_id' => auth()->id(),
-            'request_data' => $request->all()
-        ]);
+        // \Log::info('Comment store request received', [
+        //     'user_id' => auth()->id(),
+        //     'request_data' => $request->all()
+        // ]);
 
         $validated = $request->validated();
 
@@ -39,12 +39,13 @@ class CommentsController extends Controller
 
         $comment->load(['user.roles', 'user.departments']);
 
-        \Log::info('Comment created successfully', [
-            'comment_id' => $comment->id,
-            'user_id' => $comment->user_id,
-            'post_id' => $comment->post_id
-        ]);
+        // \Log::info('Comment created successfully', [
+        //     'comment_id' => $comment->id,
+        //     'user_id' => $comment->user_id,
+        //     'post_id' => $comment->post_id
+        // ]);
 
+        // Broadcast to other users only (not the author)
         broadcast(new CommentPosted($comment))->toOthers();
         broadcast(new NewCommentCreated($comment))->toOthers();
 

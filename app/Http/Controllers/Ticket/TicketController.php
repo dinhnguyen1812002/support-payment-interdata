@@ -33,6 +33,10 @@ class TicketController extends Controller
     public function index(Request $request): \Inertia\Response
     {
         $data = $this->ticketService->getTicketsForIndex($request);
+
+        // Add search suggestions
+        $data['searchSuggestions'] = $this->getSearchSuggestions();
+
         return Inertia::render('Ticket/Index', $data);
     }
 
@@ -117,17 +121,15 @@ class TicketController extends Controller
                 'id' => $post->user->id,
                 'name' => $post->user->name,
                 'email' => $post->user->email,
-                'profile_photo_path' => $post->user->profile_photo_path
-                    ? asset('storage/'.$post->user->profile_photo_path)
-                    : null,
+                'profile_photo_path' => $post->user->profile_photo_path,
+                'profile_photo_url' => $post->user->profile_photo_url,
             ],
             'assignee' => $post->assignee ? [
                 'id' => $post->assignee->id,
                 'name' => $post->assignee->name,
                 'email' => $post->assignee->email,
-                'profile_photo_path' => $post->assignee->profile_photo_path
-                    ? asset('storage/'.$post->assignee->profile_photo_path)
-                    : null,
+                'profile_photo_path' => $post->assignee->profile_photo_path,
+                'profile_photo_url' => $post->assignee->profile_photo_url,
             ] : null,
             'department' => $post->department,
             'categories' => $post->categories,
@@ -148,8 +150,133 @@ class TicketController extends Controller
      */
     public function search(Request $request): \Inertia\Response
     {
+        $startTime = microtime(true);
+        $query = $request->input('q', '');
+
+        if (!$query) {
+            return Inertia::render('Ticket/SearchPage', [
+                'tickets' => [],
+                'query' => '',
+                'totalResults' => 0,
+                'searchTime' => 0,
+                'suggestions' => ['bug', 'feature request', 'urgent', 'payment', 'login'],
+                'categories' => \App\Models\Category::select(['id', 'title', 'slug'])->get(),
+                'tags' => \App\Models\Tag::select(['id', 'name'])->get(),
+                'departments' => \App\Models\Department::select(['id', 'name'])->get(),
+                'users' => \App\Models\User::select(['id', 'name'])->get(),
+                'filters' => [
+                    'search' => $query,
+                    'status' => $request->input('status'),
+                    'priority' => $request->input('priority'),
+                    'sortBy' => $request->input('sortBy', 'relevance'),
+                ],
+                'notifications' => [],
+            ]);
+        }
+
         $data = $this->ticketService->searchTickets($request);
-        return Inertia::render('Ticket/Index', $data);
+        $endTime = microtime(true);
+        $searchTime = round(($endTime - $startTime) * 1000); // Convert to milliseconds
+
+        // Add search-specific data
+        $data['query'] = $query;
+        $data['totalResults'] = $data['tickets']->total();
+        $data['searchTime'] = $searchTime;
+        $data['suggestions'] = ['bug', 'feature request', 'urgent', 'payment', 'login'];
+
+        return Inertia::render('Ticket/SearchPage', $data);
+    }
+
+    /**
+     * Get search suggestions from various sources
+     */
+    private function getSearchSuggestions(): array
+    {
+        // Get popular search terms from actual ticket data
+        $popularTerms = \DB::table('posts')
+            ->select(\DB::raw('LOWER(title) as term'))
+            ->where('is_published', true)
+            ->whereNotNull('title')
+            ->get()
+            ->pluck('term')
+            ->flatMap(function ($title) {
+                // Extract meaningful words from titles
+                $words = preg_split('/[\s\-_]+/', $title);
+                return array_filter($words, function ($word) {
+                    return strlen($word) >= 3 && !in_array(strtolower($word), [
+                        'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'its', 'may', 'new', 'now', 'old', 'see', 'two', 'who', 'boy', 'did', 'she', 'use', 'way', 'why', 'oil', 'sit', 'set'
+                    ]);
+                });
+            })
+            ->countBy()
+            ->sortDesc()
+            ->take(10)
+            ->keys()
+            ->toArray();
+
+        // Get category names as suggestions
+        $categoryTerms = \App\Models\Category::select('title')
+            ->get()
+            ->pluck('title')
+            ->map(fn($title) => strtolower($title))
+            ->toArray();
+
+        // Get common status and priority terms
+        $systemTerms = [
+            'bug', 'issue', 'problem', 'error', 'urgent', 'high priority',
+            'feature request', 'enhancement', 'improvement',
+            'payment', 'billing', 'account', 'login', 'password',
+            'support', 'help', 'question', 'how to'
+        ];
+
+        // Combine and deduplicate
+        $allSuggestions = array_unique(array_merge($popularTerms, $categoryTerms, $systemTerms));
+
+        // Return top 15 suggestions
+        return array_slice($allSuggestions, 0, 15);
+    }
+
+    /**
+     * API endpoint to get search suggestions
+     */
+    public function apiSearchSuggestions(Request $request)
+    {
+        $query = $request->input('q', '');
+        $limit = $request->input('limit', 10);
+
+        if (strlen($query) < 2) {
+            return response()->json([
+                'suggestions' => $this->getSearchSuggestions()
+            ]);
+        }
+
+        // Get suggestions based on query
+        $suggestions = collect($this->getSearchSuggestions())
+            ->filter(function ($suggestion) use ($query) {
+                return stripos($suggestion, $query) !== false;
+            })
+            ->take($limit)
+            ->values()
+            ->toArray();
+
+        // If no matches, get popular terms that contain the query
+        if (empty($suggestions)) {
+            $suggestions = \DB::table('posts')
+                ->select(\DB::raw('LOWER(title) as term'))
+                ->where('is_published', true)
+                ->where('title', 'LIKE', "%{$query}%")
+                ->limit($limit)
+                ->get()
+                ->pluck('term')
+                ->unique()
+                ->values()
+                ->toArray();
+        }
+
+        return response()->json([
+            'suggestions' => $suggestions,
+            'query' => $query
+        ]);
     }
 
     public function showForm()

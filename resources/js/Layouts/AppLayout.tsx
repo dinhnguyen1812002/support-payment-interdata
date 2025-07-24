@@ -27,7 +27,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import MobileSidebarToggle from '@/Components/toggle-side-bar';
 import MobileSidebar from '@/Components/MobileSidebar';
 import { SearchCommandDialog } from '@/Components/command-dialog';
-import { LogOut, ScanSearch } from 'lucide-react';
+import { LogOut, Search } from 'lucide-react';
 import ThemeSwitch from '@/Components/dashboard/toggle-switch';
 import { PageTransition } from '@/Components/ui/page-transition';
 
@@ -118,7 +118,7 @@ export default function AppLayout({
         )}
       >
         {/* Primary Navigation Menu */}
-        <div className="max-w-[1450px] mx-auto px-3 sm:px-4 lg:px-6 ">
+        <div className="container mx-auto px-3 sm:px-4 lg:px-6 ">
           <div className="flex justify-between h-14 sm:h-16 md:h-18 lg:h-20">
             {/* Left section: Logo and menu toggle */}
             <div className="flex items-center space-x-1">
@@ -187,7 +187,8 @@ export default function AppLayout({
                   className="rounded-full"
                   onClick={() => handleCategoryClick()}
                 >
-                  <ScanSearch className="h-10 w-10" />
+                
+                 <Search className="h-10 w-10"/>
                   <small className="hidden sm:inline">(Ctrl+K)</small>
                 </Button>
               </div>

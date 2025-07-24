@@ -306,9 +306,7 @@ class AdminService
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'avatarUrl' => $user->profile_photo_path
-                ? asset('storage/'.$user->profile_photo_path)
-                : $this->getDefaultAvatarUrl($user->name),
+            'avatarUrl' => $user->profile_photo_url ?: $this->getDefaultAvatarUrl($user->name),
         ];
     }
 
@@ -424,7 +422,7 @@ class AdminService
                     'email' => $user->email,
                     'created_at' => $user->created_at->toISOString(),
                     'updated_at' => $user->updated_at->toISOString(),
-                    'profile_photo_path' => $user->profile_photo_path ? asset('storage/'.$user->profile_photo_path) : null,
+                    'profile_photo_path' => $user->profile_photo_url,
                 ];
             })->values()->all(),
             'pagination' => $this->formatPagination($users),

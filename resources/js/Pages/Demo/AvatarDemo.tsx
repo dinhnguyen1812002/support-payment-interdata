@@ -20,9 +20,9 @@ export default function AvatarDemo() {
       <div className="container mx-auto py-10 px-4">
         <h1 className="text-3xl font-bold mb-8 text-center">Avatar Fallback Demo</h1>
         
-        {/* Geometric Variant */}
+        {/* Marble Variant */}
         <div className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Geometric Pattern</h2>
+          <h2 className="text-2xl font-semibold mb-6">Marble Pattern</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {testUsers.map((user, index) => (
               <div key={index} className="flex flex-col items-center space-y-2">
@@ -30,7 +30,7 @@ export default function AvatarDemo() {
                   src={user.src}
                   name={user.name}
                   className="h-16 w-16"
-                  variant="geometric"
+                  variant="marble"
                   size={64}
                 />
                 <span className="text-sm text-center">{user.name}</span>
@@ -39,9 +39,9 @@ export default function AvatarDemo() {
           </div>
         </div>
 
-        {/* Identicon Variant */}
+        {/* Beam Variant */}
         <div className="mb-12">
-          <h2 className="text-2xl font-semibold mb-6">Identicon Pattern</h2>
+          <h2 className="text-2xl font-semibold mb-6">Beam Pattern</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {testUsers.map((user, index) => (
               <div key={index} className="flex flex-col items-center space-y-2">
@@ -49,7 +49,7 @@ export default function AvatarDemo() {
                   src={user.src}
                   name={user.name}
                   className="h-16 w-16"
-                  variant="identicon"
+                  variant="beam"
                   size={64}
                 />
                 <span className="text-sm text-center">{user.name}</span>
@@ -87,13 +87,13 @@ export default function AvatarDemo() {
                   src={user.src}
                   name={user.name}
                   className="h-16 w-16"
-                  variant={index === 0 ? "geometric" : index === 1 ? "identicon" : "initials"}
+                  variant={index === 0 ? "pixel" : index === 1 ? "sunset" : "initials"}
                   size={64}
                   square={true}
                 />
                 <span className="text-sm text-center">{user.name}</span>
                 <span className="text-xs text-gray-500">
-                  {index === 0 ? "Geometric" : index === 1 ? "Identicon" : "Initials"}
+                  {index === 0 ? "Pixel" : index === 1 ? "Sunset" : "Initials"}
                 </span>
               </div>
             ))}
@@ -110,7 +110,7 @@ export default function AvatarDemo() {
                   src={null}
                   name="John Doe"
                   className={`h-${size/4} w-${size/4}`}
-                  variant="geometric"
+                  variant="ring"
                   size={size}
                 />
                 <span className="text-xs text-gray-500">{size}px</span>
@@ -129,7 +129,7 @@ export default function AvatarDemo() {
                   src={user.src}
                   name={user.name}
                   className="h-16 w-16"
-                  variant="geometric"
+                  variant="bauhaus"
                   size={64}
                   colors={
                     index === 0 

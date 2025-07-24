@@ -24,6 +24,7 @@ interface TicketIndexProps {
   users: User[];
   pagination: Paginate;
   notifications: Notification[];
+  searchSuggestions?: string[];
   filters: {
     status?: string;
     priority?: string;
@@ -44,6 +45,7 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
   users = [],
   pagination,
   notifications,
+  searchSuggestions = [],
   filters,
 }) => {
   const title = 'My Tickets';
@@ -59,8 +61,9 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
       departments={departments}
       users={users}
       tags={tags}
-      filters={filters} 
+      filters={filters}
       notifications={notifications}
+      searchSuggestions={searchSuggestions}
       showTabs={true}
       showCreateButton={true}
     >

@@ -30,7 +30,7 @@ import { Notification, Post, Session } from '@/types';
 import PostsTable from '@/Pages/Profile/Partials/PostTable';
 import { router } from '@inertiajs/core';
 import { route } from 'ziggy-js';
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import { Badge } from '@/Components/ui/badge';
 import { Toaster } from '@/Components/ui/sonner';
 
@@ -93,13 +93,13 @@ const ProfilePage = ({
         <Card className="bg-card">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20">
-                <AvatarImage
-                  src={user.profile_photo_url}
-                  alt={user.name}
-                />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-              </Avatar>
+              <AvatarWithFallback
+                src={user.profile_photo_url}
+                name={user.name}
+                alt={user.name}
+                className="h-20 w-20"
+                variant="marble"
+              />
               <div className="space-y-1">
                 <h2 className="text-2xl font-semibold">{user.name}</h2>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">

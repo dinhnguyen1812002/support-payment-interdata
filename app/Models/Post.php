@@ -128,6 +128,7 @@ class Post extends Model
             'status' => $this->status ?? 'open',
             'priority' => $this->priority ?? 'medium',
             'upvote_count' => $this->upvotes_count ?? 0,
+            'has_upvote' => auth()->check() ? $this->isUpvotedBy(auth()->id()) : false,
             'is_published' => $this->is_published,
             'created_at' => $this->created_at->diffForHumans(),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
@@ -135,17 +136,13 @@ class Post extends Model
                 'id' => $this->user->id,
                 'name' => $this->user->name,
                 'email' => $this->user->email,
-                'profile_photo_path' => $this->user->profile_photo_path
-                    ? asset('storage/'.$this->user->profile_photo_path)
-                    : null
+                'profile_photo_path' => $this->user->profile_photo_url
             ] : null,
             'assignee' => $this->assignee ? [
                 'id' => $this->assignee->id,
                 'name' => $this->assignee->name,
                 'email' => $this->assignee->email,
-                'profile_photo_path' => $this->assignee->profile_photo_path
-                    ? asset('storage/'.$this->assignee->profile_photo_path)
-                    : null
+                'profile_photo_path' => $this->assignee->profile_photo_url
             ] : null,
             'department' => $this->department ? [
                 'id' => $this->department->id,
@@ -249,9 +246,7 @@ class Post extends Model
             'user' => [
                 'id' => $comment->user->id,
                 'name' => $comment->user->name,
-                'profile_photo_path' => $comment->user->profile_photo_path
-                    ? asset('storage/'.$comment->user->profile_photo_path)
-                    : null,
+                'profile_photo_path' => $comment->user->profile_photo_url,
                 'roles' => $comment->user->getRoleNames(),
                 'departments' => $comment->user->departments->pluck('name'),
             ],

@@ -32,6 +32,7 @@ interface TicketLayoutProps {
   backLabel?: string; // Label cho back button
   showTabs?: boolean; // Có hiển thị tabs không
   showCreateButton?: boolean; // Có hiển thị nút Create Ticket không
+  searchSuggestions?: string[];
 }
 
 const TicketLayout: React.FC<TicketLayoutProps> = ({
@@ -48,6 +49,7 @@ const TicketLayout: React.FC<TicketLayoutProps> = ({
   backLabel = 'Back',
   showTabs = false,
   showCreateButton = false,
+  searchSuggestions = [],
 }) => {
   const { props } = usePage();
 
@@ -69,6 +71,7 @@ const TicketLayout: React.FC<TicketLayoutProps> = ({
                 users={users}
                 filters={filters}
                 currentUser={(props as any)?.auth?.user}
+                searchSuggestions={searchSuggestions}
               />
             </div>
           )}

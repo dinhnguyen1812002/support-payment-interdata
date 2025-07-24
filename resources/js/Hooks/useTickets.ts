@@ -72,6 +72,15 @@ export function useTickets(initialTickets?: any[], initialFilters?: TicketFilter
         return false;
       }
 
+      if (filters.category && ticket.categories) {
+        const hasCategory = ticket.categories.some((cat: any) =>
+          cat.slug === filters.category || cat.id.toString() === filters.category
+        );
+        if (!hasCategory) {
+          return false;
+        }
+      }
+
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         return (
@@ -94,7 +103,7 @@ export function useTickets(initialTickets?: any[], initialFilters?: TicketFilter
       case "most-upvoted":
         return filtered.sort((a: Ticket, b: Ticket) => (b.upvote_count || 0) - (a.upvote_count || 0));
       case "most-replies":
-        return filtered.sort((a: Ticket, b: Ticket) => (b.comments?.length || 0) - (a.comments?.length || 0));
+        return filtered.sort((a: Ticket, b: Ticket) => (b.comments_count || 0) - (a.comments_count || 0));
       case "newest":
       default:
         return filtered.sort(

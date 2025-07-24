@@ -28,6 +28,7 @@ interface TicketIndexProps {
   keyword: string;
   notifications: any[];
   sort: string;
+  searchSuggestions?: string[];
   filters: {
     status?: string;
     priority?: string;
@@ -52,6 +53,7 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
   keyword,
   notifications,
   sort,
+  searchSuggestions = [],
   filters,
 }) => {
   const title = 'Support Tickets';
@@ -69,6 +71,7 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
       tags={tags}
       filters={filters}
       notifications={notifications}
+      searchSuggestions={searchSuggestions}
       showTabs={true}
       showCreateButton={true}
     >

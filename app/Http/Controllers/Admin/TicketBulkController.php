@@ -398,12 +398,12 @@ class TicketBulkController extends Controller
     /**
      * Show ticket detail page
      */
-    public function show($ticket)
+    public function show(string $slug)
     {
         $this->authorize('view admin dashboard');
 
-        $post = Post::where('slug', $ticket)
-            ->orWhere('id', $ticket)
+        $post = Post::where('slug', $slug)
+            ->orWhere('id', $slug)
             ->with([
                 'user:id,name,profile_photo_path,email', 
                 'categories',
@@ -443,12 +443,12 @@ class TicketBulkController extends Controller
     /**
      * Get ticket details with comments
      */
-    public function getComments($ticket)
+    public function getComments(string $slug)
     {
         $this->authorize('view admin dashboard');
 
-        $post = Post::where('slug', $ticket)
-            ->orWhere('id', $ticket)
+        $post = Post::where('slug', $slug)
+            ->orWhere('id', $slug)
             ->with(['user', 'categories', 'tags', 'assignee', 'department'])
             ->withCount('upvotes')
             ->firstOrFail();
@@ -481,7 +481,7 @@ class TicketBulkController extends Controller
     /**
      * Add response/comment to a ticket
      */
-    public function addResponse(Request $request, $ticket)
+    public function addResponse(Request $request, string $slug)
     {
         $this->authorize('view admin dashboard');
 
@@ -492,8 +492,8 @@ class TicketBulkController extends Controller
         ]);
 
         // Find the ticket
-        $post = Post::where('slug', $ticket)
-            ->orWhere('id', $ticket)
+        $post = Post::where('slug', $slug)
+            ->orWhere('id', $slug)
             ->firstOrFail();
 
         $result = $this->responseService->addResponse($post, $validated);
@@ -508,7 +508,7 @@ class TicketBulkController extends Controller
     /**
      * Update single ticket status
      */
-    public function updateStatus(Request $request, $ticket)
+    public function updateStatus(Request $request, string $slug)
     {
         // $this->authorize('manage tickets');
 
@@ -520,8 +520,8 @@ class TicketBulkController extends Controller
             DB::beginTransaction();
 
             // Find the ticket
-            $post = Post::where('slug', $ticket)
-                ->orWhere('id', $ticket)
+            $post = Post::where('slug', $slug)
+                ->orWhere('id', $slug)
                 ->firstOrFail();
 
             $oldStatus = $post->status;

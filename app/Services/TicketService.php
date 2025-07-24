@@ -29,6 +29,7 @@ class TicketService
         $priority = $request->input('priority', null);
         $department = $request->input('department', null);
         $assignee = $request->input('assignee', null);
+        $category = $request->input('category', null);
 
         // Build query for tickets (posts with ticket-like behavior)
         $query = Post::query()
@@ -58,6 +59,17 @@ class TicketService
 
         if ($assignee) {
             $query->where('assignee_id', $assignee);
+        }
+
+        if ($category) {
+            $query->whereHas('categories', function ($q) use ($category) {
+                // Support both slug and ID for backward compatibility
+                if (is_numeric($category)) {
+                    $q->where('categories.id', $category);
+                } else {
+                    $q->where('categories.slug', $category);
+                }
+            });
         }
 
         // Apply sorting
@@ -97,6 +109,7 @@ class TicketService
             'filters' => [
                 'status' => $status,
                 'priority' => $priority,
+                'category' => $category,
                 'department' => $department,
                 'assignee' => $assignee,
                 'search' => $search,
@@ -243,8 +256,11 @@ class TicketService
      */
     public function searchTickets(Request $request): array
     {
-        $search = $request->input('search', '');
-        $sort = $request->input('sort', 'latest');
+        $search = $request->input('q', $request->input('search', ''));
+        $sort = $request->input('sortBy', $request->input('sort', 'relevance'));
+        $category = $request->input('category', null);
+        $status = $request->input('status', null);
+        $priority = $request->input('priority', null);
 
         // Use search functionality similar to PostService
         $ticketIds = Post::search($search)->keys();
@@ -253,9 +269,35 @@ class TicketService
             ->where('is_published', true)
             ->with(['user', 'categories', 'assignee', 'department'])
             ->withCount(['upvotes', 'comments'])
+            ->when($category, function ($q) use ($category) {
+                $q->whereHas('categories', function ($subQ) use ($category) {
+                    // Support both slug and ID for backward compatibility
+                    if (is_numeric($category)) {
+                        $subQ->where('categories.id', $category);
+                    } else {
+                        $subQ->where('categories.slug', $category);
+                    }
+                });
+            })
+            ->when($status, fn ($q) => $q->where('status', $status))
+            ->when($priority, fn ($q) => $q->where('priority', $priority))
             ->when($sort === 'latest', fn ($q) => $q->latest())
+            ->when($sort === 'oldest', fn ($q) => $q->oldest())
             ->when($sort === 'upvotes', fn ($q) => $q->orderBy('upvotes_count', 'desc'))
             ->when($sort === 'priority', fn ($q) => $q->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')"))
+            ->when($sort === 'relevance', function ($q) use ($search) {
+                // For relevance, order by title match first, then content match
+                if ($search) {
+                    return $q->orderByRaw("
+                        CASE
+                            WHEN title LIKE ? THEN 1
+                            WHEN content LIKE ? THEN 2
+                            ELSE 3
+                        END, created_at DESC
+                    ", ["%{$search}%", "%{$search}%"]);
+                }
+                return $q->latest();
+            })
             ->paginate(self::TICKETS_PER_PAGE)
             ->withQueryString();
 
@@ -266,11 +308,20 @@ class TicketService
             'tickets' => $tickets->map(fn ($ticket) => $ticket->toFormattedArray()),
             'categories' => $this->getCategories(),
             'departments' => $this->getDepartments(),
+            'users' => $this->getUsers(),
+            'tags' => $this->getTags(),
             'ticketCount' => $tickets->total(),
             'pagination' => $this->getPaginationData($tickets),
             'keyword' => $search,
             'notifications' => $notifications,
             'sort' => $sort,
+            'filters' => [
+                'search' => $search,
+                'category' => $category,
+                'status' => $status,
+                'priority' => $priority,
+                'sortBy' => $sort,
+            ],
         ];
     }
 

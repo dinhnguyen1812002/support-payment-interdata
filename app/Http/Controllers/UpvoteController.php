@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Auth;
 class UpvoteController extends Controller
 {
     //
-    public function upvote(Post $post)
+    public function upvote(string $id)
     {
         $user = Auth::user();
+        $post = Post::findOrFail($id);
 
         // Kiểm tra nếu user đã upvote
         if ($user == null) {

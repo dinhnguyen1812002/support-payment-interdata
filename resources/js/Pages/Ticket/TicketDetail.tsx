@@ -4,7 +4,6 @@ import {
   MessageCircle,
   Clock,
   Tag,
-  ChevronUp,
   Send,
   Settings,
   ArrowBigUp,
@@ -27,12 +26,14 @@ import CommentsSection from '../Comments/CommentsSection';
 import { Category, Department } from '@/types';
 import { Notification } from '@/types/Notification';
 import { CommentsResponse } from '@/types/CommentTypes';
+import { UpvoteButton } from '@/Components/UpvoteButton';
 
 
 export interface User {
   id: number;
   name: string;
   profile_photo_path: string | null;
+  profile_photo_url?: string | null;
   roles?: string[];
   departments?: string[];
 }
@@ -43,7 +44,7 @@ interface TicketDetailPageProps {
   categories?: Category[];
   departments?: Department[];
   users?: User[];
-  auth: { user: { id: number; name: string; profile_photo_path: string } };
+  auth: { user: { id: number; name: string; profile_photo_path: string; profile_photo_url?: string } };
   notifications?: Notification[];
   filters?: {
     status?: string;
@@ -82,8 +83,8 @@ export default function TicketDetail({
     roles: currentUser?.roles?.map(role => role.name) || [],
     departments: currentUser?.departments?.map(dept => dept.name) || []
   } : null;
-  // Check if current user has upvoted this ticket
-  const hasUpvoted = ticket.has_upvote || false;
+  // Check if current user has upvoted this ticket (initial state)
+  const initialHasUpvoted = ticket.has_upvote || false;
 
   // Helper function to check if user has specific role
   const hasRole = (roleName: string): boolean => {
@@ -97,9 +98,9 @@ export default function TicketDetail({
   const canManageTicket = isAdmin || isStaff;
   const [body, setBody] = useState('');
   // Debug: Log user roles and comments (remove in production)
-  console.log('Current user:', currentUser);
-  console.log('Ticket comments:', ticket.comments);
-  console.log('Comment user:', commentUser);
+  // console.log('Current user:', currentUser);
+  // console.log('Ticket comments:', ticket.comments);
+  // console.log('Comment user:', commentUser);
   // console.log('User roles:', currentUser?.roles);
   // console.log('Is admin:', isAdmin);
   // console.log('Is staff:', isStaff);
@@ -137,19 +138,10 @@ export default function TicketDetail({
     }
   };
 
-  const handleUpvote = () => {
-    // TODO: Implement upvote functionality with Inertia
-    console.log('Upvote ticket:', ticket.id);
-  };
 
+  
   const handleCommentSubmit = (content: string, parentId?: string) => {
     setIsSubmitting(true);
-
-    console.log('Submitting comment:', {
-      comment: content,
-      post_id: ticket.id,
-      parent_id: parentId || null,
-    });
 
     router.post(
       route('comments.store'),
@@ -159,8 +151,7 @@ export default function TicketDetail({
         parent_id: parentId || null,
       },
       {
-        onSuccess: (response) => {
-          console.log('Comment submitted successfully:', response);
+        onSuccess: () => {
           setBody('');
           setIsSubmitting(false);
         },
@@ -192,36 +183,14 @@ export default function TicketDetail({
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   {/* Upvote Section */}
-                  <div className="flex flex-col items-center gap-2 pt-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={`h-10 w-10 p-0 transition-colors ${
-                        hasUpvoted
-                          ? 'text-orange-600 bg-orange-50 hover:bg-orange-100'
-                          : 'text-muted-foreground hover:text-orange-600 hover:bg-orange-50'
-                      }`}
-                      onClick={handleUpvote}
-                    >
-                      <ChevronUp
-                        className={`h-5 w-5 ${hasUpvoted ? 'fill-current' : ''}`}
-                      />
-                    </Button>
-                    <div className="text-center">
-                      <div
-                        className={`text-sm font-semibold ${
-                          hasUpvoted
-                            ? 'text-orange-600'
-                            : 'text-muted-foreground'
-                        }`}
-                      >
-                        {ticket.upvote_count || 0}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {(ticket.upvote_count || 0) === 1 ? 'vote' : 'votes'}
-                      </div>
-                    </div>
-                  </div>
+                  <UpvoteButton
+                    post_id={ticket.id}
+                    initialUpvoteCount={ticket.upvote_count || 0}
+                    initialHasUpvoted={initialHasUpvoted}
+                    size="md"
+                    variant="detail"
+                    className="pt-1"
+                  />
 
                   {/* <span className="text-2xl">{getCategoryIcon(ticket.category)}</span> */}
                   <div className="flex-1 min-w-0">
@@ -286,12 +255,12 @@ export default function TicketDetail({
                     <div className="text-sm font-medium">Author</div>
                     <div className="flex items-center gap-2">
                       <AvatarWithFallback
-                        src={ticket.user?.profile_photo_path}
-                        name={ticket.user?.name || 'Unknown'}
+                        src={ticket.user?.profile_photo_url}
+                        name={ticket.user?.name}
                         className="w-5 h-5"
                       />
                       <span className="text-sm text-muted-foreground">
-                        {ticket.user?.name || 'Unknown'}
+                        {ticket.user?.name}
                       </span>
                     </div>
                   </div>
@@ -300,10 +269,11 @@ export default function TicketDetail({
                       <div className="text-sm font-medium">Assigned to</div>
                       <div className="flex items-center gap-2">
                         <AvatarWithFallback
-                          src={ticket.assignee.profile_photo_path}
+                          src={ticket.assignee.profile_photo_url}
                           name={ticket.assignee.name}
                           className="w-5 h-5"
                         />
+
                         <span className="text-sm text-muted-foreground">
                           {ticket.assignee.name}
                         </span>
@@ -413,134 +383,9 @@ export default function TicketDetail({
                   </div>
                 )}
 
-                {/* Comments */}
-                {/* {ticket.comments && ticket.comments.data && ticket.comments.data.length > 0 && (
-                  <div className="space-y-4">
-                    <h3 className="font-semibold flex items-center gap-2">
-                      <MessageCircle className="w-4" />
-                      Comments ({ticket.comments.data.length})
-                    </h3>
-                    <div className="space-y-4">
-                      {ticket.comments.data.map(comment => (
-                        <div key={comment.id} className="border rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <AvatarWithFallback
-                                src={comment.user?.profile_photo_path}
-                                name={comment.user?.name || 'Unknown'}
-                                className="w-8 h-8"
-                              />
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium text-sm">
-                                    {comment.user?.name || 'Unknown'}
-                                  </span>
-                                  {comment.is_hr_response && (
-                                    <Badge
-                                      variant="outline"
-                                      className="text-xs bg-blue-50 text-blue-700 border-blue-200"
-                                    >
-                                      HR Staff
-                                    </Badge>
-                                  )}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  {formatDistanceToNow(
-                                    new Date(comment.created_at),
-                                    {
-                                      addSuffix: true,
-                                    },
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-sm leading-relaxed whitespace-pre-wrap">
-                            {comment.content}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )} */}
-
                 {/* Comment Form */}
                 <Separator />
-                {/* <div className="space-y-4">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4" />
-                    Add a comment
-                  </h3>
-                  {currentUser ? (
-                    <form onSubmit={handleSubmitComment} className="space-y-4">
-                      <div className="flex items-start gap-3">
-                        <AvatarWithFallback
-                          src={currentUser.profile_photo_url}
-                          name={currentUser.name}
-                          className="w-8 h-8 mt-1"
-                        />
-                        <div className="flex-1 space-y-3">
-                          <Textarea
-                            placeholder="Write your comment here..."
-                            value={comment}
-                            onChange={e => setComment(e.target.value)}
-                            className="min-h-[100px] resize-none"
-                            disabled={isSubmitting}
-                          />
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <span>
-                                Commenting as{' '}
-                                <span className="font-medium">
-                                  {currentUser.name}
-                                </span>
-                              </span>
-                              {isAdmin && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs bg-red-50 text-red-700 border-red-200"
-                                >
-                                  Admin
-                                </Badge>
-                              )}
-                              {isStaff && !isAdmin && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs bg-blue-50 text-blue-700 border-blue-200"
-                                >
-                                  Staff
-                                </Badge>
-                              )}
-                            </div>
-                            <Button
-                              type="submit"
-                              disabled={!comment.trim() || isSubmitting}
-                              className="gap-2"
-                            >
-                              {isSubmitting ? (
-                                <>
-                                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                  Posting...
-                                </>
-                              ) : (
-                                <>
-                                  <Send className="w-4 h-4" />
-                                  Post Comment
-                                </>
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </form>
-                  ) : (
-                    <div className="text-center py-4">
-                      <p className="text-muted-foreground">
-                        Please log in to post a comment.
-                      </p>
-                    </div>
-                  )}
-                </div> */}
+
                 <CommentsSection
                   initialComments={ticket.comments}
                   onCommentSubmit={handleCommentSubmit}

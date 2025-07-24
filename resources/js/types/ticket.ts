@@ -10,6 +10,7 @@ export interface Comment {
     email: string
     profile?: string
     profile_photo_path?: string
+    profile_photo_url?: string
     roles?: string[]
     departments?: string[]
   }
@@ -32,12 +33,14 @@ export interface Ticket {
     name: string
     email: string
     profile_photo_path?: string
+    profile_photo_url?: string
   }
   assignee?: {
     id: number
     name: string
     email: string
     profile_photo_path?: string
+    profile_photo_url?: string
   }
   department?: {
     id: number

@@ -26,9 +26,23 @@ export function formatDate(date: string): string {
 }
 
 export const getAvatarUrl = (user: { name: string; profile_photo_path: string | null }) => {
-    return user.profile_photo_path
-        ? `/storage/${user.profile_photo_path}`
-        : null;
+    if (!user.profile_photo_path) return null;
+
+    // If it's already a full URL, return as is
+    if (user.profile_photo_path.startsWith('http')) {
+        return user.profile_photo_path;
+    }
+
+    // If it's a relative path, add the storage prefix
+    return `/storage/${user.profile_photo_path}`;
+};
+
+// Helper function to get user data for AvatarWithFallback component
+export const getUserForAvatar = (user: { name: string; profile_photo_path?: string | null; profile_photo_url?: string | null }) => {
+    return {
+        name: user.name,
+        src: user.profile_photo_url || user.profile_photo_path ? getAvatarUrl({ name: user.name, profile_photo_path: user.profile_photo_path || null }) : null
+    };
 };
 
 export const formatTimeAgo = (dateString: string) => {

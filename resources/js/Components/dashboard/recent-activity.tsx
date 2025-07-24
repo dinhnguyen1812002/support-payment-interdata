@@ -144,7 +144,7 @@ export function RecentActivity({ posts }: RecentActivityProps) {
                 name={post.user.name}
                 alt={post.user.name}
                 className="h-8 w-8"
-                variant="geometric"
+                variant="marble"
               />
               
               <div className="flex-1 min-w-0">

@@ -1,5 +1,4 @@
-import { Search, Filter, User, Users } from "lucide-react";
-import { Input } from "@/Components/ui/input";
+import { Filter, User, Users } from "lucide-react";
 import { Button } from "@/Components/ui/button";
 import { Badge } from "@/Components/ui/badge";
 import { Separator } from "@/Components/ui/separator";
@@ -12,6 +11,8 @@ import {
 } from "@/Components/ui/select";
 import { router } from "@inertiajs/react";
 import React from "react";
+import { CategoryFilter } from "@/Components/CategoryFilter";
+import { SearchInput } from "@/Components/SearchInput";
 
 interface FilterSidebarProps {
   categories?: any[];
@@ -28,6 +29,7 @@ interface FilterSidebarProps {
     sortBy?: string;
   };
   currentUser?: any;
+  searchSuggestions?: string[];
 }
 
 const sortOptions = [
@@ -56,7 +58,8 @@ export function FilterSidebar({
   departments = [],
   users = [],
   filters = {},
-  currentUser
+  currentUser,
+  searchSuggestions = []
 }: FilterSidebarProps) {
 
   const updateFilters = (newFilters: any) => {
@@ -102,46 +105,33 @@ export function FilterSidebar({
           )}
         </div> */}
 
-        {/* Search */}
-        <div className="space-y-2">
-          {/* <label className="text-sm font-medium">Search</label> */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search tickets..."
-              value={filters.search || ""}
-              onChange={(e) => updateFilters({ search: e.target.value })}
-              className="pl-10"
-            />
-          </div>
+        {/* Enhanced Search */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium">Search</label>
+          <SearchInput
+            value={filters.search || ''}
+            placeholder="Search tickets..."
+            onSearch={(value) => updateFilters({ search: value || undefined })}
+            onClear={() => updateFilters({ search: undefined })}
+            showHistory={true}
+            showSuggestions={true}
+            storageKey="ticket-search-history"
+            suggestions={searchSuggestions}
+            enableApiSuggestions={true}
+            apiSuggestionsUrl="/api/search/suggestions"
+            size="md"
+          />
         </div>
-          <hr/>
-      
-
-
+        <hr/>
         {/* Category */}
         <div className="space-y-3">
           <label className="text-sm font-medium">Category</label>
-          <Select
-            value={filters.category || ""}
-            onValueChange={(value) =>
-              updateFilters({
-                category: value === "all" ? undefined : value,
-              })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id.toString()}>
-                  {category.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CategoryFilter
+            categories={categories}
+            value={filters.category}
+            onValueChange={(value) => updateFilters({ category: value })}
+            showPostCount={true}
+          />
         </div>
 
         {/* Priority */}

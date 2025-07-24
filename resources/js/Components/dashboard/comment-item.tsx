@@ -69,7 +69,7 @@ interface CommentItemProps {
           name={comment.user.name}
           alt={comment.user.name}
           className="h-10 w-10 flex-shrink-0"
-          variant="identicon"
+          variant="marble"
         />
 
         <div className="flex-1">
