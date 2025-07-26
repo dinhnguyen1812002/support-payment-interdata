@@ -24,7 +24,7 @@ interface SearchInputProps {
 
 export function SearchInput({
   value = '',
-  placeholder = 'Search...',
+  placeholder = 'Tìm kiếm...',
   onSearch,
   onClear,
   className = '',
@@ -41,7 +41,7 @@ export function SearchInput({
   const [searchTerm, setSearchTerm] = useState(value);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [popularSearches] = useState(['bug', 'feature request', 'urgent', 'payment', 'login']);
+  const [popularSearches] = useState(['lỗi', 'yêu cầu tính năng', 'khẩn cấp', 'thanh toán', 'đăng nhập']);
   const [apiSuggestions, setApiSuggestions] = useState<string[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   
@@ -221,7 +221,7 @@ export function SearchInput({
               <div className="mb-3">
                 <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  Recent searches
+                  Tìm kiếm gần đây
                 </div>
                 {searchHistory.map((item, index) => (
                   <div
@@ -257,7 +257,7 @@ export function SearchInput({
                   {isLoadingSuggestions && (
                     <div className="animate-spin h-3 w-3 border border-muted-foreground border-t-transparent rounded-full"></div>
                   )}
-                  Smart suggestions
+                  Gợi ý thông minh
                 </div>
                 {apiSuggestions.map((item, index) => (
                   <div
@@ -276,7 +276,7 @@ export function SearchInput({
             {suggestions.length > 0 && (
               <div className="mb-3">
                 <div className="text-xs text-muted-foreground mb-2">
-                  Suggestions
+                  Gợi ý
                 </div>
                 {suggestions.map((item, index) => (
                   <div
@@ -296,7 +296,7 @@ export function SearchInput({
               <div>
                 <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
                   <TrendingUp className="h-3 w-3" />
-                  Popular searches
+                  Tìm kiếm phổ biến
                 </div>
                 {popularSearches.map((item, index) => (
                   <div
@@ -319,7 +319,7 @@ export function SearchInput({
         <div className="mt-2">
           <Badge variant="secondary" className="text-xs">
             <Search className="h-3 w-3 mr-1" />
-            Searching: "{value}"
+            Đang tìm: "{value}"
             <Button
               type="button"
               variant="ghost"

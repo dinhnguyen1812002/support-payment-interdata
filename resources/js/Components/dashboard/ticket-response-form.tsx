@@ -1,17 +1,15 @@
 
 
-import  React from "react"
-import { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { Button } from "@/Components/ui/button"
 import { Textarea } from "@/Components/ui/textarea"
 import { Label } from "@/Components/ui/label"
-import { Badge } from "@/Components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar"
-import { Send, User, Clock, MessageSquare, AlertCircle, X, Reply, CornerDownRight } from "lucide-react"
+import { Send, User, MessageSquare, AlertCircle, X } from "lucide-react"
 import { useForm } from "@inertiajs/react"
 import { toast } from "sonner"
 import { CommentItem } from "./comment-item"
-import { Ticket, Comment } from "@/types/ticket"
+import { Ticket } from "@/types/ticket"
+import { Comment } from "@/types/CommentTypes"
 
 
 
@@ -30,8 +28,8 @@ interface TicketResponseFormProps {
 
 export function TicketResponseForm({ ticket, onCommentAdded, currentUser }: TicketResponseFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [localComments, setLocalComments] = useState<Comment[]>(ticket.comments || [])
-  const [replyingTo, setReplyingTo] = useState<number | null>(null)
+  const [localComments, setLocalComments] = useState<Comment[]>(ticket.comments?.data || [])
+  const [replyingTo, setReplyingTo] = useState<string | null>(null)
   const channelRef = useRef<any>(null)
   const isUnmountedRef = useRef(false)
 
@@ -53,13 +51,13 @@ export function TicketResponseForm({ ticket, onCommentAdded, currentUser }: Tick
 
       const handleCommentPosted = (e: { comment: Comment }) => {
         if (!isUnmountedRef.current && e.comment) {
-          console.log('New comment received via real-time:', e.comment)
+          // console.log('New comment received via real-time:', e.comment)
 
-          // For any new comment/reply, reload the entire comments to maintain proper nested structure
-          console.log('Reloading comments due to new comment/reply...')
+          // // For any new comment/reply, reload the entire comments to maintain proper nested structure
+          // console.log('Reloading comments due to new comment/reply...')
 
           // Remove optimistic comments first
-          setLocalComments(prev => prev.filter(c => !(c.id > 1000000000000)))
+          setLocalComments(prev => prev.filter(c => !(parseInt(c.id) > 1000000000000)))
 
           // Reload comments from server to get proper nested structure
           fetch(`/admin/tickets/${ticket.slug}/comments`)
@@ -103,7 +101,7 @@ export function TicketResponseForm({ ticket, onCommentAdded, currentUser }: Tick
   // Update local comments when ticket.comments changes
   useEffect(() => {
     console.log('Ticket comments updated:', ticket.comments)
-    setLocalComments(ticket.comments || [])
+    setLocalComments(ticket.comments?.data || [])
   }, [ticket.comments])
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -116,16 +114,20 @@ export function TicketResponseForm({ ticket, onCommentAdded, currentUser }: Tick
 
     // Create optimistic comment for immediate UI update
     const optimisticComment: Comment = {
-      id: Date.now(), // Temporary ID
+      id: Date.now().toString(), // Temporary ID
       content: data.content,
       created_at: new Date().toISOString(),
-      user: currentUser || {
+      user: currentUser ? {
+        ...currentUser,
+        profile_photo_path: currentUser.profile_photo_path || null
+      } : {
         id: 0,
         name: 'You',
         email: '',
-        profile_photo_path: undefined
+        profile_photo_path: null
       },
-      is_hr_response: data.is_hr_response
+      is_hr_response: data.is_hr_response,
+      replies: []
     }
 
     // Add optimistic comment immediately
@@ -155,20 +157,24 @@ export function TicketResponseForm({ ticket, onCommentAdded, currentUser }: Tick
   }
 
   // Handle reply submission
-  const handleReplySubmit = (parentId: number, content: string) => {
+  const handleReplySubmit = (parentId: string, content: string) => {
     // Create optimistic reply
     const optimisticReply: Comment = {
-      id: Date.now(),
+      id: Date.now().toString(),
       content: content,
       created_at: new Date().toISOString(),
-      user: currentUser || {
+      user: currentUser ? {
+        ...currentUser,
+        profile_photo_path: currentUser.profile_photo_path || null
+      } : {
         id: 0,
         name: 'You',
         email: '',
-        profile_photo_path: undefined
+        profile_photo_path: null
       },
       parent_id: parentId,
-      is_hr_response: false
+      is_hr_response: false,
+      replies: []
     }
 
     // Add optimistic reply immediately to the correct parent
@@ -191,7 +197,7 @@ export function TicketResponseForm({ ticket, onCommentAdded, currentUser }: Tick
       },
       body: JSON.stringify({
         content: content,
-        parent_id: parentId,
+        parent_id: parseInt(parentId),
         is_hr_response: false
       })
     })

@@ -2,19 +2,10 @@ import React from 'react';
 import { router } from '@inertiajs/react';
 import TicketLayout from '@/Layouts/TicketLayout';
 import { TicketCard } from './TicketCard';
-import { Card, CardContent } from '@/Components/ui/card';
+import { Card } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/Components/ui/select';
 import Pagination from '@/Components/Pagination';
 import { Ticket } from '@/types/ticket';
-import { ScrollArea } from '@/Components/ui/scroll-area';
 
 interface TicketIndexProps {
   tickets: Ticket[];
@@ -50,13 +41,11 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
   ticketCount,
   myTicketsCount = 0,
   pagination,
-  keyword,
   notifications,
-  sort,
   searchSuggestions = [],
   filters,
 }) => {
-  const title = 'Support Tickets';
+  const title = 'Hỗ trợ khách hàng';
 
   const handleTicketClick = (ticket: any) => {
     router.get(`/tickets/${ticket.slug}`);
@@ -74,20 +63,25 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
       searchSuggestions={searchSuggestions}
       showTabs={true}
       showCreateButton={true}
+      showLable={true}
     >
-      <div className="p-6">
+      <div className="p-3 sm:p-6">
         <div className="container mx-auto">
           {/* Tickets List */}
           {tickets.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-4xl mb-4">🎫</div>
-              <h3 className="text-lg font-semibold mb-2">No tickets found</h3>
-              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                No tickets match your current filters. Try adjusting your search
-                criteria or create a new ticket.
+            <div className="text-center py-12 sm:py-16 px-4">
+              <div className="text-3xl sm:text-4xl mb-4">🎫</div>
+              <h3 className="text-base sm:text-lg font-semibold mb-2">
+                Không tìm thấy yêu cầu hỗ trợ
+              </h3>
+              <p className="text-sm sm:text-base text-muted-foreground mb-6 max-w-md mx-auto">
+                Không có yêu cầu hỗ trợ nào phù hợp với bộ lọc hiện tại. Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc tạo yêu cầu mới.
               </p>
-              <Button onClick={() => router.get('/tickets/create')}>
-                Create your first ticket
+              <Button
+                onClick={() => router.get('/tickets/create')}
+                className="w-full sm:w-auto"
+              >
+                Tạo yêu cầu hỗ trợ đầu tiên
               </Button>
             </div>
           ) : (
@@ -104,30 +98,25 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
             </Card>
           )}
 
-          {/* Results Summary */}
+          {/* Results Summary and Pagination */}
           {tickets.length > 0 && (
-            <div className="flex items-center justify-between mt-6 text-sm text-muted-foreground">
-              <div className="flex space-x-2">
-                Showing {pagination?.from || 1}-
-                {pagination?.to || tickets.length} of {ticketCount} tickets
-                {/* {pagination && pagination.last_page > 1 && (
-                  <div>
-                    Page {pagination.current_page} of {pagination.last_page}
-                  </div>
-                )} */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 sm:mt-6 gap-4 text-sm text-muted-foreground">
+              <div className="order-2 sm:order-1">
+                Hiển thị {pagination?.from || 1}-
+                {pagination?.to || tickets.length} trong tổng số {ticketCount} yêu cầu
               </div>
 
-          {/* Pagination */}
-            {pagination && pagination.total > 0 && (
-              <div className="flex justify-end">
-                <Pagination
-                  current_page={pagination.current_page}
-                  next_page_url={pagination.next_page_url}
-                  prev_page_url={pagination.prev_page_url}
-                  last_page={pagination.last_page}
-                />
-              </div>
-            )}
+              {/* Pagination */}
+              {pagination && pagination.total > 0 && (
+                <div className="order-1 sm:order-2 w-full sm:w-auto flex justify-center sm:justify-end">
+                  <Pagination
+                    current_page={pagination.current_page}
+                    next_page_url={pagination.next_page_url}
+                    prev_page_url={pagination.prev_page_url}
+                    last_page={pagination.last_page}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

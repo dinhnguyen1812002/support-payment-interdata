@@ -61,6 +61,10 @@ Route::get('/demo/search', function () {
     return Inertia::render('Demo/SearchDemo');
 })->name('demo.search');
 
+Route::get('/demo/responsive', function () {
+    return Inertia::render('Demo/ResponsiveDemo');
+})->name('demo.responsive');
+
 // API endpoint for search suggestions
 Route::get('/api/search/suggestions', [\App\Http\Controllers\Ticket\TicketController::class, 'apiSearchSuggestions'])
     ->name('api.search.suggestions');

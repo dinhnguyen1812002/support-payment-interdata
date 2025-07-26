@@ -106,10 +106,10 @@ const CommentsContent: React.FC<
           <div className="flex flex-col items-center space-y-3">
             <div>
               <p className="text-gray-700 dark:text-gray-300 mb-1 font-medium">
-                Join the conversation
+               Tham gia bình luận
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Sign in to leave a comment and engage with the community
+               Đăng nhập để tham gia trao đổi
               </p>
             </div>
           </div>
@@ -119,7 +119,7 @@ const CommentsContent: React.FC<
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Comments
+            Bình luận
           </h2>
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
             {commentCount}
@@ -130,7 +130,7 @@ const CommentsContent: React.FC<
       </div>
 
       {!hasComments ? (
-        <div className="py-16 text-center">
+        <div className="py-10 text-center">
           <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
             Be the first to share your thoughts and start the conversation!
           </p>

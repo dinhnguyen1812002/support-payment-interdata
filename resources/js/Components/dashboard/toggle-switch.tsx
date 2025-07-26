@@ -22,20 +22,22 @@ export default function ThemeSwitch() {
   };
 
   return (
-    <div className="flex items-center space-x-2  p-2 dark:bg-dark h-10 border-b">
-      <Sun
-        size={16}
-        className={`transition-colors ${!isDark ? 'text-primary' : 'text-muted-foreground'}`}
-      />
+    <div className="flex items-center justify-between w-full">
+      <div className="flex items-center space-x-2">
+        {isDark ? (
+          <MoonStar size={14} className="text-blue-400" />
+        ) : (
+          <Sun size={14} className="text-amber-500" />
+        )}
+        <span className="text-sm font-medium">
+          {isDark ? 'Dark mode' : 'Light mode'}
+        </span>
+      </div>
       <Switch
         checked={isDark}
         onCheckedChange={handleThemeChange}
         aria-label="Toggle theme"
-        className="data-[state=checked]:bg-slate-900 data-[state=unchecked]:text-primary  dark:bg-amber-50"
-      />
-      <MoonStar
-        size={16}
-        className={`transition-colors ${isDark ? 'text-blue-400' : 'text-muted-foreground'}`}
+        className="scale-75"
       />
     </div>
   );

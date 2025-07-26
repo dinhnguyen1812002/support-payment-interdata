@@ -7,6 +7,7 @@ import {
   Send,
   Settings,
   ArrowBigUp,
+  ArrowLeft,
 } from 'lucide-react';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
@@ -173,11 +174,22 @@ export default function TicketDetail({
       filters={filters}
       notifications={notifications}
       backUrl="/tickets"
-      backLabel="Back to tickets"
+      backLabel="Quay lại danh sách yêu cầu"
+      showTabs={false}
+      showLable = {false}
+      showCreateButton={false}
     >
       <ScrollArea className="h-screen">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto space-y-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.get('/tickets')}
+            >
+              <ArrowLeft className="h-4 w-4" />
+             
+            </Button>
             {/* Content */}
             <Card className="p-6">
               <div className="flex items-start justify-between">
@@ -201,15 +213,15 @@ export default function TicketDetail({
                       <span>#{ticket.id}</span>
                       <div className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
-                        <span>Created {ticket.created_at}</span>
+                        <span>Tạo lúc {ticket.created_at}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <MessageCircle className="w-4 h-4" />
-                        <span>{ticket.comments?.data?.length || 0} replies</span>
+                        <span>{ticket.comments?.data?.length || 0} phản hồi</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <ArrowBigUp className="w-5 h-8" />
-                        <span>{ticket.upvote_count || 0} upvotes</span>
+                        <span>{ticket.upvote_count || 0} lượt thích</span>
                       </div>
                     </div>
                   </div>
@@ -229,10 +241,10 @@ export default function TicketDetail({
                   </Badge>
                 </div>
               </div>
-              <div className="space-y-6">
+              <div className="space-y-7 mt-5">
                 {/* Description */}
                 <div className="space-y-3">
-                  <h3 className="font-semibold">Description</h3>
+                  <h3 className="font-semibold">Mô tả</h3>
                   <div className="p-4 bg-muted/30 border rounded-lg">
                     <p
                       className="text-sm leading-relaxed whitespace-pre-wrap"
@@ -242,22 +254,22 @@ export default function TicketDetail({
                 </div>
 
                 {/* Ticket Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-lg">
-                  <div className="space-y-1">
-                    <div className="text-sm font-medium">Category</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Danh mục</div>
                     <div className="text-sm text-muted-foreground capitalize">
                       {ticket.categories && ticket.categories.length > 0
                         ? ticket.categories[0].title
-                        : 'No category'}
+                        : 'Không có danh mục'}
                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <div className="text-sm font-medium">Author</div>
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Người dùng</div>
                     <div className="flex items-center gap-2">
                       <AvatarWithFallback
                         src={ticket.user?.profile_photo_url}
                         name={ticket.user?.name}
-                        className="w-5 h-5"
+                        className="w-8 h-8"
                       />
                       <span className="text-sm text-muted-foreground">
                         {ticket.user?.name}
@@ -265,13 +277,13 @@ export default function TicketDetail({
                     </div>
                   </div>
                   {ticket.assignee && (
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium">Assigned to</div>
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium">Được giao cho</div>
                       <div className="flex items-center gap-2">
                         <AvatarWithFallback
                           src={ticket.assignee.profile_photo_url}
                           name={ticket.assignee.name}
-                          className="w-5 h-5"
+                          className="w-8 h-8"
                         />
 
                         <span className="text-sm text-muted-foreground">
@@ -281,8 +293,8 @@ export default function TicketDetail({
                     </div>
                   )}
                   {ticket.department && (
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium">Department</div>
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium">Phòng ban</div>
                       <div className="text-sm text-muted-foreground">
                         {ticket.department.name}
                       </div>
@@ -367,7 +379,7 @@ export default function TicketDetail({
                   <div className="space-y-3">
                     <h3 className="font-semibold flex items-center gap-2">
                       <Tag className="w-4 h-4" />
-                      Tags
+                      Thẻ
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {ticket.tags.map(tag => (

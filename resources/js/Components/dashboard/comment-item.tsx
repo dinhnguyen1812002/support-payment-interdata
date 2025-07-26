@@ -1,16 +1,12 @@
 
 
-import  React from "react"
-import { useState, useEffect, useRef } from "react"
+import React, { useState } from "react"
 import { Button } from "@/Components/ui/button"
 import { Textarea } from "@/Components/ui/textarea"
-import { Label } from "@/Components/ui/label"
 import { Badge } from "@/Components/ui/badge"
 import { AvatarWithFallback } from "@/Components/ui/avatar-with-fallback"
-import { Send, User, Clock, MessageSquare, AlertCircle, X, Reply, CornerDownRight } from "lucide-react"
-import { useForm } from "@inertiajs/react"
-import { toast } from "sonner"
-import { Comment } from "@/types/ticket"
+import { Send, Clock, Reply, CornerDownRight } from "lucide-react"
+import { Comment } from "@/types/CommentTypes"
 
 
 interface CommentItemProps {
@@ -21,10 +17,10 @@ interface CommentItemProps {
     email: string
     profile_photo_path?: string
   }
-  onReply: (commentId: number) => void
-  replyingTo: number | null
+  onReply: (commentId: string) => void
+  replyingTo: string | null
   onCancelReply: () => void
-  onSubmitReply: (parentId: number, content: string) => void
+  onSubmitReply: (parentId: string, content: string) => void
   allComments: Comment[]
   depth?: number
 }
@@ -41,7 +37,7 @@ interface CommentItemProps {
   depth = 0
 }: CommentItemProps) {
   const [replyText, setReplyText] = useState("")
-  const isOptimistic = comment.id > 1000000000000
+  const isOptimistic = parseInt(comment.id) > 1000000000000
   const isCurrentUser = currentUser && comment.user.id === currentUser.id
   const replies = comment.replies || []
   const isReplying = replyingTo === comment.id
@@ -69,7 +65,7 @@ interface CommentItemProps {
           name={comment.user.name}
           alt={comment.user.name}
           className="h-10 w-10 flex-shrink-0"
-          variant="marble"
+          variant="geometric"
         />
 
         <div className="flex-1">

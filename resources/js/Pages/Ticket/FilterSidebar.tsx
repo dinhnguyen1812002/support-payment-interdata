@@ -33,24 +33,24 @@ interface FilterSidebarProps {
 }
 
 const sortOptions = [
-  { value: "newest", label: "Newest First" },
-  { value: "oldest", label: "Oldest First" },
-  { value: "most-upvoted", label: "Most Upvoted" },
-  { value: "most-replies", label: "Most Replies" },
+  { value: "newest", label: "Mới nhất trước" },
+  { value: "oldest", label: "Cũ nhất trước" },
+  { value: "most-upvoted", label: "Nhiều upvote nhất" },
+  { value: "most-replies", label: "Nhiều phản hồi nhất" },
 ];
 
 const priorities = [
-  { value: "low", label: "Low", color: "bg-green-100 text-green-800" },
-  { value: "medium", label: "Medium", color: "bg-yellow-100 text-yellow-800" },
-  { value: "high", label: "High", color: "bg-orange-100 text-orange-800" },
-  { value: "urgent", label: "Urgent", color: "bg-red-100 text-red-800" },
+  { value: "low", label: "Thấp", color: "bg-green-100 text-green-800" },
+  { value: "medium", label: "Trung bình", color: "bg-yellow-100 text-yellow-800" },
+  { value: "high", label: "Cao", color: "bg-orange-100 text-orange-800" },
+  { value: "urgent", label: "Khẩn cấp", color: "bg-red-100 text-red-800" },
 ];
 
 const statuses = [
-  { value: "open", label: "Open", color: "bg-blue-100 text-blue-800" },
-  { value: "in_progress", label: "In Progress", color: "bg-purple-100 text-purple-800" },
-  { value: "resolved", label: "Resolved", color: "bg-green-100 text-green-800" },
-  { value: "closed", label: "Closed", color: "bg-gray-100 text-gray-800" },
+  { value: "open", label: "Mở", color: "bg-blue-100 text-blue-800" },
+  { value: "in_progress", label: "Đang xử lý", color: "bg-purple-100 text-purple-800" },
+  { value: "resolved", label: "Đã giải quyết", color: "bg-green-100 text-green-800" },
+  { value: "closed", label: "Đã đóng", color: "bg-gray-100 text-gray-800" },
 ];
 
 export function FilterSidebar({
@@ -90,27 +90,28 @@ export function FilterSidebar({
   );
 
   return (
-    <div className="w-full h-full bg-card p-6 border-r overflow-y-auto ">
-      <div className="space-y-6">
-        {/* Header */}
-        {/* <div className="flex items-center justify-between">
+    <div className="w-full h-full bg-card border-r flex flex-col">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0 p-4 sm:p-6 border-b">
+        {/* Header - Show on mobile */}
+        <div className="flex items-center justify-between lg:hidden mb-4">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <Filter className="h-5 w-5" />
-            Filters
+            Bộ lọc
           </h2>
           {hasActiveFilters && (
-            <Button variant={'ghost'} size="sm" onClick={clearFilters} className='text-white'>
-              Clear all
+            <Button variant="ghost" size="sm" onClick={clearFilters}>
+              Xóa tất cả
             </Button>
           )}
-        </div> */}
+        </div>
 
-        {/* Enhanced Search */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Search</label>
+        {/* Enhanced Search - Always visible */}
+        <div className="space-y-2 sm:space-y-3">
+          <label className="text-sm font-medium">Tìm kiếm</label>
           <SearchInput
             value={filters.search || ''}
-            placeholder="Search tickets..."
+            placeholder="Tìm kiếm yêu cầu hỗ trợ..."
             onSearch={(value) => updateFilters({ search: value || undefined })}
             onClear={() => updateFilters({ search: undefined })}
             showHistory={true}
@@ -122,115 +123,120 @@ export function FilterSidebar({
             size="md"
           />
         </div>
-        <hr/>
-        {/* Category */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Category</label>
-          <CategoryFilter
-            categories={categories}
-            value={filters.category}
-            onValueChange={(value) => updateFilters({ category: value })}
-            showPostCount={true}
-          />
-        </div>
+      </div>
 
-        {/* Priority */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Priority</label>
-          <Select
-            value={filters.priority || ""}
-            onValueChange={(value) =>
-              updateFilters({
-                priority: value === "all" ? undefined : value,
-              })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Priorities</SelectItem>
-              {priorities.map((priority) => (
-                <SelectItem key={priority.value} value={priority.value}>
-                  <div className="flex items-center gap-2">
-                    <Badge className={`text-xs ${priority.color}`}>
-                      {priority.label}
-                    </Badge>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+          <Separator className="lg:hidden mb-4" />
+          
+          {/* Category */}
+          <div className="space-y-2 sm:space-y-3">
+            <label className="text-sm font-medium">Danh mục</label>
+            <CategoryFilter
+              categories={categories}
+              value={filters.category}
+              onValueChange={(value) => updateFilters({ category: value })}
+              showPostCount={true}
+            />
+          </div>
 
-        {/* Status */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Status</label>
-          <Select
-            value={filters.status || ""}
-            onValueChange={(value) =>
-              updateFilters({
-                status: value === "all" ? undefined : value,
-              })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              {statuses.map((status) => (
-                <SelectItem key={status.value} value={status.value}>
-                  <div className="flex items-center gap-2">
-                    <Badge className={`text-xs ${status.color}`}>
-                      {status.label}
-                    </Badge>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+          {/* Priority */}
+          <div className="space-y-2 sm:space-y-3">
+            <label className="text-sm font-medium">Độ ưu tiên</label>
+            <Select
+              value={filters.priority || ""}
+              onValueChange={(value) =>
+                updateFilters({
+                  priority: value === "all" ? undefined : value,
+                })
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Chọn độ ưu tiên" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả độ ưu tiên</SelectItem>
+                {priorities.map((priority) => (
+                  <SelectItem key={priority.value} value={priority.value}>
+                    <div className="flex items-center gap-2">
+                      <Badge className={`text-xs ${priority.color}`}>
+                        {priority.label}
+                      </Badge>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Sort By */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Sort By</label>
-          <Select
-            value={filters.sortBy || "newest"}
-            onValueChange={(value) =>
-              updateFilters({ sortBy: value === "newest" ? undefined : value })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              {sortOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+          {/* Status */}
+          <div className="space-y-2 sm:space-y-3">
+            <label className="text-sm font-medium">Trạng thái</label>
+            <Select
+              value={filters.status || ""}
+              onValueChange={(value) =>
+                updateFilters({
+                  status: value === "all" ? undefined : value,
+                })
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Chọn trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                {statuses.map((status) => (
+                  <SelectItem key={status.value} value={status.value}>
+                    <div className="flex items-center gap-2">
+                      <Badge className={`text-xs ${status.color}`}>
+                        {status.label}
+                      </Badge>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Active Filters */}
-        {/* {hasActiveFilters && (
-          <>
-            <Separator />
-            <div className="space-y-3">
-              <label className="text-sm font-medium">Active Filters</label>
+          {/* Sort By */}
+          <div className="space-y-2 sm:space-y-3">
+            <label className="text-sm font-medium">Sắp xếp theo</label>
+            <Select
+              value={filters.sortBy || "newest"}
+              onValueChange={(value) =>
+                updateFilters({ sortBy: value === "newest" ? undefined : value })
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sắp xếp theo" />
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Active Filters - Show on mobile */}
+          {hasActiveFilters && (
+            <div className="space-y-2 sm:space-y-3 lg:hidden">
+              <Separator />
+              <label className="text-sm font-medium">Bộ lọc đang áp dụng</label>
               <div className="flex flex-wrap gap-2">
                 {filters.myTickets && (
                   <Badge variant="secondary" className="text-xs">
-                    My Tickets
+                    Yêu cầu của tôi
                   </Badge>
                 )}
                 {filters.category && (
                   <Badge variant="secondary" className="text-xs">
                     {
                       categories.find((c) => c.id.toString() === filters.category)
-                        ?.title || 'Category'
+                        ?.title || 'Danh mục'
                     }
                   </Badge>
                 )}
@@ -249,19 +255,19 @@ export function FilterSidebar({
                 )}
                 {filters.search && (
                   <Badge variant="secondary" className="text-xs">
-                    Search: {filters.search}
+                    Tìm kiếm: {filters.search}
                   </Badge>
                 )}
                 {filters.sortBy && filters.sortBy !== "newest" && (
                   <Badge variant="secondary" className="text-xs">
-                    Sort:{" "}
+                    Sắp xếp:{" "}
                     {sortOptions.find((s) => s.value === filters.sortBy)?.label}
                   </Badge>
                 )}
               </div>
             </div>
-          </>
-        )} */}
+          )}
+        </div>
       </div>
     </div>
   );

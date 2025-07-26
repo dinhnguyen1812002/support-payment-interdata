@@ -382,3 +382,169 @@
       padding: 1rem;
     }
   }
+
+/* Responsive improvements for ticket system */
+@layer utilities {
+  /* Mobile-first responsive utilities */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  
+  /* Fixed sidebar positioning */
+  .sidebar-fixed {
+    position: fixed;
+    left: 0;
+    width: 320px;
+    z-index: 10;
+  }
+  
+  /* Responsive sidebar heights */
+  .sidebar-height {
+    height: calc(100vh - 3.5rem);
+  }
+  
+  @media (min-width: 640px) {
+    .sidebar-height {
+      height: calc(100vh - 4rem);
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .sidebar-height {
+      height: calc(100vh - 4.5rem);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .sidebar-height {
+      height: calc(100vh - 5rem);
+    }
+  }
+  
+  /* Content area heights */
+  .content-height {
+    height: calc(100vh - 7rem);
+  }
+  
+  @media (min-width: 640px) {
+    .content-height {
+      height: calc(100vh - 8rem);
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .content-height {
+      height: calc(100vh - 9rem);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .content-height {
+      height: calc(100vh - 10rem);
+    }
+  }
+  
+  /* Responsive text truncation */
+  .truncate-mobile {
+    @apply truncate;
+  }
+  
+  @media (min-width: 640px) {
+    .truncate-mobile {
+      overflow: visible;
+      text-overflow: unset;
+      white-space: normal;
+    }
+  }
+  
+  /* Responsive spacing */
+  .responsive-padding {
+    @apply p-3;
+  }
+  
+  @media (min-width: 640px) {
+    .responsive-padding {
+      @apply p-6;
+    }
+  }
+  
+  /* Responsive grid for ticket cards */
+  .ticket-grid {
+    @apply grid gap-3;
+  }
+  
+  @media (min-width: 640px) {
+    .ticket-grid {
+      @apply gap-4;
+    }
+  }
+  
+  /* Mobile sidebar overlay */
+  .mobile-sidebar-overlay {
+    @apply fixed inset-0 bg-black/50 z-40;
+  }
+  
+  /* Responsive container */
+  .responsive-container {
+    @apply container mx-auto px-4;
+  }
+  
+  @media (min-width: 640px) {
+    .responsive-container {
+      @apply px-6;
+    }
+  }
+  
+  /* Responsive flex layouts */
+  .responsive-flex {
+    @apply flex flex-col gap-2;
+  }
+  
+  @media (min-width: 640px) {
+    .responsive-flex {
+      @apply flex-row gap-4;
+    }
+  }
+  
+  /* Responsive text sizes */
+  .responsive-text-base {
+    @apply text-sm;
+  }
+  
+  @media (min-width: 640px) {
+    .responsive-text-base {
+      @apply text-base;
+    }
+  }
+  
+  .responsive-text-lg {
+    @apply text-base;
+  }
+  
+  @media (min-width: 640px) {
+    .responsive-text-lg {
+      @apply text-lg;
+    }
+  }
+  
+  /* Responsive button sizes */
+  .responsive-button {
+    @apply px-3 py-2 text-sm;
+  }
+  
+  @media (min-width: 640px) {
+    .responsive-button {
+      @apply px-4 py-2 text-base;
+    }
+  }
+}

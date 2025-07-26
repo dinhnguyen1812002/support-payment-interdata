@@ -90,8 +90,8 @@ const NotificationsDropdown: React.FC<NotificationsDropdownProps> = ({
       {/* Main Dropdown */}
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+          <Button variant="ghost" size="icon" className="relative h-10 w-10 border">
+            <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             {stats.unreadCount > 0 && (
               <Badge
                 variant="destructive"

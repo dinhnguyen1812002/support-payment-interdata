@@ -67,10 +67,11 @@ export function UpvoteButton({
     switch (size) {
       case 'sm':
         return {
-          button: 'h-8 w-8 p-0',
-          icon: 'h-4 w-4',
+          button: 'h-8 w-8 p-0', 
+          icon: 'h-3.5 w-3.5',   
           count: 'text-xs',
         };
+
       case 'lg':
         return {
           button: 'h-12 w-12 p-0',
@@ -90,13 +91,13 @@ export function UpvoteButton({
 
   if (variant === 'detail') {
     return (
-      <div className={`flex flex-col items-center gap-2 ${className}`}>
+      <div className={`flex flex-col items-center gap-1 ${className}`}>
         <Button
           variant="ghost"
           size="sm"
-          className={`${sizeClasses.button} transition-colors ${
+          className={` transition-colors ${
             hasUpvoted
-              ? 'text-orange-600 bg-orange-50 hover:bg-orange-100'
+              ? 'text-orange-600 bg-orange-50 '
               : 'text-muted-foreground hover:text-orange-600 hover:bg-orange-50'
           } ${isUpvoting || disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           onClick={handleUpvote}
@@ -106,6 +107,7 @@ export function UpvoteButton({
             className={`${sizeClasses.icon} ${hasUpvoted ? 'fill-current' : ''}`}
           />
         </Button>
+
         <div className="text-center">
           <div
             className={`${sizeClasses.count} font-semibold ${
@@ -129,10 +131,10 @@ export function UpvoteButton({
     <div className={`flex flex-col items-center gap-1 ${className}`}>
       <Button
         variant="ghost"
-        size="sm"
+        size="icon"
         className={`${sizeClasses.button} transition-colors ${
           hasUpvoted
-            ? 'text-orange-600 bg-orange-50 hover:bg-orange-100'
+            ? 'text-orange-600 bg-orange-50 '
             : 'text-muted-foreground hover:text-orange-600 hover:bg-orange-50'
         } ${isUpvoting || disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         onClick={handleUpvote}
@@ -142,6 +144,7 @@ export function UpvoteButton({
           className={`${sizeClasses.icon} ${hasUpvoted ? 'fill-current' : ''}`}
         />
       </Button>
+    
       <span
         className={`${sizeClasses.count} font-medium ${
           hasUpvoted ? 'text-orange-600' : 'text-muted-foreground'

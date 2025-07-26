@@ -48,7 +48,7 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
   searchSuggestions = [],
   filters,
 }) => {
-  const title = 'My Tickets';
+  const title = 'Yêu cầu của tôi';
 
   const handleTicketClick = (ticket: any) => {
     router.get(`/tickets/${ticket.slug}`);
@@ -73,13 +73,12 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
           {tickets.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-4xl mb-4">🎫</div>
-              <h3 className="text-lg font-semibold mb-2">No tickets found</h3>
+              <h3 className="text-lg font-semibold mb-2">Không tìm thấy yêu cầu hỗ trợ</h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                No tickets match your current filters. Try adjusting your search
-                criteria or create a new ticket.
+                Không có yêu cầu hỗ trợ nào phù hợp với bộ lọc hiện tại. Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc tạo yêu cầu mới.
               </p>
               <Button onClick={() => router.get('/tickets/create')}>
-                Create your first ticket
+                Tạo yêu cầu hỗ trợ đầu tiên
               </Button>
             </div>
           ) : (
@@ -100,11 +99,11 @@ const TicketIndex: React.FC<TicketIndexProps> = ({
           {tickets.length > 0 && (
             <div className="flex items-center justify-between mt-6 text-sm text-muted-foreground">
               <div className="flex space-x-2">
-                Showing {((pagination.current_page - 1) * pagination.per_page) + 1}-
-                {Math.min(pagination.current_page * pagination.per_page, pagination.total)} of {pagination.total} tickets
+                Hiển thị {((pagination.current_page - 1) * pagination.per_page) + 1}-
+                {Math.min(pagination.current_page * pagination.per_page, pagination.total)} trong tổng số {pagination.total} yêu cầu
                 {pagination && pagination.last_page > 1 && (
                   <div>
-                    Page {pagination.current_page} of {pagination.last_page}
+                    Trang {pagination.current_page} / {pagination.last_page}
                   </div>
                 )}
               </div>

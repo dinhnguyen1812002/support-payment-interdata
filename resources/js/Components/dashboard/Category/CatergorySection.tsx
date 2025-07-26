@@ -121,7 +121,7 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
     <div className="min-h-screen bg-white dark:bg-[#0F1014] justify-center">
       {/* Header */}
       <div className="bg-white dark:bg-[#0F1014] shadow-sm sticky top-0 z-20 border-b border-gray-100 dark:border-gray-700">
-        <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">

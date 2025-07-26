@@ -10,8 +10,8 @@ import {
   DialogTrigger,
 } from '@/Components/ui/dialog';
 import { Input } from '@/Components/ui/input';
-import { Textarea } from '@/Components/ui/textarea';
 import { Label } from '@/Components/ui/label';
+import RichTextEditor from '@/Components/ui/rich-text-editor';
 import {
   Select,
   SelectContent,
@@ -29,30 +29,30 @@ import { route } from 'ziggy-js';
 type PublicType = 'public' | 'private';
 
 const publicOptions: { value: PublicType; label: string }[] = [
-  { value: 'public', label: 'Public - Visible to everyone' },
-  { value: 'private', label: 'Private - Only visible to staff' },
+  { value: 'public', label: 'Công khai - Hiển thị cho mọi người' },
+  { value: 'private', label: 'Riêng tư - Chỉ hiển thị cho nhân viên' },
 ];
 
 // Zod validation schema
 const createTicketSchema = z.object({
   title: z.string()
-    .min(1, 'Title is required')
-    .min(5, 'Title must be at least 5 characters')
-    .max(200, 'Title must be less than 200 characters'),
+    .min(1, 'Tiêu đề là bắt buộc')
+    .min(5, 'Tiêu đề phải có ít nhất 5 ký tự')
+    .max(200, 'Tiêu đề phải ít hơn 200 ký tự'),
   description: z.string()
-    .min(1, 'Description is required')
-    .min(10, 'Description must be at least 10 characters')
-    .max(2000, 'Description must be less than 2000 characters'),
+    .min(1, 'Mô tả là bắt buộc')
+    .min(10, 'Mô tả phải có ít nhất 10 ký tự')
+    .max(2000, 'Mô tả phải ít hơn 2000 ký tự'),
   selectedCategory: z.number({
-    required_error: 'Please select a category',
-    invalid_type_error: 'Please select a valid category',
-  }).min(1, 'Please select a category'),
+    required_error: 'Vui lòng chọn danh mục',
+    invalid_type_error: 'Vui lòng chọn danh mục hợp lệ',
+  }).min(1, 'Vui lòng chọn danh mục'),
   selectedTag: z.number({
-    required_error: 'Please select a tag',
-    invalid_type_error: 'Please select a valid tag',
-  }).min(1, 'Please select a tag'),
+    required_error: 'Vui lòng chọn thẻ',
+    invalid_type_error: 'Vui lòng chọn thẻ hợp lệ',
+  }).min(1, 'Vui lòng chọn thẻ'),
   isPublic: z.enum(['public', 'private'], {
-    required_error: 'Please select visibility',
+    required_error: 'Vui lòng chọn chế độ hiển thị',
   }),
 });
 
@@ -87,21 +87,24 @@ export function CreateTicketDialog({ categories = [], tags = [] }: CreateTicketD
         return newErrors;
       });
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        setErrors(prev => ({
-          ...prev,
-          [field]: error.errors[0].message
-        }));
-      }
+      // if (error instanceof z.ZodError) {
+      //   setErrors(prev => ({
+      //     ...prev,
+      //     [field]: error.errors[0].message
+      //   }));
+      // }
     }
   };
 
   const validateForm = (): boolean => {
     try {
+      // Strip HTML tags from description for validation
+      const textDescription = description.replace(/<[^>]*>/g, '').trim();
+
       // Validate using Zod schema
       createTicketSchema.parse({
         title: title.trim(),
-        description: description.trim(),
+        description: textDescription,
         selectedCategory: selectedCategory || undefined,
         selectedTag: selectedTag || undefined,
         isPublic,
@@ -133,7 +136,7 @@ export function CreateTicketDialog({ categories = [], tags = [] }: CreateTicketD
 
     router.post(route('posts.store'), {
       title: title.trim(),
-      content: description.trim(),
+      content: description, // Send HTML content
       categories: [selectedCategory],
       tags: [selectedTag],
       is_published: isPublic === 'public' ? 1 : 0,
@@ -166,23 +169,23 @@ export function CreateTicketDialog({ categories = [], tags = [] }: CreateTicketD
       <DialogTrigger asChild>
         <Button className="gap-2">
           <Plus className="h-4 w-4" />
-          Create Ticket
+         Tạo ticket
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Create New Support Ticket</DialogTitle>
+          <DialogTitle>Tạo yêu cầu hỗ trợ mới</DialogTitle>
           <DialogDescription>
-            Describe your issue or question and our support team will help you.
+            Mô tả vấn đề hoặc câu hỏi của bạn và đội ngũ hỗ trợ sẽ giúp bạn.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-6 py-4">
           {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="title">Title *</Label>
+            <Label htmlFor="title">Tiêu đề *</Label>
             <Input
               id="title"
-              placeholder="Brief description of your issue"
+              placeholder="Mô tả ngắn gọn về vấn đề của bạn"
               value={title}
               onChange={(e) => {
                 setTitle(e.target.value);
@@ -203,7 +206,7 @@ export function CreateTicketDialog({ categories = [], tags = [] }: CreateTicketD
           {/* Category and Priority */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="category">Category *</Label>
+              <Label htmlFor="category">Danh mục *</Label>
               <Select
                 value={selectedCategory.toString()}
                 onValueChange={(value) => {
@@ -213,7 +216,7 @@ export function CreateTicketDialog({ categories = [], tags = [] }: CreateTicketD
                 }}
               >
                 <SelectTrigger className={errors.selectedCategory ? 'border-red-500' : ''}>
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue placeholder="Chọn danh mục" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
@@ -229,7 +232,7 @@ export function CreateTicketDialog({ categories = [], tags = [] }: CreateTicketD
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="visibility">Visibility *</Label>
+              <Label htmlFor="visibility">Chế độ hiển thị *</Label>
               <Select value={isPublic} onValueChange={(value) => {
                 const publicValue = value as PublicType;
                 setIsPublic(publicValue);
@@ -254,31 +257,33 @@ export function CreateTicketDialog({ categories = [], tags = [] }: CreateTicketD
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
-            <Textarea
-              id="description"
-              placeholder="Please provide detailed information about your issue, including steps to reproduce if applicable..."
+            <Label htmlFor="description">Mô tả *</Label>
+            <RichTextEditor
               value={description}
-              onChange={(e) => {
-                setDescription(e.target.value);
-                validateField('description', e.target.value.trim());
+              onChange={(value) => {
+                setDescription(value);
+                // Strip HTML tags for validation
+                const textContent = value.replace(/<[^>]*>/g, '');
+                validateField('description', textContent.trim());
               }}
+              placeholder="Vui lòng cung cấp thông tin chi tiết về vấn đề của bạn, bao gồm các bước tái tạo nếu có..."
               className={errors.description ? 'border-red-500' : ''}
-              rows={4}
+              minHeight="120px"
+              maxHeight="200px"
             />
             <div className="flex justify-between items-center">
               {errors.description && (
                 <p className="text-sm text-red-500">{errors.description}</p>
               )}
               <p className="text-xs text-muted-foreground ml-auto">
-                {description.length}/2000
+                {description.replace(/<[^>]*>/g, '').length}/2000
               </p>
             </div>
           </div>
 
           {/* Tags */}
           <div className="space-y-2">
-            <Label htmlFor="tags">Tag *</Label>
+            <Label htmlFor="tags">Thẻ *</Label>
             <Select
               value={selectedTag.toString()}
               onValueChange={(value) => {
@@ -288,7 +293,7 @@ export function CreateTicketDialog({ categories = [], tags = [] }: CreateTicketD
               }}
             >
               <SelectTrigger className={errors.selectedTag ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Select a tag" />
+                <SelectValue placeholder="Chọn thẻ" />
               </SelectTrigger>
               <SelectContent>
                 {tags.map((tag) => (
@@ -306,13 +311,13 @@ export function CreateTicketDialog({ categories = [], tags = [] }: CreateTicketD
 
         <div className="flex justify-end gap-3">
           <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
+            Hủy
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={isSubmitting || !title.trim() || !description.trim()}
+            disabled={isSubmitting || !title.trim() || !description.replace(/<[^>]*>/g, '').trim()}
           >
-            {isSubmitting ? 'Creating...' : 'Create Ticket'}
+            {isSubmitting ? 'Đang tạo...' : 'Tạo yêu cầu hỗ trợ'}
           </Button>
         </div>
       </DialogContent>

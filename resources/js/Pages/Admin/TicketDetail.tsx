@@ -45,7 +45,7 @@ interface Comment {
 }
 
 interface Ticket {
-  id: number;
+  id: string;
   slug: string;
   title: string;
   content: string;
@@ -132,7 +132,6 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
     }
   };
 
-  console.log(ticket);
 
   return (
      <SidebarProvider>
