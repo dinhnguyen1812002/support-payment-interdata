@@ -97,11 +97,28 @@ class TicketController extends Controller
             ->withCount('upvotes')
             ->firstOrFail();
 
-        // Get formatted comments in the expected format for CommentsSection
-        $formattedComments = $post->getFormattedComments();
-        $comments = [
-            'data' => $formattedComments,
-            'next_page_url' => null
+        // Get paginated comments in the expected format for CommentsSection
+        $comments = $post->comments()
+            ->whereNull('parent_id')
+            ->with([
+                'user.roles',
+                'user.departments',
+                'replies.user.roles',
+                'replies.user.departments',
+            ])
+            ->latest()
+            ->paginate(5);
+
+        $commentsData = [
+            'data' => $comments->items(),
+            'next_page_url' => $comments->nextPageUrl(),
+            'prev_page_url' => $comments->previousPageUrl(),
+            'current_page' => $comments->currentPage(),
+            'last_page' => $comments->lastPage(),
+            'per_page' => $comments->perPage(),
+            'total' => $comments->total(),
+            'from' => $comments->firstItem(),
+            'to' => $comments->lastItem(),
         ];
 
         // Check if current user has upvoted this ticket
@@ -134,7 +151,7 @@ class TicketController extends Controller
             'department' => $post->department,
             'categories' => $post->categories,
             'tags' => $post->tags,
-            'comments' => $comments,
+            'comments' => $commentsData,
             'upvote_count' => $post->upvotes_count,
             'has_upvote' => $hasUpvote,
         ];

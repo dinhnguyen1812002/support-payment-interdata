@@ -42,7 +42,7 @@ const createTicketSchema = z.object({
   description: z.string()
     .min(1, 'Mô tả là bắt buộc')
     .min(10, 'Mô tả phải có ít nhất 10 ký tự')
-    .max(2000, 'Mô tả phải ít hơn 2000 ký tự'),
+    .max(1000, 'Mô tả phải ít hơn 1000 ký tự'),
   selectedCategory: z.number({
     required_error: 'Vui lòng chọn danh mục',
     invalid_type_error: 'Vui lòng chọn danh mục hợp lệ',
@@ -266,7 +266,7 @@ export function CreateTicketDialog({ categories = [], tags = [] }: CreateTicketD
                 const textContent = value.replace(/<[^>]*>/g, '');
                 validateField('description', textContent.trim());
               }}
-              placeholder="Vui lòng cung cấp thông tin chi tiết về vấn đề của bạn, bao gồm các bước tái tạo nếu có..."
+              placeholder="Vui lòng cung cấp thông tin chi  tiết về vấn đề của bạn, bao gồm các bước tái tạo nếu có..."
               className={errors.description ? 'border-red-500' : ''}
               minHeight="120px"
               maxHeight="200px"

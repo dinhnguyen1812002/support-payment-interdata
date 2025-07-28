@@ -11,6 +11,7 @@ import {
   TooltipContent,
   Tooltip,
 } from '@radix-ui/react-tooltip';
+import { getPriorityColor, getPriorityLabel, getStatusColor, getStatusLabel } from '@/Utils/utils';
 
 interface TicketCardProps {
   ticket: Ticket;
@@ -31,69 +32,22 @@ export function TicketCard({ ticket, onClick }: TicketCardProps) {
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
-  const getPriorityColor = (priority: string | undefined) => {
-    switch (priority) {
-      case 'low':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'high':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'urgent':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+  // const getPriorityColor = (priority: string | undefined) => {
+  //   switch (priority) {
+  //     case 'low':
+  //       return 'bg-green-100 text-green-800 border-green-200';
+  //     case 'medium':
+  //       return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+  //     case 'high':
+  //       return 'bg-orange-100 text-orange-800 border-orange-200';
+  //     case 'urgent':
+  //       return 'bg-red-100 text-red-800 border-red-200';
+  //     default:
+  //       return 'bg-gray-100 text-gray-800 border-gray-200';
+  //   }
+  // };
 
-  const getPriorityLabel = (priority: string | undefined) => {
-    switch (priority) {
-      case 'low':
-        return 'Thấp';
-      case 'medium':
-        return 'Trung bình';
-      case 'high':
-        return 'Cao';
-      case 'urgent':
-        return 'Khẩn cấp';
-      default:
-        return 'Không xác định';
-    }
-  };
 
-  const getStatusColor = (status: string | undefined) => {
-    switch (status) {
-      case 'open':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'in-progress':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'waiting-response':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
-      case 'resolved':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'closed':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
-  const getStatusLabel = (status: string | undefined) => {
-    switch (status) {
-      case 'open':
-        return 'Mở';
-      case 'in_progress':
-        return 'Đang xử lý';
-      case 'waiting-response':
-        return 'Chờ phản hồi';
-      case 'resolved':
-        return 'Đã giải quyết';
-      case 'closed':
-        return 'Đã đóng';
-      default:
-        return 'Mở';
-    }
-  };
 
   return (
     <div

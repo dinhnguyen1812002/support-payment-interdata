@@ -356,14 +356,12 @@ export default function AdminNotifications({
                           post={{
                             ...selectedPost,
                             is_published: true,
-                            next_page_url: null,
                             categories: [],
                             tags: [],
                             upvote_count: 0,
                             has_upvote: false,
                             user: auth.user as User,
                           }}
-                          comments={selectedPost.comments}
                           onCommentSubmit={handleCommentSubmit}
                           showBorder={false}
                           currentUser={auth.user as User}

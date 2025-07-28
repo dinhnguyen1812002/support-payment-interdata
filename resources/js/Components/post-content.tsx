@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Link, router } from '@inertiajs/react';
 import { Badge } from '@/Components/ui/badge';
 import { AvatarWithFallback } from '@/Components/ui/avatar-with-fallback';
 import UpvoteButton from '@/Components/VoteButton';
 import CommentsSection from '@/Pages/Comments/CommentsSection';
-import { Comment, CommentsResponse } from '@/types/CommentTypes';
+import { CommentsResponse } from '@/types/CommentTypes';
 import { Category, Tag } from '@/types';
 import {
   DropdownMenu,
@@ -32,31 +32,25 @@ interface PostContentProps {
     is_published: boolean;
     upvote_count: number;
     has_upvote: boolean;
-    next_page_url: string | null;
-   
+    comments: CommentsResponse;
+
   };
-  comments: Comment[];
   currentUser: { id: number; name: string; profile_photo_path: string } | null;
   onCommentSubmit: (content: string, parentId?: string) => void;
   showBorder?: boolean;
 }
 
-interface NewCommentEvent {
-  comment: Comment;
-}
+
 
 const PostContent: React.FC<PostContentProps> = ({
   post,
-  comments: initialComments,
   currentUser,
   onCommentSubmit,
   showBorder = true,
 }) => {
-  const [comments, setComments] = useState<Comment[]>(initialComments || []);
   const [isPublished, setIsPublished] = useState(post.is_published);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-  const channelRef = useRef<any>(null);
-  const isUnmountedRef = useRef(false);
+
 
   const authorAvatar = post.user.profile_photo_path
     ? `/storage/${post.user.profile_photo_path}`
@@ -98,17 +92,9 @@ const PostContent: React.FC<PostContentProps> = ({
 
   // Setup Echo channel for real-time comment updates
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      isUnmountedRef.current = true;
-    };
-  }, []);
 
-  const commentsResponse: CommentsResponse = {
-    data: comments,
-    next_page_url: post.next_page_url,
-  };
+
+
 
   return (
     <div
@@ -227,7 +213,7 @@ const PostContent: React.FC<PostContentProps> = ({
         </div>
         <hr className="w-full border-t border-dashed border-gray-300 mt-8 mb-8" />
         <CommentsSection
-          initialComments={commentsResponse}
+          initialComments={post.comments}
           onCommentSubmit={onCommentSubmit}
           postId={post.id}
           currentUser={currentUser}

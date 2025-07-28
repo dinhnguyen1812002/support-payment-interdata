@@ -29,58 +29,9 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
-
-interface Comment {
-  id: number;
-  content: string;
-  created_at: string;
- 
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    profile?: string;
-  };
-  is_hr_response?: boolean;
-}
-
-interface Ticket {
-  id: string;
-  slug: string;
-  title: string;
-  content: string;
-  status: string;
-  priority: string;
-  created_at: string;
-  updated_at: string;
-  profile?: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    profile?: string;
-  };
-  assignee?: {
-    id: number;
-    name: string;
-    email: string;
-    profile_photo_path?: string;
-  };
-  department?: {
-    id: number;
-    name: string;
-  };
-  categories?: Array<{
-    id: number;
-    title: string;
-  }>;
-  tags?: Array<{
-    id: number;
-    name: string;
-  }>;
-  upvote_count?: number;
-  comments: Comment[];
-}
+import { getPriorityColor } from '@/Utils/utils';
+import { Ticket } from '@/types/ticket';
+import { Comment } from '@/types/CommentTypes';
 
 interface TicketDetailProps {
   ticket: Ticket;
@@ -92,20 +43,23 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
   const page = useTypedPage();
   const currentUser = page.props.auth?.user;
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'urgent': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+  // const getPriorityColor = (priority: string) => {
+  //   switch (priority) {
+  //     case 'low': return 'bg-green-100 text-green-800 border-green-200';
+  //     case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+  //     case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
+  //     case 'urgent': return 'bg-red-100 text-red-800 border-red-200';
+  //     default: return 'bg-gray-100 text-gray-800 border-gray-200';
+  //   }
+  // };
 
   const handleCommentAdded = (newComment: Comment) => {
     setTicket(prevTicket => ({
       ...prevTicket,
-      comments: [...prevTicket.comments, newComment]
+      comments: {
+        ...prevTicket.comments,
+        data: [...(prevTicket.comments?.data || []), newComment]
+      }
     }));
   };
 
@@ -116,16 +70,11 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
       if (response.ok) {
         const data = await response.json();
         setTicket(data.ticket);
-        toast.success
+        toast.success("Ticket refreshed successfully!");
       } else {
         throw new Error('Failed to refresh');
       }
     } catch (error) {
-      // toast({
-      //   toas
-      //   description: "Failed to refresh ticket. Please try again.",
-      //   variant: "destructive",
-      // });
       toast.error("Failed to refresh ticket. Please try again.");
     } finally {
       setIsRefreshing(false);
@@ -192,7 +141,7 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-muted-foreground">Status</span>
                       <StatusUpdateDropdown
-                        ticketId={ticket.id}
+                        ticketId={parseInt(ticket.id)}
                         currentStatus={ticket.status}
                         onStatusUpdated={refreshTicket}
                       />
@@ -275,7 +224,7 @@ export default function TicketDetail({ ticket: initialTicket }: TicketDetailProp
                       <span className="text-sm font-medium text-muted-foreground block mb-2">Reporter</span>
                       <div className="flex items-center gap-3">
                         <AvatarWithFallback
-                          src={ticket.profile ? `/storage/${ticket.profile}` : null}
+                          src={ticket.user.profile_photo_path ? `/storage/${ticket.user.profile_photo_path}` : null}
                           name={ticket.user.name}
                           alt={ticket.user.name}
                           className="h-8 w-8"

@@ -195,9 +195,13 @@ class Post extends Model
         }
 
         if ($sort === 'latest') {
-            $query->latest();
+            $query->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")
+                  ->latest();
         } elseif ($sort === 'upvotes') {
             $query->orderBy('upvotes_count', 'desc');
+        } elseif ($sort === 'priority') {
+            $query->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")
+                  ->latest();
         }
 
         return $query->paginate($perPage);

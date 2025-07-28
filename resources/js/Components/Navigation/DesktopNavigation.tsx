@@ -1,6 +1,7 @@
 import React from 'react';
 import NavLink from '@/Components/NavLink';
 import useRoute from '@/Hooks/useRoute';
+import { router } from '@inertiajs/react';
 
 interface DesktopNavigationProps {
   role: string;
@@ -20,8 +21,8 @@ export default function DesktopNavigation({ role, department }: DesktopNavigatio
           Home
         </NavLink>
         <NavLink 
-          href={route('all')} 
-          active={route().current('all')}
+          href={route('tickets.index')}
+          active={route().current('tickets')}
         >
           Tickets
         </NavLink>

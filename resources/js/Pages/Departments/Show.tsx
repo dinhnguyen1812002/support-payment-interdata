@@ -367,15 +367,15 @@ console.log(localPosts);
             )}
 
             {selectedPost ? (
-              <ScrollArea className="h-[calc(100vh-100px)]">  
-                <PostContent
-                  post={selectedPost}
-                  comments={selectedPost.comments || []}
-                  currentUser={auth.user}
-                  onCommentSubmit={handleCommentSubmit}
-                  showBorder={false}
-                />
-              </ScrollArea>
+              // <ScrollArea className="h-[calc(100vh-100px)]">  
+              //   <PostContent
+              //     post={selectedPost}
+              //     currentUser={auth.user}
+              //     onCommentSubmit={handleCommentSubmit}
+              //     showBorder={false}
+              //   />
+              // </ScrollArea>
+              <div>content </div>
               
             ) : (
               <div className="flex flex-col items-center justify-center h-full text-muted-foreground">

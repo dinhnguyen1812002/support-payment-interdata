@@ -197,7 +197,7 @@ export default function AutomationRules({ rules, stats, search: initialSearch }:
                       />
                     </div>
                     
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                       <select
                         value={filterByStatus}
                         onChange={(e) => setFilterByStatus(e.target.value as typeof filterByStatus)}
@@ -228,7 +228,7 @@ export default function AutomationRules({ rules, stats, search: initialSearch }:
                       >
                         {sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
                       </Button>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Rules List */}

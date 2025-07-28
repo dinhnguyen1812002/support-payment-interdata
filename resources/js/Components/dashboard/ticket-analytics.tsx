@@ -26,6 +26,7 @@ import {
   Clock,
   Target
 } from 'lucide-react';
+import { getPriorityColor, getStatusColor } from '@/Utils/utils';
 
 interface Post {
   id: number;
@@ -127,25 +128,25 @@ export function TicketAnalytics({ posts, automationStats }: TicketAnalyticsProps
     };
   }, [posts]);
 
-  function getStatusColor(status: string) {
-    switch (status) {
-      case 'open': return '#3b82f6';
-      case 'in_progress': return '#f59e0b';
-      case 'resolved': return '#10b981';
-      case 'closed': return '#6b7280';
-      default: return '#6b7280';
-    }
-  }
+  // function getStatusColor(status: string) {
+  //   switch (status) {
+  //     case 'open': return '#3b82f6';
+  //     case 'in_progress': return '#f59e0b';
+  //     case 'resolved': return '#10b981';
+  //     case 'closed': return '#6b7280';
+  //     default: return '#6b7280';
+  //   }
+  // }
 
-  function getPriorityColor(priority: string) {
-    switch (priority) {
-      case 'urgent': return '#ef4444';
-      case 'high': return '#f97316';
-      case 'medium': return '#eab308';
-      case 'low': return '#22c55e';
-      default: return '#6b7280';
-    }
-  }
+  // function getPriorityColor(priority: string) {
+  //   switch (priority) {
+  //     case 'urgent': return '#ef4444';
+  //     case 'high': return '#f97316';
+  //     case 'medium': return '#eab308';
+  //     case 'low': return '#22c55e';
+  //     default: return '#6b7280';
+  //   }
+  // }
 
   const totalTickets = posts.length;
   const resolvedTickets = posts.filter(p => p.status === 'resolved').length;

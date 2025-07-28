@@ -28,6 +28,7 @@ import {
 } from '@/Components/ui/alert-dialog';
 
 import { useToast } from '@/Hooks/use-toast';
+import { getStatusColor } from '@/Utils/utils';
 
 // Define the Post type to match backend data structure
 export type Post = {
@@ -71,7 +72,7 @@ export const columns: ColumnDef<Post>[] = [
             name={user.name}
             alt={user.name}
             className="h-8 w-8"
-            variant="initials"
+            variant="identicon"
             square={true}
           />
           <div className="flex flex-col">
@@ -99,7 +100,7 @@ export const columns: ColumnDef<Post>[] = [
     cell: ({ row }) => {
       return (
         <div className="font-medium max-w-[300px] truncate">
-          <Link href={`/posts/${row.original.slug}`}>
+          <Link href={`/admin/tickets/${row.original.slug}`}>
             {row.getValue('title')}
           </Link>
         </div>
@@ -114,19 +115,37 @@ export const columns: ColumnDef<Post>[] = [
       const status = row.getValue('status') as string;
       const getStatusBadge = (status: string) => {
         switch (status?.toLowerCase()) {
-          case 'published':
-          case 'public':
-            return <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Published</Badge>;
-          case 'private':
-          case 'draft':
-            return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">Private</Badge>;
-          case 'archived':
-            return <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">Archived</Badge>;
+          case 'Open':
+            return <Badge className="bg-blue-100 text-blue-800 border-blue-200 dark:text-blue-300">Open</Badge>;
+          case 'in_progress':
+            return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">in_progress</Badge>;
+          case 'resolved':
+            return <Badge className="bg-green-100 text-green-800 border-green-200">Resolved</Badge>;
+          case 'closed':
+            return <Badge className="bg-gray-100 text-gray-800 border-gray-200">Closed</Badge>;
           default:
             return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">{status || 'Unknown'}</Badge>;
         }
       };
       return getStatusBadge(status);
+
+//  export const getStatusColor = (status: string) => {
+//     switch (status) {
+//       case 'open':
+//         return 'bg-blue-100 text-blue-800 border-blue-200';
+//       case 'in-progress':
+//         return 'bg-purple-100 text-purple-800 border-purple-200';
+//       case 'waiting-response':
+//         return 'bg-amber-100 text-amber-800 border-amber-200';
+//       case 'resolved':
+//         return 'bg-green-100 text-green-800 border-green-200';
+//       case 'closed':
+//         return '';
+//       default:
+//         return 'bg-gray-100 text-gray-800 border-gray-200';
+//     }
+  // };
+
     },
   },
 
@@ -213,12 +232,21 @@ export const columns: ColumnDef<Post>[] = [
 
       return (
         <div className="flex items-center gap-2">
-          <AvatarWithFallback
+          {/* <AvatarWithFallback
             src={avatarUrl}
             name={assignee.name}
             alt={assignee.name}
             className="h-6 w-6"
             variant="geometric"
+            square={true}
+            size={24}
+          /> */}
+          <AvatarWithFallback
+            src={avatarUrl}
+            name={assignee.name}
+            alt={assignee.name}
+            className="h-6 w-6"
+            variant="identicon"
             square={true}
             size={24}
           />
@@ -289,17 +317,17 @@ export const columns: ColumnDef<Post>[] = [
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
+              {/* <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(post.id)}
               >
                 Copy post ID
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <Link href={`/posts/${post.slug}`}>View post</Link>
+                <Link href={`/admin/tickets/${post.slug}`}>View post</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>Edit post</DropdownMenuItem>
-              <DropdownMenuItem>View author profile</DropdownMenuItem>
+              {/* <DropdownMenuItem>Edit post</DropdownMenuItem>
+              <DropdownMenuItem>View author profile</DropdownMenuItem> */}
               <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
                 Delete
               </DropdownMenuItem>

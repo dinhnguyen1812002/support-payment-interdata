@@ -76,7 +76,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/posts/{slug}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
-    Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::delete('/posts/{post}/delete', [PostController::class, 'destroy'])->name('posts.destroy');
     Route::post('/posts/{id}/restore', [PostController::class, 'restore'])->name('posts.restore');
     Route::post('/comments', [CommentsController::class, 'store'])
         ->middleware('comment.rate.limit')

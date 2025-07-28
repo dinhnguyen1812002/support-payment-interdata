@@ -281,7 +281,7 @@ class TicketService
             })
             ->when($status, fn ($q) => $q->where('status', $status))
             ->when($priority, fn ($q) => $q->where('priority', $priority))
-            ->when($sort === 'latest', fn ($q) => $q->latest())
+            ->when($sort === 'latest', fn ($q) => $q->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")->latest())
             ->when($sort === 'oldest', fn ($q) => $q->oldest())
             ->when($sort === 'upvotes', fn ($q) => $q->orderBy('upvotes_count', 'desc'))
             ->when($sort === 'priority', fn ($q) => $q->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')"))
@@ -296,7 +296,7 @@ class TicketService
                         END, created_at DESC
                     ", ["%{$search}%", "%{$search}%"]);
                 }
-                return $q->latest();
+                return $q->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")->latest();
             })
             ->paginate(self::TICKETS_PER_PAGE)
             ->withQueryString();

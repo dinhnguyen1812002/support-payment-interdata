@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Category;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -22,13 +23,34 @@ class CategoryService
 
     private function getListCategories(Request $request, int $perPage): LengthAwarePaginator
     {
-        $cacheKey = "categories_page_{$request->page}_perPage_{$perPage}_search_{$request->search}_sort_{$request->sort}_{$request->direction}";
+        $currentUser = auth()->user();
+        $userDeptKey = $currentUser && !$currentUser->isAdmin() ?
+            '_dept_' . $currentUser->departments()->pluck('departments.id')->implode('_') :
+            '_all';
+
+        $cacheKey = "categories_page_{$request->page}_perPage_{$perPage}_search_{$request->search}_sort_{$request->sort}_{$request->direction}{$userDeptKey}";
         $cacheDuration = now()->addMinutes(5);
 
-        return Cache::remember($cacheKey, $cacheDuration, function () use ($request, $perPage) {
-            $query = Category::select(['id', 'title', 'slug', 'description', 'logo'])
-                ->withCount('posts')
-                ->latest();
+        return Cache::remember($cacheKey, $cacheDuration, function () use ($request, $perPage, $currentUser) {
+            $query = Category::select(['id', 'title', 'slug', 'description', 'logo']);
+
+            // Lọc posts count theo phòng ban nếu user không phải admin
+            if ($currentUser && !$currentUser->isAdmin()) {
+                $departmentIds = $currentUser->departments()->pluck('departments.id');
+                if ($departmentIds->isNotEmpty()) {
+                    $query->withCount(['posts' => function ($q) use ($departmentIds) {
+                        $q->whereIn('department_id', $departmentIds);
+                    }]);
+                } else {
+                    $query->withCount(['posts' => function ($q) {
+                        $q->whereRaw('1 = 0'); // No posts if user has no department
+                    }]);
+                }
+            } else {
+                $query->withCount('posts');
+            }
+
+            $query->latest();
 
             // Apply search filter if provided
             if ($request->has('search')) {

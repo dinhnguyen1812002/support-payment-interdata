@@ -3,6 +3,7 @@ import { CommentsProvider, useComments } from '@/Context/CommentsContext';
 import { CommentsResponse, Comment, User } from '@/types/CommentTypes';
 import CommentList from '@/Pages/Comments/CommentList';
 import CommentForm from '@/Pages/Comments/CommentForm';
+import CommentsPagination from '@/Components/CommentsPagination';
 
 interface CommentsSectionProps {
   initialComments: CommentsResponse;
@@ -16,8 +17,11 @@ const CommentsContent: React.FC<
 > = ({ onCommentSubmit, postId, currentUser }) => {
   const {
     comments,
+    pagination,
+    isLoading,
     addComment,
     addReply,
+    loadPage,
   } = useComments();
 
   const submittingRef = useRef<boolean>(false);
@@ -129,21 +133,27 @@ const CommentsContent: React.FC<
 
       </div>
 
-      {!hasComments ? (
-        <div className="py-10 text-center">
-          <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
-            Be the first to share your thoughts and start the conversation!
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
+ <div className="space-y-6">
           <CommentList
             comments={comments}
             onReply={handleCommentSubmit}
             currentUser={currentUser}
           />
+
+          {/* Pagination */}
+          {pagination && pagination.last_page > 1 && (
+            <div className="flex justify-center mt-6">
+              <CommentsPagination
+                current_page={pagination.current_page}
+                last_page={pagination.last_page}
+                next_page_url={pagination.next_page_url}
+                prev_page_url={pagination.prev_page_url}
+                onPageChange={loadPage}
+                isLoading={isLoading}
+              />
+            </div>
+          )}
         </div>
-      )}
     </div>
   );
 };

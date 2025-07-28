@@ -164,7 +164,7 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
       </div>
 
       {/* Filters */}
-      <div className="max-w-[1450px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-end mb-8">
           {/* Search */}
           <div className="relative flex-1 max-w-md flex justify-end">

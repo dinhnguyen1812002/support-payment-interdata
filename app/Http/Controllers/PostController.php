@@ -107,12 +107,21 @@ class PostController extends Controller
         return redirect()->back()->with('success', $result['message']);
     }
 
-    public function destroy(Post $post)
-    {
-        $result = $this->postService->deletePost($post);
+   public function destroy(Post $post)
+{
+    $user = Auth::user();
 
-        return redirect()->back()->with('success', 'delete post successfully.');
+    if (
+        $user->hasRole('admin') ||
+        $user->can('delete') ||
+        $user->id === $post->user_id
+    ) {
+        $result = $this->postService->deletePost($post);
+        return redirect()->back()->with('success', 'Delete post successfully.');
     }
+
+    abort(403, 'Unauthorized action.');
+}
 
     public function filterPostByCategory(Request $request, $categorySlug): \Inertia\Response
     {

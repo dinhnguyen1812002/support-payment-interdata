@@ -75,6 +75,13 @@ class CommentsController extends Controller
             'comments' => [
                 'data' => $comments->items(),
                 'next_page_url' => $comments->nextPageUrl(),
+                'prev_page_url' => $comments->previousPageUrl(),
+                'current_page' => $comments->currentPage(),
+                'last_page' => $comments->lastPage(),
+                'per_page' => $comments->perPage(),
+                'total' => $comments->total(),
+                'from' => $comments->firstItem(),
+                'to' => $comments->lastItem(),
             ],
         ]);
     }

@@ -175,7 +175,9 @@ const TicketLayout: React.FC<TicketLayoutProps> = ({
 
             {/* Content with proper spacing */}
             <div className="relative">
-              <ScrollArea className="h-screen">{children}</ScrollArea>
+             
+                {children}
+              
             </div>
           </main>
         </div>

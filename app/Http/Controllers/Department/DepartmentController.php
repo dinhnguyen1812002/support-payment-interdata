@@ -28,10 +28,10 @@ class DepartmentController extends Controller
     public function index(Request $request)
     {
         // Kiểm tra vai trò admin
-        if (! auth()->user()->hasRole('admin')) {
-            throw UnauthorizedException::forRoles(['admin']);
-        }
-
+        // if (! auth()->user()->hasRole('admin') || ! auth()->user()->hasRole('employee') ) {
+        //     throw UnauthorizedException::forRoles(['admin']);
+        // }
+        
         $search = $request->input('search', '');
 
         $departments = Departments::query()
@@ -57,14 +57,14 @@ class DepartmentController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        if (! auth()->user()->hasRole('admin')) {
-            throw UnauthorizedException::forRoles(['admin']);
-        }
+    // public function create()
+    // {
+    //     if (! auth()->user()->hasRole('admin')) {
+    //         throw UnauthorizedException::forRoles(['admin']);
+    //     }
 
-        return Inertia::render('Departments/Create');
-    }
+    //     return Inertia::render('Departments/Create');
+    // }
 
     public function store(Request $request)
     {
@@ -111,7 +111,30 @@ class DepartmentController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($post) {
-                $comments = $post->getFormattedComments();
+                // Get paginated comments
+                $comments = $post->comments()
+                    ->whereNull('parent_id')
+                    ->with([
+                        'user.roles',
+                        'user.departments',
+                        'replies.user.roles',
+                        'replies.user.departments',
+                    ])
+                    ->latest()
+                    ->paginate(5);
+
+                $commentsData = [
+                    'data' => $comments->items(),
+                    'next_page_url' => $comments->nextPageUrl(),
+                    'prev_page_url' => $comments->previousPageUrl(),
+                    'current_page' => $comments->currentPage(),
+                    'last_page' => $comments->lastPage(),
+                    'per_page' => $comments->perPage(),
+                    'total' => $comments->total(),
+                    'from' => $comments->firstItem(),
+                    'to' => $comments->lastItem(),
+                ];
+
                 $hasUpvoted = auth()->check() ? $post->isUpvotedBy(auth()->id()) : false;
 
                 return [
@@ -128,7 +151,7 @@ class DepartmentController extends Controller
                     'department' => $post->department,
                     'categories' => $post->categories,
                     'tags' => $post->tags,
-                    'comments' => $comments,
+                    'comments' => $commentsData,
                     'upvote_count' => $post->upvotes_count,
                     'has_upvote' => $hasUpvoted,
                     'product_name' => $post->product_name,

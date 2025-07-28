@@ -48,6 +48,7 @@ class AdminController extends Controller
     {
 
         $this->authorize('view posts');
+       
         $perPage = $request->get('per_page', 10);
         $postData = $this->adminService->getAllPosts($request, $perPage);
 
@@ -79,7 +80,22 @@ class AdminController extends Controller
     {
         $this->authorize('view admin dashboard');
 
-        $tags = Tag::all();
+        $currentUser = auth()->user();
+
+        if ($currentUser->isAdmin()) {
+            // Admin xem tất cả tags
+            $tags = Tag::all();
+        } else {
+            // Non-admin chỉ xem tags của posts trong phòng ban họ
+            $departmentIds = $currentUser->departments()->pluck('departments.id');
+            if ($departmentIds->isNotEmpty()) {
+                $tags = Tag::whereHas('posts', function($query) use ($departmentIds) {
+                    $query->whereIn('department_id', $departmentIds);
+                })->get();
+            } else {
+                $tags = collect(); // Empty collection if user has no department
+            }
+        }
 
         return Inertia::render('Admin/Tags', [
             'tags' => $tags,
@@ -97,9 +113,24 @@ class AdminController extends Controller
         $permissions = \Spatie\Permission\Models\Permission::all();
 
         // Phân trang cho users
-        $users = \App\Models\User::query()
-            ->with(['roles', 'permissions'])
-            ->when($search, function ($query, $search) {
+        $usersQuery = \App\Models\User::query()
+            ->with(['roles', 'permissions']);
+
+        // Lọc theo phòng ban nếu user không phải admin
+        $currentUser = auth()->user();
+        if (!$currentUser->isAdmin()) {
+            $departmentIds = $currentUser->departments()->pluck('departments.id');
+            if ($departmentIds->isNotEmpty()) {
+                $usersQuery->whereHas('departments', function($q) use ($departmentIds) {
+                    $q->whereIn('departments.id', $departmentIds);
+                });
+            } else {
+                // Nếu user không thuộc phòng ban nào, không hiển thị users nào
+                $usersQuery->whereRaw('1 = 0');
+            }
+        }
+
+        $users = $usersQuery->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             })
@@ -149,10 +180,22 @@ class AdminController extends Controller
         $posts = [];
 
         if (! empty($postIds)) {
-            $posts = \App\Models\Post::whereIn('id', $postIds)
+            $postsQuery = \App\Models\Post::whereIn('id', $postIds)
                 ->with(['user', 'categories', 'tags'])
-                ->withCount('upvotes')
-                ->get()
+                ->withCount('upvotes');
+
+            // Lọc theo phòng ban nếu user không phải admin
+            if (!$user->isAdmin()) {
+                $departmentIds = $user->departments()->pluck('departments.id');
+                if ($departmentIds->isNotEmpty()) {
+                    $postsQuery->whereIn('department_id', $departmentIds);
+                } else {
+                    // Nếu user không thuộc phòng ban nào, không hiển thị posts nào
+                    $postsQuery->whereRaw('1 = 0');
+                }
+            }
+
+            $posts = $postsQuery->get()
                 ->map(function ($post) {
                     $comments = $post->getFormattedComments();
                     $hasUpvote = auth()->check() ? $post->isUpvotedBy(auth()->id()) : false;

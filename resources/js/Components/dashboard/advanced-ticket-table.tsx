@@ -49,6 +49,8 @@ import {
 } from 'lucide-react';
 import { Link, router } from '@inertiajs/react';
 import { StatusUpdateDropdown } from './status-update-dropdown';
+import { getPriorityColor } from '@/Utils/utils';
+import { route } from 'ziggy-js';
 
 
 interface Post {
@@ -236,25 +238,25 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'bg-red-100 text-red-800 border-red-200';
-      case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+  // const getPriorityColor = (priority: string) => {
+  //   switch (priority) {
+  //     case 'urgent': return 'bg-red-100 text-red-800 border-red-200';
+  //     case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
+  //     case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+  //     case 'low': return 'bg-green-100 text-green-800 border-green-200';
+  //     default: return 'bg-gray-100 text-gray-800 border-gray-200';
+  //   }
+  // };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'in_progress': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'resolved': return 'bg-green-100 text-green-800 border-green-200';
-      case 'closed': return 'bg-gray-100 text-gray-800 border-gray-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+  // const getStatusColor = (status: string) => {
+  //   switch (status) {
+  //     case 'open': return 'bg-blue-100 text-blue-800 border-blue-200';
+  //     case 'in_progress': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+  //     case 'resolved': return 'bg-green-100 text-green-800 border-green-200';
+  //     case 'closed': return 'bg-gray-100 text-gray-800 border-gray-200';
+  //     default: return 'bg-gray-100 text-gray-800 border-gray-200';
+  //   }
+  // };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -280,7 +282,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
               {selectedTickets.length > 0 && ` • ${selectedTickets.length} selected`}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={onRefresh} disabled={isLoading}>
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -289,7 +291,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
-          </div>
+          </div> */}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -308,28 +310,28 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
           </div>
           
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="open">Open</SelectItem>
-              <SelectItem value="in_progress">In Progress</SelectItem>
-              <SelectItem value="resolved">Resolved</SelectItem>
-              <SelectItem value="closed">Closed</SelectItem>
+              <SelectItem value="all">Tất cả trạng thái</SelectItem>
+              <SelectItem value="open">Mở</SelectItem>
+              <SelectItem value="in_progress">Đang xử lý</SelectItem>
+              <SelectItem value="resolved">Đã giải quyết</SelectItem>
+              <SelectItem value="closed">Đóng</SelectItem>
             </SelectContent>
           </Select>
 
           <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Priority" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Priority</SelectItem>
-              <SelectItem value="urgent">Urgent</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="urgent">Khẩn cấp</SelectItem>
+              <SelectItem value="high">Cao</SelectItem>
+              <SelectItem value="medium">Trung bình</SelectItem>
+              <SelectItem value="low">Thấp</SelectItem>
             </SelectContent>
           </Select>
 
@@ -338,8 +340,8 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
               <SelectValue placeholder="Assignee" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Assignees</SelectItem>
-              <SelectItem value="unassigned">Unassigned</SelectItem>
+              <SelectItem value="all">Nhượng quyền</SelectItem>
+              <SelectItem value="unassigned">Chưa được chỉ định</SelectItem>
               {uniqueAssignees.map(assignee => (
                 <SelectItem key={assignee.id} value={assignee.id.toString()}>
                   {assignee.name}
@@ -349,11 +351,11 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
           </Select>
 
           <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="Department" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
+              <SelectItem value="all">Tất cả phòng ban</SelectItem>
               {uniqueDepartments.map(dept => (
                 <SelectItem key={dept.id} value={dept.id.toString()}>
                   {dept.name}
@@ -374,11 +376,11 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                   <UserPlus className="h-4 w-4 mr-2" />
-                  Assign
+                  Nhượng quyền
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>Assign to</DropdownMenuLabel>
+                <DropdownMenuLabel>Nhượng quyền cho</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {uniqueAssignees.map(assignee => (
                   <DropdownMenuItem 
@@ -400,23 +402,23 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                   <Settings className="h-4 w-4 mr-2" />
-                  Status
+                 Trạng thái
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>Change status to</DropdownMenuLabel>
+                <DropdownMenuLabel>Thay đổi trạng thái thành</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => handleBulkStatusUpdate('open')}>
-                  Open
+                  Mở
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleBulkStatusUpdate('in_progress')}>
-                  In Progress
+                  Đang xử lý
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleBulkStatusUpdate('resolved')}>
-                  Resolved
+                  Đã giải quyết
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleBulkStatusUpdate('closed')}>
-                  Closed
+                  Đóng
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -425,23 +427,23 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                   <AlertTriangle className="h-4 w-4 mr-2" />
-                  Priority
+                  Độ ưu tiên
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>Change priority to</DropdownMenuLabel>
+                <DropdownMenuLabel>Thay đổi độ ưu tiên thành</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => handleBulkPriorityUpdate('urgent')}>
-                  Urgent
+                  Khẩn cấp
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleBulkPriorityUpdate('high')}>
-                  High
+                  Cao
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleBulkPriorityUpdate('medium')}>
-                  Medium
+                  Trung bình
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleBulkPriorityUpdate('low')}>
-                  Low
+                  Thấp
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -451,7 +453,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
               size="sm" 
               onClick={() => setSelectedTickets([])}
             >
-              Clear Selection
+              Xóa lựa chọn
             </Button>
           </div>
         )}
@@ -477,8 +479,8 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                   Ticket
                 </TableHead>
                
-                <TableHead>Assignee</TableHead>
-                <TableHead>Department</TableHead>
+                <TableHead>Người nhận</TableHead>
+                <TableHead>Phòng ban</TableHead>
 
                 <TableHead 
                   className="cursor-pointer hover:bg-muted/50"
@@ -487,10 +489,10 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                     setSortOrder(sortBy === 'created_at' && sortOrder === 'asc' ? 'desc' : 'asc');
                   }}
                 >
-                  Created
+                  Ngày tạo
                 </TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Priority</TableHead>
+                <TableHead>Trạng thái</TableHead>
+                <TableHead>Độ ưu tiên</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -589,19 +591,21 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                           <DropdownMenuItem asChild>
                             <Link href={`/admin/tickets/${ticket.id}`}>
                               <Eye className="h-4 w-4 mr-2" />
-                              View
+                              Xem
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
+                          {/* <DropdownMenuItem asChild>
                             <Link href={`/admin/tickets/${ticket.id}/edit`}>
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </Link>
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
+                          <DropdownMenuItem asChild className='text-red-600'>
+                            <Link href={(route('posts.destroy', ticket.id))}>
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Xóa
+                            </Link>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

@@ -39,7 +39,30 @@ class PostService
             ->orderBy('posts_count', 'desc')
             ->get();
 
-        $comments = $post->getFormattedComments();
+        // Get paginated comments instead of all comments
+        $comments = $post->comments()
+            ->whereNull('parent_id')
+            ->with([
+                'user.roles',
+                'user.departments',
+                'replies.user.roles',
+                'replies.user.departments',
+            ])
+            ->latest()
+            ->paginate(5);
+
+        $commentsData = [
+            'data' => $comments->items(),
+            'next_page_url' => $comments->nextPageUrl(),
+            'prev_page_url' => $comments->previousPageUrl(),
+            'current_page' => $comments->currentPage(),
+            'last_page' => $comments->lastPage(),
+            'per_page' => $comments->perPage(),
+            'total' => $comments->total(),
+            'from' => $comments->firstItem(),
+            'to' => $comments->lastItem(),
+        ];
+
         $hasUpvote = auth()->check() ? $post->isUpvotedBy(auth()->id()) : false;
 
         return [
@@ -53,7 +76,7 @@ class PostService
                 'user' => $post->user,
                 'categories' => $post->categories,
                 'tags' => $post->tags,
-                'comments' => $comments,
+                'comments' => $commentsData,
                 'upvote_count' => $post->upvotes_count,
                 'has_upvote' => $hasUpvote,
                 'priority' => $post->priority,
@@ -140,6 +163,7 @@ class PostService
             })
             ->with(['user', 'categories', 'tags', 'comments'])
             ->withCount(['comments', 'upvotes'])
+            ->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")
             ->orderBy($sort === 'oldest' ? 'created_at' : 'created_at', $sort === 'oldest' ? 'asc' : 'desc')
             ->paginate(6);
 
@@ -390,6 +414,7 @@ class PostService
             ->where('is_published', true)
             ->with(['user', 'categories'])
             ->withCount('upvotes')
+            ->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")
             ->orderBy('upvotes_count', 'desc')
             ->latest()
             ->paginate(6);
@@ -450,8 +475,9 @@ class PostService
             ->where('is_published', true)
             ->with(['user', 'categories'])
             ->withCount('upvotes')
-            ->when($sort === 'latest', fn ($q) => $q->latest())
+            ->when($sort === 'latest', fn ($q) => $q->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")->latest())
             ->when($sort === 'upvote', fn ($q) => $q->orderBy('upvotes_count', 'desc'))
+            ->when($sort === 'priority', fn ($q) => $q->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")->latest())
             ->paginate(6)
             ->withQueryString();
 
@@ -473,6 +499,7 @@ class PostService
     {
         return Post::select(['id', 'title', 'slug'])
             ->withCount('upvotes')
+            ->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")
             ->orderBy('upvotes_count', 'desc')
             ->latest()
             ->limit($limit)

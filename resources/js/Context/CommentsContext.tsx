@@ -1,18 +1,18 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { CommentsResponse, Comment } from '@/types/CommentTypes';
 import axios from 'axios';
+import { router } from '@inertiajs/react';
 
 interface CommentsContextType {
   comments: Comment[];
-  nextPage: string | null;
+  pagination: CommentsResponse | null;
   isLoading: boolean;
-  hasMore: boolean;
   addComment: (comment: Comment) => void;
   addReply: (parentId: string, reply: Comment) => void;
   removeComment: (commentId: string) => void;
-  loadMoreComments: () => void;
+  loadPage: (page: number) => void;
   setComments: React.Dispatch<React.SetStateAction<Comment[]>>;
-  setNextPage: React.Dispatch<React.SetStateAction<string | null>>;
+  setPagination: React.Dispatch<React.SetStateAction<CommentsResponse | null>>;
 }
 
 const CommentsContext = createContext<CommentsContextType | undefined>(
@@ -33,8 +33,8 @@ export const CommentsProvider: React.FC<CommentsProviderProps> = ({
   const [comments, setComments] = useState<Comment[]>(
     initialComments.data || [],
   );
-  const [nextPage, setNextPage] = useState<string | null>(
-    initialComments.next_page_url,
+  const [pagination, setPagination] = useState<CommentsResponse | null>(
+    initialComments,
   );
   const [isLoading, setIsLoading] = useState(false);
 
@@ -90,37 +90,54 @@ export const CommentsProvider: React.FC<CommentsProviderProps> = ({
     );
   }, []);
 
-  const loadMoreComments = useCallback(async () => {
-    if (!nextPage || isLoading) return;
+  const loadPage = useCallback(async (page: number) => {
+    if (isLoading) return;
 
     setIsLoading(true);
     try {
-      const response = await axios.get(nextPage);
-      const newComments: Comment[] = response.data.comments.data;
-      setComments(prev => [...prev, ...newComments]);
-      setNextPage(response.data.comments.next_page_url);
+      // Sử dụng router.get để navigate với preserveScroll
+      router.get(window.location.pathname,
+        {
+          ...Object.fromEntries(new URLSearchParams(window.location.search)),
+          page: page
+        },
+        {
+          preserveScroll: true,
+          preserveState: true,
+          only: ['comments'], // Chỉ reload comments
+          onSuccess: (page) => {
+            if (page.props.comments) {
+              const newCommentsResponse = page.props.comments as CommentsResponse;
+              setComments(newCommentsResponse.data || []);
+              setPagination(newCommentsResponse);
+            }
+          },
+          onError: (error) => {
+            console.error('Error loading comments page:', error);
+          },
+          onFinish: () => {
+            setIsLoading(false);
+          }
+        }
+      );
     } catch (error) {
-      console.error('Error loading more comments:', error);
-    } finally {
+      console.error('Error loading comments page:', error);
       setIsLoading(false);
     }
-  }, [nextPage, isLoading]);
-
-  const hasMore = !!nextPage;
+  }, [isLoading]);
 
   return (
     <CommentsContext.Provider
       value={{
         comments,
-        nextPage,
+        pagination,
         isLoading,
-        hasMore,
         addComment,
         addReply,
         removeComment,
-        loadMoreComments,
+        loadPage,
         setComments,
-        setNextPage,
+        setPagination,
       }}
     >
       {children}
