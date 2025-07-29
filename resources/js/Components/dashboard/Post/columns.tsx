@@ -61,7 +61,7 @@ export const columns: ColumnDef<Post>[] = [
   {
     accessorKey: 'user',
     id: 'user',
-    header: 'Author',
+    header: 'Người viết',
     cell: ({ row }) => {
       const user = row.getValue('user') as Post['user'];
       const avatarUrl = user.avatarUrl || (user.profile_photo_path ? `/storage/${user.profile_photo_path}` : null);
@@ -92,7 +92,7 @@ export const columns: ColumnDef<Post>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Title
+         Tiêu đề
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -110,19 +110,19 @@ export const columns: ColumnDef<Post>[] = [
   {
     accessorKey: 'status',
     id: 'status',
-    header: 'Status',
+    header: 'Trạng thái',
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
       const getStatusBadge = (status: string) => {
         switch (status?.toLowerCase()) {
-          case 'Open':
-            return <Badge className="bg-blue-100 text-blue-800 border-blue-200 dark:text-blue-300">Open</Badge>;
+          case 'open':  
+            return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">Mở</Badge>;
           case 'in_progress':
-            return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">in_progress</Badge>;
+            return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">Đang xử lý</Badge>;
           case 'resolved':
-            return <Badge className="bg-green-100 text-green-800 border-green-200">Resolved</Badge>;
+            return <Badge className="bg-green-100 text-green-800 border-green-200">Đã xử lý</Badge>;
           case 'closed':
-            return <Badge className="bg-gray-100 text-gray-800 border-gray-200">Closed</Badge>;
+            return <Badge className="bg-gray-100 text-gray-800 border-gray-200">Đóng</Badge>;
           default:
             return <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">{status || 'Unknown'}</Badge>;
         }
@@ -158,7 +158,7 @@ export const columns: ColumnDef<Post>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className="whitespace-nowrap"
         >
-          Votes
+          Số bình chọn
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -176,7 +176,7 @@ export const columns: ColumnDef<Post>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className="whitespace-nowrap"
         >
-          Comments
+          Số bình luận
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -194,21 +194,17 @@ export const columns: ColumnDef<Post>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           className="whitespace-nowrap"
         >
-          Created At
+          Ngày tạo
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => {
       const createdAt = row.getValue('created_at') as string;
-      const date = new Date(createdAt);
+    
       return (
         <span className="text-sm text-muted-foreground">
-          {date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-          })}
+          {createdAt}
         </span>
       );
     },
@@ -216,14 +212,14 @@ export const columns: ColumnDef<Post>[] = [
   {
     accessorKey: 'assignee',
     id: 'assignee',
-    header: 'Assignee',
+    header: 'Ủy nhiệm',
     cell: ({ row }) => {
       const assignee = row.getValue('assignee') as Post['assignee'];
 
       if (!assignee) {
         return (
           <div className="text-sm text-muted-foreground">
-            Unassigned
+            chưa được ủy nhiệm
           </div>
         );
       }
@@ -311,7 +307,7 @@ export const columns: ColumnDef<Post>[] = [
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">Mở</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -324,12 +320,12 @@ export const columns: ColumnDef<Post>[] = [
               </DropdownMenuItem> */}
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <Link href={`/admin/tickets/${post.slug}`}>View post</Link>
+                <Link href={`/admin/tickets/${post.slug}`}>Xem post</Link>
               </DropdownMenuItem>
               {/* <DropdownMenuItem>Edit post</DropdownMenuItem>
               <DropdownMenuItem>View author profile</DropdownMenuItem> */}
               <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                Delete
+               Xóa
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -340,11 +336,10 @@ export const columns: ColumnDef<Post>[] = [
           >
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogTitle>Bạn có chắc là muốn xóa ticket này không</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the
-                  post "{post.title}" and remove all associated data from our
-                  servers.
+                  Hành động này không thể hoàn tác. Điều này sẽ xóa vĩnh viễn bài viết
+                  "{post.title}" và loại bỏ tất cả dữ liệu liên quan khỏi hệ thống máy chủ của chúng tôi.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -353,7 +348,7 @@ export const columns: ColumnDef<Post>[] = [
                   onClick={confirmDelete}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Delete
+                  Xóa
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

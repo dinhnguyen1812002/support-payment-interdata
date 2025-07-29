@@ -157,7 +157,7 @@ export default function DepartmentCards({
                           </CardContent>
                           <CardFooter className="p-2 flex justify-between gap-1 border-t bg-muted/10">
                             <div className="flex gap-1">
-                              <Link href={`/departments/${department.slug}`}>
+                              <Link href={`/departments/${department.slug}/employee`}>
                                 <Button
                                   variant="ghost"
                                   size="sm"

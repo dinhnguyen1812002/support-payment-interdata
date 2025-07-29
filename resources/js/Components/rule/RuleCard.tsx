@@ -1,6 +1,6 @@
 import { AutomationRule } from "@/types/rules";
 
-import {Eye, Edit, Trash2 } from "lucide-react";
+import {Eye, Edit, Trash2, Loader2 } from "lucide-react";
 import React from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -20,12 +20,14 @@ const CATEGORY_COLORS = {
   general: 'bg-gray-100 text-gray-800',
 } as const;
 
-export const RuleCard = React.memo(({ 
-  rule, 
-  onDelete 
-}: { 
-  rule: AutomationRule; 
+export const RuleCard = React.memo(({
+  rule,
+  onDelete,
+  isDeleting = false
+}: {
+  rule: AutomationRule;
   onDelete: (id: number) => void;
+  isDeleting?: boolean;
 }) => (
   <div className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
     <div className="flex items-start justify-between">
@@ -78,14 +80,19 @@ export const RuleCard = React.memo(({
             <Edit className="h-4 w-4" />
           </Button>
         </Link>
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           className="text-red-600 hover:text-red-700"
           onClick={() => onDelete(rule.id)}
+          disabled={isDeleting}
           title="Delete rule"
         >
-          <Trash2 className="h-4 w-4" />
+          {isDeleting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Trash2 className="h-4 w-4" />
+          )}
         </Button>
       </div>
     </div>

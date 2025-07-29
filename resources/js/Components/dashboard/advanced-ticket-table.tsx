@@ -275,7 +275,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
           <div>
             <CardTitle className="flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
-              Advanced Ticket Management
+              Quản lý Tickets
             </CardTitle>
             <CardDescription>
               {filteredTickets.length} of {posts.length} tickets

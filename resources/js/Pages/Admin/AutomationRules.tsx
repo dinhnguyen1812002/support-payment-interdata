@@ -28,6 +28,7 @@ import { AutomationRule, AutomationRulesProps } from '@/types/rules';
 import { StatsCard } from '@/Components/rule/StatsCard';
 import { RuleCard } from '@/Components/rule/RuleCard';
 import { EmptyState } from '@/Components/notification/NotificationStates';
+import { ConfirmDeleteDialog } from '@/Components/rule/ConfirmDeleteDialog';
 
 
 
@@ -51,6 +52,10 @@ export default function AutomationRules({ rules, stats, search: initialSearch }:
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [filterByStatus, setFilterByStatus] = useState<'all' | 'active' | 'inactive'>('all');
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
+  
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [ruleToDelete, setRuleToDelete] = useState<AutomationRule | null>(null);
 
   // Memoized filtered and sorted rules
   const filteredAndSortedRules = useMemo(() => {
@@ -99,21 +104,42 @@ export default function AutomationRules({ rules, stats, search: initialSearch }:
       : 0
   }), [stats]);
 
-  // Optimized delete handler with loading state
+  // Show delete confirmation dialog
   const handleDelete = useCallback((id: number) => {
-    if (isDeleting) return;
+    const rule = rules.data.find(r => r.id === id);
+    if (rule) {
+      setRuleToDelete(rule);
+      setDeleteDialogOpen(true);
+    }
+  }, [rules.data]);
+
+  // Actual delete handler after confirmation
+  const handleConfirmDelete = useCallback(() => {
+    if (!ruleToDelete || isDeleting) return;
     
-    setIsDeleting(id);
-    router.delete(`/admin/automation-rules/${id}`, {
+    setIsDeleting(ruleToDelete.id);
+    router.delete(`/admin/automation-rules/${ruleToDelete.id}`, {
       onSuccess: () => {
-        toast.success('Automation rule deleted successfully');
+        toast.success('Quy tắc tự động đã được xóa thành công');
         setIsDeleting(null);
+        setDeleteDialogOpen(false);
+        setRuleToDelete(null);
       },
       onError: () => {
-        toast.error('Failed to delete automation rule');
+        toast.error('Không thể xóa quy tắc tự động');
         setIsDeleting(null);
       },
     });
+  }, [ruleToDelete, isDeleting]);
+
+  // Handle dialog close
+  const handleDeleteDialogClose = useCallback((open: boolean) => {
+    if (!isDeleting) {
+      setDeleteDialogOpen(open);
+      if (!open) {
+        setRuleToDelete(null);
+      }
+    }
   }, [isDeleting]);
 
   const handleSortToggle = useCallback((newSortBy: typeof sortBy) => {
@@ -239,6 +265,7 @@ export default function AutomationRules({ rules, stats, search: initialSearch }:
                           key={rule.id}
                           rule={rule}
                           onDelete={handleDelete}
+                          isDeleting={isDeleting === rule.id}
                         />
                       ))
                     ) : localSearch || filterByStatus !== 'all' ? (
@@ -275,6 +302,15 @@ export default function AutomationRules({ rules, stats, search: initialSearch }:
           </div>
         </div>
       </SidebarInset>
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={handleDeleteDialogClose}
+        rule={ruleToDelete}
+        onConfirm={handleConfirmDelete}
+        isDeleting={isDeleting === ruleToDelete?.id}
+      />
     </SidebarProvider>
   );
 }

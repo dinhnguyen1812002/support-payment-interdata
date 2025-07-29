@@ -234,9 +234,9 @@ export function DataTable({
           <div>
             <CardTitle className="text-xl font-bold flex items-center gap-2">
               <Ticket className="h-5 w-5 text-primary" />
-              All Tickets
+              Tất cả tickets
             </CardTitle>
-            <CardDescription>Manage and track your tickets</CardDescription>
+            <CardDescription>Quản lý tickets của bạn</CardDescription>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
             <div className="relative w-full sm:w-auto">
@@ -256,11 +256,11 @@ export function DataTable({
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All statuses</SelectItem>
-                <SelectItem value="published">Published</SelectItem>
-                <SelectItem value="private">Private</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="archived">Archived</SelectItem>
+                <SelectItem value="all">Tất cả</SelectItem>
+                <SelectItem value="open">Mở</SelectItem>
+                <SelectItem value="in_progress">Đang xử lý</SelectItem>
+                <SelectItem value="resloved">đã xử lý</SelectItem>
+                <SelectItem value="closed">Đóng</SelectItem>
               </SelectContent>
             </Select>
             <Select
@@ -271,10 +271,10 @@ export function DataTable({
                 <SelectValue placeholder="Items per page" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="10">10 per page</SelectItem>
-                <SelectItem value="25">25 per page</SelectItem>
-                <SelectItem value="50">50 per page</SelectItem>
-                <SelectItem value="100">100 per page</SelectItem>
+                <SelectItem value="10">10 / page</SelectItem>
+                <SelectItem value="25">25 / page</SelectItem>
+                <SelectItem value="50">50 / page</SelectItem>
+                <SelectItem value="100">100 / page</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -342,8 +342,8 @@ export function DataTable({
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-4 border-t">
           <div className="text-sm text-muted-foreground mb-4 sm:mb-0">
-            Showing <span className="font-medium">{pagination.from}</span> to{' '}
-            <span className="font-medium">{pagination.to}</span> of{' '}
+           Hiển thị <span className="font-medium">{pagination.from}</span> đến{' '}
+            <span className="font-medium">{pagination.to}</span> trong{' '}
             <span className="font-medium">{pagination.total}</span> tickets
           </div>
           <div className="flex items-center gap-2">

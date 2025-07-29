@@ -510,8 +510,23 @@ class TicketBulkController extends Controller
      */
     public function updateStatus(Request $request, string $slug)
     {
-        // $this->authorize('manage tickets');
+        $user = auth()->user();
+  // Check quyền: admin | manage tickets | là người được giao (assignee)
+        $isAuthorized = $user->hasRole('admin') ||
+                        $user->can('manage tickets') ||
+                        $user->id === $post->assignee_id; // Giả sử bạn có cột 'assigned_to'
 
+        // Tìm ticket trước
+        $post = Post::where('slug', $slug)
+            ->orWhere('id', $slug)
+            ->firstOrFail();
+
+      
+        if (!$isAuthorized) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Validate status
         $validated = $request->validate([
             'status' => 'required|string|in:open,in_progress,resolved,closed',
         ]);
@@ -519,21 +534,15 @@ class TicketBulkController extends Controller
         try {
             DB::beginTransaction();
 
-            // Find the ticket
-            $post = Post::where('slug', $slug)
-                ->orWhere('id', $slug)
-                ->firstOrFail();
-
             $oldStatus = $post->status;
             $post->status = $validated['status'];
             $post->save();
 
-            // Log the status change
             Log::info('Ticket status updated', [
                 'ticket_id' => $post->id,
                 'old_status' => $oldStatus,
                 'new_status' => $validated['status'],
-                'updated_by' => auth()->id(),
+                'updated_by' => $user->id,
             ]);
 
             DB::commit();
@@ -543,9 +552,9 @@ class TicketBulkController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to update ticket status', [
-                'ticket' => $ticket,
+                'ticket_id' => $post->id ?? null,
                 'status' => $validated['status'] ?? null,
-                'user_id' => auth()->id(),
+                'user_id' => $user->id,
                 'error' => $e->getMessage(),
             ]);
 
@@ -554,4 +563,5 @@ class TicketBulkController extends Controller
             ], 500);
         }
     }
+
 }

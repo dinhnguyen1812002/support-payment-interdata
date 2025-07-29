@@ -49,7 +49,7 @@ const data = {
 
   dashboard: [
     {
-      name: 'Dashboard',
+      name: 'Quản Trị',
       url: '/admin',
       icon: LayoutDashboardIcon,
     }
@@ -86,59 +86,59 @@ const data = {
       icon: FileTextIcon,
       items: [
         {
-          title: 'Posts',
+          title: 'Ticket',
           url: '/admin/posts',
         },
         {
-          title: 'Categories',
+          title: 'Danh Mục',
           url: '/admin/categories',
         },
         {
-          title: 'Tags',
+          title: 'Nhãn',
           url: '/admin/tags',
         },
         {
-          title: 'Trash',
+          title: 'Ticket Đã xóa',
           url: '/admin/posts/trash',
         },
       ],
     },
     {
-      title: 'User',
+      title: 'Quản lý',
       url: '#',
       icon: ContactRound,
       items: [
         {
-          title: 'Users',
+          title: 'Người dùng',
           url: '/users',
         },
         {
-          title: 'Roles & Permissions',
+          title: 'Quyền và Vai trò',
           url: '/admin/roles-permissions',
         },
         {
-          title: 'Departments',
+          title: 'Phòng ban', 
           url: '/departments',
         },
       ],
     },
     {
-      title: 'System',
+      title: 'Cài đặt',
       url: '#',
       icon: SettingsIcon,
       items: [
+        // {
+        //   title: 'Notifications',
+        //   url: '/admin/notifications',
+        // },
         {
-          title: 'Notifications',
-          url: '/admin/notifications',
-        },
-        {
-          title: 'Automation Rules',
+          title: 'Quy tắc',
           url: '/admin/automation-rules',
         },
-        {
-          title: 'Documentation',
-          url: '/admin/docs',
-        },
+        // {
+        //   title: 'Documentation',
+        //   url: '/admin/docs',
+        // },
       ],
     },
   ],

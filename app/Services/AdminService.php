@@ -250,7 +250,7 @@ class AdminService
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'created_at' => $user->created_at->toISOString(),
+            'created_at' => $user->created_at->format('d/m/Y'),
             'updated_at' => $user->updated_at->toISOString(),
             'profile_photo_path' => $user->profile_photo_url,
         ];
@@ -436,7 +436,7 @@ class AdminService
                 'slug' => $post->slug,
                 'title' => $post->title,
                 'status' => $post->status,
-                'created_at' => $post->created_at,
+                'created_at' => $post->created_at->format('d/m/Y'),
                 'user' => $post->user,
                 'categories' => $post->categories,
                 'upvotes_count' => $post->upvotes_count,
@@ -537,13 +537,9 @@ class AdminService
             });
         }
 
-        // Status filter
+        // Status filter - lọc theo status thật
         if ($request->filled('status')) {
-            if ($request->status === 'published') {
-                $query->where('is_published', true);
-            } elseif ($request->status === 'private') {
-                $query->where('is_published', false);
-            }
+            $query->where('status', $request->status);
         }
 
         // Date range filter

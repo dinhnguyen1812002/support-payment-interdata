@@ -43,17 +43,17 @@ export default function TagsPage({ tags = [] }: TagsPageProps) {
     setDialogOpen(false);
   };
   const handleDelete = (tag: Tag) => {
-    if (confirm(`Are you sure you want to delete ${tag.name}?`)) {
+    if (confirm(`Bạn có chắc chắn muốn xóa ${tag.name}?`)) {
       Inertia.delete(`/admin/tags/${tag.id}`);
     }
   };
 
   return (
     <SidebarProvider>
-      <Head title={'Tags'} />
+      <Head title={'Thẻ'} />
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader title={'All Tags'} />
+        <SiteHeader title={'Tất cả thẻ'} />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 ml-4 mr-4">
@@ -61,23 +61,23 @@ export default function TagsPage({ tags = [] }: TagsPageProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold tracking-tight">
-                    Tags Management
+                    Quản lý thẻ
                   </h2>
                   <p className="text-muted-foreground">
-                    Manage your tags and categories
+                    Quản lý thẻ và danh mục của bạn
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   {/* <div className="relative">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search tags..."
+                      placeholder="Tìm kiếm thẻ..."
                       className="pl-8 w-[250px]"
                     />
                   </div> */}
                   <Button onClick={() => handleOpenDialog()}>
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Tag
+                    Thêm thẻ
                   </Button>
                 </div>
               </div>
@@ -86,10 +86,10 @@ export default function TagsPage({ tags = [] }: TagsPageProps) {
               <Table className="border border-gray-200 rounded-md">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Tên</TableHead>
                     <TableHead>Slug</TableHead>
-                    <TableHead>Created at</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>Ngày tạo</TableHead>
+                    <TableHead>Hành động</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

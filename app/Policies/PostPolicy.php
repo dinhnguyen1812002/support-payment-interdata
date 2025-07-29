@@ -45,7 +45,7 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
-        return $user->hasRole('admin') || $user->id === $post->user_id;
+        return $user->hasRole('admin')|| $user->hasRole('employee') || $user->id === $post->user_id;
     }
 
     /**

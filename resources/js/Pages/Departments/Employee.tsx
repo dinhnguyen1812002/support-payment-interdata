@@ -9,10 +9,15 @@ import UserCard from '@/Components/Ticket/user-card';
 import AddUserToDepartment from '@/Pages/Departments/AddUser';
 import { Pagination } from '@/Components/ui/pagination';
 import { Button } from '@/Components/ui/button';
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import type { Department, Notification } from '@/types';
 import type { PaginatedData } from '@/types';
 
+import { PageTransition } from '@/Components/ui/page-transition';
+
+import { SidebarInset, SidebarProvider } from '@/Components/ui/sidebar';
+import { AppSidebar } from '@/Components/dashboard/app-sidebar';
+import { SiteHeader } from '@/Components/dashboard/site-header';
 interface UserType {
   id: number;
   name: string;
@@ -41,13 +46,14 @@ export default function Employee({ users, department, notifications }: Props) {
     : users.data;
 
   return (
-    <TooltipProvider>
-      <AppLayout
-        title={department.name}
-        department={department}
-        notifications={notifications}
-      >
-        <div className="p-4  pl-9">
+
+<SidebarProvider>
+      <Head title="Tickets" />
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader title={'Nhân viên phòng ' + department.name} />
+        <PageTransition>
+          <div className="p-4  pl-9">
           <div className="flex gap-4">
             <div className="relative w-64">
               {' '}
@@ -139,8 +145,21 @@ export default function Employee({ users, department, notifications }: Props) {
             </div>
           )}
         </div>
-      </AppLayout>
-      <Toaster />
-    </TooltipProvider>
+
+        </PageTransition>
+      </SidebarInset>
+    </SidebarProvider>
+
+
+    // <TooltipProvider>
+    //   <AppLayout
+    //     title={department.name}
+    //     department={department}
+    //     notifications={notifications}
+    //   >
+      
+    //   </AppLayout>
+    //   <Toaster />
+    // </TooltipProvider>
   );
 }

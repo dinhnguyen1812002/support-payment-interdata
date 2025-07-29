@@ -27,7 +27,7 @@ export function useNavigation() {
       setState(prev => ({
         ...prev,
         isNavigating: false,
-        currentUrl: event.detail.page.url,
+        currentUrl: event.detail?.page?.url || prev.currentUrl,
       }));
     };
 

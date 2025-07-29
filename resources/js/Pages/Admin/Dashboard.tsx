@@ -86,7 +86,7 @@ export default function Page({
   const ticketStats = React.useMemo(() => {
     const openTickets = posts.filter(p => p.status === 'open').length;
     const inProgressTickets = posts.filter(p => p.status === 'in_progress').length;
-    const urgentTickets = posts.filter(p => p.priority === 'urgent').length;
+    const urgentTickets = posts.filter(p => p.priority === 'urgent' && p.status !== 'resolved').length;
     const highPriorityTickets = posts.filter(p => p.priority === 'high').length;
     const unassignedTickets = posts.filter(p => !p.assignee).length;
 
@@ -110,11 +110,11 @@ export default function Page({
 
   return (
     <SidebarProvider>
-      <Head title={'Support Dashboard'} />
+      <Head title={'Bảng điều khiển hỗ trợ'} />
       <NavigationProgress />
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader title={'Support Dashboard'} />
+        <SiteHeader title={'Bảng điều khiển hỗ trợ'} />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
@@ -127,7 +127,7 @@ export default function Page({
                       <AlertTriangle className="h-5 w-5 text-red-600" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-red-800 dark:text-red-200">
-                          {ticketStats.urgentTickets} urgent ticket{ticketStats.urgentTickets > 1 ? 's' : ''} require immediate attention
+                          {ticketStats.urgentTickets} ticket khẩn cấp cần được xử lý ngay lập tức
                         </p>
                       </div>
                       <Badge variant="destructive">{ticketStats.urgentTickets}</Badge>

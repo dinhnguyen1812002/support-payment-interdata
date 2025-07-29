@@ -256,10 +256,10 @@ export default function Categories() {
 console.log(data);
   return (
     <SidebarProvider>
-      <Head title={'Categories'} />
+      <Head title={'Danh mục'} />
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader title={'Categories'} />
+        <SiteHeader title={'Danh mục'} />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4">
@@ -269,10 +269,10 @@ console.log(data);
                     <div>
                       <CardTitle className="text-xl flex items-center gap-2">
                         <FolderOpen className="h-5 w-5 text-primary" />
-                        Categories
+                        Danh mục
                       </CardTitle>
                       <CardDescription className="mt-1">
-                        Manage your content categories and organization
+                        Quản lý danh mục nội dung và tổ chức
                       </CardDescription>
                     </div>
 
@@ -285,7 +285,7 @@ console.log(data);
                           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                           <Input
                             type="search"
-                            placeholder="Search categories..."
+                            placeholder="Tìm kiếm danh mục..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                             className="pl-9 pr-10"
@@ -299,7 +299,7 @@ console.log(data);
                               onClick={handleClearSearch}
                             >
                               <X className="h-4 w-4" />
-                              <span className="sr-only">Clear search</span>
+                              <span className="sr-only">Xóa tìm kiếm</span>
                             </Button>
                           )}
                         </div>
@@ -308,7 +308,7 @@ console.log(data);
                         onClick={handleAddNew}
                         className="flex items-center gap-2"
                       >
-                        <Plus className="h-4 w-4" /> Add Category
+                        <Plus className="h-4 w-4" /> Thêm danh mục
                       </Button>
                     </div>
                   </div>
@@ -337,10 +337,10 @@ console.log(data);
               >
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Are you sure you want to delete?</DialogTitle>
+                    <DialogTitle>Bạn có chắc chắn muốn xóa?</DialogTitle>
                     <DialogDescription>
-                      This will permanently delete the category "
-                      {categoryToDelete?.title}". This action cannot be undone.
+                      Điều này sẽ xóa vĩnh viễn danh mục "
+                      {categoryToDelete?.title}". Hành động này không thể hoàn tác.
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
@@ -349,14 +349,14 @@ console.log(data);
                       onClick={() => setDeleteDialogOpen(false)}
                       disabled={isLoading}
                     >
-                      Cancel
+                      Hủy
                     </Button>
                     <Button
                       variant="destructive"
                       onClick={confirmDelete}
                       disabled={isLoading}
                     >
-                      {isLoading ? 'Deleting...' : 'Delete'}
+                      {isLoading ? 'Đang xóa...' : 'Xóa'}
                     </Button>
                   </DialogFooter>
                 </DialogContent>

@@ -236,6 +236,7 @@ class DepartmentController extends Controller
 
     public function getEmployee(string $slug)
     {
+
         // Lấy thông tin phòng ban
         $department = Departments::where('slug', $slug)->firstOrFail();
         $user = auth()->user();
@@ -274,7 +275,7 @@ class DepartmentController extends Controller
         // Kiểm tra quyền
         //        $this->authorize('add users to department', $department);
         //        $this->hasRole('admin');
-        if (! auth()->user()->hasRole('admin')) {
+        if (! auth()->user()->hasRole('admin') && ! auth()->user()->hasRole('department_manager')) {
             throw UnauthorizedException::forRoles(['admin']);
         }
 
@@ -285,9 +286,10 @@ class DepartmentController extends Controller
         $user = User::findOrFail($request->user_id);
 
         // Kiểm tra xem user đã thuộc phòng ban khác chưa
-        if ($user->departments()->exists()) {
-            return response()->json(['error' => 'User already belongs to a department'], 422);
+          if (! auth()->user()->hasRole('admin') && ! auth()->user()->hasRole('department_manager')) {
+            throw UnauthorizedException::forRoles(['admin']);
         }
+
 
         // Thêm user vào phòng ban
         $department->users()->attach($user->id);

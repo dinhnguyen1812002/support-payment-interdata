@@ -1,5 +1,5 @@
 import { usePage } from '@inertiajs/react';
-import {InertiaSharedProps, NotificationContextType} from '@/types';
+import {InertiaSharedProps, NotificationContextType} from '../types';
 import {createContext, useContext} from "react";
 
 export default function useTypedPage<T = {}>() {
