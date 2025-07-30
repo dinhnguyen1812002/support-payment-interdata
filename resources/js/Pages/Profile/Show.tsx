@@ -87,6 +87,7 @@ const ProfilePage = ({
       canRegister={true}
       canLogin={true}
       title={user.name}
+    
     >
       <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
         {/* Profile Header */}
@@ -98,7 +99,7 @@ const ProfilePage = ({
                 name={user.name}
                 alt={user.name}
                 className="h-20 w-20"
-                variant="marble"
+                variant="identicon"
               />
               <div className="space-y-1">
                 <h2 className="text-2xl font-semibold">{user.name}</h2>
@@ -117,28 +118,28 @@ const ProfilePage = ({
           <TabsList className="grid w-full grid-cols-4 lg:w-[400px]">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <UserCircle className="w-4 h-4" />
-              Profile
+              Hồ sơ
             </TabsTrigger>
             <TabsTrigger value="security" className="flex items-center gap-2">
               <Shield className="w-4 h-4" />
-              Security
+              Bảo mật
             </TabsTrigger>
             <TabsTrigger value="sessions" className="flex items-center gap-2">
               <Activity className="w-4 h-4" />
-              Sessions
+              session
             </TabsTrigger>
             <TabsTrigger value="posts" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              Tickets
+              tickets
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
+                <CardTitle>Thông tin hồ sơ</CardTitle>
                 <CardDescription>
-                  Update your account's profile information and email address.
+                  Cập nhật thông tin hồ sơ và địa chỉ email của tài khoản.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -150,9 +151,10 @@ const ProfilePage = ({
           <TabsContent value="security" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Update Password</CardTitle>
+                <CardTitle>Cập nhật mật khẩu</CardTitle>
                 <CardDescription>
-                  Ensure your account is using a long, random password to stay secure.
+                  Đảm bảo tài khoản của bạn sử dụng mật 
+                  khẩu dài và ngẫu nhiên để giữ an toàn.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -163,9 +165,9 @@ const ProfilePage = ({
             {page.props.jetstream.canManageTwoFactorAuthentication && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Two Factor Authentication</CardTitle>
+                  <CardTitle>Xác thực hai yếu tố</CardTitle>
                   <CardDescription>
-                    Add additional security to your account using two factor authentication.
+                    Thêm bảo mật bổ sung cho tài khoản của bạn bằng xác thực hai yếu tố.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -178,9 +180,9 @@ const ProfilePage = ({
           <TabsContent value="sessions">
             <Card>
               <CardHeader>
-                <CardTitle>Browser Sessions</CardTitle>
+                <CardTitle>Phiên trình duyệt</CardTitle>
                 <CardDescription>
-                  Manage and log out your active sessions on other browsers and devices.
+                  Quản lý và đăng xuất các phiên hoạt động trên trình duyệt và thiết bị khác.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -192,9 +194,9 @@ const ProfilePage = ({
           <TabsContent value="posts">
             <Card>
               <CardHeader>
-                <CardTitle>Your Tickets and Features Requests</CardTitle>
+                <CardTitle>Yêu cầu hỗ trợ và tính năng của bạn</CardTitle>
                 <CardDescription>
-                  View and manage your tickets and features requests.
+                  Xem và quản lý các yêu cầu hỗ trợ và tính năng của bạn.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -208,22 +210,22 @@ const ProfilePage = ({
           </TabsContent>
         </Tabs>
 
-        {page.props.jetstream.hasAccountDeletionFeatures && (
+        {/* {page.props.jetstream.hasAccountDeletionFeatures && (
           <Card className="border-destructive">
             <CardHeader>
               <CardTitle className="text-destructive flex items-center gap-2">
                 <UserX className="w-5 h-5" />
-                Delete Account
+                Xóa tài khoản
               </CardTitle>
               <CardDescription>
-                Permanently delete your account and all of its data.
+                Xóa vĩnh viễn tài khoản và tất cả dữ liệu của nó.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <DeleteUserForm />
             </CardContent>
           </Card>
-        )}
+        )} */}
       </div>
 
       <Toaster expand={true} closeButton />

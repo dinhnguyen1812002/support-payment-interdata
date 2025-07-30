@@ -75,6 +75,7 @@ class TicketService
         // Apply sorting
         switch ($sort) {
             case 'latest':
+            case 'newest':
                 $query->latest();
                 break;
             case 'oldest':
@@ -84,7 +85,16 @@ class TicketService
                 $query->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')");
                 break;
             case 'upvotes':
+            case 'most-upvoted':
                 $query->orderBy('upvotes_count', 'desc');
+                break;
+            case 'most-replies':
+                $query->orderBy('comments_count', 'desc');
+                break;
+            case 'inactive':
+                // Sort by inactive status first (closed, resolved), then by updated_at desc
+                $query->orderByRaw("FIELD(status, 'closed', 'resolved', 'in_progress', 'open')")
+                      ->orderBy('updated_at', 'desc');
                 break;
         }
 
@@ -281,10 +291,12 @@ class TicketService
             })
             ->when($status, fn ($q) => $q->where('status', $status))
             ->when($priority, fn ($q) => $q->where('priority', $priority))
-            ->when($sort === 'latest', fn ($q) => $q->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")->latest())
+            ->when($sort === 'latest' || $sort === 'newest', fn ($q) => $q->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")->latest())
             ->when($sort === 'oldest', fn ($q) => $q->oldest())
-            ->when($sort === 'upvotes', fn ($q) => $q->orderBy('upvotes_count', 'desc'))
+            ->when($sort === 'upvotes' || $sort === 'most-upvoted', fn ($q) => $q->orderBy('upvotes_count', 'desc'))
+            ->when($sort === 'most-replies', fn ($q) => $q->orderBy('comments_count', 'desc'))
             ->when($sort === 'priority', fn ($q) => $q->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')"))
+            ->when($sort === 'inactive', fn ($q) => $q->orderByRaw("FIELD(status, 'closed', 'resolved', 'in_progress', 'open')")->orderBy('updated_at', 'desc'))
             ->when($sort === 'relevance', function ($q) use ($search) {
                 // For relevance, order by title match first, then content match
                 if ($search) {

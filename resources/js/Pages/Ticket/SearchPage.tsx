@@ -91,7 +91,7 @@ export default function SearchPage({
 
   return (
     <TicketLayout
-      title="Search Results"
+      title="Kết quả tìm kiếm"
       categories={categories}
       departments={departments}
       users={users}
@@ -100,8 +100,9 @@ export default function SearchPage({
       notifications={notifications}
       showTabs={false}
       showCreateButton={true}
+      showLable={false}
     >
-      <Head title={`Search: ${query}`} />
+      <Head title={`Tìm kiếm: ${query}`} />
       
       <div className="p-6">
         <div className="max-w-4xl mx-auto space-y-6">
@@ -114,7 +115,7 @@ export default function SearchPage({
                 onClick={() => router.get('/tickets')}
                 className="text-muted-foreground hover:text-foreground"
               >
-                ← Back to tickets
+                ← Quay lại danh sách yêu cầu
               </Button>
             </div>
 
@@ -124,7 +125,7 @@ export default function SearchPage({
                 <div className="space-y-4">
                   <SearchInput
                     value={searchQuery}
-                    placeholder="Search tickets, categories, users..."
+                    placeholder="Tìm kiếm yêu cầu hỗ trợ, danh mục, người dùng..."
                     onSearch={handleSearch}
                     onClear={clearSearch}
                     showHistory={true}
@@ -139,8 +140,8 @@ export default function SearchPage({
                   {query && (
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <div>
-                        Found <strong>{totalResults}</strong> results for "<strong>{query}</strong>"
-                        {searchTime > 0 && ` in ${searchTime}ms`}
+                        Tìm thấy <strong>{totalResults}</strong> kết quả cho "<strong>{query}</strong>"
+                        {searchTime > 0 && ` trong ${searchTime}ms`}
                       </div>
                       <Button
                         variant="ghost"
@@ -148,7 +149,7 @@ export default function SearchPage({
                         onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                       >
                         <Filter className="h-4 w-4 mr-2" />
-                        {showAdvancedFilters ? 'Hide' : 'Show'} filters
+                        {showAdvancedFilters ? 'Ẩn' : 'Hiện'} bộ lọc
                       </Button>
                     </div>
                   )}
@@ -160,55 +161,56 @@ export default function SearchPage({
             {showAdvancedFilters && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Advanced Filters</CardTitle>
+                  <CardTitle className="text-base">Bộ lọc nâng cao</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Status Filter */}
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Status</label>
+                      <label className="text-sm font-medium">Trạng thái</label>
                       <select
                         className="w-full p-2 border border-border rounded-md bg-background"
                         value={filters.status || ''}
                         onChange={(e) => updateFilters({ status: e.target.value || undefined })}
                       >
-                        <option value="">All Status</option>
-                        <option value="open">Open</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="resolved">Resolved</option>
-                        <option value="closed">Closed</option>
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="open">Mở</option>
+                        <option value="in_progress">Đang xử lý</option>
+                        <option value="resolved">Đã giải quyết</option>
+                        <option value="closed">Đã đóng</option>
                       </select>
                     </div>
 
                     {/* Priority Filter */}
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Priority</label>
+                      <label className="text-sm font-medium">Độ ưu tiên</label>
                       <select
                         className="w-full p-2 border border-border rounded-md bg-background"
                         value={filters.priority || ''}
                         onChange={(e) => updateFilters({ priority: e.target.value || undefined })}
                       >
-                        <option value="">All Priorities</option>
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                        <option value="urgent">Urgent</option>
+                        <option value="">Tất cả độ ưu tiên</option>
+                        <option value="low">Thấp</option>
+                        <option value="medium">Trung bình</option>
+                        <option value="high">Cao</option>
+                        <option value="urgent">Khẩn cấp</option>
                       </select>
                     </div>
 
                     {/* Sort Filter */}
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Sort By</label>
+                      <label className="text-sm font-medium">Sắp xếp theo</label>
                       <select
                         className="w-full p-2 border border-border rounded-md bg-background"
                         value={filters.sortBy || 'relevance'}
                         onChange={(e) => updateFilters({ sortBy: e.target.value })}
                       >
-                        <option value="relevance">Relevance</option>
-                        <option value="latest">Latest</option>
-                        <option value="oldest">Oldest</option>
-                        <option value="upvotes">Most Upvoted</option>
-                        <option value="priority">Priority</option>
+                        <option value="relevance">Liên quan</option>
+                        <option value="latest">Mới nhất</option>
+                        <option value="oldest">Cũ nhất</option>
+                        <option value="upvotes">Nhiều upvote nhất</option>
+                        <option value="priority">Độ ưu tiên</option>
+                        <option value="inactive">Không hoạt động trước</option>
                       </select>
                     </div>
                   </div>
@@ -217,7 +219,7 @@ export default function SearchPage({
                   {Object.entries(filters).some(([key, value]) => value && key !== 'search') && (
                     <div className="mt-4 pt-4 border-t border-border">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-medium">Active filters:</span>
+                        <span className="text-sm font-medium">Bộ lọc đang áp dụng:</span>
                         {Object.entries(filters).map(([key, value]) => {
                           if (!value || key === 'search') return null;
                           return (
@@ -239,7 +241,7 @@ export default function SearchPage({
                           size="sm"
                           onClick={() => updateFilters({ status: undefined, priority: undefined, sortBy: undefined })}
                         >
-                          Clear all
+                          Xóa tất cả
                         </Button>
                       </div>
                     </div>
@@ -268,15 +270,15 @@ export default function SearchPage({
                 <Card>
                   <CardContent className="p-12 text-center">
                     <Search className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold mb-2">No results found</h3>
+                    <h3 className="text-lg font-semibold mb-2">Không tìm thấy kết quả</h3>
                     <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                      We couldn't find any tickets matching "{query}". Try adjusting your search terms or filters.
+                      Chúng tôi không thể tìm thấy yêu cầu hỗ trợ nào phù hợp với "{query}". Hãy thử điều chỉnh từ khóa tìm kiếm hoặc bộ lọc.
                     </p>
                     
                     {/* Search Suggestions */}
                     {suggestions.length > 0 && (
                       <div className="space-y-3">
-                        <p className="text-sm font-medium">Try searching for:</p>
+                        <p className="text-sm font-medium">Thử tìm kiếm:</p>
                         <div className="flex flex-wrap gap-2 justify-center">
                           {suggestions.map((suggestion, index) => (
                             <Button
@@ -299,9 +301,9 @@ export default function SearchPage({
             <Card>
               <CardContent className="p-12 text-center">
                 <Search className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">Start searching</h3>
+                <h3 className="text-lg font-semibold mb-2">Bắt đầu tìm kiếm</h3>
                 <p className="text-muted-foreground">
-                  Enter a search term above to find tickets, categories, or users.
+                  Nhập từ khóa tìm kiếm ở trên để tìm yêu cầu hỗ trợ, danh mục hoặc người dùng.
                 </p>
               </CardContent>
             </Card>

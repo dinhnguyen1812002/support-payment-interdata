@@ -81,7 +81,7 @@ export default function DepartmentCards({
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="text-muted-foreground">Loading...</div>
+          <div className="text-muted-foreground">Đang tải...</div>
         </div>
       </div>
     );
@@ -89,7 +89,7 @@ export default function DepartmentCards({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat('vi-VN', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -100,18 +100,18 @@ export default function DepartmentCards({
     <SidebarProvider>
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader title={'Department'} />
+        <SiteHeader title={'Phòng ban'} />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 ml-4">
               <div className="w-full">
                 <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-2">
-                  <CardTitle>Departments</CardTitle>
+                  <CardTitle>Phòng ban</CardTitle>
                   <div className="flex gap-4 w-full sm:w-auto">
                     <div className="relative flex-1 sm:w-64">
                       <Input
                         type="search"
-                        placeholder="Search departments..."
+                        placeholder="Tìm kiếm phòng ban..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && handleSearch()}
@@ -124,7 +124,7 @@ export default function DepartmentCards({
                         onClick={handleSearch}
                       >
                         <Search className="h-4 w-4" />
-                        <span className="sr-only">Search</span>
+                        <span className="sr-only">Tìm kiếm</span>
                       </Button>
                     </div>
                     <Button
@@ -152,7 +152,7 @@ export default function DepartmentCards({
                           <CardContent className="p-3 pt-0">
                             <p className="text-xs text-muted-foreground line-clamp-2 h-8">
                               {department.description ||
-                                'No description available'}
+                                'Không có mô tả'}
                             </p>
                           </CardContent>
                           <CardFooter className="p-2 flex justify-between gap-1 border-t bg-muted/10">
@@ -181,7 +181,7 @@ export default function DepartmentCards({
                                 onClick={() => {
                                   if (
                                     confirm(
-                                      'Are you sure you want to delete this department?',
+                                      'Bạn có chắc chắn muốn xóa phòng ban này?',
                                     )
                                   ) {
                                     Inertia.delete(
@@ -209,7 +209,7 @@ export default function DepartmentCards({
                   ) : (
                     <div className="flex items-center justify-center h-24 border rounded-md">
                       <p className="text-muted-foreground">
-                        No departments found.
+                        Không tìm thấy phòng ban nào.
                       </p>
                     </div>
                   )}
@@ -226,12 +226,12 @@ export default function DepartmentCards({
                       className="w-full sm:w-auto"
                     >
                       <ChevronLeft className="h-4 w-4 mr-2" />
-                      Previous
+                      Trước
                     </Button>
 
                     <div className="text-sm text-muted-foreground">
-                      Page {departments.current_page} of {departments.last_page}{' '}
-                      (Total: {departments.total} departments)
+                      Trang {departments.current_page} trong tổng số {departments.last_page}{' '}
+                      (Tổng cộng: {departments.total} phòng ban)
                     </div>
 
                     <Button
@@ -244,7 +244,7 @@ export default function DepartmentCards({
                       disabled={!departments.next_page_url}
                       className="w-full sm:w-auto"
                     >
-                      Next
+                      Tiếp
                       <ChevronRight className="h-4 w-4 ml-2" />
                     </Button>
                   </div>

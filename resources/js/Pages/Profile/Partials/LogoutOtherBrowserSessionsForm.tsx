@@ -10,6 +10,21 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { Session } from '@/types';
+import { Airplay, Smartphone } from 'lucide-react';
+
+import { Button } from '@/Components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/Components/ui/dialog';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
 
 interface Props {
   sessions: Session[];
@@ -52,10 +67,10 @@ export default function LogoutOtherBrowserSessions({ sessions }: Props) {
       }
     >
       <div className="max-w-xl text-sm text-gray-600 dark:text-gray-400">
-        If necessary, you may log out of all of your other browser sessions
-        across all of your devices. Some of your recent sessions are listed
-        below; however, this list may not be exhaustive. If you feel your
-        account has been compromised, you should also update your password.
+        Nếu cần, bạn có thể đăng xuất khỏi tất cả các phiên trình duyệt khác của
+        mình trên tất cả các thiết bị. Một số phiên gần đây của bạn được liệt kê
+        bên dưới; tuy nhiên, danh sách này có thể không đầy đủ. Nếu bạn cảm thấy
+        tài khoản của mình đã bị xâm phạm, bạn cũng nên cập nhật mật khẩu.
       </div>
 
       {/* <!-- Other Browser Sessions --> */}
@@ -65,32 +80,9 @@ export default function LogoutOtherBrowserSessions({ sessions }: Props) {
             <div className="flex items-center" key={i}>
               <div>
                 {session.agent.is_desktop ? (
-                  <svg
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    className="w-8 h-8 text-gray-500"
-                  >
-                    <path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                  </svg>
+                  <Airplay className="w-8 h-8 text-gray-500" />
                 ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-8 h-8 text-gray-500"
-                  >
-                    <path d="M0 0h24v24H0z" stroke="none"></path>
-                    <rect x="7" y="4" width="10" height="16" rx="1"></rect>
-                    <path d="M11 5h2M12 17v.01"></path>
-                  </svg>
+                  <Smartphone className="w-8 h-8 text-gray-500" />
                 )}
               </div>
 
@@ -117,21 +109,22 @@ export default function LogoutOtherBrowserSessions({ sessions }: Props) {
         </div>
       ) : null}
 
-      <div className="flex items-center mt-5">
+      {/* <div className="flex items-center mt-5">
         <PrimaryButton onClick={confirmLogout}>
-          Log Out Other Browser Sessions
+        Đăng xuất khỏi các thiết bị khác
         </PrimaryButton>
 
         <ActionMessage on={form.recentlySuccessful} className="ml-3">
           Done.
         </ActionMessage>
-      </div>
+      </div> */}
 
       {/* <!-- Log Out Other Devices Confirmation Modal --> */}
-      <DialogModal isOpen={confirmingLogout} onClose={closeModal}>
+      {/* <DialogModal isOpen={confirmingLogout} onClose={closeModal}>
         <DialogModal.Content title={'Log Out Other Browser Sessions'}>
-          Please enter your password to confirm you would like to log out of
-          your other browser sessions across all of your devices.
+          Để xác nhận rằng bạn muốn đăng xuất khỏi các phiên trình 
+          duyệt khác trên tất cả các thiết bị của mình, 
+          vui lòng nhập mật khẩu của bạn.
           <div className="mt-4">
             <TextInput
               type="password"
@@ -154,10 +147,69 @@ export default function LogoutOtherBrowserSessions({ sessions }: Props) {
             className={classNames('ml-2', { 'opacity-25': form.processing })}
             disabled={form.processing}
           >
-            Log Out Other Browser Sessions
+            Đăng xuất khỏi các thiết bị khác
           </PrimaryButton>
         </DialogModal.Footer>
       </DialogModal>
+     */}
+
+      <div className="mt-5">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="secondary"> Đăng xuất khỏi các thiết bị khác</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle></DialogTitle>
+              <DialogDescription>
+                Để xác nhận rằng bạn muốn đăng xuất khỏi các phiên trình duyệt
+                khác trên tất cả các thiết bị của mình, vui lòng nhập mật khẩu
+                của bạn.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center gap-2">
+              <div className="grid flex-1 gap-2">
+                <Label htmlFor="link" className="sr-only">
+                  Link
+                </Label>
+                <Input
+                  type="password"
+                  className="mt-1 block w-3/4"
+                  placeholder="Password"
+                  ref={passwordRef}
+                  value={form.data.password}
+                  onChange={e =>
+                    form.setData('password', e.currentTarget.value)
+                  }
+                />
+              </div>
+            </div>
+            <DialogFooter className="sm:justify-start">
+              <Button variant={'destructive'}
+               onClick={logoutOtherBrowserSessions}
+                className={classNames('bg-red-600', { 'opacity-25': form.processing })}
+                disabled={form.processing}
+              >
+                Đăng xuất khỏi các thiết bị khác
+              </Button>
+              <DialogClose asChild>
+              {/* 
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={logoutOtherBrowserSessions}
+                  className={classNames('ml-2', {
+                    'opacity-25': form.processing,
+                  })}
+                  disabled={form.processing}
+                >
+                  Đóng
+                </Button> */}
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </ActionSection>
   );
 }

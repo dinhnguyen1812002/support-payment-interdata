@@ -40,6 +40,7 @@ import { useToast } from '@/Hooks/use-toast';
 import { toast } from "sonner"
 // import { useToast } from '@/Hooks/use-toast';
 import { Toast } from '@/Components/ui/toast';
+import { getStatusColor, getStatusLabel } from '@/Utils/utils';
 interface PostsTableProps {
   posts: {
     data: Post[];
@@ -101,7 +102,7 @@ export default function PostsTable({
       preserveState: true,
       onSuccess: () => {
         toast("Your have bên restore", {
-          description: "Post restored successfully",
+          description: "",
           closeButton : true,
           duration : 5000,
           style: {
@@ -149,7 +150,7 @@ export default function PostsTable({
       <Card className="w-full">
         <CardContent className="p-6">
           <div className="text-center text-muted-foreground">
-            No posts found
+           Bạn chưa có tickets nào
           </div>
         </CardContent>
       </Card>
@@ -189,12 +190,13 @@ export default function PostsTable({
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead className="w-[40%]">Title</TableHead>
-                <TableHead className="w-[15%]">Status</TableHead>
-                <TableHead className="w-[15%]">Created at</TableHead>
-                <TableHead className="w-[15%]">Comments</TableHead>
-                <TableHead className="w-[15%]">Upvotes</TableHead>
-                <TableHead className="w-[15%] text-right">Actions</TableHead>
+                <TableHead className="w-[40%]">Tiêu đề</TableHead>
+                <TableHead className="w-[15%]">Công khai</TableHead>
+                <TableHead className="w-[15%]">Trạng thái</TableHead>
+                <TableHead className="w-[15%]">Ngày tạo</TableHead>
+                <TableHead className="w-[15%]">Thảo luận</TableHead>
+                <TableHead className="w-[15%]">upvotes </TableHead>
+                <TableHead className="w-[15%] text-right">Tính năng</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -207,13 +209,26 @@ export default function PostsTable({
                   </TableCell>
                   <TableCell>
                     <Badge variant={post.is_published ? 'outline' : 'default'}>
-                      {post.is_published ? (
+                      {post.status ? (
                         <Eye className="mr-1 h-3 w-3 inline" />
                       ) : (
                         <EyeOff className="mr-1 h-3 w-3 inline" />
                       )}
                       {post.is_published ? 'Public' : 'Private'}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                   {post.status ? (
+                      <Badge className={getStatusColor(post.status)}>
+                        {getStatusLabel(post.status)}
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-gray-100 text-gray-800">
+                        Unknown
+                      </Badge>
+                    )
+
+                   }
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {post.created_at}
@@ -284,7 +299,7 @@ export default function PostsTable({
             className="gap-1"
           >
             <ChevronLeft className="h-4 w-4" />
-            Previous
+            Trước
           </Button>
           <div className="text-sm text-muted-foreground">
             Page {pagination.current_page} of {pagination.last_page}
@@ -307,7 +322,7 @@ export default function PostsTable({
             disabled={!pagination.next_page_url}
             className="gap-1"
           >
-            Next
+           Tiếp theo
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -315,19 +330,19 @@ export default function PostsTable({
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogTitle>Bạn có chắc muốn xóa ticket này không?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                post and remove all associated data from our servers.
+                Hành động này không thể hoàn tác. Điều này sẽ xóa vĩnh viễn bài viết
+                "{postToDelete?.title}" và loại bỏ tất cả dữ liệu liên quan khỏi hệ thống máy chủ của chúng tôi.  
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>Thoát</AlertDialogCancel>
               <AlertDialogAction
                 onClick={confirmDelete}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                remove
+                Xóa
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

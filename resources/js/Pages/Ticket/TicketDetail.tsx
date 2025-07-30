@@ -307,11 +307,11 @@ export default function TicketDetail({
                     <div className="space-y-4">
                       <h3 className="font-semibold flex items-center gap-2">
                         <Settings className="w-4 h-4" />
-                        Ticket Management
+                        Quản lý yêu cầu hỗ trợ
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg">
                         <div className="space-y-2  ">
-                          <label className="text-sm font-medium dark:text-black">Status</label>
+                          <label className="text-sm font-medium dark:text-black">Trạng thái</label>
                           <select
                             className="w-full p-2 border rounded-md text-sm dark:text-white text-black"
                             value={ticket.status}
@@ -320,18 +320,18 @@ export default function TicketDetail({
                               console.log('Update status to:', e.target.value);
                             }}
                           >
-                            <option value="open">Open</option>
-                            <option value="in-progress">In Progress</option>
+                            <option value="open">Mở</option>
+                            <option value="in-progress">Đang xử lý</option>
                             <option value="waiting-response">
-                              Waiting Response
+                              Chờ phản hồi
                             </option>
-                            <option value="resolved">Resolved</option>
-                            <option value="closed">Closed</option>
+                            <option value="resolved">Đã giải quyết</option>
+                            <option value="closed">Đã đóng</option>
                           </select>
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium dark:text-black">
-                            Priority
+                            Độ ưu tiên
                           </label>
                           <select
                             className="w-full p-2 border rounded-md text-sm dark:text-white text-black"
@@ -344,15 +344,15 @@ export default function TicketDetail({
                               );
                             }}
                           >
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
+                            <option value="low">Thấp</option>
+                            <option value="medium">Trung bình</option>
+                            <option value="high">Cao</option>
+                            <option value="urgent">Khẩn cấp</option>
                           </select>
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium dark:text-black">
-                            Assign To
+                            Giao cho
                           </label>
                           <select
                             className="w-full p-2 border rounded-md text-sm dark:text-white text-black"
@@ -362,7 +362,7 @@ export default function TicketDetail({
                               console.log('Assign to user:', e.target.value);
                             }}
                           >
-                            <option value="">Unassigned</option>
+                            <option value="">Chưa giao</option>
                             {users.map(user => (
                               <option key={user.id} value={user.id}>
                                 {user.name}

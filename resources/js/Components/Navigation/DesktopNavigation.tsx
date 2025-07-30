@@ -18,7 +18,7 @@ export default function DesktopNavigation({ role, department }: DesktopNavigatio
           href={route('/')} 
           active={route().current('/')}
         >
-          Home
+          Trang chủ
         </NavLink>
         <NavLink 
           href={route('tickets.index')}

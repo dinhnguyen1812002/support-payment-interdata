@@ -67,7 +67,7 @@ export function CategoryFilter({
           <SelectItem value="all">
             <div className="flex items-center gap-2">
               <Folder className="h-4 w-4 text-muted-foreground" />
-              <span>All Categories</span>
+              <span>Tất cả</span>
             </div>
           </SelectItem>
         )}

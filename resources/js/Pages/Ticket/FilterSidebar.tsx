@@ -1,18 +1,18 @@
-import { Filter, User, Users } from "lucide-react";
-import { Button } from "@/Components/ui/button";
-import { Badge } from "@/Components/ui/badge";
-import { Separator } from "@/Components/ui/separator";
+import { Filter, User, Users } from 'lucide-react';
+import { Button } from '@/Components/ui/button';
+import { Badge } from '@/Components/ui/badge';
+import { Separator } from '@/Components/ui/separator';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
-import { router } from "@inertiajs/react";
-import React from "react";
-import { CategoryFilter } from "@/Components/CategoryFilter";
-import { SearchInput } from "@/Components/SearchInput";
+} from '@/Components/ui/select';
+import { router } from '@inertiajs/react';
+import React, { useState,useEffect } from 'react';
+import { CategoryFilter } from '@/Components/CategoryFilter';
+import { SearchInput } from '@/Components/SearchInput';
 
 interface FilterSidebarProps {
   categories?: any[];
@@ -26,31 +26,44 @@ interface FilterSidebarProps {
     assignee?: string;
     category?: string;
     myTickets?: boolean;
-    sortBy?: string;
+    sort?: string;
   };
   currentUser?: any;
   searchSuggestions?: string[];
 }
 
 const sortOptions = [
-  { value: "newest", label: "Mới nhất trước" },
-  { value: "oldest", label: "Cũ nhất trước" },
-  { value: "most-upvoted", label: "Nhiều upvote nhất" },
-  { value: "most-replies", label: "Nhiều phản hồi nhất" },
+  { value: 'newest', label: 'Mới nhất' },
+  { value: 'oldest', label: 'Cũ nhất' },
+  { value: 'most-upvoted', label: 'Nhiều upvote nhất' },
+  { value: 'most-replies', label: 'Nhiều phản hồi nhất' },
+  { value: 'inactive', label: 'Chưa hoạt động trước' },
 ];
 
 const priorities = [
-  { value: "low", label: "Thấp", color: "bg-green-100 text-green-800" },
-  { value: "medium", label: "Trung bình", color: "bg-yellow-100 text-yellow-800" },
-  { value: "high", label: "Cao", color: "bg-orange-100 text-orange-800" },
-  { value: "urgent", label: "Khẩn cấp", color: "bg-red-100 text-red-800" },
+  { value: 'low', label: 'Thấp', color: 'bg-green-100 text-green-800' },
+  {
+    value: 'medium',
+    label: 'Trung bình',
+    color: 'bg-yellow-100 text-yellow-800',
+  },
+  { value: 'high', label: 'Cao', color: 'bg-orange-100 text-orange-800' },
+  { value: 'urgent', label: 'Khẩn cấp', color: 'bg-red-100 text-red-800' },
 ];
 
 const statuses = [
-  { value: "open", label: "Mở", color: "bg-blue-100 text-blue-800" },
-  { value: "in_progress", label: "Đang xử lý", color: "bg-purple-100 text-purple-800" },
-  { value: "resolved", label: "Đã giải quyết", color: "bg-green-100 text-green-800" },
-  { value: "closed", label: "Đã đóng", color: "bg-gray-100 text-gray-800" },
+  { value: 'open', label: 'Mở', color: 'bg-blue-100 text-blue-800' },
+  {
+    value: 'in_progress',
+    label: 'Đang xử lý',
+    color: 'bg-purple-100 text-purple-800',
+  },
+  {
+    value: 'resolved',
+    label: 'Đã giải quyết',
+    color: 'bg-green-100 text-green-800',
+  },
+  { value: 'closed', label: 'Đã đóng', color: 'bg-gray-100 text-gray-800' },
 ];
 
 export function FilterSidebar({
@@ -59,9 +72,12 @@ export function FilterSidebar({
   users = [],
   filters = {},
   currentUser,
-  searchSuggestions = []
+  searchSuggestions = [],
 }: FilterSidebarProps) {
-
+  const [sort, setSort] = useState(filters.sort || 'newest');
+  useEffect(() => {
+    setSort(filters.sort || 'newest');
+  }, [filters.sort]);
   const updateFilters = (newFilters: any) => {
     const searchParams = new URLSearchParams();
     const updatedFilters = { ...filters, ...newFilters };
@@ -72,21 +88,29 @@ export function FilterSidebar({
       }
     });
 
-    router.get(`/tickets?${searchParams.toString()}`, {}, {
-      preserveState: true,
-      preserveScroll: true,
-    });
+    router.get(
+      `/tickets?${searchParams.toString()}`,
+      {},
+      {
+        preserveState: true,
+        preserveScroll: true,
+      },
+    );
   };
 
   const clearFilters = () => {
-    router.get('/tickets', {}, {
-      preserveState: true,
-      preserveScroll: true,
-    });
+    router.get(
+      '/tickets',
+      {},
+      {
+        preserveState: true,
+        preserveScroll: true,
+      },
+    );
   };
 
   const hasActiveFilters = Object.values(filters).some(
-    (value) => value !== undefined && value !== ""
+    value => value !== undefined && value !== '',
   );
 
   return (
@@ -112,7 +136,7 @@ export function FilterSidebar({
           <SearchInput
             value={filters.search || ''}
             placeholder="Tìm kiếm yêu cầu hỗ trợ..."
-            onSearch={(value) => updateFilters({ search: value || undefined })}
+            onSearch={value => updateFilters({ search: value || undefined })}
             onClear={() => updateFilters({ search: undefined })}
             showHistory={true}
             showSuggestions={true}
@@ -129,14 +153,14 @@ export function FilterSidebar({
       <div className="flex-1 overflow-y-auto">
         <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           <Separator className="lg:hidden mb-4" />
-          
+
           {/* Category */}
           <div className="space-y-2 sm:space-y-3">
             <label className="text-sm font-medium">Danh mục</label>
             <CategoryFilter
               categories={categories}
               value={filters.category}
-              onValueChange={(value) => updateFilters({ category: value })}
+              onValueChange={value => updateFilters({ category: value })}
               showPostCount={true}
             />
           </div>
@@ -145,10 +169,10 @@ export function FilterSidebar({
           <div className="space-y-2 sm:space-y-3">
             <label className="text-sm font-medium">Độ ưu tiên</label>
             <Select
-              value={filters.priority || ""}
-              onValueChange={(value) =>
+              value={filters.priority || ''}
+              onValueChange={value =>
                 updateFilters({
-                  priority: value === "all" ? undefined : value,
+                  priority: value === 'all' ? undefined : value,
                 })
               }
             >
@@ -157,7 +181,7 @@ export function FilterSidebar({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tất cả độ ưu tiên</SelectItem>
-                {priorities.map((priority) => (
+                {priorities.map(priority => (
                   <SelectItem key={priority.value} value={priority.value}>
                     <div className="flex items-center gap-2">
                       <Badge className={`text-xs ${priority.color}`}>
@@ -174,10 +198,10 @@ export function FilterSidebar({
           <div className="space-y-2 sm:space-y-3">
             <label className="text-sm font-medium">Trạng thái</label>
             <Select
-              value={filters.status || ""}
-              onValueChange={(value) =>
+              value={filters.status || ''}
+              onValueChange={value =>
                 updateFilters({
-                  status: value === "all" ? undefined : value,
+                  status: value === 'all' ? undefined : value,
                 })
               }
             >
@@ -186,7 +210,7 @@ export function FilterSidebar({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                {statuses.map((status) => (
+                {statuses.map(status => (
                   <SelectItem key={status.value} value={status.value}>
                     <div className="flex items-center gap-2">
                       <Badge className={`text-xs ${status.color}`}>
@@ -203,16 +227,17 @@ export function FilterSidebar({
           <div className="space-y-2 sm:space-y-3">
             <label className="text-sm font-medium">Sắp xếp theo</label>
             <Select
-              value={filters.sortBy || "newest"}
-              onValueChange={(value) =>
-                updateFilters({ sortBy: value === "newest" ? undefined : value })
-              }
-            >
+                value={sort}
+                onValueChange={(value) => {
+                  setSort(value);
+                  updateFilters({ sort: value === "newest" ? undefined : value });
+                }}
+              >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Sắp xếp theo" />
               </SelectTrigger>
               <SelectContent>
-                {sortOptions.map((option) => (
+                {sortOptions.map(option => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>
@@ -234,23 +259,20 @@ export function FilterSidebar({
                 )}
                 {filters.category && (
                   <Badge variant="secondary" className="text-xs">
-                    {
-                      categories.find((c) => c.id.toString() === filters.category)
-                        ?.title || 'Danh mục'
-                    }
+                    {categories.find(c => c.id.toString() === filters.category)
+                      ?.title || 'Danh mục'}
                   </Badge>
                 )}
                 {filters.priority && (
                   <Badge variant="secondary" className="text-xs">
-                    {
-                      priorities.find((p) => p.value === filters.priority)
-                        ?.label || filters.priority
-                    }
+                    {priorities.find(p => p.value === filters.priority)
+                      ?.label || filters.priority}
                   </Badge>
                 )}
                 {filters.status && (
                   <Badge variant="secondary" className="text-xs">
-                    {statuses.find((s) => s.value === filters.status)?.label || filters.status}
+                    {statuses.find(s => s.value === filters.status)?.label ||
+                      filters.status}
                   </Badge>
                 )}
                 {filters.search && (
@@ -258,10 +280,10 @@ export function FilterSidebar({
                     Tìm kiếm: {filters.search}
                   </Badge>
                 )}
-                {filters.sortBy && filters.sortBy !== "newest" && (
+                {filters.sort && filters.sort !== 'newest' && (
                   <Badge variant="secondary" className="text-xs">
-                    Sắp xếp:{" "}
-                    {sortOptions.find((s) => s.value === filters.sortBy)?.label}
+                    Sắp xếp:{' '}
+                    {sortOptions.find(s => s.value === filters.sort)?.label}
                   </Badge>
                 )}
               </div>
@@ -272,5 +294,3 @@ export function FilterSidebar({
     </div>
   );
 }
-
-

@@ -46,20 +46,20 @@ export default function UpdatePasswordForm() {
       renderActions={() => (
         <>
           <ActionMessage on={form.recentlySuccessful} className="mr-3">
-            Saved.
+            Đã lưu.
           </ActionMessage>
 
           <PrimaryButton
             className={classNames({ 'opacity-25': form.processing })}
             disabled={form.processing}
           >
-            Save
+            Lưu
           </PrimaryButton>
         </>
       )}
     >
       <div className="col-span-6 sm:col-span-4">
-        <InputLabel htmlFor="current_password">Current Password</InputLabel>
+        <InputLabel htmlFor="current_password">Mật khẩu hiện tại</InputLabel>
         <TextInput
           id="current_password"
           type="password"
@@ -75,7 +75,7 @@ export default function UpdatePasswordForm() {
       </div>
 
       <div className="col-span-6 sm:col-span-4">
-        <InputLabel htmlFor="password">New Password</InputLabel>
+        <InputLabel htmlFor="password">Mật khẩu mới</InputLabel>
         <TextInput
           id="password"
           type="password"
@@ -90,7 +90,7 @@ export default function UpdatePasswordForm() {
 
       <div className="col-span-6 sm:col-span-4">
         <InputLabel htmlFor="password_confirmation">
-          Confirm Password
+          Xác nhận mật khẩu
         </InputLabel>
         <TextInput
           id="password_confirmation"

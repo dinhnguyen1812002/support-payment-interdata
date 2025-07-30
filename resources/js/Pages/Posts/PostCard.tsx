@@ -46,7 +46,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
       <div className="flex justify-between items-center flex-wrap mb-8 lg:mb-7">
         <div className="space-y-1">
           <span className="font-bold text-2xl text-customBlue dark:text-white">
-            No Question Ask
+            Chưa có câu hỏi nào
           </span>
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
@@ -54,15 +54,15 @@ const BlogCard: React.FC<BlogCardProps> = ({
             <Link href={route('posts.create')} className="w-full sm:w-auto">
 
               <Button variant="default">
-                <span className="hidden sm:inline">Ask Question</span>
-                <span className="sm:hidden">Ask Question</span>
+                <span className="hidden sm:inline">Đặt câu hỏi</span>
+                <span className="sm:hidden">Đặt câu hỏi</span>
               </Button>
             </Link>
           ) : (
             <Link href="/login" className="w-full sm:w-auto">
               <Button variant="default">
-                <span className="hidden sm:inline">Ask Question</span>
-                <span className="sm:hidden">Ask Question</span>
+                <span className="hidden sm:inline">Đặt câu hỏi</span>
+                <span className="sm:hidden">Đặt câu hỏi</span>
               </Button>
             </Link>
           )}
@@ -75,7 +75,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
       <div className="flex justify-between items-center flex-wrap mb-8 lg:mb-7">
         <div className="space-y-1">
           <span className="font-bold text-2xl text-customBlue dark:text-white">
-            All Tickets
+            Tất cả yêu cầu hỗ trợ
             <small className="text-gray-500 dark:text-gray-400 text-base font-semibold ml-1">
               ({postCount})
             </small>
@@ -85,15 +85,15 @@ const BlogCard: React.FC<BlogCardProps> = ({
           {isAuthenticated ? (
             <Link href={route('posts.create')} className="w-full sm:w-auto">
                 <Button variant="default">
-                <span className="hidden sm:inline">Ask Question</span>
-                <span className="sm:hidden">Ask Question</span>
+                <span className="hidden sm:inline">Đặt câu hỏi</span>
+                <span className="sm:hidden">Đặt câu hỏi</span>
               </Button>
             </Link>
           ) : (
             <Link href="/login" className="w-full sm:w-auto">
               <Button variant="default">
-                <span className="hidden sm:inline">Ask Question</span>
-                <span className="sm:hidden">Ask Question</span>
+                <span className="hidden sm:inline">Đặt câu hỏi</span>
+                <span className="sm:hidden">Đặt câu hỏi</span>
               </Button>
             </Link>
           )}

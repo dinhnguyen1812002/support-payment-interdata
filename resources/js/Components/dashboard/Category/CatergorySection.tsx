@@ -111,7 +111,8 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
   });
 
   const handleCategorySelect = (slug: string) => {
-     router.get(`/categories/${slug}/posts`);
+    //  router.get(`/categories/${slug}/posts`);
+     router.get(`/tickets?category=${slug}&sortBy=latest`);
     setSelectedCategory(slug);
   };
 

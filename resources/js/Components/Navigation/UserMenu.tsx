@@ -33,7 +33,7 @@ export default function UserMenu({ logout }: UserMenuProps) {
         >
           <div className="hidden lg:block text-xs xl:text-sm text-left">
             <span className="text-gray-500 dark:text-gray-400 text-xs">
-              Hello,
+              Xin chào,
             </span>
             <div className="font-medium line-clamp-1 max-w-[100px] truncate">
               {page.props.auth.user?.name}

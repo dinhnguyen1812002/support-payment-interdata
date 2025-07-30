@@ -55,7 +55,7 @@ class CategoryController extends Controller
             'logo' => $logoPath,
         ]);
 
-        return redirect()->route('admin.categories')->with('success', 'Category created successfully.');
+        return redirect()->route('admin.categories')->with('success', 'Danh mục đã được tạo thành công.');
     }
 
     /**
@@ -102,7 +102,7 @@ class CategoryController extends Controller
         $category->update($validated);
 
         // Chuyển hướng về trang danh sách với thông báo thành công
-        return Redirect::route('admin.categories')->with('success', 'Category updated successfully.');
+        return Redirect::route('admin.categories')->with('success', 'Danh mục đã được cập nhật thành công.');
     }
 
     /**
@@ -119,7 +119,7 @@ class CategoryController extends Controller
         $category->delete();
 
         // Chuyển hướng về trang danh sách với thông báo thành công
-        return Redirect::route('admin.categories')->with('success', 'Category deleted successfully.');
+        return Redirect::route('admin.categories')->with('success', 'Danh mục đã được xóa thành công.');
     }
 
     /**
@@ -132,6 +132,6 @@ class CategoryController extends Controller
             $category->update(['logo' => null]);
         }
 
-        return response()->json(['success' => true, 'message' => 'Logo removed successfully.']);
+        return response()->json(['success' => true, 'message' => 'Logo đã được xóa thành công.']);
     }
 }

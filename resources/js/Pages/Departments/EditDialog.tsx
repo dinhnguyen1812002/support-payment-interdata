@@ -58,13 +58,13 @@ export function CreateDepartmentDialog({ open, onOpenChange }: CreateDepartmentD
         <Dialog open={open} onOpenChange={handleClose}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>Create Department</DialogTitle>
+                    <DialogTitle>Tạo phòng ban</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
                             <label htmlFor="name" className="text-sm font-medium">
-                                Name
+                                Tên
                             </label>
                             <Input
                                 id="name"
@@ -76,7 +76,7 @@ export function CreateDepartmentDialog({ open, onOpenChange }: CreateDepartmentD
                         </div>
                         <div className="grid gap-2">
                             <label htmlFor="description" className="text-sm font-medium">
-                                Description
+                                Mô tả
                             </label>
                             <Textarea
                                 id="description"
@@ -90,11 +90,11 @@ export function CreateDepartmentDialog({ open, onOpenChange }: CreateDepartmentD
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button type="button" variant="outline">
-                                Cancel
+                                Hủy
                             </Button>
                         </DialogClose>
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? "Creating..." : "Create Department"}
+                            {isSubmitting ? "Đang tạo..." : "Tạo phòng ban"}
                         </Button>
                     </DialogFooter>
                 </form>

@@ -43,7 +43,7 @@ const CreateTicket: React.FC<CreateTicketProps> = ({
   notifications,
   tags = [],
 }) => {
-  const title = 'Create New Ticket';
+  const title = 'Tạo yêu cầu hỗ trợ mới';
 
   const [selectedTag, setSelectedTag] = React.useState<number | null>(null);
 
@@ -92,7 +92,12 @@ const CreateTicket: React.FC<CreateTicketProps> = ({
       notifications={notifications}
       showSidebar={true} // Không hiển thị sidebar cho trang create
       backUrl="/tickets"
-      backLabel="Back to Tickets"
+      backLabel="Quay lại danh sách yêu cầu"
+      showTabs={false}
+      showCreateButton={false}
+      categories={categories}
+      tags={tags}
+      showLable={false}
     >
       <div className="container mx-auto lg:px-4">
         <div className="relative flex-1 mx-auto px-0 pl-6 lg:pl-5 mt-0 lg:w-full">
@@ -100,7 +105,7 @@ const CreateTicket: React.FC<CreateTicketProps> = ({
           <div className="">
             <CardHeader>
               <CardTitle className="text-2xl font-semibold">
-                Ask a Question
+                Đặt câu hỏi
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -111,14 +116,14 @@ const CreateTicket: React.FC<CreateTicketProps> = ({
                     htmlFor="title"
                     className="text-base font-bold text-customBlue1 flex"
                   >
-                    Title{' '}
+                    Tiêu đề{' '}
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <span className="text-red-500 mr-1">*</span>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Please enter a title</p>
+                          <p>Vui lòng nhập tiêu đề</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -127,7 +132,7 @@ const CreateTicket: React.FC<CreateTicketProps> = ({
                     id="title"
                     value={data.title}
                     onChange={e => setData('title', e.target.value)}
-                    placeholder="Your question title"
+                    placeholder="Tiêu đề câu hỏi của bạn"
                     className={cn(
                       'h-10 dark:text-[#9a9cae]',
                       errors.title && 'ring-2 ring-red-500',
@@ -146,14 +151,14 @@ const CreateTicket: React.FC<CreateTicketProps> = ({
                     htmlFor="content"
                     className="text-base font-bold text-customBlue1 flex"
                   >
-                    Question
+                    Câu hỏi
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <span className="text-red-500 mr-1">*</span>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p className="tt">Enter your question</p>
+                          <p className="tt">Nhập câu hỏi của bạn</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -189,14 +194,14 @@ const CreateTicket: React.FC<CreateTicketProps> = ({
                 {/* Tags */}
                 <div className="space-y-2 mt-10">
                   <Label className="text-base flex items-center mt-14 text-customBlue1 font-bold">
-                    Tags
+                    Thẻ
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <span className="text-red-500 mr-1">*</span>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Choose one tag</p>
+                          <p>Chọn một thẻ</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -206,7 +211,7 @@ const CreateTicket: React.FC<CreateTicketProps> = ({
                     options={tags}
                     selectedTag={selectedTag}
                     setSelectedTag={tagId => handleTagSelect(tagId)}
-                    placeholder="Choose a tag..."
+                    placeholder="Chọn một thẻ..."
                   />
 
                   {errors.tags && (
@@ -219,14 +224,14 @@ const CreateTicket: React.FC<CreateTicketProps> = ({
                 {/* Categories */}
                 <div className="space-y-2 mt-5">
                   <Label className="text-base flex items-center text-customBlue1 font-bold">
-                    Category
+                    Danh mục
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <span className="text-red-500 mr-1">*</span>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Choose at least one (max 3)</p>
+                          <p>Chọn ít nhất một (tối đa 3)</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -236,7 +241,7 @@ const CreateTicket: React.FC<CreateTicketProps> = ({
                     options={categories}
                     selectedItems={data.categories}
                     setSelectedItems={handleCategoryChange}
-                    placeholder="Search and select categories..."
+                    placeholder="Tìm kiếm và chọn danh mục..."
                     maxItems={1}
                   />
 
@@ -263,17 +268,17 @@ const CreateTicket: React.FC<CreateTicketProps> = ({
                       htmlFor="is_published"
                       className="font-medium cursor-pointer"
                     >
-                      Public
+                      Công khai
                     </Label>
                   </div>
                   <Button type="submit" disabled={processing} variant="default">
                     {processing ? (
                       <div className="flex items-center">
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        Processing...
+                        Đang xử lý...
                       </div>
                     ) : (
-                      'Submit'
+                      'Gửi'
                     )}
                   </Button>
                 </div>

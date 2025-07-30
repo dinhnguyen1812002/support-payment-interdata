@@ -21,7 +21,7 @@ export default function Welcome({
 
   return (
     <>
-      <Head title="Welcome" />
+      <Head title="Chào mừng" />
 
       <div className="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center
       dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
@@ -32,7 +32,7 @@ export default function Welcome({
                 href={route('dashboard')}
                 className="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
               >
-                Dashboard
+                Bảng điều khiển
               </Link>
             ) : (
               <>
@@ -40,7 +40,7 @@ export default function Welcome({
                   href={route('login')}
                   className="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                 >
-                  Log in
+                  Đăng nhập
                 </Link>
 
                 {canRegister ? (
@@ -48,7 +48,7 @@ export default function Welcome({
                     href={route('register')}
                     className="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
                   >
-                    Register
+                    Đăng ký
                   </Link>
                 ) : null}
               </>

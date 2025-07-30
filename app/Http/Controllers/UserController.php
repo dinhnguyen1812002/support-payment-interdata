@@ -38,6 +38,7 @@ class UserController extends UserProfileController
                     'created_at' => Carbon::parse($post->created_at)->format('d/m/Y'),
                     'deleted_at' => Carbon::parse($post->deleted_at)->format('d/m/Y'),
                     'is_published' => $post->is_published,
+                    'status' => $post->status,
                     'comments_count' => $post->comments_count,
                     'upvotes_count' => $post->upvotes_count,
                     'slug' => $post->slug,

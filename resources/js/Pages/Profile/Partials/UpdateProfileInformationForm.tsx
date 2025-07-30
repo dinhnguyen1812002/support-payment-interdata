@@ -85,14 +85,14 @@ export default function UpdateProfileInformationForm({ user }: Props) {
       renderActions={() => (
         <>
           <ActionMessage on={form.recentlySuccessful} className="mr-3">
-            Saved.
+            Đã lưu.
           </ActionMessage>
 
           <PrimaryButton
             className={classNames({ 'opacity-25': form.processing })}
             disabled={form.processing}
           >
-            Save
+            Lưu
           </PrimaryButton>
         </>
       )}
@@ -108,7 +108,7 @@ export default function UpdateProfileInformationForm({ user }: Props) {
             onChange={updatePhotoPreview}
           />
 
-          <InputLabel htmlFor="photo" value="Photo" />
+          <InputLabel htmlFor="photo" value="Ảnh đại diện" />
 
           {photoPreview ? (
             // <!-- New Profile Photo Preview -->
@@ -139,7 +139,7 @@ export default function UpdateProfileInformationForm({ user }: Props) {
             type="button"
             onClick={selectNewPhoto}
           >
-            Select A New Photo
+            Chọn ảnh mới
           </SecondaryButton>
 
           {user.profile_photo_path ? (
@@ -148,7 +148,7 @@ export default function UpdateProfileInformationForm({ user }: Props) {
               className="mt-2"
               onClick={deletePhoto}
             >
-              Remove Photo
+              Xóa ảnh
             </SecondaryButton>
           ) : null}
 
@@ -158,7 +158,7 @@ export default function UpdateProfileInformationForm({ user }: Props) {
 
       {/* <!-- Name --> */}
       <div className="col-span-6 sm:col-span-4">
-        <InputLabel htmlFor="name" value="Name" />
+        <InputLabel htmlFor="name" value="Tên" />
         <TextInput
           id="name"
           type="text"
@@ -186,7 +186,7 @@ export default function UpdateProfileInformationForm({ user }: Props) {
         user.email_verified_at === null ? (
           <div>
             <p className="mt-2 text-sm dark:text-white">
-              Your email address is unverified.
+              Địa chỉ email của bạn chưa được xác minh.
               <Link
                 href={route('verification.send')}
                 method="post"
@@ -197,12 +197,12 @@ export default function UpdateProfileInformationForm({ user }: Props) {
                   setVerificationLinkSent(true);
                 }}
               >
-                Click here to re-send the verification email.
+                Nhấp vào đây để gửi lại email xác minh.
               </Link>
             </p>
             {verificationLinkSent && (
               <div className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
-                A new verification link has been sent to your email address.
+                Một liên kết xác minh mới đã được gửi đến địa chỉ email của bạn.
               </div>
             )}
           </div>

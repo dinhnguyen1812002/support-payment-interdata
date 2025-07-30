@@ -268,6 +268,7 @@ export interface Post {
   slug: string;
   upvotes_count: number;
   deleted_at: string;
+  status: string
 }
 
 export interface Department {

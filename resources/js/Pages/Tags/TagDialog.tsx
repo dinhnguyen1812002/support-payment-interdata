@@ -58,17 +58,17 @@ export function TagDialog({ isOpen, onClose, tag }: TagDialogProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Tag' : 'Create New Tag'}</DialogTitle>
+          <DialogTitle>{isEditing ? 'Chỉnh sửa thẻ' : 'Tạo thẻ mới'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">Tag Name</Label>
+              <Label htmlFor="name">Tên thẻ</Label>
               <Input
                 id="name"
                 value={data.name}
                 onChange={e => setData('name', e.target.value)}
-                placeholder="Enter tag name"
+                placeholder="Nhập tên thẻ"
                 className={errors.name ? 'border-destructive' : ''}
               />
               {errors.name && (
@@ -78,10 +78,10 @@ export function TagDialog({ isOpen, onClose, tag }: TagDialogProps) {
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              Hủy
             </Button>
             <Button type="submit" disabled={processing}>
-              {isEditing ? 'Update' : 'Create'}
+              {isEditing ? 'Cập nhật' : 'Tạo'}
             </Button>
           </DialogFooter>
         </form>

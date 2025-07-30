@@ -91,7 +91,7 @@ export default function UsersTable({
         <CardContent className="flex items-center justify-center h-64">
           <div className="flex flex-col items-center gap-2">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <div className="text-muted-foreground">Loading users data...</div>
+            <div className="text-muted-foreground">Đang tải dữ liệu người dùng...</div>
           </div>
         </CardContent>
       </Card>
@@ -100,7 +100,7 @@ export default function UsersTable({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat('vi-VN', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -142,10 +142,10 @@ export default function UsersTable({
           <div>
             <CardTitle className="text-xl flex items-center gap-2">
               <Users className="h-5 w-5 text-primary" />
-              User Management
+              Quản lý người dùng
             </CardTitle>
             <CardDescription className="mt-1">
-              Manage your users and their roles
+              Quản lý người dùng và vai trò của họ
             </CardDescription>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
@@ -153,7 +153,7 @@ export default function UsersTable({
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search users..."
+                placeholder="Tìm kiếm người dùng..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
@@ -164,14 +164,14 @@ export default function UsersTable({
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="shrink-0">
                   <Filter className="h-4 w-4" />
-                  <span className="sr-only">Filter</span>
+                  <span className="sr-only">Bộ lọc</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>All Users</DropdownMenuItem>
-                <DropdownMenuItem>Admins</DropdownMenuItem>
-                <DropdownMenuItem>Editors</DropdownMenuItem>
-                <DropdownMenuItem>Users</DropdownMenuItem>
+                <DropdownMenuItem>Tất cả người dùng</DropdownMenuItem>
+                <DropdownMenuItem>Quản trị viên</DropdownMenuItem>
+                <DropdownMenuItem>Biên tập viên</DropdownMenuItem>
+                <DropdownMenuItem>Người dùng</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -183,11 +183,11 @@ export default function UsersTable({
             <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead className="w-[80px]"></TableHead>
-                <TableHead>Name</TableHead>
+                <TableHead>Tên</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Roles</TableHead>
+                <TableHead>Vai trò</TableHead>
                 <TableHead className="hidden md:table-cell">
-                  Created At
+                  Ngày tạo
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -239,7 +239,7 @@ export default function UsersTable({
                           })
                         ) : (
                           <span className="text-muted-foreground text-xs px-2 py-1 bg-muted rounded-full">
-                            No role
+                            Không có vai trò
                           </span>
                         )}
                       </div>
@@ -255,7 +255,7 @@ export default function UsersTable({
                     <div className="flex flex-col items-center justify-center gap-2">
                       <Users className="h-8 w-8 text-muted-foreground/50" />
                       <p className="text-muted-foreground">
-                        No users found matching your criteria.
+                        Không tìm thấy người dùng phù hợp với tiêu chí của bạn.
                       </p>
                       <Button
                         variant="outline"
@@ -263,7 +263,7 @@ export default function UsersTable({
                         onClick={() => Inertia.get('/users')}
                         className="mt-2"
                       >
-                        Reset filters
+                        Đặt lại bộ lọc
                       </Button>
                     </div>
                   </TableCell>
@@ -287,19 +287,19 @@ export default function UsersTable({
                   <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
-              <span className="text-sm text-muted-foreground">per page</span>
+              <span className="text-sm text-muted-foreground">mỗi trang</span>
             </div>
 
             <div className="text-sm text-muted-foreground">
-              Showing{' '}
+              Hiển thị{' '}
               <span className="font-medium">
                 {(users.current_page - 1) * users.per_page + 1}
               </span>{' '}
-              to{' '}
+              đến{' '}
               <span className="font-medium">
                 {Math.min(users.current_page * users.per_page, users.total)}
               </span>{' '}
-              of <span className="font-medium">{users.total}</span> users
+              trong tổng số <span className="font-medium">{users.total}</span> người dùng
             </div>
 
             <div className="flex items-center gap-2">
@@ -312,12 +312,12 @@ export default function UsersTable({
                 disabled={!users.prev_page_url}
               >
                 <ChevronLeft className="h-4 w-4" />
-                <span className="sr-only">Previous page</span>
+                <span className="sr-only">Trang trước</span>
               </Button>
 
               <span className="text-sm">
-                Page <span className="font-medium">{users.current_page}</span>{' '}
-                of <span className="font-medium">{users.last_page}</span>
+                Trang <span className="font-medium">{users.current_page}</span>{' '}
+                trong tổng số <span className="font-medium">{users.last_page}</span>
               </span>
 
               <Button
@@ -329,7 +329,7 @@ export default function UsersTable({
                 disabled={!users.next_page_url}
               >
                 <ChevronRight className="h-4 w-4" />
-                <span className="sr-only">Next page</span>
+                <span className="sr-only">Trang sau</span>
               </Button>
             </div>
           </div>
