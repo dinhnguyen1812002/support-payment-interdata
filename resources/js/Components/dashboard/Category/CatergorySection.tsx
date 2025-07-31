@@ -1,99 +1,15 @@
 import React, { useState } from 'react';
 import { Search, Filter, HelpCircle, Settings, Bug, CreditCard, Shield, Smartphone, Globe, MessageSquare, FileText, Headphones, Moon, Sun, Plus } from 'lucide-react';
 import DashboardCategoryCard from './DashboardCategoryCard';
-import { Category } from '@/types';
+import { Category, Tag } from '@/types';
 import { useDarkMode } from '@/Hooks/useDarkMode';
 import { Link, router } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
+import { CreateTicketDialog } from '@/Pages/Ticket/Create';
 
 
-// const categories = [
-//   {
-//     id: '1',
-//     name: 'Technical Support',
-//     description: 'Get help with technical issues, bugs, and system problems',
-//     icon: <Settings className="w-6 h-6" />,
-//     responseTime: '2-4 hours',
-//     priority: 'high' as const,
-//     ticketCount: 1247,
-//     popular: true
-//   },
-//   {
-//     id: '2',
-//     name: 'Bug Report',
-//     description: 'Report software bugs, glitches, or unexpected behavior',
-//     icon: <Bug className="w-6 h-6" />,
-//     responseTime: '1-2 hours',
-//     priority: 'urgent' as const,
-//     ticketCount: 892
-//   },
-//   {
-//     id: '3',
-//     name: 'Billing & Payments',
-//     description: 'Questions about billing, payments, refunds, and subscriptions',
-//     icon: <CreditCard className="w-6 h-6" />,
-//     responseTime: '4-6 hours',
-//     priority: 'medium' as const,
-//     ticketCount: 634,
-//     popular: true
-//   },
-//   {
-//     id: '4',
-//     name: 'Security & Privacy',
-//     description: 'Security concerns, privacy questions, and account safety',
-//     icon: <Shield className="w-6 h-6" />,
-//     responseTime: '1-3 hours',
-//     priority: 'high' as const,
-//     ticketCount: 423
-//   },
-//   {
-//     id: '5',
-//     name: 'Mobile App',
-//     description: 'Issues specific to mobile applications and mobile experience',
-//     icon: <Smartphone className="w-6 h-6" />,
-//     responseTime: '3-5 hours',
-//     priority: 'medium' as const,
-//     ticketCount: 567
-//   },
-//   {
-//     id: '6',
-//     name: 'Website Issues',
-//     description: 'Problems with website functionality, loading, or navigation',
-//     icon: <Globe className="w-6 h-6" />,
-//     responseTime: '2-4 hours',
-//     priority: 'medium' as const,
-//     ticketCount: 789
-//   },
-//   {
-//     id: '7',
-//     name: 'Feature Request',
-//     description: 'Suggest new features or improvements to existing functionality',
-//     icon: <MessageSquare className="w-6 h-6" />,
-//     responseTime: '1-2 days',
-//     priority: 'low' as const,
-//     ticketCount: 1156
-//   },
-//   {
-//     id: '8',
-//     name: 'Documentation',
-//     description: 'Questions about documentation, guides, and how-to resources',
-//     icon: <FileText className="w-6 h-6" />,
-//     responseTime: '6-8 hours',
-//     priority: 'low' as const,
-//     ticketCount: 345
-//   },
-//   {
-//     id: '9',
-//     name: 'General Inquiry',
-//     description: 'General questions and inquiries that don\'t fit other categories',
-//     icon: <HelpCircle className="w-6 h-6" />,
-//     responseTime: '4-8 hours',
-//     priority: 'low' as const,
-//     ticketCount: 892
-//   }
-// ];
 
-const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) => {
+const CategorySelection: React.FC <{categories: Category[], tags: Tag[]}> = ({ categories, tags }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('all');
@@ -168,26 +84,28 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-end mb-8">
           {/* Search */}
-          <div className="relative flex-1 max-w-md flex justify-end">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search categories..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 
-              rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 dark:text-white shadow-sm"
-            />
-              <Link href="/posts/create" className="w-full sm:w-auto ml-2">
-             {/* <Button className="h-full  rounded-xl dark:bg-gray-700 dark:text-white" variant={"outline"} >
-                <Plus className="h-4 w-4 mr-2" />
-            Tạo ticket
-            </Button> */}
-            <Button className="h-full rounded-xl ">
-              <Plus className="h-4 w-4 mr-2" />
-            Tạo ticket
-            </Button>
-            </Link>
+          <div className="relative flex-1 max-w-md flex items-center">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search categories..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-10 pl-10 pr-4 border border-gray-200 dark:border-gray-600 
+                rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white
+                dark:bg-gray-700 dark:text-white shadow-sm"
+              />
+            </div>
+
+            <div className='ml-2'>
+              <CreateTicketDialog
+                categories={categories}
+                tags={tags}
+              />
+            </div>
+             
+             
           </div>
           
           
@@ -232,40 +150,6 @@ const CategorySelection: React.FC <{categories: Category[]}> = ({ categories }) 
         )}
       </div>
 
-      {/* Continue Button */}
-      {/* {selectedCategory && (
-        <div className="fixed bottom-6 right-6 z-30">
-          <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl px-8 py-4 shadow-xl transition-all duration-200 flex items-center gap-3 font-semibold">
-            <span>Continue with {selectedCategoryData?.name}</span>
-            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-          </button>
-        </div>
-      )} */}
-
-      {/* Quick Stats */}
-      {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Support Statistics</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">2.4h</div>
-              <div className="text-sm text-gray-600">Avg Response Time</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">94%</div>
-              <div className="text-sm text-gray-600">Resolution Rate</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">4.8/5</div>
-              <div className="text-sm text-gray-600">Customer Rating</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">24/7</div>
-              <div className="text-sm text-gray-600">Support Available</div>
-            </div>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 };

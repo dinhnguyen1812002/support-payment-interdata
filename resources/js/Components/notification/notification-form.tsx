@@ -34,7 +34,10 @@ export default function NotificationForm({
                         <p className="text-sm text-muted-foreground">
                             Slug: <span className="font-mono text-xs">{slug}</span>
                         </p>
-                        <p className="text-xs text-muted-foreground">{formatDistanceToNow(dateTime, { addSuffix: true })}</p>
+                        <p className="text-xs text-muted-foreground">
+                         
+                            {dateTime.toISOString()}
+                         </p>
                     </div>
                 </div>
             </CardContent>

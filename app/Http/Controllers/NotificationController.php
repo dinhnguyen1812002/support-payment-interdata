@@ -48,9 +48,8 @@ class NotificationController extends Controller
                         'id' => $notification->id,
                         'type' => class_basename($notification->type),
                         'data' => $notification->data,
-                        'read_at' => $notification->read_at,
+                        'read_at' => $notification->read_at ? $notification->read_at->diffForHumans() : null,
                         'created_at' => $notification->created_at->diffForHumans(),
-                        'time' => $notification->created_at->diffForHumans(),
                     ];
                 });
 

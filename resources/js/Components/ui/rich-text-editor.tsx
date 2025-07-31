@@ -110,8 +110,8 @@ export function RichTextEditor({
         contentEditable={!disabled}
         className={cn(
           'p-3 outline-none overflow-y-auto',
-          'prose prose-sm max-w-none',
-          'focus:ring-0',
+          'prose prose-base max-w-none dark:prose-invert',
+          'focus:ring-0 text-foreground text-base',
           disabled && 'opacity-50 cursor-not-allowed'
         )}
         style={{ 
@@ -125,14 +125,8 @@ export function RichTextEditor({
         suppressContentEditableWarning={true}
       />
 
-      {/* Placeholder styling */}
-      <style jsx>{`
-        [contenteditable]:empty:before {
-          content: attr(data-placeholder);
-          color: #9ca3af;
-          pointer-events: none;
-        }
-      `}</style>
+      
+      
     </div>
   );
 }

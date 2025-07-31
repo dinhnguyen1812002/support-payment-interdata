@@ -10,13 +10,13 @@ import React from "react"
 import AppLayout from "@/Layouts/AppLayout"
 import CategoryTable from "@/Components/dashboard/Category/category-table"
 import CatergorySection from "@/Components/dashboard/Category/CatergorySection"
-import { Category } from "@/types"
+import { Category, Tag } from "@/types"
 
 
-export default function Page({categories}: {categories: Category[]  }) {
+export default function Page({categories,tags}: {categories: Category[]  ,tags: Tag[]}) {
   return (
     <AppLayout title={"Hệ thống hỗ trợ khách hàng"} canLogin={true} canRegister={true} notifications={[]}>
-        <CatergorySection   categories={categories}/>
+        <CatergorySection   categories={categories} tags={tags}/>
     </AppLayout>
   )
 }
