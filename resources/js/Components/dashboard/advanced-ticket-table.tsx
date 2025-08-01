@@ -5,12 +5,12 @@ import { Input } from '@/Components/ui/input';
 import { Badge } from '@/Components/ui/badge';
 import { Checkbox } from '@/Components/ui/checkbox';
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from '@/Components/ui/select';
 import {
   DropdownMenu,
@@ -28,13 +28,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/Components/ui/table';
-import { 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
-  UserPlus, 
-  Edit, 
-  Trash2, 
+import {
+  Search,
+  MoreHorizontal,
+  UserPlus,
+  Trash2,
   AlertTriangle,
   Clock,
   CheckCircle,
@@ -51,6 +49,7 @@ import { Link, router } from '@inertiajs/react';
 import { StatusUpdateDropdown } from './status-update-dropdown';
 import { getPriorityColor } from '@/Utils/utils';
 import { route } from 'ziggy-js';
+import useTypedPage from '@/Hooks/useTypedPage';
 
 
 interface Post {
@@ -78,13 +77,35 @@ interface Post {
   priority_score?: number;
 }
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  roles: Array<{ name: string }>;
+  profile_photo_url: string | null;
+}
+
 interface AdvancedTicketTableProps {
   posts: Post[];
   refreshKey?: number;
   onRefresh?: () => void;
+  currentUser?: User;
+  assignableUsers?: Array<{
+    id: number;
+    name: string;
+    email: string;
+    profile_photo_url: string | null;
+  }>;
 }
 
-export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: AdvancedTicketTableProps) {
+export function AdvancedTicketTable({
+  posts,
+  refreshKey = 0,
+  onRefresh,
+  assignableUsers = []
+}: AdvancedTicketTableProps) {
+  const page = useTypedPage();
+  const isAdmin = page.props.auth.user?.roles?.some((role: any) => role.name === 'admin');
   const [selectedTickets, setSelectedTickets] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -96,22 +117,27 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isLoading, setIsLoading] = useState(false);
 
+
+
   // Filter and sort tickets
   const filteredTickets = useMemo(() => {
     let filtered = posts.filter(ticket => {
       const matchesSearch = ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           ticket.user.name.toLowerCase().includes(searchTerm.toLowerCase());
+        ticket.user.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter;
       const matchesPriority = priorityFilter === 'all' || ticket.priority === priorityFilter;
-      const matchesAssignee = assigneeFilter === 'all' || 
-                             (assigneeFilter === 'unassigned' && !ticket.assignee) ||
-                             (ticket.assignee && ticket.assignee.id.toString() === assigneeFilter);
+
+      const matchesAssignee = assigneeFilter === 'all' ||
+        (assigneeFilter === 'unassigned' && !ticket.assignee) ||
+        (ticket.assignee && ticket.assignee.id.toString() === assigneeFilter);
+
       const matchesDepartment = departmentFilter === 'all' ||
-                               (ticket.department && ticket.department.id.toString() === departmentFilter);
+        (ticket.department && ticket.department.id.toString() === departmentFilter);
+
       const matchesCategory = categoryFilter === 'all' ||
-                             ((ticket as any).categories && (ticket as any).categories.some((cat: any) =>
-                               cat.slug === categoryFilter || cat.id.toString() === categoryFilter
-                             ));
+        ((ticket as any).categories && (ticket as any).categories.some((cat: any) =>
+          cat.slug === categoryFilter || cat.id.toString() === categoryFilter
+        ));
 
       return matchesSearch && matchesStatus && matchesPriority && matchesAssignee && matchesDepartment && matchesCategory;
     });
@@ -119,7 +145,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
     // Sort tickets
     filtered.sort((a, b) => {
       let aValue: any, bValue: any;
-      
+
       switch (sortBy) {
         case 'priority_score':
           aValue = a.priority_score || 0;
@@ -157,7 +183,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
     const assignees = posts
       .filter(p => p.assignee)
       .map(p => p.assignee!)
-      .filter((assignee, index, self) => 
+      .filter((assignee, index, self) =>
         index === self.findIndex(a => a.id === assignee.id)
       );
     return assignees;
@@ -167,7 +193,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
     const departments = posts
       .filter(p => p.department)
       .map(p => p.department!)
-      .filter((dept, index, self) => 
+      .filter((dept, index, self) =>
         index === self.findIndex(d => d.id === dept.id)
       );
     return departments;
@@ -267,7 +293,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
       default: return <MessageSquare className="h-3 w-3" />;
     }
   };
-
+  console.log('assignableUsers:', assignableUsers);
   return (
     <Card className="w-full">
       <CardHeader>
@@ -308,7 +334,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
               />
             </div>
           </div>
-          
+
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="Status" />
@@ -340,7 +366,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
               <SelectValue placeholder="Assignee" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Nhượng quyền</SelectItem>
+              <SelectItem value="all">Tất cả</SelectItem>
               <SelectItem value="unassigned">Chưa được chỉ định</SelectItem>
               {uniqueAssignees.map(assignee => (
                 <SelectItem key={assignee.id} value={assignee.id.toString()}>
@@ -371,38 +397,46 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
             <span className="text-sm font-medium">
               {selectedTickets.length} ticket{selectedTickets.length > 1 ? 's' : ''} selected
             </span>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Nhượng quyền
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>Nhượng quyền cho</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {uniqueAssignees.map(assignee => (
-                  <DropdownMenuItem 
-                    key={assignee.id}
-                    onClick={() => handleBulkAssign(assignee.id)}
-                  >
-                    <Avatar className="h-6 w-6 mr-2">
-                      {/* <AvatarImage src={'/storage/$} alt={assignee.name} /> */}
-                      <AvatarImage src={ assignee.profile_photo_url  || ''} />
-                      <AvatarFallback>{assignee.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    {assignee.name}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+
+            {isAdmin && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" disabled={!assignableUsers.length}>
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Giao việc
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>Giao việc cho</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {assignableUsers.length > 0 ? (
+                    assignableUsers.map(assignee => (
+                      <DropdownMenuItem
+                        key={assignee.id}
+                        onClick={() => handleBulkAssign(assignee.id)}
+                        className="cursor-pointer"
+                      >
+                        <Avatar className="h-6 w-6 mr-2">
+                          <AvatarImage src={assignee.profile_photo_url || ''} alt={assignee.name} />
+                          <AvatarFallback>{assignee.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        {assignee.name}
+                      </DropdownMenuItem>
+                    ))
+                  ) : (
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                      Không có nhân viên nào để giao việc
+                    </div>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                   <Settings className="h-4 w-4 mr-2" />
-                 Trạng thái
+                  Trạng thái
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -448,9 +482,9 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setSelectedTickets([])}
             >
               Xóa lựa chọn
@@ -469,7 +503,7 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
-                <TableHead 
+                <TableHead
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => {
                     setSortBy('title');
@@ -478,11 +512,11 @@ export function AdvancedTicketTable({ posts, refreshKey = 0, onRefresh }: Advanc
                 >
                   Ticket
                 </TableHead>
-               
+
                 <TableHead>Người nhận</TableHead>
                 <TableHead>Phòng ban</TableHead>
 
-                <TableHead 
+                <TableHead
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => {
                     setSortBy('created_at');

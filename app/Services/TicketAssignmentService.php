@@ -17,6 +17,19 @@ class TicketAssignmentService
         try {
             $ticket = Post::findOrFail($data['ticket_id']);
             $assignee = User::findOrFail($data['assignee_id']);
+            $currentUser = auth()->user();
+
+            // Check if current user is admin
+            if (!$currentUser->hasRole('admin')) {
+                throw new \Exception('Only admin users can assign tickets');
+            }
+
+            // Check if assignee has employee role
+            if (!$assignee->hasRole('employee')) {
+                throw new \Exception('You can only assign tickets to employees');
+            }
+
+
 
             $ticket->update([
                 'assignee_id' => $data['assignee_id'],
@@ -56,6 +69,19 @@ class TicketAssignmentService
     public function bulkAssign(array $data): array
     {
         try {
+            $currentUser = auth()->user();
+            $assignee = User::findOrFail($data['assignee_id']);
+
+            // Check if current user is admin
+            if (!$currentUser->hasRole('admin')) {
+                throw new \Exception('Only admin users can assign tickets');
+            }
+
+            // Check if assignee has employee role
+            if (!$assignee->hasRole('employee')) {
+                throw new \Exception('You can only assign tickets to employees');
+            }
+
             DB::beginTransaction();
 
             $assignedCount = 0;
@@ -73,7 +99,7 @@ class TicketAssignmentService
                     $failedTickets[] = $ticketId;
                 }
             }
-
+  
             DB::commit();
 
             Log::info('Bulk ticket assignment completed', [

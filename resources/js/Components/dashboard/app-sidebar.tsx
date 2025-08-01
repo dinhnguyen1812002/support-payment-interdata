@@ -110,7 +110,7 @@ const data = {
       items: [
         {
           title: 'Người dùng',
-          url: '/users',
+          url: '/admin/users',
         },
         {
           title: 'Quyền và Vai trò',
@@ -163,6 +163,8 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
+  
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>

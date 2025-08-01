@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tag;
+use App\Models\Tags;
+use App\Models\User;
 use App\Services\AdminService;
 use App\Services\CategoryService;
 use App\Services\TicketAutomationService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
+use Illuminate\Support\Facades\Gate;
 class AdminController extends Controller
 {
     use AuthorizesRequests;
@@ -35,12 +36,19 @@ class AdminController extends Controller
     {
         $this->authorize('view admin dashboard');
 
+        $assignableUsers = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['admin', 'employee']);
+        })->get(['id', 'name', 'email', 'profile_photo_path']);
+
         $data = $this->adminService->getDashboardData(auth()->user());
         // $data['posts'] = $this->adminService->getTopPosts();
         // Add automation stats to dashboard
         $data['automation_stats'] = $this->automationService->getAutomationStats();
 
-        return Inertia::render('Admin/Dashboard', $data);
+        return Inertia::render('Admin/Dashboard', [
+            'assignableUsers' => $assignableUsers,
+            "data"=> $data
+        ]);
 
     }
 
@@ -104,8 +112,12 @@ class AdminController extends Controller
 
     public function getAllRolesAndPermissions(Request $request)
     {
-        $this->authorize('view admin dashboard');
-
+        if(!auth()->user()->hasrole('admin')) {
+            return "use dont have permission to be here";
+        }
+        
+      
+     
         $perPage = $request->input('per_page', 10);
         $search = $request->input('search', '');
         $page = $request->input('page', 1);

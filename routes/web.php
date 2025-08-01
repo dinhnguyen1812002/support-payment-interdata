@@ -226,7 +226,7 @@ Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store
 //     Route::get('/api/tickets/my/data', [\App\Http\Controllers\PostController::class, 'getMyTicketsData'])->name('tickets.my.data')->middleware('auth');
 // });
 
-Route::get('/users', [UserController::class, 'index'])->name('users.index');
+Route::get('/admin/users', [UserController::class, '/admin/tickets/bulk-assign'])->name('users.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/departments/{slug}', [DepartmentController::class, 'show'])->name('departments.show');

@@ -31,9 +31,9 @@ class RoleController extends Controller
             'role' => 'required|string|exists:roles,name',
         ]);
 
-        // Chỉ admin có thể gán vai trò
-        if (! auth()->user()->hasRole('admin')) {
-            throw UnauthorizedException::forRoles(['admin']);
+        // Chỉ admin hoặc employee có thể gán vai trò
+        if (! (auth()->user()->hasRole('admin') || auth()->user()->hasRole('employee'))) {
+            throw UnauthorizedException::forRoles(['admin', 'employee']);
         }
 
         // Tìm user theo ID

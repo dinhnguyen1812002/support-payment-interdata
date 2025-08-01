@@ -33,17 +33,8 @@ export function defineRulesFor(user: User | null): AppAbility {
     return build();
   }
 
-  // Kiểm tra xem user có role admin không
-  const isAdmin = user.roles.some(role => role.name === 'admin');
-  
-  if (isAdmin) {
-    // Admin có thể làm mọi thứ
-    can('manage', 'all');
-    return build();
-  }
-
-  // Kiểm tra xem user có role Department Manager không
-  const isDepartmentManager = user.roles.some(role => role.name === 'Department Manager');
+  // Check if user has roles and if they are a Department Manager
+  const isDepartmentManager = user.roles?.some(role => role.name === 'Department Manager') ?? false;
   
   if (isDepartmentManager) {
     can('read', 'Department');
@@ -52,18 +43,22 @@ export function defineRulesFor(user: User | null): AppAbility {
     can('update', 'User');
   }
 
-  // Thêm quyền dựa trên permissions của user
-  user.permissions.forEach(permission => {
-    // Chuyển đổi tên permission thành actions và subjects
-    // Ví dụ: "create-post" -> ["create", "Post"]
-    const parts = permission.name.split('-');
-    if (parts.length === 2) {
-      const action = parts[0] as Actions;
-      // Chuyển đổi subject thành PascalCase
-      const subject = parts[1].charAt(0).toUpperCase() + parts[1].slice(1) as Subjects;
-      can(action, subject);
-    }
-  });
+  // Add permissions based on user's permissions if they exist
+  if (user.permissions && Array.isArray(user.permissions)) {
+    user.permissions.forEach(permission => {
+      if (permission?.name) {
+        // Convert permission name to action and subject
+        // Example: "create-post" -> ["create", "Post"]
+        const parts = permission.name.split('-');
+        if (parts.length === 2) {
+          const action = parts[0] as Actions;
+          // Convert subject to PascalCase
+          const subject = parts[1].charAt(0).toUpperCase() + parts[1].slice(1) as Subjects;
+          can(action, subject);
+        }
+      }
+    });
+  }
 
   // Người dùng luôn có thể đọc bài viết
   can('read', 'Post');

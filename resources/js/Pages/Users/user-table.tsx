@@ -82,7 +82,7 @@ export default function UsersTable({
   const [search, setSearch] = useState(keyword);
 
   const handleSearch = () => {
-    Inertia.get('/users', { search }, { preserveState: true });
+    Inertia.get('/admin/users', { search }, { preserveState: true });
   };
 
   if (!users || !users.data) {
@@ -183,6 +183,7 @@ export default function UsersTable({
             <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead className="w-[80px]"></TableHead>
+                <TableHead>Ảnh</TableHead>
                 <TableHead>Tên</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Vai trò</TableHead>
@@ -217,7 +218,19 @@ export default function UsersTable({
                         square={true}
                       /> */}
                     </TableCell>
-                    <TableCell className="font-medium">{user.name}</TableCell>
+                    <TableCell className="font-medium">
+                    
+                      <AvatarWithFallback 
+                      name={user.name}
+                      src={user.profile_photo_path ? `/storage/${user.profile_photo_path}` : null}
+                      variant="geometric"
+                     square={true}
+                    />
+                  
+                      </TableCell>
+                    <TableCell className="font-medium">
+                      {user.name}
+                      </TableCell>
                     <TableCell className="text-muted-foreground">
                       {user.email}
                     </TableCell>
