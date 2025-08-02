@@ -293,7 +293,7 @@ export function AdvancedTicketTable({
       default: return <MessageSquare className="h-3 w-3" />;
     }
   };
-  console.log('assignableUsers:', assignableUsers);
+
   return (
     <Card className="w-full">
       <CardHeader>
