@@ -167,7 +167,7 @@ export default function Page({ data, assignableUsers = [] }: DashboardProps) {
                       <AlertTriangle className="h-5 w-5 text-red-600" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-red-800 dark:text-red-200">
-                          {ticketStats.urgentTickets} ticket khẩn cấp cần được xử lý ngay lập tức
+                          {ticketStats.urgentTickets} ticket khẩn cấp
                         </p>
                       </div>
                       <Badge variant="destructive">{ticketStats.urgentTickets}</Badge>
